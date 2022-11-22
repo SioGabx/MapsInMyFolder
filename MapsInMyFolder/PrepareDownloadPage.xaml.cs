@@ -392,6 +392,7 @@ namespace MapsInMyFolder
                             }
                         }
                     }
+                    center_view_city = "";
                     return;
                 }
                 catch (Exception ex)

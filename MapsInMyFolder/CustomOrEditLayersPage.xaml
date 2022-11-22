@@ -206,7 +206,7 @@
                             <RowDefinition Height="*" />
                             <RowDefinition/>
                         </Grid.RowDefinitions>
-                        <Label Content="PBF Tiles style (json) :" Foreground="#888989" Grid.Row="0"></Label>
+                        <Label Content="PBF Tiles style (json ou chemin d'accès) :" Foreground="#888989" Grid.Row="0"></Label>
                         <TextBox x:Name="TextboxSpecialOptionPBFJsonStyle" Height="Auto"  HorizontalAlignment="Stretch" TextWrapping="NoWrap" Grid.Row="1" 
                                  Style="{DynamicResource TextBoxCleanStyle_13}" Padding="5,5,13,15" Cursor="IBeam" AcceptsReturn="True" AcceptsTab="True" 
                                  AutoWordSelection="False" HorizontalScrollBarVisibility="Auto" MinHeight="80" MaxHeight="500" SpellCheck.IsEnabled="False"  

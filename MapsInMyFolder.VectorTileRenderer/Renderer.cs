@@ -71,11 +71,12 @@ namespace MapsInMyFolder.VectorTileRenderer
             public bool GenerateCanvas;
             public double OverflowTextCorrectingValue;
             public double TextSizeMultiplicateur;
+            public int TileSize;
             public int ImgCenterPositionX;
             public int ImgCenterPositionY;
 
 
-            public ROptions(int ImgPositionX = 0, int ImgPositionY = 0,int ImgCenterPositionX = 0, int ImgCenterPositionY = 0,int NbrTileHeightWidth = 1, bool GenerateCanvas = true, double OverflowTextCorrectingValue = 0.2, double TextSizeMultiplicateur = 1)
+            public ROptions(int ImgPositionX = 0, int ImgPositionY = 0,int ImgCenterPositionX = 0, int ImgCenterPositionY = 0,int NbrTileHeightWidth = 1, int TileSize = 256, bool GenerateCanvas = true, double OverflowTextCorrectingValue = 0.2, double TextSizeMultiplicateur = 1)
             {
                 this.OverflowTextCorrectingValue = OverflowTextCorrectingValue;
                 this.ImgPositionX = ImgPositionX;
@@ -84,6 +85,7 @@ namespace MapsInMyFolder.VectorTileRenderer
                 this.ImgCenterPositionY = ImgCenterPositionY;
                 this.GenerateCanvas = GenerateCanvas;
                 this.NbrTileHeightWidth = NbrTileHeightWidth;
+                this.TileSize = TileSize;
                 this.TextSizeMultiplicateur = TextSizeMultiplicateur;
             }
         }
@@ -102,97 +104,95 @@ namespace MapsInMyFolder.VectorTileRenderer
             public Brush Brush { get; set; } = null;
         }
 
-        public async static Task<BitmapSource> RenderCached(string cachePath, Style style, ICanvas canvas, int x, int y, double zoom, double sizeX = 512, double sizeY = 512, double scale = 1, List<string> whiteListLayers = null)
-        {
-            string layerString = whiteListLayers == null ? "" : string.Join(",-", whiteListLayers.ToArray());
+        //public async static Task<BitmapSource> RenderCached(string cachePath, Style style, ICanvas canvas, int x, int y, double zoom, double scale = 1, List<string> whiteListLayers = null)
+        //{
+        //    string layerString = whiteListLayers == null ? "" : string.Join(",-", whiteListLayers.ToArray());
 
-            var bundle = new
-            {
-                style.Hash,
-                sizeX,
-                sizeY,
-                scale,
-                layerString,
-            };
+        //    var bundle = new
+        //    {
+        //        style.Hash,
+        //        scale,
+        //        layerString,
+        //    };
 
-            lock (cacheLock)
-            {
-                if (!Directory.Exists(cachePath))
-                {
-                    Directory.CreateDirectory(cachePath);
-                }
-            }
+        //    lock (cacheLock)
+        //    {
+        //        if (!Directory.Exists(cachePath))
+        //        {
+        //            Directory.CreateDirectory(cachePath);
+        //        }
+        //    }
 
-            var json = Newtonsoft.Json.JsonConvert.SerializeObject(bundle);
-            var hash = Utils.Sha256(json).Substring(0, 12); // get 12 digits to avoid fs length issues
+        //    var json = Newtonsoft.Json.JsonConvert.SerializeObject(bundle);
+        //    var hash = Utils.Sha256(json).Substring(0, 12); // get 12 digits to avoid fs length issues
 
-            var fileName = x + "x" + y + "-" + zoom + "-" + hash + ".png";
-            var path = Path.Combine(cachePath, fileName);
+        //    var fileName = x + "x" + y + "-" + zoom + "-" + hash + ".png";
+        //    var path = Path.Combine(cachePath, fileName);
 
-            lock (cacheLock)
-            {
-                if (File.Exists(path))
-                {
-                    return LoadBitmap(path);
-                }
-            }
+        //    lock (cacheLock)
+        //    {
+        //        if (File.Exists(path))
+        //        {
+        //            return LoadBitmap(path);
+        //        }
+        //    }
 
-            var bitmapa = await Render(style, canvas, x, y, zoom, sizeX, sizeY, scale, whiteListLayers, collisions:null);
+        //    var bitmapa = await Render(style, canvas, x, y, zoom, scale, whiteListLayers, collisions:null);
 
-            var bitmap = bitmapa.bitmap.FinishDrawing();
-            // save to file in async fashion
-            var _t = Task.Run(() =>
-              {
+        //    var bitmap = bitmapa.bitmap.FinishDrawing();
+        //    // save to file in async fashion
+        //    var _t = Task.Run(() =>
+        //      {
 
-                  if (bitmap != null)
-                  {
-                      try
-                      {
-                          lock (cacheLock)
-                          {
-                              if (File.Exists(path))
-                              {
-                                  return;
-                              }
+        //          if (bitmap != null)
+        //          {
+        //              try
+        //              {
+        //                  lock (cacheLock)
+        //                  {
+        //                      if (File.Exists(path))
+        //                      {
+        //                          return;
+        //                      }
 
-                              using (var fileStream = new FileStream(path, FileMode.CreateNew, FileAccess.Write, FileShare.ReadWrite))
-                              {
-                                  BitmapEncoder encoder = new PngBitmapEncoder();
-                                  encoder.Frames.Add(BitmapFrame.Create(bitmap));
-                                  encoder.Save(fileStream);
-                              }
-                          }
-                      }
-                      catch (Exception)
-                      {
-                          return;
-                      }
-                  }
+        //                      using (var fileStream = new FileStream(path, FileMode.CreateNew, FileAccess.Write, FileShare.ReadWrite))
+        //                      {
+        //                          BitmapEncoder encoder = new PngBitmapEncoder();
+        //                          encoder.Frames.Add(BitmapFrame.Create(bitmap));
+        //                          encoder.Save(fileStream);
+        //                      }
+        //                  }
+        //              }
+        //              catch (Exception)
+        //              {
+        //                  return;
+        //              }
+        //          }
 
-              });
+        //      });
 
 
 
 
-            return bitmap;
-        }
+        //    return bitmap;
+        //}
 
-        static BitmapSource LoadBitmap(string path)
-        {
-            using (var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-            {
-                var fsBitmap = new BitmapImage();
-                fsBitmap.BeginInit();
-                fsBitmap.StreamSource = stream;
-                fsBitmap.CacheOption = BitmapCacheOption.OnLoad;
-                fsBitmap.EndInit();
-                fsBitmap.Freeze();
+        //static BitmapSource LoadBitmap(string path)
+        //{
+        //    using (var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+        //    {
+        //        var fsBitmap = new BitmapImage();
+        //        fsBitmap.BeginInit();
+        //        fsBitmap.StreamSource = stream;
+        //        fsBitmap.CacheOption = BitmapCacheOption.OnLoad;
+        //        fsBitmap.EndInit();
+        //        fsBitmap.Freeze();
 
-                return fsBitmap;
-            }
-        }
+        //        return fsBitmap;
+        //    }
+        //}
 
-        public async static Task<MapsInMyFolder.VectorTileRenderer.Renderer.ICanvasCollisions> Render(Style style, ICanvas canvas, int x, int y, double zoom, double sizeX = 512, double sizeY = 512, double scale = 1, List<string> whiteListLayers = null, ROptions options = null, Collisions collisions = null)
+        public async static Task<MapsInMyFolder.VectorTileRenderer.Renderer.ICanvasCollisions> Render(Style style, ICanvas canvas, int x, int y, double zoom, double scale = 1, List<string> whiteListLayers = null, ROptions options = null, Collisions collisions = null)
         {
            Dictionary<Source, Stream> rasterTileCache = new Dictionary<Source, Stream>();
             Dictionary<Source, VectorTile> vectorTileCache = new Dictionary<Source, VectorTile>();
@@ -211,17 +211,18 @@ namespace MapsInMyFolder.VectorTileRenderer
 
             double actualZoom = 0;
 
-            if (sizeX < 1024)
+            if (options.TileSize < 1024)
             {
-                var ratio = 1024 / sizeX;
+                var ratio = 1024 / options.TileSize;
                 var zoomDelta = Math.Log(ratio, 2);
 
                 actualZoom = zoom - zoomDelta;
             }
             //Debug.WriteLine("Zoom ini :" + zoom + "   Zoom act : " + actualZoom);
-
+            double sizeX = options.TileSize;
+            double sizeY = options.TileSize;
             if (options is null || options.GenerateCanvas == true) { 
-            canvas.StartDrawing(sizeX*options.NbrTileHeightWidth, sizeY * options.NbrTileHeightWidth);
+            canvas.StartDrawing(options.TileSize * options.NbrTileHeightWidth, options.TileSize * options.NbrTileHeightWidth);
             sizeX *= scale;
             sizeY *= scale;
             }

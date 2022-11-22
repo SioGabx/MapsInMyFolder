@@ -426,8 +426,6 @@ namespace MapsInMyFolder.Commun
                 }
 
 
-
-
                 bitmap.DrawTextOnCanvas(ListOfEntitiesCollisions, Roptions);
                 ListOfEntitiesCollisions.TextElementsList.Clear();
                 ListOfEntitiesCollisions = null;
@@ -457,12 +455,13 @@ namespace MapsInMyFolder.Commun
                             ImgPositionY = PosY,
                             ImgCenterPositionX = 1,
                             ImgCenterPositionY = 1,
-                            OverflowTextCorrectingValue = 50,
+                            TileSize = render_tile_size,
+                            OverflowTextCorrectingValue = 0.5,
                             TextSizeMultiplicateur = TextSizeMultiplicateur,
                             GenerateCanvas = createCanvas
                         };
                         style.SetSourceProvider(0, pbfTileSource);
-                        MapsInMyFolder.VectorTileRenderer.Renderer.ICanvasCollisions bitmapff = await Renderer.Render(style, bitmapf, 0, 0, zoom, render_tile_size, render_tile_size, 1, options: options, collisions: collisions);
+                        MapsInMyFolder.VectorTileRenderer.Renderer.ICanvasCollisions bitmapff = await Renderer.Render(style, bitmapf, 0, 0, zoom, 1, options: options, collisions: collisions);
                         return bitmapff;
                     }
                     else
