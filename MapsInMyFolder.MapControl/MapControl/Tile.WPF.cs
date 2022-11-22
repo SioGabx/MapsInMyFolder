@@ -43,7 +43,7 @@ namespace MapsInMyFolder.MapControl
                 #region drawborder
                 if (Commun.Settings.map_show_tile_border || Commun.Settings.is_in_debug_mode)
                 {
-                    BitmapSource bImage = image as BitmapSource;
+                    BitmapSource bImage = (BitmapSource)image;
                     if (bImage != null)
                     {
                         // Draw a Rectangle

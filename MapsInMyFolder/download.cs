@@ -135,8 +135,11 @@ namespace MapsInMyFolder
         }
 
 
-        public static List<Dictionary<int, DownloadClass>> engine_list = new List<Dictionary<int, DownloadClass>>() { };
-        public static int number_of_download = 0;
+        private static List<Dictionary<int, DownloadClass>> engine_list = new List<Dictionary<int, DownloadClass>>() { };
+        private static int number_of_download = 0;
+
+        public static List<Dictionary<int, DownloadClass>> Engine_list { get => engine_list; set => engine_list = value; }
+        public static int Number_of_download { get => number_of_download; set => number_of_download = value; }
 
 
         /// <summary>
@@ -147,26 +150,26 @@ namespace MapsInMyFolder
         /// <returns></returns>
         public static int Add(DownloadClass engine, int id)
         {
-            int number_of_engine_in_list = engine_list.Count + 1;
+            int number_of_engine_in_list = Engine_list.Count + 1;
             //Dictionary<int, Download_main_engine_class> temp_dictionnary = new Dictionary<int, Download_main_engine_class>
             //{
             //    { id, engine }
             //};
             //Download_engine_list.engine_list.Add(temp_dictionnary);
-            engine_list.Add(new Dictionary<int, DownloadClass> { { id, engine } });
+            Engine_list.Add(new Dictionary<int, DownloadClass> { { id, engine } });
             return number_of_engine_in_list;
         }
 
         public static int GetId()
         {
-            return engine_list.Count + 1;
+            return Engine_list.Count + 1;
         }
 
         public static List<DownloadClass> GetEngineList()
         {
             List<DownloadClass> EngineList = new List<DownloadClass>() { };
 
-            foreach (Dictionary<int, DownloadClass> engine_dic in engine_list)
+            foreach (Dictionary<int, DownloadClass> engine_dic in Engine_list)
             {
 
                 DownloadClass value = engine_dic.Values.First();
@@ -188,7 +191,7 @@ namespace MapsInMyFolder
         /// <returns></returns>
         public static DownloadClass GetEngineById(int id)
         {
-            foreach (Dictionary<int, DownloadClass> engine_dic in engine_list)
+            foreach (Dictionary<int, DownloadClass> engine_dic in Engine_list)
             {
                 try
                 {
@@ -263,10 +266,10 @@ namespace MapsInMyFolder
 
         static void CheckIfReadyToStartDownload()
         {
-            DebugMode.WriteLine("Checking... From : " + "" + "number : " + DownloadClass.number_of_download);
+            DebugMode.WriteLine("Checking... From : " + "" + "number : " + DownloadClass.Number_of_download);
            
             int settings_max_download_simult = Commun.Settings.max_download_project_in_parralele;
-            if (DownloadClass.number_of_download < settings_max_download_simult)
+            if (DownloadClass.Number_of_download < settings_max_download_simult)
             {
                 string listofid = "";
                 int number_of_download_started = 0;
@@ -469,7 +472,7 @@ namespace MapsInMyFolder
             }
             engine.cancellation_token_source = new CancellationTokenSource();
             engine.cancellation_token = engine.cancellation_token_source.Token;
-            if (DownloadClass.number_of_download < Commun.Settings.max_download_project_in_parralele)
+            if (DownloadClass.Number_of_download < Commun.Settings.max_download_project_in_parralele)
             {
                 UpdateDownloadPanel(engine_id, "Verification de l'intégritée...", "0", true, Status.no_data);
 
@@ -482,7 +485,7 @@ namespace MapsInMyFolder
         }
         async void DownloadThisEngine(DownloadClass download_main_engine_class_args)
         {
-            DownloadClass.number_of_download++;
+            DownloadClass.Number_of_download++;
             download_main_engine_class_args.state = Status.progress;
             CheckIfReadyToStartDownload();
             List<Url_class> urls = download_main_engine_class_args.urls;
@@ -632,7 +635,7 @@ namespace MapsInMyFolder
             {
                 await Assemblage(download_main_engine_class_args.id);
             }
-            DownloadClass.number_of_download--;
+            DownloadClass.Number_of_download--;
             CheckifMultipleDownloadInProgress();
             TaskbarItemInfo.ProgressValue = 0;
             CheckIfReadyToStartDownload();

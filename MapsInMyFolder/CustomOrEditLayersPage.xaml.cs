@@ -175,7 +175,7 @@ namespace MapsInMyFolder
             TextBoxSetValueAndLock(TextboxSpecialOptionPBFJsonStyle, LayerInEditMode.class_specialsoptions.PBFJsonStyle);
         }
 
-        void TextBoxSetValueAndLock(TextBox textBox, string value)
+        static void TextBoxSetValueAndLock(TextBox textBox, string value)
         {
             textBox.Text = value;
             Collectif.LockPreviousUndo(textBox);
@@ -514,7 +514,7 @@ namespace MapsInMyFolder
                     "','TILECOMPUTATIONSCRIPT'='" + TILECOMPUTATIONSCRIPT + "','SPECIALSOPTIONS'='" + SPECIALSOPTIONS + "' WHERE ID = " + LayerId);
                 }
             }
-            MainPage._instance.Clear_cache(LayerId, false);
+            MainPage.Clear_cache(LayerId, false);
             
             Javascript.EngineStopAll();
             Javascript.EngineClearList();
@@ -777,7 +777,7 @@ namespace MapsInMyFolder
                     Database.ExecuteNonQuerySQLCommand("DELETE FROM EDITEDLAYERS WHERE ID=" + LayerId);
                     MainPage._instance.ReloadPage();
                     MainWindow._instance.FrameBack(true);
-                    MainPage._instance.LayerEditOpenWindow(LayerId);
+                    MainPage.LayerEditOpenWindow(LayerId);
                 }
                 result = ContentDialogResult.None;
             }

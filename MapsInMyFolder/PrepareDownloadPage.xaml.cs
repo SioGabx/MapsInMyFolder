@@ -165,7 +165,7 @@ namespace MapsInMyFolder
                         {
                             string urlbase = Collectif.GetUrl.FromTileXYZ(Curent.Layer.class_tile_url, TileX + index_x, TileY + index_y, zoom, LayerID);
                             DebugMode.WriteLine("Add " + urlbase + " to the list");
-                            ListOfUrls.Add(new { url = urlbase, index_x = index_x, index_y = index_y });
+                            ListOfUrls.Add(new { url = urlbase, index_x, index_y });
                         }
                     }
                     DebugMode.WriteLine("Téléchargement en parralele des fichiers");

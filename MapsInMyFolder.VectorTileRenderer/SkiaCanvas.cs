@@ -27,11 +27,9 @@ namespace MapsInMyFolder.VectorTileRenderer
         public bool ClipOverflow { get; set; } = false;
         private Rect clipRectangle;
         List<IntPoint> clipRectanglePath;
-
-        ConcurrentDictionary<string, SKTypeface> fontPairs = new ConcurrentDictionary<string, SKTypeface>();
+        readonly ConcurrentDictionary<string, SKTypeface> fontPairs = new ConcurrentDictionary<string, SKTypeface>();
         private static readonly Object fontLock = new Object();
-
-        List<Rect> textRectangles = new List<Rect>();
+        readonly List<Rect> textRectangles = new List<Rect>();
 
         public void StartDrawing(double width, double height)
         {
@@ -92,46 +90,6 @@ namespace MapsInMyFolder.VectorTileRenderer
             return SKStrokeCap.Square;
         }
 
-        private double getAngle(double x1, double y1, double x2, double y2)
-        {
-            double degrees;
-
-            if (x2 - x1 == 0)
-            {
-                if (y2 > y1)
-                    degrees = 90;
-                else
-                    degrees = 270;
-            }
-            else
-            {
-                // Calculate angle from offset.
-                double riseoverrun = (y2 - y1) / (x2 - x1);
-                double radians = Math.Atan(riseoverrun);
-                degrees = radians * (180 / Math.PI);
-
-                if ((x2 - x1) < 0 || (y2 - y1) < 0)
-                    degrees += 180;
-                if ((x2 - x1) > 0 && (y2 - y1) < 0)
-                    degrees -= 180;
-                if (degrees < 0)
-                    degrees += 360;
-            }
-            return degrees;
-        }
-
-        //private double getAngleAverage(double a, double b)
-        //{
-        //    a = a % 360;
-        //    b = b % 360;
-
-        //    double sum = a + b;
-        //    if (sum > 360 && sum < 540)
-        //    {
-        //        sum = sum % 180;
-        //    }
-        //    return sum / 2;
-        //}
 
         double Clamp(double number, double min = 0, double max = 1)
         {
@@ -417,7 +375,7 @@ namespace MapsInMyFolder.VectorTileRenderer
             if (glyphs.Length < style.Text.Length)
             {
                 var fm = SKFontManager.Default;
-                var charIdx = (glyphs.Length > 0) ? glyphs.Length : 0;
+                int charIdx;// = (glyphs.Length > 0) ? glyphs.Length : 0;
                 var newTypeface = fm.MatchCharacter(style.Text[glyphs.Length]);
 
                 if (newTypeface == null)
@@ -601,7 +559,7 @@ namespace MapsInMyFolder.VectorTileRenderer
             return c - Math.Abs((Math.Abs(x - y) % 2 * c) - c);
         }
 
-        bool CheckPathSqueezing(List<Point> path, double textHeight)
+        bool CheckPathSqueezing(List<Point> path)
         {
             //double maxCurve = 0;
             double previousAngle = 0;
@@ -633,25 +591,26 @@ namespace MapsInMyFolder.VectorTileRenderer
             //return maxCurve;
         }
 
-        void DebugRectangle(Rect rectangle, Color color)
-        {
-            var list = new List<Point>()
-            {
-                rectangle.TopLeft,
-                rectangle.TopRight,
-                rectangle.BottomRight,
-                rectangle.BottomLeft,
-            };
+#if DEBUG
+        //void DebugRectangle(Rect rectangle, Color color)
+        //{
+        //    var list = new List<Point>()
+        //    {
+        //        rectangle.TopLeft,
+        //        rectangle.TopRight,
+        //        rectangle.BottomRight,
+        //        rectangle.BottomLeft,
+        //    };
 
-            var brush = new Brush
-            {
-                Paint = new Paint()
-            };
-            brush.Paint.FillColor = color;
-            brush.Paint.FillOpacity = 0.5;
-            this.DrawPolygon(list, brush);
-        }
-
+        //    var brush = new Brush
+        //    {
+        //        Paint = new Paint()
+        //    };
+        //    brush.Paint.FillColor = color;
+        //    brush.Paint.FillOpacity = 0.5;
+        //    this.DrawPolygon(list, brush);
+        //}
+#endif
         public Renderer.Collisions DrawTextOnPath(List<Point> geometry, Brush style, Renderer.ROptions options, Renderer.Collisions collisions, int hatchCode)
         {
            // return collisions;
@@ -678,7 +637,7 @@ namespace MapsInMyFolder.VectorTileRenderer
                 var path = GetPathFromGeometry(geometry);
                 var text = TransformText(style.Text, style, options);
 
-                var pathSqueezed = CheckPathSqueezing(geometry, style.Paint.TextSize);
+                var pathSqueezed = CheckPathSqueezing(geometry);
 
                 if (pathSqueezed)
                 {
@@ -869,7 +828,7 @@ namespace MapsInMyFolder.VectorTileRenderer
 
         public void DrawPolygon(List<Point> geometry, Brush style)
         {
-            List<List<Point>> allGeometries = null;
+            List<List<Point>> allGeometries;
             if (ClipOverflow)
             {
                 allGeometries = ClipPolygon(geometry);

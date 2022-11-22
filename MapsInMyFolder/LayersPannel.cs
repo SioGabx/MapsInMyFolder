@@ -167,7 +167,7 @@ namespace MapsInMyFolder
                             doCreateSpecialsOptionsClass = false;
                         }
                     }
-                    catch (Exception e)
+                    catch (Exception)
                     {
                         Debug.WriteLine("Invalide JSON");
                     }
@@ -459,7 +459,7 @@ namespace MapsInMyFolder
 
 
 
-        public void Clear_cache(int id, bool ShowMessageBox = true)
+        public static void Clear_cache(int id, bool ShowMessageBox = true)
         {
             if (id == 0) { return; }
 
@@ -494,7 +494,7 @@ namespace MapsInMyFolder
 
 
 
-        public void DB_Layer_Favorite(int id, int fav_state)
+        public static void DBLayerFavorite(int id, int fav_state)
         {
             if (id == 0) { return; }
             try
@@ -530,7 +530,7 @@ namespace MapsInMyFolder
             return;
         }
 
-        public void LayerEditOpenWindow(int id = -1)
+        public static void LayerEditOpenWindow(int id = -1)
         {
             MainWindow._instance.FrameLoad_CustomOrEditLayers(id);
         }
@@ -621,7 +621,7 @@ namespace MapsInMyFolder
             int id_int = Convert.ToInt32(id);
             App.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
             {
-                MainPage._instance.DB_Layer_Favorite(id_int, 1);
+                MainPage.DBLayerFavorite(id_int, 1);
             }, null);
             DebugMode.WriteLine("Adding layer" + id_int + " to favorite");
         }
@@ -632,7 +632,7 @@ namespace MapsInMyFolder
             int id_int = Convert.ToInt32(id);
             App.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
             {
-                MainPage._instance.Clear_cache(id_int);
+                MainPage.Clear_cache(id_int);
             }, null);
             DebugMode.WriteLine("Clear_cache layer " + id_int);
         }
@@ -643,7 +643,7 @@ namespace MapsInMyFolder
             int id_int = Convert.ToInt32(id);
             App.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
             {
-                MainWindow._instance.MainPage.DB_Layer_Favorite(id_int, 0);
+                MainPage.DBLayerFavorite(id_int, 0);
             }, null);
             DebugMode.WriteLine("Removing layer" + id_int + " to favorite");
         }
@@ -653,7 +653,7 @@ namespace MapsInMyFolder
             int id_int = Convert.ToInt32(id);
             App.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
             {
-                MainWindow._instance.MainPage.LayerEditOpenWindow(id_int);
+                MainPage.LayerEditOpenWindow(id_int);
             }, null);
             DebugMode.WriteLine("Editing layer" + id_int + " to favorite");
         }

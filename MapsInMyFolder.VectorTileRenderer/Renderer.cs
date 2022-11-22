@@ -13,7 +13,7 @@ namespace MapsInMyFolder.VectorTileRenderer
 {
     public class Renderer
     {
-        private static Object cacheLock = new Object();
+       // private static Object cacheLock = new Object();
 
         enum VisualLayerType
         {

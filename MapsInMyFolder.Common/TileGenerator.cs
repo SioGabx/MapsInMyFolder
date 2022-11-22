@@ -95,7 +95,7 @@ namespace MapsInMyFolder.Commun
             {
                 case "pbf":
                     int TileSize = 1;
-                    return await GetTilePBF(layerID, urlBase, TileX, TileY, TileZoom, save_temp_directory, settings_max_tiles_cache_days, Layer.class_tiles_size * TileSize, TileSize, 50 * TileSize, pbfdisableadjacent).ConfigureAwait(false);
+                    return await GetTilePBF(layerID, urlBase, TileX, TileY, TileZoom, save_temp_directory, settings_max_tiles_cache_days, Layer.class_tiles_size * TileSize, TileSize, 0.5, pbfdisableadjacent).ConfigureAwait(false);
 
                 default:
                     //Debug.WriteLine("Classic format start Converting");

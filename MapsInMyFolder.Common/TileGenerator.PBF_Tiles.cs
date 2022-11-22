@@ -24,7 +24,7 @@ namespace MapsInMyFolder.Commun
     public partial class TileGenerator
     {
 
-        public async Task<HttpResponse> GetTilePBF(int layerID, string urlBase, int TileX, int TileY, int TileZoom, string save_temp_directory, int settings_max_tiles_cache_days, int render_tile_size = 256, int TextSizeMultiplicateur = 1, int OverflowTextCorrectingValue = 50, bool pbfdisableadjacent = false)
+        public async Task<HttpResponse> GetTilePBF(int layerID, string urlBase, int TileX, int TileY, int TileZoom, string save_temp_directory, int settings_max_tiles_cache_days, int render_tile_size, int TextSizeMultiplicateur, double OverflowTextCorrectingValue, bool pbfdisableadjacent = false)
         {
             System.Threading.Thread.CurrentThread.Priority = System.Threading.ThreadPriority.Highest;
             //Commun.TileGeneratorSettings.Number_tile_converted++;
@@ -95,7 +95,7 @@ namespace MapsInMyFolder.Commun
 
         static readonly object PBF_RenderingAsync_Locker = new object();
         static readonly object PBF_SetProviders_Locker = new object();
-        public async Task<HttpResponse> PBF_RenderingAsync(int tache, int layerID, string urlBase, int TileX, int TileY, int zoom, string save_temp_directory, int settings_max_tiles_cache_days, int render_tile_size = 256, int TextSizeMultiplicateur = 1, int OverflowTextCorrectingValue = 50, bool pbfdisableadjacent = false)
+        public async Task<HttpResponse> PBF_RenderingAsync(int tache, int layerID, string urlBase, int TileX, int TileY, int zoom, string save_temp_directory, int settings_max_tiles_cache_days, int render_tile_size, int TextSizeMultiplicateur, double OverflowTextCorrectingValue, bool pbfdisableadjacent = false)
         {
             System.Threading.Thread.CurrentThread.Priority = System.Threading.ThreadPriority.Highest;
             DebugMode.WriteLine("Function PBFrender LayerId:" + layerID + " for tache " + tache);
@@ -456,7 +456,7 @@ namespace MapsInMyFolder.Commun
                             ImgCenterPositionX = 1,
                             ImgCenterPositionY = 1,
                             TileSize = render_tile_size,
-                            OverflowTextCorrectingValue = 0.5,
+                            OverflowTextCorrectingValue = OverflowTextCorrectingValue,
                             TextSizeMultiplicateur = TextSizeMultiplicateur,
                             GenerateCanvas = createCanvas
                         };

@@ -90,7 +90,7 @@ namespace MapsInMyFolder.Commun
             add.SetValue("print", PrintAction);
             Action<object> AlertAction = (stringtext => Javascript.Alert(stringtext, LayerId));
             add.SetValue("alert", AlertAction);
-            Action<object> PrintClearAction = (stringtext => Javascript.PrintClear(LayerId));
+            Action<object> PrintClearAction = (stringtext => Javascript.PrintClear());
             add.SetValue("printClear", PrintClearAction);
             Action<object> helpAction = (stringtext => Javascript.Help(LayerId));
             add.SetValue("help", helpAction);
@@ -115,7 +115,7 @@ namespace MapsInMyFolder.Commun
         }
 
         #region StoreVariable
-        private static Dictionary<int, Dictionary<string, object>> DictionnaryOfVariablesKeyLayerId = new Dictionary<int, Dictionary<string, object>>();
+        private static readonly Dictionary<int, Dictionary<string, object>> DictionnaryOfVariablesKeyLayerId = new Dictionary<int, Dictionary<string, object>>();
         static public void SetVar(object variablename, object value, int LayerId = 0)
         {
             string variablenameString;
@@ -266,7 +266,7 @@ namespace MapsInMyFolder.Commun
             DebugMode.WriteLine("print abord" + LayerId);
         }
 
-        static public void PrintClear(int LayerId = 0)
+        static public void PrintClear()
         {
             DebugMode.WriteLine("JSClear console");
             if (Commun.TileGeneratorSettings.AcceptJavascriptPrint)
@@ -342,8 +342,8 @@ print("lat : " + locations.lat + " / long : " + locations.long)
 
 
         #region engines
-        private static Dictionary<int, CancellationTokenSource> JsListCancelTocken = new Dictionary<int, CancellationTokenSource>();
-        private static Dictionary<int, Engine> ListOfEngines = new Dictionary<int, Engine>();
+        private static readonly Dictionary<int, CancellationTokenSource> JsListCancelTocken = new Dictionary<int, CancellationTokenSource>();
+        private static readonly Dictionary<int, Engine> ListOfEngines = new Dictionary<int, Engine>();
 
         public static void EngineStopAll()
         {
