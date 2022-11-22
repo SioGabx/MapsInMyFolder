@@ -19,6 +19,7 @@ namespace MapsInMyFolder.VectorTileRenderer
         void DrawPolygon(List<Point> geometry, Brush style);
 
         void DrawPoint(Point geometry, Brush style);
+        void DrawTextOnCanvas(Renderer.Collisions textElements, Renderer.ROptions options);
 
         Renderer.Collisions DrawText(Point geometry, Brush style, Renderer.ROptions options, Renderer.Collisions collisions, int hatchCode);
 

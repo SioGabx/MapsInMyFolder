@@ -372,6 +372,7 @@ namespace MapsInMyFolder.Commun
                 ICanvas bitmap = canvas;
                 MapsInMyFolder.VectorTileRenderer.Renderer.ICanvasCollisions ReturnCanvasAndCollisions;
                 MapsInMyFolder.VectorTileRenderer.Renderer.Collisions ListOfEntitiesCollisions = new MapsInMyFolder.VectorTileRenderer.Renderer.Collisions();
+                Renderer.ROptions Roptions = null;
                 if (!(providers[1][1] is null))
                 {
                     ReturnCanvasAndCollisions = await CreateBitmap(bitmap, 1, 1, providers[1][1], ListOfEntitiesCollisions, true, 3).ConfigureAwait(false);
@@ -382,8 +383,9 @@ namespace MapsInMyFolder.Commun
                     if (!(ReturnCanvasAndCollisions is null))
                     {
                         bitmap = ReturnCanvasAndCollisions.bitmap;
-
+                        Roptions = ReturnCanvasAndCollisions.Roptions;
                         ListOfEntitiesCollisions = ReturnCanvasAndCollisions.ListOfEntitiesCollisions;
+                        
                     }
                 }
                 else
@@ -409,6 +411,7 @@ namespace MapsInMyFolder.Commun
                                     if (!(ReturnCanvasAndCollisions is null))
                                     {
                                         bitmap = ReturnCanvasAndCollisions.bitmap;
+                                        ListOfEntitiesCollisions.TextElementsList = ReturnCanvasAndCollisions.ListOfEntitiesCollisions.TextElementsList;
                                     }
                                     ReturnCanvasAndCollisions = null;
                                 }
@@ -423,6 +426,12 @@ namespace MapsInMyFolder.Commun
                 }
 
 
+
+
+                bitmap.DrawTextOnCanvas(ListOfEntitiesCollisions, Roptions);
+                ListOfEntitiesCollisions.TextElementsList.Clear();
+                ListOfEntitiesCollisions = null;
+                Roptions = null;
                 if (!(StreamPBFFile is null))
                 {
                     StreamPBFFile.Flush();
@@ -453,13 +462,13 @@ namespace MapsInMyFolder.Commun
                             GenerateCanvas = createCanvas
                         };
                         style.SetSourceProvider(0, pbfTileSource);
-                        MapsInMyFolder.VectorTileRenderer.Renderer.ICanvasCollisions bitmapff = await Renderer.Render(style, bitmapf, 0, 0, zoom, render_tile_size, render_tile_size, 1, options: options);
+                        MapsInMyFolder.VectorTileRenderer.Renderer.ICanvasCollisions bitmapff = await Renderer.Render(style, bitmapf, 0, 0, zoom, render_tile_size, render_tile_size, 1, options: options, collisions: collisions);
                         return bitmapff;
                     }
                     else
                     {
                         DebugMode.WriteLine("pdfTileSource not define");
-                        return new Renderer.ICanvasCollisions(collisions, bitmapf);
+                        return new Renderer.ICanvasCollisions(collisions, bitmapf, null);
                     }
                 }
                 DebugMode.WriteLine("Tache n°" + tache + " : " + "FinishDraw");

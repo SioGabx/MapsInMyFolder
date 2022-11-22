@@ -26,19 +26,41 @@ namespace MapsInMyFolder.VectorTileRenderer
         {
             public Collisions ListOfEntitiesCollisions;
             public ICanvas bitmap;
+            public ROptions Roptions;
 
-            public ICanvasCollisions(Collisions ListOfEntitiesCollisions, ICanvas bitmap)
+            public ICanvasCollisions(Collisions ListOfEntitiesCollisions, ICanvas bitmap, ROptions Roptions)
             {
                 this.ListOfEntitiesCollisions = ListOfEntitiesCollisions;
                 this.bitmap = bitmap;
+                this.Roptions = Roptions;
             }
         }
 
 
+        public class TextElements
+        {
+            public Point geometry;
+            public Brush style;
+            public int hatchCode;
+            public Rect rectangle;
+            public bool doDraw;
+
+            public TextElements(Point geometry, Brush style,int hatchCode,Rect rectangle, bool doDraw = true)
+            {
+                this.geometry = geometry;
+                this.style = style;
+                this.hatchCode = hatchCode;
+                this.rectangle = rectangle;
+                this.doDraw = doDraw;
+            }
+        }
+
         public class Collisions
         {
-           
+
             public List<int> CollisionEntity = new List<int>() { };
+            public List<TextElements> TextElementsList = new List<TextElements>() { };
+
         }
 
         public class ROptions
@@ -115,7 +137,7 @@ namespace MapsInMyFolder.VectorTileRenderer
                 }
             }
 
-            var bitmapa = await Render(style, canvas, x, y, zoom, sizeX, sizeY, scale, whiteListLayers);
+            var bitmapa = await Render(style, canvas, x, y, zoom, sizeX, sizeY, scale, whiteListLayers, collisions:null);
 
             var bitmap = bitmapa.bitmap.FinishDrawing();
             // save to file in async fashion
@@ -170,7 +192,7 @@ namespace MapsInMyFolder.VectorTileRenderer
             }
         }
 
-        public async static Task<MapsInMyFolder.VectorTileRenderer.Renderer.ICanvasCollisions> Render(Style style, ICanvas canvas, int x, int y, double zoom, double sizeX = 512, double sizeY = 512, double scale = 1, List<string> whiteListLayers = null, ROptions options = null)
+        public async static Task<MapsInMyFolder.VectorTileRenderer.Renderer.ICanvasCollisions> Render(Style style, ICanvas canvas, int x, int y, double zoom, double sizeX = 512, double sizeY = 512, double scale = 1, List<string> whiteListLayers = null, ROptions options = null, Collisions collisions = null)
         {
            Dictionary<Source, Stream> rasterTileCache = new Dictionary<Source, Stream>();
             Dictionary<Source, VectorTile> vectorTileCache = new Dictionary<Source, VectorTile>();
@@ -182,7 +204,10 @@ namespace MapsInMyFolder.VectorTileRenderer
                 };
             }
             //ICanvasCollisions ReturncanvasCollisions = new ICanvasCollisions() { };
-            Collisions collisions = new Collisions();
+            if (collisions is null)
+            {
+                collisions = new Collisions();
+            }
 
             double actualZoom = 0;
 
@@ -525,7 +550,7 @@ namespace MapsInMyFolder.VectorTileRenderer
                 }
             }
 
-            return new Renderer.ICanvasCollisions(collisions,canvas);
+            return new Renderer.ICanvasCollisions(collisions,canvas, options);
         }
 
         //private static List<List<Point>> LocalizeGeometry(List<List<Point>> coordinates, double sizeX, double sizeY, double extent)

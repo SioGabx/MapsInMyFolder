@@ -295,7 +295,7 @@ namespace MapsInMyFolder.VectorTileRenderer
 
             var paint = GetTextPaint(style);
             paint.TextSize = (float)(paint.TextSize);
-          
+
             text = BreakText(text, paint, style, options);
 
             return text;
@@ -326,7 +326,7 @@ namespace MapsInMyFolder.VectorTileRenderer
                     break;
                 }
 
-                int multiplieur = Math.Max(1,Convert.ToInt32(Math.Round(options.TextSizeMultiplicateur)));
+                int multiplieur = Math.Max(1, Convert.ToInt32(Math.Round(options.TextSizeMultiplicateur)));
                 brokenText += restOfText.Substring(0, (int)lastSpaceIndex).Trim() + string.Concat(Enumerable.Repeat("\n", multiplieur));
 
                 restOfText = restOfText.Substring((int)lastSpaceIndex, restOfText.Length - (int)lastSpaceIndex);
@@ -438,6 +438,73 @@ namespace MapsInMyFolder.VectorTileRenderer
 
         }
 
+
+
+        public void DrawTextOnCanvas(Renderer.Collisions Colisions, Renderer.ROptions options)
+        {
+
+            foreach (Renderer.TextElements textElements in Colisions.TextElementsList)
+            {
+                foreach (Renderer.TextElements textElementsInList in Colisions.TextElementsList)
+                {
+                    if (textElementsInList.doDraw == true && textElementsInList.rectangle.IntersectsWith(textElements.rectangle) && textElements.hatchCode != textElementsInList.hatchCode)
+                    {
+                        if (textElementsInList.style.Text.Length > textElements.style.Text.Length)
+                        {
+                            textElements.doDraw = false;
+                        }
+                        else
+                        {
+                            textElementsInList.doDraw = false;
+                        }
+                    }
+                }
+
+
+            }
+
+
+            foreach (Renderer.TextElements textElements in Colisions.TextElementsList)
+            {
+                if (textElements.doDraw) { 
+                Point geometry = textElements.geometry;
+                Brush style = textElements.style;
+
+                var paint = GetTextPaint(style);
+
+                paint.TextSize = (float)(paint.TextSize * options.TextSizeMultiplicateur);
+                QualifyTypeface(style, paint);
+
+                var strokePaint = GetTextStrokePaint(style);
+                var text = TransformText(style.Text, style, options);
+                var allLines = text.Split('\n');
+                int i = 0;
+                foreach (var line in allLines)
+                {
+                    var bytes = Encoding.UTF32.GetBytes(line);
+                    float lineOffset = (float)(i * style.Paint.TextSize) - ((float)(allLines.Length) * (float)style.Paint.TextSize) / 2 + (float)style.Paint.TextSize;
+                    var position = new SKPoint((float)geometry.X + (float)(style.Paint.TextOffset.X * style.Paint.TextSize), (float)geometry.Y + (float)(style.Paint.TextOffset.Y * style.Paint.TextSize) + lineOffset);
+
+
+
+                    if (style.Paint.TextStrokeWidth != 0)
+                    {
+#pragma warning disable CS0618 // Le type ou le membre est obsolète
+                        canvas.DrawText(bytes, position, strokePaint);
+#pragma warning restore CS0618 // Le type ou le membre est obsolète
+                    }
+
+#pragma warning disable CS0618 // Le type ou le membre est obsolète
+                    canvas.DrawText(bytes, position, paint);
+#pragma warning restore CS0618 // Le type ou le membre est obsolète
+                    i++;
+                }
+            }
+            }
+        }
+
+
+
         public Renderer.Collisions DrawText(Point geometry, Brush style, Renderer.ROptions options, Renderer.Collisions collisions, int hatchCode)
         {
 
@@ -448,7 +515,7 @@ namespace MapsInMyFolder.VectorTileRenderer
             //style.ZIndex = 999;
 
             var paint = GetTextPaint(style);
-           
+
             paint.TextSize = (float)(paint.TextSize * options.TextSizeMultiplicateur);
             QualifyTypeface(style, paint);
 
@@ -472,104 +539,44 @@ namespace MapsInMyFolder.VectorTileRenderer
                 var rectangle = new Rect(left, top, width, height);
                 rectangle.Inflate(5, 5);
 
-                if (ClipOverflow)
-                {
-                    if (!clipRectangle.Contains(rectangle))
-                    {
-                        //return collisions;
-                    }
-                }
-
-
-                foreach (int coli in collisions.CollisionEntity)
-                {
-                    if (hatchCode == coli)
-                    {
-                        Debug.WriteLine("ignoring geometrie " + hatchCode);
-                        return collisions;
-
-                    }
-                }
-
-
-
-
-                if (TextCollides(rectangle))
-                {
-                    // collision detected
-                    if (options.ImgPositionX == options.ImgCenterPositionX && options.ImgPositionY == options.ImgCenterPositionY)
-                    {
-
-                        collisions.CollisionEntity.Add(hatchCode);
-                        return collisions;
-
-
-
-
-
-
-                        //Debug.WriteLine("Colision detecté : " + style.Text + " \n L=" + left + "T=" + top + "W=" + width + "H=" + height);
-                        //if (top > (256 * options.ImgCenterPositionY) && left > (256 * options.ImgCenterPositionX))
-                        //{
-                        //    if (geometry.X > (256 * options.ImgCenterPositionX + 20) && geometry.Y > (256 * options.ImgCenterPositionY) + 20)
-                        //    {
-                        //        double width_restante = left + width;
-                        //        double height_restante = top + height;
-                        //        if ((width_restante - 40 < 256 * (options.ImgPositionX + 1)) && (height_restante - 40 < 256 * (options.ImgCenterPositionY + 1)))
-                        //        {
-                        //            //Debug.WriteLine("Ajout texte " + hatchCode);
-                        //            collisions.CollisionEntity.Add(hatchCode);
-                        //            return collisions;
-                        //        }
-                        //    }
-                        //}
-                    }
-                }
-                textRectangles.Add(rectangle);
-
-                //var list = new List<Point>()
+                //if (ClipOverflow)
                 //{
-                //    rectangle.TopLeft,
-                //    rectangle.TopRight,
-                //    rectangle.BottomRight,
-                //    rectangle.BottomLeft,
-                //};
+                //    if (!clipRectangle.Contains(rectangle))
+                //    {
+                //        //return collisions;
+                //    }
+                //}
 
-                //var brush = new Brush();
-                //brush.Paint = new Paint();
-                //brush.Paint.FillColor = Color.FromArgb(150, 255, 0, 0);
 
-                //this.DrawPolygon(list, brush);
-            }
+                //foreach (int coli in collisions.CollisionEntity)
+                //{
+                //    if (hatchCode == coli)
+                //    {
+                //        Debug.WriteLine("ignoring geometrie " + hatchCode);
+                //        return collisions;
 
-            int i = 0;
-            foreach (var line in allLines)
-            {
-                var bytes = Encoding.UTF32.GetBytes(line);
-                float lineOffset = (float)(i * style.Paint.TextSize) - ((float)(allLines.Length) * (float)style.Paint.TextSize) / 2 + (float)style.Paint.TextSize;
-                var position = new SKPoint((float)geometry.X + (float)(style.Paint.TextOffset.X * style.Paint.TextSize), (float)geometry.Y + (float)(style.Paint.TextOffset.Y * style.Paint.TextSize) + lineOffset);
+                //    }
+                //}
 
 
 
-                if (style.Paint.TextStrokeWidth != 0)
-                {
-#pragma warning disable CS0618 // Le type ou le membre est obsolète
-                    canvas.DrawText(bytes, position, strokePaint);
-#pragma warning restore CS0618 // Le type ou le membre est obsolète
-                }
 
-#pragma warning disable CS0618 // Le type ou le membre est obsolète
-                canvas.DrawText(bytes, position, paint);
-#pragma warning restore CS0618 // Le type ou le membre est obsolète
-                i++;
-            }
+                //if (TextCollides(rectangle))
+                //{
+                //    // collision detected
+                //    if (options.ImgPositionX == options.ImgCenterPositionX && options.ImgPositionY == options.ImgCenterPositionY)
+                //    {
 
-            if (options.ImgPositionX == options.ImgCenterPositionX && options.ImgPositionY == options.ImgCenterPositionY)
-            {
-                collisions.CollisionEntity.Add(hatchCode);
+                //        collisions.CollisionEntity.Add(hatchCode);
+                //        return collisions;
+                //    }
+                //}
+                //textRectangles.Add(rectangle);
+
+                collisions.TextElementsList.Add(new Renderer.TextElements(geometry, style, hatchCode, rectangle));
+
             }
             return collisions;
-            //todo ; draw text at the end
         }
 
         double GetPathLength(List<Point> path)
