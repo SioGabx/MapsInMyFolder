@@ -1,0 +1,66 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32228.430
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MapsInMyFolder", "MapsInMyFolder\MapsInMyFolder.csproj", "{2E0B14EC-2DF3-4238-8887-549DA9FBA906}"
+	ProjectSection(ProjectDependencies) = postProject
+		{ADC22697-3B59-47FA-B8CD-FC75AB6012E3} = {ADC22697-3B59-47FA-B8CD-FC75AB6012E3}
+		{C94EE2A8-F0E9-4098-A343-B9DB9E26039A} = {C94EE2A8-F0E9-4098-A343-B9DB9E26039A}
+		{579455BC-EE2B-4B6E-BF0C-CB3FEAC2D69D} = {579455BC-EE2B-4B6E-BF0C-CB3FEAC2D69D}
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MapsInMyFolder.MapControl", "MapsInMyFolder.MapControl\MapControl\MapsInMyFolder.MapControl.csproj", "{579455BC-EE2B-4B6E-BF0C-CB3FEAC2D69D}"
+	ProjectSection(ProjectDependencies) = postProject
+		{ADC22697-3B59-47FA-B8CD-FC75AB6012E3} = {ADC22697-3B59-47FA-B8CD-FC75AB6012E3}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MapsInMyFolder.Commun", "MapsInMyFolder.Common\MapsInMyFolder.Commun.csproj", "{ADC22697-3B59-47FA-B8CD-FC75AB6012E3}"
+	ProjectSection(ProjectDependencies) = postProject
+		{C94EE2A8-F0E9-4098-A343-B9DB9E26039A} = {C94EE2A8-F0E9-4098-A343-B9DB9E26039A}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MapsInMyFolder.VectorTileRenderer", "MapsInMyFolder.VectorTileRenderer\MapsInMyFolder.VectorTileRenderer.csproj", "{C94EE2A8-F0E9-4098-A343-B9DB9E26039A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x64 = Debug|x64
+		Release|Any CPU = Release|Any CPU
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2E0B14EC-2DF3-4238-8887-549DA9FBA906}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{2E0B14EC-2DF3-4238-8887-549DA9FBA906}.Debug|Any CPU.Build.0 = Debug|x64
+		{2E0B14EC-2DF3-4238-8887-549DA9FBA906}.Debug|x64.ActiveCfg = Debug|x64
+		{2E0B14EC-2DF3-4238-8887-549DA9FBA906}.Debug|x64.Build.0 = Debug|x64
+		{2E0B14EC-2DF3-4238-8887-549DA9FBA906}.Release|Any CPU.ActiveCfg = Release|x64
+		{2E0B14EC-2DF3-4238-8887-549DA9FBA906}.Release|Any CPU.Build.0 = Release|x64
+		{2E0B14EC-2DF3-4238-8887-549DA9FBA906}.Release|x64.ActiveCfg = Release|x64
+		{2E0B14EC-2DF3-4238-8887-549DA9FBA906}.Release|x64.Build.0 = Release|x64
+		{579455BC-EE2B-4B6E-BF0C-CB3FEAC2D69D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{579455BC-EE2B-4B6E-BF0C-CB3FEAC2D69D}.Debug|x64.ActiveCfg = Debug|x64
+		{579455BC-EE2B-4B6E-BF0C-CB3FEAC2D69D}.Debug|x64.Build.0 = Debug|x64
+		{579455BC-EE2B-4B6E-BF0C-CB3FEAC2D69D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{579455BC-EE2B-4B6E-BF0C-CB3FEAC2D69D}.Release|x64.ActiveCfg = Release|x64
+		{579455BC-EE2B-4B6E-BF0C-CB3FEAC2D69D}.Release|x64.Build.0 = Release|x64
+		{ADC22697-3B59-47FA-B8CD-FC75AB6012E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ADC22697-3B59-47FA-B8CD-FC75AB6012E3}.Debug|x64.ActiveCfg = Debug|x64
+		{ADC22697-3B59-47FA-B8CD-FC75AB6012E3}.Debug|x64.Build.0 = Debug|x64
+		{ADC22697-3B59-47FA-B8CD-FC75AB6012E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ADC22697-3B59-47FA-B8CD-FC75AB6012E3}.Release|x64.ActiveCfg = Release|x64
+		{ADC22697-3B59-47FA-B8CD-FC75AB6012E3}.Release|x64.Build.0 = Release|x64
+		{C94EE2A8-F0E9-4098-A343-B9DB9E26039A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C94EE2A8-F0E9-4098-A343-B9DB9E26039A}.Debug|x64.ActiveCfg = Debug|x64
+		{C94EE2A8-F0E9-4098-A343-B9DB9E26039A}.Debug|x64.Build.0 = Debug|x64
+		{C94EE2A8-F0E9-4098-A343-B9DB9E26039A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C94EE2A8-F0E9-4098-A343-B9DB9E26039A}.Release|x64.ActiveCfg = Release|x64
+		{C94EE2A8-F0E9-4098-A343-B9DB9E26039A}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {138AA06C-37A9-4516-B156-9138BB046D95}
+	EndGlobalSection
+EndGlobal

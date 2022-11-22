@@ -1,0 +1,97 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+<!-- dotnet publish - -runtime win-x64 -c Release - -self-contained -->
+  
+    
+<PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFrameworks>net6.0-windows</TargetFrameworks>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <NeutralLanguage>en-US</NeutralLanguage>
+    <Platforms>x64</Platforms>
+   <PlatformTarget>x64</PlatformTarget>
+  <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
+  <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <SatelliteResourceLanguages>fr</SatelliteResourceLanguages>
+    <CefSharpAnyCpuSupport>true</CefSharpAnyCpuSupport>
+    <CefSharpBuildAction>Content</CefSharpBuildAction>
+<ProduceReferenceAssembly>True</ProduceReferenceAssembly>
+    
+    <Prefer32Bit>false</Prefer32Bit>
+    <ErrorReport>prompt</ErrorReport>
+    <SignAssembly>True</SignAssembly>
+    <AssemblyOriginatorKeyFile>MapsInMyFolder.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+
+ 
+
+  
+  
+  
+  
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>False</Optimize>
+  </PropertyGroup>
+  
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Optimize>False</Optimize>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="closedhand.cur" />
+    <None Remove="layer_panel.html" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="closedhand.cur" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="cef.redist.x64" Version="104.4.24" />
+    <PackageReference Include="CefSharp.Common" Version="104.4.240" />
+    <PackageReference Include="CefSharp.Common.NETCore" Version="104.4.240" />
+    <PackageReference Include="CefSharp.Wpf" Version="104.4.240" />
+    <PackageReference Include="Jint" Version="3.0.0-beta-2043" />
+    <PackageReference Include="ModernWpfUis" Version="1.4.0" />
+    <PackageReference Include="NetVips" Version="2.2.0" />
+    <PackageReference Include="NetVips.Native" Version="8.13.1" />
+    <PackageReference Include="NetVips.Native.win-x64" Version="8.13.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="System.Data.SQLite" Version="1.0.116" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="layer_panel.html" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\.editorconfig" Link=".editorconfig" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MapsInMyFolder.Common\MapsInMyFolder.Commun.csproj" />
+    <ProjectReference Include="..\MapsInMyFolder.MapControl\MapControl\MapsInMyFolder.MapControl.csproj" />
+    <ProjectReference Include="..\MapsInMyFolder.VectorTileRenderer\MapsInMyFolder.VectorTileRenderer.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Update="chromiumembeddedframework.runtime.win-arm64" Version="104.4.24" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Update="chromiumembeddedframework.runtime.win-x64" Version="104.4.24" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Update="chromiumembeddedframework.runtime.win-x86" Version="104.4.24" />
+  </ItemGroup>
+
+  <!--<Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="RMDIR &quot;$(TargetDir)af-ZA/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)am-ET/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)ar-SA/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)az-Latn-AZ/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)be-BY/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)bg-BG/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)bn-BD/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)bs-Latn-BA/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)ca-ES/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)cs/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)cs-CZ/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)da-DK/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)de/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)de-DE/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)de-DE/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)el-GR/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)en-GB/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)es-ES/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)es-MX/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)et-EE/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)eu-ES/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)fa-IR/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)fi-FI/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)fr-CA/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)fr-FR/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)gl-ES/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)ha-Latn-NG/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)he-IL/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)hi-IN/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)hr-HR/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)hu-HU/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)id-ID/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)is-IS/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)it-IT/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)ja-JP/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)ka-GE/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)kk-KZ/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)km-KH/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)kn-IN/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)ko-KR/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)lo-LA/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)lt-LT/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)lv-LV/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)mk-MK/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)ml-IN/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)ms-MY/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)nb-NO/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)nl-NL/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)nn-NO/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)pl/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)es/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)fr/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)it/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)ja/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)ko/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)pl-PL/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)pt-BR/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)pt-PT/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)ro-RO/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)ru/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)ru-RU/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)sk-SK/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)sl-SI/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)sq-AL/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)sr-Latn-RS/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)sv-SE/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)sw-KE/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)ta-IN/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)te-IN/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)th-TH/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)tr/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)tr-TR/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)uk-UA/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)uz-Latn-UZ/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)vi-VN/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)zh-CN/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)zh-Hans/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)zh-Hant/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)zh-TW/&quot; /S /Q " />
+  </Target>-->
+
+</Project>

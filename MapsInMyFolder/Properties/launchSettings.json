@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "MapsInMyFolder": {
+      "commandName": "Project"
+    },
+    "NoRechargementAChaud": {
+      "commandName": "Project",
+      "hotReloadEnabled": false
+    }
+  }
+}

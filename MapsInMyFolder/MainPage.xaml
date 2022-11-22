@@ -1,0 +1,172 @@
+﻿<Page x:Class="MapsInMyFolder.MainPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:MapsInMyFolder" xmlns:map="clr-namespace:MapsInMyFolder.MapControl;assembly=MapsInMyFolder.MapControl" xmlns:wpf="clr-namespace:CefSharp.Wpf;assembly=CefSharp.Wpf"
+      mc:Ignorable="d" 
+      d:DesignHeight="450" d:DesignWidth="800"
+      Title="MainPage" Loaded="Page_Loaded" Initialized="Page_Initialized">
+    <Page.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="RessourcesDictionnary.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+
+        </ResourceDictionary>
+    </Page.Resources>
+  
+        <!--Main-->
+    <Grid x:Name="MainPageGrid" Visibility="Visible">
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="360" />
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+
+
+            <Grid Grid.Column="0" Background="#FF171719">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="65"/>
+                    <RowDefinition Height="50" />
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+
+                <Label Grid.Row="0" Content="Calques" HorizontalAlignment="Left" Margin="28,10,0,0" VerticalAlignment="Top" Width="Auto" Height="50" FontSize="30" FontFamily="Segoe UI Light" Foreground="#FFE2E2E1"/>
+            <TextBox Grid.Row="1" x:Name="layer_searchbar" Style="{DynamicResource TextBoxCleanStyle_16}"  Margin="10,0,5,0" Text="Rechercher un calque, un site..." HorizontalAlignment="Stretch" GotFocus="Layer_searchbar_GotFocus" LostFocus="Layer_searchbar_LostFocus" TextChanged="Layer_searchbar_TextChanged" KeyDown="Layer_searchbar_KeyDown" Cursor="IBeam"/>
+
+                <Border Grid.Row="2" BorderBrush="Transparent" BorderThickness="1" Margin="0,0,5,0" Width="Auto" Height="Auto">
+                    <wpf:ChromiumWebBrowser x:Name="layer_browser" WebBrowser="{Binding WebBrowser, Mode=OneWayToSource}"/>
+                </Border>
+            </Grid>
+
+            <Grid Grid.Column="1">
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="65"/>
+                    <RowDefinition Height="50" />
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+
+                <Label Grid.Row="0" Content="Carte" HorizontalAlignment="Left" Margin="28,10,0,0" VerticalAlignment="Top" Width="192" Height="50" FontSize="30" FontFamily="Segoe UI Light" Foreground="#FFE2E2E1"/>
+                <Grid x:Name="MapGrid" Grid.Row="1" Margin="0,0,0,0" MouseLeave="MapGrid_MouseLeave">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="45" />
+                        <ColumnDefinition Width="5" />
+                    </Grid.ColumnDefinitions>
+
+
+                <TextBox Grid.Column="0" x:Name="map_searchbar" Style="{DynamicResource TextBoxCleanStyle_16}" Text="Rechercher un lieux..." HorizontalAlignment="Stretch" Margin="10,0,0,0" GotFocus="Map_searchbar_GotFocus" LostFocus="Map_searchbar_LostFocus" TextChanged="Map_searchbar_TextChanged" KeyDown="Map_searchbar_KeyDown" Cursor="IBeam"/>
+
+
+                    <Rectangle Grid.Column="0" x:Name="map_searchbar_overflow" HorizontalAlignment="Right" IsHitTestVisible="False" Width="55" Margin="0,0,0,0" VerticalAlignment="Top" Height="34">
+                        <Rectangle.Fill>
+                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0" SpreadMethod="Pad">
+                                <LinearGradientBrush.RelativeTransform>
+                                    <TransformGroup>
+                                        <ScaleTransform CenterY="0.5" CenterX="0.5"/>
+                                        <SkewTransform CenterY="0.5" CenterX="0.5"/>
+                                        <RotateTransform Angle="-90" CenterY="0.5" CenterX="0.5"/>
+                                        <TranslateTransform/>
+                                    </TransformGroup>
+                                </LinearGradientBrush.RelativeTransform>
+                                <GradientStop Color="#E52D2D2D" Offset="1"/>
+                                <GradientStop Color="#002D2D2D" Offset="0"/>
+                            </LinearGradientBrush>
+                        </Rectangle.Fill>
+                    </Rectangle>
+
+                    <Button Grid.Column="1" x:Name="map_panel_open_location_panel" Style="{DynamicResource IconButton}" Margin="0,5,0,0" VerticalAlignment="Top" HorizontalAlignment="Center" Click="Map_panel_open_location_panel_Click" Height="26" Cursor="Hand" Foreground="#FFE2E2E1">
+                        <Path Panel.ZIndex="999" Fill="Transparent" StrokeStartLineCap="round" StrokeEndLineCap="round" StrokeLineJoin="round" StrokeThickness="0.8" Data="{StaticResource LocationButton}" Stroke="{Binding Foreground, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Button}}" Stretch="Uniform" RenderTransformOrigin="0,0" MaxWidth="22" MaxHeight="20"/>
+                    </Button>
+                </Grid>
+
+                <ListBox Panel.ZIndex="999" Grid.Row="1" Grid.Column="1" Grid.RowSpan="2" x:Name="map_searchbar_suggestion" Visibility="Hidden" Margin="10,35,50,0" SelectionChanged="Map_searchbar_suggestion_SelectionChanged" Height="100" MaxHeight="140" HorizontalAlignment="Stretch" VerticalAlignment="Top" Background="#2B2B2B" >
+
+                </ListBox>
+
+
+
+
+                <Grid Grid.Row="2">
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="265" />
+                        <ColumnDefinition Width="15" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="60"/>
+                        <RowDefinition Height="15"/>
+
+                    </Grid.RowDefinitions>
+
+                    <map:Map Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Grid.RowSpan="2" x:Name="mapviewer" ZoomLevel="18" Margin="10,0,0,0" MinHeight="30" MinWidth="30"
+                 MouseMove="Mapviewer_MouseMove" MouseLeftButtonUp="Mapviewer_MouseLeftButtonUp" MouseDown="Mapviewer_MouseDown" 
+                 Background="White" MouseRightButtonUp="Mapviewer_MouseRightButtonUp" MouseRightButtonDown="Mapviewer_MouseRightButtonDown" MouseLeave="Mapviewer_MouseLeave" MouseWheel="Mapviewer_MouseWheel" 
+                            >
+
+                        <map:Map.Center>
+                            <map:Location Longitude="6.429381" Latitude="48.198846"/>
+                        </map:Map.Center>
+                        <map:Pushpin Panel.ZIndex="999" x:Name="SE_PIN"  Background="#303031" Foreground="#FFE2E2E1" map:MapPanel.Location="48.198846,6.4" Content="Coin_Superieur" MouseMove="SE_PIN_MouseMove" MouseLeftButtonDown="SE_PIN_MouseLeftButtonDown" MouseRightButtonUp="SE_PIN_MouseRightButtonUp" MouseRightButtonDown="SE_PIN_MouseLeftButtonDown" Cursor="Hand" />
+                        <map:Pushpin Panel.ZIndex="999" x:Name="NO_PIN" Background="#303031" Foreground="#FFE2E2E1" map:MapPanel.Location="48.16,6.5" Content="Coin_Inferieur" MouseMove="NO_PIN_MouseMove" MouseLeftButtonDown="NO_PIN_MouseLeftButtonDown" MouseLeftButtonUp="NO_PIN_MouseLeftButtonUp" MouseRightButtonDown="NO_PIN_MouseLeftButtonDown" Cursor="Hand" />
+                        <map:Pushpin Panel.ZIndex="999" x:Name="search_result" Style="{DynamicResource PushpinStyleOrange}"  map:MapPanel.Location="48.16,6.5" Visibility="Hidden" MouseDoubleClick="Search_result_MouseDoubleClick"/>
+
+                        <map:MapTileLayer x:Name="MapTileLayer_Transparent"/>
+                        <map:MapPolygon Panel.ZIndex="999" x:Name="Selection_Rectangle" Stroke="#F18712" Locations="53.447,65 -18,8.1114" StrokeThickness="3" MouseMove="Selection_Rectangle_MouseMove" MouseDown="Selection_Rectangle_MouseDown" Fill="#4CF18712" MouseUp="Selection_Rectangle_MouseUp"  StrokeDashCap="Square" MouseLeave="Selection_Rectangle_MouseLeave" />
+
+                    </map:Map>
+                    <Button x:Name="StartDownloadButton" Grid.Row="1" Grid.Column="1" Style="{DynamicResource RoundedButton}" Content="Télécharger le calque" Height="45" Margin="0,0,15,15" VerticalAlignment="Top" Foreground="#fff" FontSize="18" Click="Start_Download_Click"/>
+                </Grid>
+            </Grid>
+            <Grid x:Name="popup_background" Grid.Row="0" Grid.Column="0"  Grid.RowSpan="1" Grid.ColumnSpan="2" Visibility="Hidden" IsHitTestVisible="True">
+                <Rectangle Fill="#9F000000" Width="{Binding ActualWidth, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}" Height="{Binding ActualHeight, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Window}}}" Panel.ZIndex="999" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"></Rectangle>
+            </Grid>
+            <Grid x:Name="download_panel" Grid.Column="0" Grid.Row="0" Grid.RowSpan="1" Grid.ColumnSpan="2" d:IsHidden="True" Visibility="Hidden">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="350" />
+                </Grid.ColumnDefinitions>
+
+                <Rectangle Grid.Column="0" x:Name="download_panel_open_overlay" HorizontalAlignment="Stretch" Height="Auto"  VerticalAlignment="Stretch" Width="Auto" IsHitTestVisible="True" MouseDown="Download_panel_open_overlay_MouseDown">
+                    <Rectangle.Fill>
+                        <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0" SpreadMethod="Pad">
+                            <LinearGradientBrush.RelativeTransform>
+                                <TransformGroup>
+                                    <ScaleTransform CenterY="0.5" CenterX="0.5"/>
+                                    <SkewTransform CenterY="0.5" CenterX="0.5"/>
+                                    <RotateTransform Angle="-90" CenterY="0.5" CenterX="0.5"/>
+                                    <TranslateTransform/>
+                                </TransformGroup>
+                            </LinearGradientBrush.RelativeTransform>
+                            <GradientStop Color="#99000000" Offset="1"/>
+                            <GradientStop Color="#B2000000" Offset="1"/>
+                            <GradientStop Color="#7F000000" Offset="0.857"/>
+                            <GradientStop Color="#7F000000" Offset="0"/>
+                        </LinearGradientBrush>
+                    </Rectangle.Fill>
+                </Rectangle>
+
+                <Grid Grid.Column="1" Width="Auto" Background="#171719">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="65"/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <Label Grid.Row="0" Content="Téléchargements" HorizontalAlignment="Left" Margin="28,10,0,0" VerticalAlignment="Top" Width="Auto" Height="50" FontSize="30" FontFamily="Segoe UI Light" Foreground="#FFE2E2E1"/>
+                <Button Grid.Row="0" x:Name="download_panel_close_button" Style="{DynamicResource IconButton}" Margin="0,15,15,0" VerticalAlignment="Top" HorizontalAlignment="Right" Click="Download_panel_close_button_Click" Height="30" Width="30" Foreground="#FFE2E2E1" Cursor="Hand"  ToolTip="Fermer ce panneau">
+                        <Path Panel.ZIndex="999" Fill="Transparent" StrokeStartLineCap="round" StrokeEndLineCap="round" StrokeLineJoin="round" StrokeThickness="0.8" Data="{StaticResource CloseButton}" Stroke="{Binding Foreground, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Button}}" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center" RenderTransformOrigin="0,0" Height="20" Width="20"/>
+                    </Button>
+
+                    <wpf:ChromiumWebBrowser Grid.Row="1" x:Name="download_panel_browser" WebBrowser="{Binding WebBrowser, Mode=OneWayToSource}"  Foreground="#FFFAFAFA" Margin="0,0,0,0" Height="Auto"/>
+
+
+                </Grid>
+            </Grid>
+
+        </Grid>
+        <!--/Main-->
+   
+</Page>
