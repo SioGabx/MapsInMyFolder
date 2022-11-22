@@ -20,7 +20,7 @@ namespace MapsInMyFolder
     /// </summary>
     public partial class MainPage : Page
     {
-
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2211:Les champs non constants ne doivent pas être visibles", Justification = "for access everywhere")]
         public static MainPage _instance;
         public MainPage()
         {

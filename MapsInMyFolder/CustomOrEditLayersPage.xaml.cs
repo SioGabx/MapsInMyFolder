@@ -514,7 +514,7 @@ namespace MapsInMyFolder
                     "','TILECOMPUTATIONSCRIPT'='" + TILECOMPUTATIONSCRIPT + "','SPECIALSOPTIONS'='" + SPECIALSOPTIONS + "' WHERE ID = " + LayerId);
                 }
             }
-            MainPage.Clear_cache(LayerId, false);
+            MainPage.ClearCache(LayerId, false);
             
             Javascript.EngineStopAll();
             Javascript.EngineClearList();

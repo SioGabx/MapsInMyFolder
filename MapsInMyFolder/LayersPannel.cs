@@ -193,34 +193,24 @@ namespace MapsInMyFolder
                     {
                         layersClassicSort.Add(calque);
                     }
-
-
                 }
                 catch (Exception ex)
                 {
                     Debug.WriteLine("fonction DB_Layer_Read : " + ex.Message);
                 }
             }
-            //conn.Close();
-
             List<Layers> layers = layersFavorite.Concat(layersClassicSort).ToList();
-
-
             return layers;
         }
 
         string DB_Layer_Load()
         {
-            // string query = "SELECT * FROM LAYERS ORDER BY " + Settings.layers_Sort.ToString() + " " + Settings.Layers_Order.ToString();
-            //SELECT *,'LAYERS' AS TYPE FROM LAYERS UNION SELECT *,'CUSTOMSLAYERS' FROM CUSTOMSLAYERS ORDER BY DISPLAY_NAME DESC
             string query = "SELECT *,'LAYERS' AS TYPE FROM LAYERS UNION SELECT *,'CUSTOMSLAYERS' FROM CUSTOMSLAYERS ORDER BY " + Commun.Settings.layers_Sort.ToString() + " " + Commun.Settings.Layers_Order.ToString() + " NULLS LAST";
             string query2 = "SELECT * FROM EDITEDLAYERS ORDER BY " + Commun.Settings.layers_Sort.ToString() + " " + Commun.Settings.Layers_Order.ToString() + " NULLS LAST";
             SQLiteConnection conn = Database.DB_Connection();
             if (conn is null)
             {
-
                 return "<p style=\"color:white;font-family:Arial;font-size:13px\">Aucune base de données trouvée. Veuillez relancer l'application.</p><p style=\"color:white;font-family:Arial;font-size:13px\">Si le problème persiste, veuillez réessayer ultérieurement</p>";
-            
             }
 
             string baseHTML = DB_Layer_CreateHTML(DB_Layer_Read(conn, query), DB_Layer_Read(conn, query2));
@@ -253,9 +243,6 @@ namespace MapsInMyFolder
             {
                 EditedLayersDictionnary.Add(individual_editedlayer.class_id, individual_editedlayer);
             }
-
-
-
             List<Layers> GenerateHTMLFromLayerList(List<Layers> ListOfLayers, bool DoRejectLayer = true)
             {
                 List<Layers> layersRejected = new List<Layers>();
@@ -335,7 +322,6 @@ namespace MapsInMyFolder
 
         public void Set_current_layer(int id)
         {
-            //MapLoad()//init
             int layer_startup_id = Commun.Settings.layer_startup_id;
             DebugMode.WriteLine("Set layer");
             string last_format = "";
@@ -347,7 +333,6 @@ namespace MapsInMyFolder
             Layers layer = Layers.GetLayerById(id);
             if (Layers.Layers_Dictionnary_List.Count <= 0)
             {
-                //layer = new Layers(1, false, "Erreur", "Erreur de chargement", "Erreur", "Erreur", "", "Erreur", "", "", 0, 20, "normal", "jpeg", "", 0);
                 layer = Layers.Empty(0);
                 Dictionary<int, Layers> x = new Dictionary<int, Layers> { { 0, layer } };
                 Layers.Layers_Dictionnary_List.Add(x);
@@ -367,23 +352,6 @@ namespace MapsInMyFolder
             {
                 try
                 {
-                    //CurentLayer.class_id = layer.class_id;
-                    //CurentLayer.class_tile_size = layer.class_tile_size;
-                    //CurentLayer.class_display_name = layer.class_display_name;
-                    //CurentLayer.class_description = layer.class_description;
-
-                    //CurentLayer.class_categorie = layer.class_categorie;
-                    //CurentLayer.class_identifiant = layer.class_identifiant;
-                    //CurentLayer.class_tile_url = layer.class_tile_url;
-                    //CurentLayer.class_site = layer.class_site;
-
-                    //CurentLayer.class_site_url = layer.class_site_url;
-                    //CurentLayer.class_min_zoom = layer.class_min_zoom;
-                    //CurentLayer.class_max_zoom = layer.class_max_zoom;
-                    //CurentLayer.class_format = layer.class_format;
-
-                    //CurentLayer.class_tilecomputationscript = layer.class_tilecomputationscript;
-                    //CurentLayer.class_specialsoptions = layer.class_specialsoptions;
                     Layers.Convert.ToCurentLayer(layer);
                     Debug.WriteLine("Set curent layer " + layer.class_display_name + " = " + layer.class_tiles_size);
                     if (layer.class_format == "png")
@@ -459,7 +427,7 @@ namespace MapsInMyFolder
 
 
 
-        public static void Clear_cache(int id, bool ShowMessageBox = true)
+        public static void ClearCache(int id, bool ShowMessageBox = true)
         {
             if (id == 0) { return; }
 
@@ -632,7 +600,7 @@ namespace MapsInMyFolder
             int id_int = Convert.ToInt32(id);
             App.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
             {
-                MainPage.Clear_cache(id_int);
+                MainPage.ClearCache(id_int);
             }, null);
             DebugMode.WriteLine("Clear_cache layer " + id_int);
         }

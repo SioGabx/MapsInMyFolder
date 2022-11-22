@@ -34,6 +34,7 @@ namespace MapsInMyFolder
             InitializeComponent();
         }
 
+
         string center_view_city;
         public string default_filename;
         int Last_Redim_HUnit_Selected = 0;
@@ -99,6 +100,7 @@ namespace MapsInMyFolder
         public void Init()
         {
             Update_Labels();
+            LastResquestZoom = -1;
             UpdateMigniatureParralele();
             GetCenterViewCityName();
             TextBox_Redim_HUnit.Opacity = 0.56;
@@ -127,7 +129,11 @@ namespace MapsInMyFolder
         CancellationToken UpdateMigniatureParraleleToken = new CancellationToken();
         async void UpdateMigniatureParralele()
         {
-            if (!IsInitialized) { return; }
+            Debug.WriteLine("update minia LastResquestZoom " + LastResquestZoom);
+            if (!IsInitialized) {
+                Debug.WriteLine("Not ini");
+                return; 
+            }
             if (LastResquestZoom == ZoomSlider.Value)
             {
                 return;
