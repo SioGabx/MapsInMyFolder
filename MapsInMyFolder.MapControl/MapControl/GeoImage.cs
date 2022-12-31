@@ -13,7 +13,6 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
-
 namespace MapsInMyFolder.MapControl
 {
     public partial class GeoImage : ContentControl
@@ -83,8 +82,8 @@ namespace MapsInMyFolder.MapControl
                     image.RenderTransform = new RotateTransform { Angle = -rotation };
 
                     // effective unrotated transform
-                    transform.M11 = Math.Sqrt(transform.M11 * transform.M11 + transform.M12 * transform.M12);
-                    transform.M22 = -Math.Sqrt(transform.M22 * transform.M22 + transform.M21 * transform.M21);
+                    transform.M11 = Math.Sqrt((transform.M11 * transform.M11) + (transform.M12 * transform.M12));
+                    transform.M22 = -Math.Sqrt((transform.M22 * transform.M22) + (transform.M21 * transform.M21));
                     transform.M12 = 0;
                     transform.M21 = 0;
                 }

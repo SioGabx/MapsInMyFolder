@@ -17,6 +17,5 @@ namespace MapsInMyFolder.Commun
             public static double SE_Latitude;
             public static double SE_Longitude;
         }
-
     }
 }

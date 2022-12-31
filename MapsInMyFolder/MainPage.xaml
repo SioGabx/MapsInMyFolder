@@ -36,7 +36,7 @@
             <TextBox Grid.Row="1" x:Name="layer_searchbar" Style="{DynamicResource TextBoxCleanStyle_16}"  Margin="10,0,5,0" Text="Rechercher un calque, un site..." HorizontalAlignment="Stretch" GotFocus="Layer_searchbar_GotFocus" LostFocus="Layer_searchbar_LostFocus" TextChanged="Layer_searchbar_TextChanged" KeyDown="Layer_searchbar_KeyDown" Cursor="IBeam"/>
 
                 <Border Grid.Row="2" BorderBrush="Transparent" BorderThickness="1" Margin="0,0,5,0" Width="Auto" Height="Auto">
-                    <wpf:ChromiumWebBrowser x:Name="layer_browser" WebBrowser="{Binding WebBrowser, Mode=OneWayToSource}"/>
+                    <wpf:ChromiumWebBrowser x:Name="layer_browser" WebBrowser="{Binding WebBrowser, Mode=OneWayToSource}" LoadingStateChanged="Layer_browser_LoadingStateChanged"/>
                 </Border>
             </Grid>
 

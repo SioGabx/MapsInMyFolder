@@ -47,14 +47,13 @@ namespace MapsInMyFolder.VectorTileRenderer
             //renderTarget.Width = this.width;
             //renderTarget.Height = this.height;
 
-
             surface = SKSurface.Create(info, bitmap.BackBuffer, bitmap.BackBufferStride);
 
             //surface = SKSurface.Create(grContext, renderTarget);
             canvas = surface.Canvas;
 
-            double padding = -5;
-            clipRectangle = new Rect(padding, padding, this.width - padding * 2, this.height - padding * 2);
+            const double padding = -5;
+            clipRectangle = new Rect(padding, padding, this.width - (padding * 2), this.height - (padding * 2));
 
             clipRectanglePath = new List<IntPoint>
             {
@@ -90,7 +89,6 @@ namespace MapsInMyFolder.VectorTileRenderer
             return SKStrokeCap.Square;
         }
 
-
         double Clamp(double number, double min = 0, double max = 1)
         {
             return Math.Max(min, Math.Min(max, number));
@@ -117,7 +115,7 @@ namespace MapsInMyFolder.VectorTileRenderer
 
             if (success && solution.Count > 0)
             {
-                var result = solution.Select(s => s.Select(item => new Point(item.X, item.Y)).ToList()).ToList();
+                var result = solution.ConvertAll(s => s.ConvertAll(item => new Point(item.X, item.Y)));
                 return result;
             }
 
@@ -131,7 +129,6 @@ namespace MapsInMyFolder.VectorTileRenderer
 
         SKPath GetPathFromGeometry(List<Point> geometry)
         {
-
             SKPath path = new SKPath
             {
                 FillType = SKPathFillType.EvenOdd,
@@ -175,7 +172,7 @@ namespace MapsInMyFolder.VectorTileRenderer
                 IsAntialias = true,
             };
 
-            if (style.Paint.LineDashArray.Count() > 0)
+            if (style.Paint.LineDashArray.Length > 0)
             {
                 var effect = SKPathEffect.CreateDash(style.Paint.LineDashArray.Select(n => (float)n).ToArray(), 0);
                 fillPaint.PathEffect = effect;
@@ -254,11 +251,9 @@ namespace MapsInMyFolder.VectorTileRenderer
             }
 
             var paint = GetTextPaint(style);
-            paint.TextSize = (float)(paint.TextSize);
+            paint.TextSize = (float)paint.TextSize;
 
-            text = BreakText(text, paint, style, options);
-
-            return text;
+            return BreakText(text, paint, style, options);
             //return Encoding.UTF32.GetBytes(newText);
         }
 
@@ -290,7 +285,6 @@ namespace MapsInMyFolder.VectorTileRenderer
                 brokenText += restOfText.Substring(0, (int)lastSpaceIndex).Trim() + string.Concat(Enumerable.Repeat("\n", multiplieur));
 
                 restOfText = restOfText.Substring((int)lastSpaceIndex, restOfText.Length - (int)lastSpaceIndex);
-
             } while (restOfText.Length > 0);
 
             return brokenText.Trim();
@@ -350,8 +344,8 @@ namespace MapsInMyFolder.VectorTileRenderer
 
                 // all options exhausted...
                 // get the first one
-                var fallback = SKTypeface.FromFamilyName(familyNames.First());
-                fontPairs[familyNames.First()] = fallback;
+                var fallback = SKTypeface.FromFamilyName(familyNames[0]);
+                fontPairs[familyNames[0]] = fallback;
                 return fallback;
             }
         }
@@ -395,22 +389,17 @@ namespace MapsInMyFolder.VectorTileRenderer
                     style.Text = style.Text.Substring(0, charIdx);
                 }
             }
-
         }
-
-
 
         public void DrawTextOnCanvas(Renderer.Collisions Colisions, Renderer.ROptions options)
         {
-
             foreach (Renderer.TextElements textElements in Colisions.TextElementsList)
             {
                 //DebugRectangle(textElements.rectangle, Color.FromRgb(255, 0, 0));
 
-
                 foreach (Renderer.TextElements textElementsInList in Colisions.TextElementsList)
                 {
-                    if (textElementsInList.doDraw == true && textElementsInList.rectangle.IntersectsWith(textElements.rectangle) && textElements.hatchCode != textElementsInList.hatchCode)
+                    if (textElementsInList.doDraw && textElementsInList.rectangle.IntersectsWith(textElements.rectangle) && textElements.hatchCode != textElementsInList.hatchCode)
                     {
                         if (textElementsInList.style.Text.Length > textElements.style.Text.Length)
                         {
@@ -422,10 +411,7 @@ namespace MapsInMyFolder.VectorTileRenderer
                         }
                     }
                 }
-
-
             }
-
 
             foreach (Renderer.TextElements textElements in Colisions.TextElementsList)
             {
@@ -446,10 +432,8 @@ namespace MapsInMyFolder.VectorTileRenderer
                     foreach (var line in allLines)
                     {
                         var bytes = Encoding.UTF32.GetBytes(line);
-                        float lineOffset = (float)(i * style.Paint.TextSize) - ((float)(allLines.Length) * (float)style.Paint.TextSize) / 2 + (float)style.Paint.TextSize;
+                        float lineOffset = (float)(i * style.Paint.TextSize) - ((float)allLines.Length * (float)style.Paint.TextSize / 2) + (float)style.Paint.TextSize;
                         var position = new SKPoint((float)geometry.X + (float)(style.Paint.TextOffset.X * style.Paint.TextSize), (float)geometry.Y + (float)(style.Paint.TextOffset.Y * style.Paint.TextSize) + lineOffset);
-
-
 
                         if (style.Paint.TextStrokeWidth != 0)
                         {
@@ -467,11 +451,8 @@ namespace MapsInMyFolder.VectorTileRenderer
             }
         }
 
-
-
         public Renderer.Collisions DrawText(Point geometry, Brush style, Renderer.ROptions options, Renderer.Collisions collisions, int hatchCode)
         {
-
             if (style.Paint.TextOptional)
             {
                 //return;
@@ -495,9 +476,9 @@ namespace MapsInMyFolder.VectorTileRenderer
                 var biggestLine = allLines.OrderBy(line => line.Length).Last();
                 var bytes = Encoding.UTF32.GetBytes(biggestLine);
 
-                var width = (int)(paint.MeasureText(bytes));
-                int left = (int)(geometry.X - width / 2);
-                int top = (int)(geometry.Y - style.Paint.TextSize / 2 * allLines.Length);
+                var width = (int)paint.MeasureText(bytes);
+                int left = (int)(geometry.X - (width / 2));
+                int top = (int)(geometry.Y - (style.Paint.TextSize / 2 * allLines.Length));
                 int height = (int)(style.Paint.TextSize * allLines.Length);
 
                 var rectangle = new Rect(left, top, width, height);
@@ -511,7 +492,6 @@ namespace MapsInMyFolder.VectorTileRenderer
                 //    }
                 //}
 
-
                 //foreach (int coli in collisions.CollisionEntity)
                 //{
                 //    if (hatchCode == coli)
@@ -521,9 +501,6 @@ namespace MapsInMyFolder.VectorTileRenderer
 
                 //    }
                 //}
-
-
-
 
                 //if (TextCollides(rectangle))
                 //{
@@ -538,7 +515,6 @@ namespace MapsInMyFolder.VectorTileRenderer
                 //textRectangles.Add(rectangle);
 
                 collisions.TextElementsList.Add(new Renderer.TextElements(geometry, style, hatchCode, rectangle));
-
             }
             return collisions;
         }
@@ -565,7 +541,7 @@ namespace MapsInMyFolder.VectorTileRenderer
             double previousAngle = 0;
             for (var i = 0; i < path.Count - 2; i++)
             {
-                var vector = (path[i] - path[i + 1]);
+                var vector = path[i] - path[i + 1];
 
                 var angle = Math.Atan2(vector.Y, vector.X);
                 var angleDiff = Math.Abs(GetAbsoluteDiff2Angles(angle, previousAngle));
@@ -626,7 +602,6 @@ namespace MapsInMyFolder.VectorTileRenderer
                 //{
                 //return collisions;
 
-
                 geometry = ClipLine(geometry);
                 if (geometry == null)
                 {
@@ -661,7 +636,6 @@ namespace MapsInMyFolder.VectorTileRenderer
                 //    // bounding box (much bigger) collides with edges
                 //    return;
                 //}
-
 
                 foreach (int coli in collisions.CollisionEntity)
                 {
@@ -718,21 +692,19 @@ namespace MapsInMyFolder.VectorTileRenderer
                 //    }
                 //}
 
-
-
                 foreach (SKPoint point in path.Points)
                 {
-                    if (!((point.X > options.TileSize && point.X < options.TileSize * 2) && (point.X > options.TileSize && point.X < options.TileSize * 2)))
+                    if (!(point.X > options.TileSize && point.X < options.TileSize * 2 && point.X > options.TileSize && point.X < options.TileSize * 2))
                     {
                         collisions.CollisionEntity.Add(hatchCode);
                         return collisions;
                     }
                 }
-                int margin = 10;
-                double reel_left = (left - options.TileSize);
-                double reel_top = (top - options.TileSize);
-                double width_utilise = (reel_left + rectangle.Width);
-                double height_utilise = (reel_top + rectangle.Height);
+                const int margin = 10;
+                double reel_left = left - options.TileSize;
+                double reel_top = top - options.TileSize;
+                double width_utilise = reel_left + rectangle.Width;
+                double height_utilise = reel_top + rectangle.Height;
                 if (width_utilise < (options.TileSize - margin) && height_utilise < (options.TileSize - margin))
                 {
                     //Debug.WriteLine("width_restante =" + width_utilise);
@@ -740,19 +712,15 @@ namespace MapsInMyFolder.VectorTileRenderer
                     collisions.CollisionEntity.Add(hatchCode);
                     return collisions;
                 }
-                if ((reel_top > margin && reel_left > margin))
+                if (reel_top > margin && reel_left > margin)
                 {
                     collisions.CollisionEntity.Add(hatchCode);
                     return collisions;
                 }
                 //DebugRectangle(rectangle, Colors.Brown);
 
-
-
-
-                if (TextCollides(rectangle) && true)
+                if (TextCollides(rectangle))
                 {
-
                     //if (options.ImgPositionX == options.ImgCenterPositionX && options.ImgPositionY == options.ImgCenterPositionY)
                     //{
                     //    double vwidth = right - left;
@@ -779,7 +747,6 @@ namespace MapsInMyFolder.VectorTileRenderer
                         collisions.CollisionEntity.Add(hatchCode);
                        return collisions;
                     }
-
                 }
                 textRectangles.Add(rectangle);
 
@@ -797,14 +764,12 @@ namespace MapsInMyFolder.VectorTileRenderer
                     return collisions;
                 }
 
-
-                style.Paint.TextSize = style.Paint.TextSize * 1;
+                style.Paint.TextSize *= 1;
 
                 var offset = new SKPoint((float)style.Paint.TextOffset.X, (float)style.Paint.TextOffset.Y);
                 var bytes = Encoding.UTF32.GetBytes(text);
                 if (style.Paint.TextStrokeWidth != 0)
                 {
-
 #pragma warning disable CS0618 // Le type ou le membre est obsolète
                     canvas.DrawTextOnPath(bytes, path, offset, GetTextStrokePaint(style));
 #pragma warning restore CS0618 // Le type ou le membre est obsolète
@@ -861,9 +826,7 @@ namespace MapsInMyFolder.VectorTileRenderer
 
                 canvas.DrawPath(path, fillPaint);
             }
-
         }
-
 
         static SKImage ToSKImage(BitmapSource bitmap)
         {
@@ -917,11 +880,7 @@ namespace MapsInMyFolder.VectorTileRenderer
 
         public void DrawUnknown(List<List<Point>> geometry, Brush style)
         {
-
         }
-
-
-
 
         public BitmapSource FinishDrawing()
         {
@@ -936,20 +895,14 @@ namespace MapsInMyFolder.VectorTileRenderer
             //    canvas.DrawText(bytes, new SKPoint(10, 10), paint);
             //}
 
-
             //surface.Canvas.Flush();
             //grContext.
-
 
             bitmap.AddDirtyRect(new Int32Rect(0, 0, this.width, this.height));
             bitmap.Unlock();
             bitmap.Freeze();
 
-
             return bitmap;
-
         }
     }
 }
-
-

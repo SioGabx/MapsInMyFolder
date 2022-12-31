@@ -186,7 +186,7 @@
                             <RowDefinition/>
                         </Grid.RowDefinitions>
                         <Label Content="Taille des tuiles :" Foreground="#888989" Grid.Row="0"></Label>
-                        <TextBox x:Name="TextboxLayerTileWidth" HorizontalAlignment="Stretch" Grid.Row="1" Style="{DynamicResource TextBoxCleanStyle_13}" IsEnabled="True" Cursor="IBeam"></TextBox>
+                        <TextBox x:Name="TextboxLayerTileWidth" HorizontalAlignment="Stretch" Grid.Row="1" Style="{DynamicResource TextBoxCleanStyle_13}" IsEnabled="True" Cursor="IBeam" TextChanged="TextboxLayerTileWidth_TextChanged"></TextBox>
                     </Grid>
                     
                     <Grid Margin="0,10,0,0">

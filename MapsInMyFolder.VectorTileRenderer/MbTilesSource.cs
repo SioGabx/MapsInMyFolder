@@ -28,7 +28,6 @@ namespace MapsInMyFolder.VectorTileRenderer.Sources
 
         SQLiteConnection sharedConnection;
 
-
         public MbTilesSource(string path)
         {
             this.Path = path;
@@ -76,7 +75,6 @@ namespace MapsInMyFolder.VectorTileRenderer.Sources
                             case "version":
                                 this.MBTilesVersion = reader["value"].ToString();
                                 break;
-
                         }
                     }
                 }
@@ -183,7 +181,7 @@ namespace MapsInMyFolder.VectorTileRenderer.Sources
 
                 overZoomed = true;
             }
-            
+
             try
             {
                 var actualTile = GetCachedVectorTile(x, y, zoom);
@@ -195,7 +193,6 @@ namespace MapsInMyFolder.VectorTileRenderer.Sources
                 }
 
                 return actualTile;
-
             } catch(Exception)
             {
                 return null;
@@ -222,7 +219,6 @@ namespace MapsInMyFolder.VectorTileRenderer.Sources
                     return tile;
                 }
             }
-
         }
 
 #pragma warning disable CS1998 // Cette méthode async n'a pas d'opérateur 'await' et elle s'exécutera de façon synchrone

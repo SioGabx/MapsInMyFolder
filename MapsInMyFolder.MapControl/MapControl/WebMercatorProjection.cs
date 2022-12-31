@@ -6,7 +6,6 @@ using System;
 
 using System.Windows;
 
-
 namespace MapsInMyFolder.MapControl
 {
     /// <summary>
@@ -63,7 +62,7 @@ namespace MapsInMyFolder.MapControl
 
         public static double YToLatitude(double y)
         {
-            return 90d - Math.Atan(Math.Exp(-y * Math.PI / 180d)) * 360d / Math.PI;
+            return 90d - (Math.Atan(Math.Exp(-y * Math.PI / 180d)) * 360d / Math.PI);
         }
     }
 }

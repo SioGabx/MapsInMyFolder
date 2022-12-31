@@ -123,7 +123,7 @@ namespace MapsInMyFolder.MapControl
 
         private void OnMouseWheel(object sender, MouseWheelEventArgs e)
         {
-            var zoomLevel = TargetZoomLevel + MouseWheelZoomDelta * Math.Sign(e.Delta);
+            var zoomLevel = TargetZoomLevel + (MouseWheelZoomDelta * Math.Sign(e.Delta));
 
             ZoomMap(e.GetPosition(this), MouseWheelZoomDelta * Math.Round(zoomLevel / MouseWheelZoomDelta));
         }

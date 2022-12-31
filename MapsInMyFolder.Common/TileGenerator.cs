@@ -5,8 +5,6 @@ using System.Threading.Tasks;
 
 namespace MapsInMyFolder.Commun
 {
-
-
     public class HttpResponse
     {
         public byte[] Buffer { get; }
@@ -42,7 +40,7 @@ namespace MapsInMyFolder.Commun
 
     public enum Status
     {
-        waitfordownloading, error, cancel, success, pause, progress, no_data, assemblage, rognage, enregistrement, deleted
+        waitfordownloading, error, cancel, success, pause, progress, no_data, assemblage, rognage, enregistrement, deleted, noconnection
     }
 
     public static class TileGeneratorSettings
@@ -74,27 +72,26 @@ namespace MapsInMyFolder.Commun
         };
     }
 
-
     public partial class TileGenerator
     {
-        public Layers Layer { get; set; } = Layers.Empty();
+        //public Layers Layer { get; set; } = Layers.Empty();
          public async Task<HttpResponse> GetImageAsync(string urlBase, int TileX, int TileY, int TileZoom, int layerID, string fileformat = null, string save_temp_directory = "", int settings_max_tiles_cache_days = 0, bool pbfdisableadjacent = false)
         {
+            Layers Layer = Layers.GetLayerById(layerID);
             string SwitchFormat;
             if (string.IsNullOrEmpty(fileformat) && !(Layer is null))
             {
-                SwitchFormat = Layer.class_format.ToString();
+                SwitchFormat = Layer.class_format;
             }
             else
             {
                 SwitchFormat = fileformat;
             }
-            
 
             switch (SwitchFormat)
             {
                 case "pbf":
-                    int TileSize = 1;
+                    const int TileSize = 1;
                     return await GetTilePBF(layerID, urlBase, TileX, TileY, TileZoom, save_temp_directory, settings_max_tiles_cache_days, Layer.class_tiles_size * TileSize, TileSize, 0.5, pbfdisableadjacent).ConfigureAwait(false);
 
                 default:
@@ -102,6 +99,5 @@ namespace MapsInMyFolder.Commun
                     return await GetTile(layerID, urlBase, TileX, TileY, TileZoom).ConfigureAwait(false);
             }
         }
-
     }
 }

@@ -7,7 +7,6 @@ using System;
 using System.Windows;
 using System.Windows.Media;
 
-
 namespace MapsInMyFolder.MapControl
 {
     public partial class PushpinBorder
@@ -64,9 +63,9 @@ namespace MapsInMyFolder.MapControl
             if (HorizontalAlignment != HorizontalAlignment.Left && HorizontalAlignment != HorizontalAlignment.Right)
             {
                 var c = width / 2d;
-                figure.Segments.Add(LineTo(c + aw / 2d, y2));
+                figure.Segments.Add(LineTo(c + (aw / 2d), y2));
                 figure.Segments.Add(LineTo(c, y3));
-                figure.Segments.Add(LineTo(c - aw / 2d, y2));
+                figure.Segments.Add(LineTo(c - (aw / 2d), y2));
             }
 
             if (HorizontalAlignment == HorizontalAlignment.Left)

@@ -36,17 +36,15 @@ namespace MapsInMyFolder
             _instance = this;
             InitializeComponent();
             MainContentFrame.Navigate(MainPage);
+            TileGeneratorSettings.handler.ServerCertificateCustomValidationCallback += (_, _, _, _) => true;
         }
 
         public MainPage MainPage = new MainPage();
         public PrepareDownloadPage PrepareDownloadPage = new PrepareDownloadPage();
         public CustomOrEditLayersPage CustomOrEditLayersPage;
 
-
         public void FrameBack(bool NoTransition = false)
         {
-
-            
             AppTitleBar.Opacity = 1;
             if (CustomOrEditLayersPage is not null)
             {
@@ -70,7 +68,7 @@ namespace MapsInMyFolder
                 return;
             }
             Popup_opening(false);
-            PrepareDownloadPage.default_filename = Curent.Layer.class_display_name.Trim().Replace(" ", "_").ToLowerInvariant();
+            PrepareDownloadPage.default_filename = Curent.Layer.class_name.Trim().Replace(" ", "_").ToLowerInvariant();
             PrepareDownloadPage.Init();
             MainContentFrame.Navigate(PrepareDownloadPage);
         }
@@ -82,7 +80,7 @@ namespace MapsInMyFolder
                 LayerId = Layerid
             };
             CustomOrEditLayersPage.Init_CustomOrEditLayersWindow();
-           
+
                 MainContentFrame.Navigate(CustomOrEditLayersPage);
             Commun.TileGeneratorSettings.AcceptJavascriptPrint = true;
         }
@@ -94,7 +92,7 @@ namespace MapsInMyFolder
             TitleTextBox.Text = "MapsInMyFolder";
             //Settings.SaveSettings();
             //Settings.LoadSettingsAsync();
-            Commun.Settings.LoadSettingsAsync();
+            Commun.Settings.LoadSetting();
             Database.DB_Download();
             ThemeManager.Current.ApplicationTheme = ApplicationTheme.Dark;
             ImageLoader.HttpClient.DefaultRequestHeaders.Add("User-Agent", Commun.Settings.user_agent);
@@ -103,15 +101,13 @@ namespace MapsInMyFolder
             Debug.WriteLine("Version dotnet :" + Environment.Version.ToString());
             Javascript JavascriptLocationInstance = Javascript.JavascriptInstance;
             JavascriptLocationInstance.LocationChanged += (o, e) => MainPage.MapViewerSetSelection(Javascript.JavascriptInstance.Location, Javascript.JavascriptInstance.ZoomToNewLocation);
+            Network.IsNetworkNowAvailable += (o, e) => CheckIfReadyToStartDownloadAfterNetworkChange();
         }
-
 
         private void Window_ContentRendered(object sender, EventArgs e)
         {
             MainPage.Set_current_layer(Commun.Settings.layer_startup_id);
         }
-
-
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
@@ -127,8 +123,6 @@ namespace MapsInMyFolder
             Init();
         }
 
-
-
         public void Popup_closing()
         {
             AppTitleBar.Opacity = 1;
@@ -136,12 +130,8 @@ namespace MapsInMyFolder
             {
                 EasingFunction = new PowerEase { EasingMode = EasingMode.EaseInOut }
             };
-            hide_anim.Completed += (s, e) =>
-            {
-                MainPage.popup_background.Visibility = Visibility.Hidden;
-            };
+            hide_anim.Completed += (s, e) => MainPage.popup_background.Visibility = Visibility.Hidden;
             MainPage.popup_background.BeginAnimation(UIElement.OpacityProperty, hide_anim);
-
         }
 
         public void Popup_opening(bool ReduceOpacity = true)
@@ -167,7 +157,6 @@ namespace MapsInMyFolder
             }
         }
 
-
         private void Map_panel_open_download_panel_Click(object sender, RoutedEventArgs e)
         {
             MainPage.Download_panel_open();
@@ -175,10 +164,13 @@ namespace MapsInMyFolder
 
         private void Map_panel_open_settings_panel_Click(object sender, RoutedEventArgs e)
         {
-            Debug.WriteLine(Collectif.GetUrl.numberofurlgenere);
+            SettingsWindow settingsModalWindow = new SettingsWindow
+            {
+                Owner = this,
+                WindowStartupLocation = WindowStartupLocation.CenterOwner
+            };
+            settingsModalWindow.ShowDialog();
+            settingsModalWindow.Focus();
         }
-
-
-
     }
 }

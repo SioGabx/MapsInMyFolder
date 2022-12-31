@@ -6,7 +6,6 @@ using System;
 using System.Windows;
 using System.Windows.Media;
 
-
 namespace MapsInMyFolder.MapControl
 {
     /// <summary>
@@ -89,8 +88,8 @@ namespace MapsInMyFolder.MapControl
             // tile matrix origin in map coordinates
             //
             var mapOrigin = new Point(
-                tileMatrixTopLeft.X + tileMatrixOrigin.X / tileMatrixScale,
-                tileMatrixTopLeft.Y - tileMatrixOrigin.Y / tileMatrixScale);
+                tileMatrixTopLeft.X + (tileMatrixOrigin.X / tileMatrixScale),
+                tileMatrixTopLeft.Y - (tileMatrixOrigin.Y / tileMatrixScale));
 
             // tile matrix origin in view coordinates
             //

@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <?define MapsInMyFolder_TargetDir=$(var.MapsInMyFolder.ProjectDir)bin/Publication/?>
+
+
+  <?define MapsInMyFolderFiles=Accessibility.dll;api-ms-win-core-console-l1-1-0.dll;api-ms-win-core-console-l1-2-0.dll;api-ms-win-core-datetime-l1-1-0.dll;api-ms-win-core-debug-l1-1-0.dll;api-ms-win-core-errorhandling-l1-1-0.dll;api-ms-win-core-fibers-l1-1-0.dll;api-ms-win-core-file-l1-1-0.dll;api-ms-win-core-file-l1-2-0.dll;api-ms-win-core-file-l2-1-0.dll;api-ms-win-core-handle-l1-1-0.dll;api-ms-win-core-heap-l1-1-0.dll;api-ms-win-core-interlocked-l1-1-0.dll;api-ms-win-core-libraryloader-l1-1-0.dll;api-ms-win-core-localization-l1-2-0.dll;api-ms-win-core-memory-l1-1-0.dll;api-ms-win-core-namedpipe-l1-1-0.dll;api-ms-win-core-processenvironment-l1-1-0.dll;api-ms-win-core-processthreads-l1-1-0.dll;api-ms-win-core-processthreads-l1-1-1.dll;api-ms-win-core-profile-l1-1-0.dll;api-ms-win-core-rtlsupport-l1-1-0.dll;api-ms-win-core-string-l1-1-0.dll;api-ms-win-core-synch-l1-1-0.dll;api-ms-win-core-synch-l1-2-0.dll;api-ms-win-core-sysinfo-l1-1-0.dll;api-ms-win-core-timezone-l1-1-0.dll;api-ms-win-core-util-l1-1-0.dll;api-ms-win-crt-conio-l1-1-0.dll;api-ms-win-crt-convert-l1-1-0.dll;api-ms-win-crt-environment-l1-1-0.dll;api-ms-win-crt-filesystem-l1-1-0.dll;api-ms-win-crt-heap-l1-1-0.dll;api-ms-win-crt-locale-l1-1-0.dll;api-ms-win-crt-math-l1-1-0.dll;api-ms-win-crt-multibyte-l1-1-0.dll;api-ms-win-crt-private-l1-1-0.dll;api-ms-win-crt-process-l1-1-0.dll;api-ms-win-crt-runtime-l1-1-0.dll;api-ms-win-crt-stdio-l1-1-0.dll;api-ms-win-crt-string-l1-1-0.dll;api-ms-win-crt-time-l1-1-0.dll;api-ms-win-crt-utility-l1-1-0.dll;CefSharp.BrowserSubprocess.Core.dll;CefSharp.BrowserSubprocess.dll;CefSharp.BrowserSubprocess.exe;CefSharp.Core.dll;CefSharp.Core.Runtime.dll;CefSharp.dll;CefSharp.Wpf.dll;chrome_100_percent.pak;chrome_200_percent.pak;chrome_elf.dll;clipper_library.dll;clretwrc.dll;clrjit.dll;ColorMine.dll;coreclr.dll;createdump.exe;d3dcompiler_47.dll;D3DCompiler_47_cor3.dll;dbgshim.dll;DirectWriteForwarder.dll;EntityFramework.dll;EntityFramework.SqlServer.dll;Esprima.dll;hostfxr.dll;hostpolicy.dll;icudtl.dat;Ijwhost.dll;Jint.dll;libcef.dll;libEGL.dll;libGLESv2.dll;libglib-2.0-0.dll;libgobject-2.0-0.dll;libvips-42.dll;Mapbox.VectorTile.Geometry.dll;Mapbox.VectorTile.PbfReader.dll;Mapbox.VectorTile.VectorTileReader.dll;MapsInMyFolder.Commun.dll;MapsInMyFolder.Commun.dll.config;MapsInMyFolder.Commun.pdb;MapsInMyFolder.deps.json;MapsInMyFolder.dll;MapsInMyFolder.exe;MapsInMyFolder.MapControl.dll;MapsInMyFolder.MapControl.pdb;MapsInMyFolder.pdb;MapsInMyFolder.runtimeconfig.json;MapsInMyFolder.VectorTileRenderer.dll;MapsInMyFolder.VectorTileRenderer.dll.config;MapsInMyFolder.VectorTileRenderer.pdb;Microsoft.CSharp.dll;Microsoft.DiaSymReader.Native.amd64.dll;Microsoft.VisualBasic.Core.dll;Microsoft.VisualBasic.dll;Microsoft.VisualBasic.Forms.dll;Microsoft.Win32.Primitives.dll;Microsoft.Win32.Registry.AccessControl.dll;Microsoft.Win32.Registry.dll;Microsoft.Win32.SystemEvents.dll;ModernWpf.Controls.dll;ModernWpf.dll;mscordaccore.dll;mscordaccore_amd64_amd64_6.0.1222.56807.dll;mscordbi.dll;mscorlib.dll;mscorrc.dll;msquic.dll;netstandard.dll;NetVips.dll;Newtonsoft.Json.dll;PenImc_cor3.dll;PresentationCore.dll;PresentationFramework-SystemCore.dll;PresentationFramework-SystemData.dll;PresentationFramework-SystemDrawing.dll;PresentationFramework-SystemXml.dll;PresentationFramework-SystemXmlLinq.dll;PresentationFramework.Aero.dll;PresentationFramework.Aero2.dll;PresentationFramework.AeroLite.dll;PresentationFramework.Classic.dll;PresentationFramework.dll;PresentationFramework.Luna.dll;PresentationFramework.Royale.dll;PresentationNative_cor3.dll;PresentationUI.dll;ReachFramework.dll;resources.pak;SkiaSharp.dll;SkiaSharp.pdb;SkiaSharp.xml;snapshot_blob.bin;sni.dll;SQLite.Interop.dll;System.AppContext.dll;System.Buffers.dll;System.CodeDom.dll;System.Collections.Concurrent.dll;System.Collections.dll;System.Collections.Immutable.dll;System.Collections.NonGeneric.dll;System.Collections.Specialized.dll;System.ComponentModel.Annotations.dll;System.ComponentModel.DataAnnotations.dll;System.ComponentModel.dll;System.ComponentModel.EventBasedAsync.dll;System.ComponentModel.Primitives.dll;System.ComponentModel.TypeConverter.dll;System.Configuration.ConfigurationManager.dll;System.Configuration.dll;System.Console.dll;System.Core.dll;System.Data.Common.dll;System.Data.DataSetExtensions.dll;System.Data.dll;System.Data.SqlClient.dll;System.Data.SQLite.dll;System.Data.SQLite.EF6.dll;System.Design.dll;System.Diagnostics.Contracts.dll;System.Diagnostics.Debug.dll;System.Diagnostics.DiagnosticSource.dll;System.Diagnostics.EventLog.dll;System.Diagnostics.EventLog.Messages.dll;System.Diagnostics.FileVersionInfo.dll;System.Diagnostics.PerformanceCounter.dll;System.Diagnostics.Process.dll;System.Diagnostics.StackTrace.dll;System.Diagnostics.TextWriterTraceListener.dll;System.Diagnostics.Tools.dll;System.Diagnostics.TraceSource.dll;System.Diagnostics.Tracing.dll;System.DirectoryServices.dll;System.dll;System.Drawing.Common.dll;System.Drawing.Design.dll;System.Drawing.dll;System.Drawing.Primitives.dll;System.Dynamic.Runtime.dll;System.Formats.Asn1.dll;System.Globalization.Calendars.dll;System.Globalization.dll;System.Globalization.Extensions.dll;System.IO.Compression.Brotli.dll;System.IO.Compression.dll;System.IO.Compression.FileSystem.dll;System.IO.Compression.Native.dll;System.IO.Compression.ZipFile.dll;System.IO.dll;System.IO.FileSystem.AccessControl.dll;System.IO.FileSystem.dll;System.IO.FileSystem.DriveInfo.dll;System.IO.FileSystem.Primitives.dll;System.IO.FileSystem.Watcher.dll;System.IO.IsolatedStorage.dll;System.IO.MemoryMappedFiles.dll;System.IO.Packaging.dll;System.IO.Pipes.AccessControl.dll;System.IO.Pipes.dll;System.IO.UnmanagedMemoryStream.dll;System.Linq.dll;System.Linq.Expressions.dll;System.Linq.Parallel.dll;System.Linq.Queryable.dll;System.Memory.dll;System.Net.dll;System.Net.Http.dll;System.Net.Http.Json.dll;System.Net.HttpListener.dll;System.Net.Mail.dll;System.Net.NameResolution.dll;System.Net.NetworkInformation.dll;System.Net.Ping.dll;System.Net.Primitives.dll;System.Net.Quic.dll;System.Net.Requests.dll;System.Net.Security.dll;System.Net.ServicePoint.dll;System.Net.Sockets.dll;System.Net.WebClient.dll;System.Net.WebHeaderCollection.dll;System.Net.WebProxy.dll;System.Net.WebSockets.Client.dll;System.Net.WebSockets.dll;System.Numerics.dll;System.Numerics.Vectors.dll;System.ObjectModel.dll;System.Printing.dll;System.Private.CoreLib.dll;System.Private.DataContractSerialization.dll;System.Private.Uri.dll;System.Private.Xml.dll;System.Private.Xml.Linq.dll;System.Reflection.DispatchProxy.dll;System.Reflection.dll;System.Reflection.Emit.dll;System.Reflection.Emit.ILGeneration.dll;System.Reflection.Emit.Lightweight.dll;System.Reflection.Extensions.dll;System.Reflection.Metadata.dll;System.Reflection.Primitives.dll;System.Reflection.TypeExtensions.dll;System.Resources.Extensions.dll;System.Resources.Reader.dll;System.Resources.ResourceManager.dll;System.Resources.Writer.dll;System.Runtime.Caching.dll;System.Runtime.CompilerServices.Unsafe.dll;System.Runtime.CompilerServices.VisualC.dll;System.Runtime.dll;System.Runtime.Extensions.dll;System.Runtime.Handles.dll;System.Runtime.InteropServices.dll;System.Runtime.InteropServices.RuntimeInformation.dll;System.Runtime.Intrinsics.dll;System.Runtime.Loader.dll;System.Runtime.Numerics.dll;System.Runtime.Serialization.dll;System.Runtime.Serialization.Formatters.dll;System.Runtime.Serialization.Json.dll;System.Runtime.Serialization.Primitives.dll;System.Runtime.Serialization.Xml.dll;System.Security.AccessControl.dll;System.Security.Claims.dll;System.Security.Cryptography.Algorithms.dll;System.Security.Cryptography.Cng.dll;System.Security.Cryptography.Csp.dll;System.Security.Cryptography.Encoding.dll;System.Security.Cryptography.OpenSsl.dll;System.Security.Cryptography.Pkcs.dll;System.Security.Cryptography.Primitives.dll;System.Security.Cryptography.ProtectedData.dll;System.Security.Cryptography.X509Certificates.dll;System.Security.Cryptography.Xml.dll;System.Security.dll;System.Security.Permissions.dll;System.Security.Principal.dll;System.Security.Principal.Windows.dll;System.Security.SecureString.dll;System.ServiceModel.Web.dll;System.ServiceProcess.dll;System.Text.Encoding.CodePages.dll;System.Text.Encoding.dll;System.Text.Encoding.Extensions.dll;System.Text.Encodings.Web.dll;System.Text.Json.dll;System.Text.RegularExpressions.dll;System.Threading.AccessControl.dll;System.Threading.Channels.dll;System.Threading.dll;System.Threading.Overlapped.dll;System.Threading.Tasks.Dataflow.dll;System.Threading.Tasks.dll;System.Threading.Tasks.Extensions.dll;System.Threading.Tasks.Parallel.dll;System.Threading.Thread.dll;System.Threading.ThreadPool.dll;System.Threading.Timer.dll;System.Transactions.dll;System.Transactions.Local.dll;System.ValueTuple.dll;System.Web.dll;System.Web.HttpUtility.dll;System.Windows.Controls.Ribbon.dll;System.Windows.dll;System.Windows.Extensions.dll;System.Windows.Forms.Design.dll;System.Windows.Forms.Design.Editors.dll;System.Windows.Forms.dll;System.Windows.Forms.Primitives.dll;System.Windows.Input.Manipulations.dll;System.Windows.Presentation.dll;System.Xaml.dll;System.Xml.dll;System.Xml.Linq.dll;System.Xml.ReaderWriter.dll;System.Xml.Serialization.dll;System.Xml.XDocument.dll;System.Xml.XmlDocument.dll;System.Xml.XmlSerializer.dll;System.Xml.XPath.dll;System.Xml.XPath.XDocument.dll;ucrtbase.dll;UIAutomationClient.dll;UIAutomationClientSideProviders.dll;UIAutomationProvider.dll;UIAutomationTypes.dll;v8_context_snapshot.bin;vcruntime140_cor3.dll;vk_swiftshader.dll;vk_swiftshader_icd.json;vulkan-1.dll;WindowsBase.dll;WindowsFormsIntegration.dll;wpfgfx_cor3.dll?>
+  <?define MapsInMyFolderFileslocales=af.pak;am.pak;ar.pak;bg.pak;bn.pak;ca.pak;cs.pak;da.pak;de.pak;el.pak;en-GB.pak;en-US.pak;es-419.pak;es.pak;et.pak;fa.pak;fi.pak;fil.pak;fr.pak;gu.pak;he.pak;hi.pak;hr.pak;hu.pak;id.pak;it.pak;ja.pak;kn.pak;ko.pak;lt.pak;lv.pak;ml.pak;mr.pak;ms.pak;nb.pak;nl.pak;pl.pak;pt-BR.pak;pt-PT.pak;ro.pak;ru.pak;sk.pak;sl.pak;sr.pak;sv.pak;sw.pak;ta.pak;te.pak;th.pak;tr.pak;uk.pak;ur.pak;vi.pak;zh-CN.pak;zh-TW.pak?>
+  <?define MapsInMyFolderFilesfr=Microsoft.VisualBasic.Forms.resources.dll;PresentationCore.resources.dll;PresentationFramework.resources.dll;PresentationUI.resources.dll;ReachFramework.resources.dll;System.Windows.Controls.Ribbon.resources.dll;System.Windows.Forms.Design.resources.dll;System.Windows.Forms.Primitives.resources.dll;System.Windows.Forms.resources.dll;System.Windows.Input.Manipulations.resources.dll;System.Xaml.resources.dll;UIAutomationClient.resources.dll;UIAutomationClientSideProviders.resources.dll;UIAutomationProvider.resources.dll;UIAutomationTypes.resources.dll;WindowsBase.resources.dll;WindowsFormsIntegration.resources.dll?>
+  <?define MapsInMyFolderFilesx64=libSkiaSharp.dll?>
+
+
+  <Product Id="*" Name="MapsInMyFolder" Language="1033" Version="3.0.0" Manufacturer="SioGabx" UpgradeCode="091b4d98-0e03-441f-8e40-acb9706db235">
+    <Package InstallerVersion="200" Compressed="yes"  InstallPrivileges="elevated" AdminImage="yes" Manufacturer="SioGabx"/><!--InstallScope="perUser"-->
+    <Media Id="1" Cabinet="MyCabFile.cab" EmbedCab="yes" />
+    <MajorUpgrade AllowDowngrades="no" AllowSameVersionUpgrades="no" IgnoreRemoveFailure="no" Schedule="afterInstallInitialize" DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+
+    <!-- Wix requires that shortcut icons' Id have the same extension as the target file, hence the .exe in the icon Id -->
+    <Icon Id="application_icon.exe" SourceFile="$(var.MapsInMyFolder_TargetDir)MapsInMyFolder.exe"/>
+
+    <!-- ARPPRODUCTICON is a special Id which sets the icon in Add/Remove Programs (see https://wixtoolset.org/documentation/manual/v3/howtos/ui_and_localization/configure_arp_appearance.html) -->
+    <Property Id="ARPPRODUCTICON" Value="application_icon.exe" />
+
+    <Property Id="VC_REDIST_X64_EXISTS" Secure="yes">
+      <RegistrySearch Id="VC_REDIST_X64_REGSEARCH" Root="HKLM" Key="SOFTWARE\Microsoft\VisualStudio\14.0\VC\Runtimes\x64" Name="Version" Type="raw" />
+    </Property>
+
+    <!--<InstallExecuteSequence>
+      <Custom Action="InstallVCRedist" Before="InstallFinalize">
+        VCRedistInstalled
+      </Custom>
+    </InstallExecuteSequence>-->
+
+    <InstallExecuteSequence>
+      <!--<Custom Action="LaunchExe2" Before="InstallFinalize"></Custom>-->
+      <!--<Custom Action="LaunchExe" Before="InstallFinalize">NOT Installed AND NOT REMOVE</Custom>-->
+      <Custom Action='DownloadAndInvokeBootstrapper' Before='InstallFinalize'>
+        <![CDATA[NOT(REMOVE OR VC_REDIST_X64_EXISTS)]]>
+      </Custom>
+      
+    </InstallExecuteSequence>
+    <CustomAction Id='DownloadAndInvokeBootstrapper' Directory="INSTALLFOLDER" Execute="deferred" ExeCommand='powershell.exe -windowstyle hidden Invoke-WebRequest -Uri "https://aka.ms/vs/17/release/vc_redist.x64.exe" -OutFile "$env:TEMP\vc_redist.x64.exe" ; &amp; $env:TEMP\vc_redist.x64.exe /install /quiet /norestart' Return='check' Impersonate="no"/>
+
+    <!--<CustomAction Id="LaunchExe2" FileKey="VCredist.x64.exe" ExeCommand="/install /norestart" Execute="deferred" Return="ignore" />-->
+    
+    
+    
+    <!--<CustomAction Id="LaunchExe" FileKey="MapsInMyFolder.exe" ExeCommand="" Execute="deferred" Return="check" Impersonate="no" />-->
+
+    <!--<Binary Id="VCRedist" SourceFile="$(var.MapsInMyFolder_TargetDir)VC_redist.x64.exe" />-->
+    <!--<CustomAction Id="InstallVCRedist" BinaryKey="VCRedist" ExeCommand="/install /quiet /norestart" Execute="deferred" Return="ignore"/>-->
+
+    <!--<Condition Message="This application requires the VC++ 2015 Redistributable x64 to be installed. vc_redist.x64 can be downloaded here : https://aka.ms/vs/17/release/vc_redist.x64.exe">
+      <![CDATA[Installed OR VC_REDIST_X64_EXISTS]]>
+    </Condition>-->
+
+    <Feature Id="ProductFeature" Title="MapsInMyFolder" Level="1">
+      <ComponentGroupRef Id="ProductComponents" />
+      <ComponentGroupRef Id="locales_files" />
+      <ComponentGroupRef Id="_x64_files" />
+      <ComponentGroupRef Id="fr_files" />
+      <ComponentRef Id="DesktopShortcut"/>
+      <ComponentRef Id="StartupShortcut"/>
+    </Feature>
+
+  </Product>
+
+
+  <Fragment>
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      
+      <Directory Id="DesktopFolder" Name="Desktop">
+        <Component Id="DesktopShortcut" Guid="0a8acb6c-78e4-46c1-8c2a-4eb87d63fd98">
+          <Shortcut Id="DesktopShortcutElement" Name="MapsInMyFolder" Target="[INSTALLFOLDER]MapsInMyFolder.exe" WorkingDirectory="INSTALLFOLDER" />
+          <RegistryValue Root="HKCU" Key="Software\SioGabx\MapsInMyFolder" Name="installed" Type="integer" Value="1" KeyPath="yes" />
+        </Component>
+      </Directory>
+      
+      <Directory Id="ProgramMenuFolder" Name="Startup">
+        <Component Id="StartupShortcut" Guid="c20320eb-53ec-4633-8291-8d1aee45c4e1">
+          <Shortcut Id="StartupShortcutElement" Name="MapsInMyFolder" Target="[INSTALLFOLDER]MapsInMyFolder.exe" WorkingDirectory="INSTALLFOLDER"/>
+          <RemoveFolder Id="ProgramMenuFolder" On="uninstall"/>
+          <RegistryValue Root="HKCU" Key="Software\MapsInMyFolder" Name="installed" Type="integer" Value="1" KeyPath="yes"/>
+        </Component>
+
+
+      </Directory>
+      
+      
+      
+      
+      <Directory Id="ProgramFilesFolder">
+        <Directory Id="INSTALLFOLDER" Name="MapsInMyFolder">
+          <Directory Id="locales" Name="locales" />
+          <Directory Id="_x64" Name="x64" />
+          <Directory Id="fr" Name="fr" />
+        </Directory>
+      </Directory>
+    </Directory>
+  </Fragment>
+  <Fragment>
+    <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+      <?foreach FileName in $(var.MapsInMyFolderFiles)?>
+      <Component>
+        <File Source="$(var.MapsInMyFolder_TargetDir)$(var.FileName)" Name="$(var.FileName)" />
+      </Component>  
+    
+      <?endforeach?>
+      <!--<Component>
+        <File Source="$(var.MapsInMyFolder_TargetDir)VC_redist.x64.exe" Name="VC_redist.x64.exe"  Id="VCredist.x64.exe" />
+      </Component>-->
+      <!--<Component>
+        <File Source="$(var.MapsInMyFolder_TargetDir)MapsInMyFolder.exe" Name="MapsInMyFolder.exe" Id="MapsInMyFolder.exe" />
+      </Component>-->
+    </ComponentGroup>
+  </Fragment>
+  <Fragment>
+    <ComponentGroup Id="locales_files" Directory="locales">
+      <?foreach File in $(var.MapsInMyFolderFileslocales)?>
+      <Component>
+        <File Source="$(var.MapsInMyFolder_TargetDir)locales\$(var.File)" Name="$(var.File)" />
+      </Component>
+      <?endforeach?>
+    </ComponentGroup>
+  </Fragment>
+  <Fragment>
+    <ComponentGroup Id="_x64_files" Directory="_x64">
+      <?foreach File in $(var.MapsInMyFolderFilesx64)?>
+      <Component>
+        <File Source="$(var.MapsInMyFolder_TargetDir)x64\$(var.File)" Name="$(var.File)" />
+      </Component>
+      <?endforeach?>
+    </ComponentGroup>
+  </Fragment>
+  <Fragment>
+    <ComponentGroup Id="fr_files" Directory="fr">
+      <?foreach File in $(var.MapsInMyFolderFilesfr)?>
+      <Component>
+        <File Source="$(var.MapsInMyFolder_TargetDir)fr\$(var.File)" Name="$(var.File)" />
+      </Component>
+      <?endforeach?>
+    </ComponentGroup>
+  </Fragment>
+</Wix>

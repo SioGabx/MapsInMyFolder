@@ -16,6 +16,7 @@
         <DefineConstants></DefineConstants>
         <Platforms>AnyCPU;x64</Platforms>
 		<LangVersion>8.0</LangVersion>
+		<ApplicationIcon>icone_v2.ico</ApplicationIcon>
     </PropertyGroup>
 
     <ItemGroup>
@@ -28,6 +29,10 @@
 
     <ItemGroup Condition="'$(TargetFramework)'=='net6.0-windows'">
         <PackageReference Include="System.Runtime.Caching" Version="6.0.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="icone_v2.ico" />
     </ItemGroup>
 
     <ItemGroup>

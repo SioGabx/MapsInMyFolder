@@ -114,9 +114,9 @@ namespace MapsInMyFolder.MapControl
             var cosLat2 = Math.Cos(lat2);
             var sinLon12 = Math.Sin(lon2 - lon1);
             var cosLon12 = Math.Cos(lon2 - lon1);
-            var a = cosLat1 * sinLat2 - sinLat1 * cosLat2 * cosLon12;
+            var a = (cosLat1 * sinLat2) - (sinLat1 * cosLat2 * cosLon12);
             var b = cosLat2 * sinLon12;
-            var s12 = Math.Atan2(Math.Sqrt(a * a + b * b), sinLat1 * sinLat2 + cosLat1 * cosLat2 * cosLon12);
+            var s12 = Math.Atan2(Math.Sqrt((a * a) + (b * b)), (sinLat1 * sinLat2) + (cosLat1 * cosLat2 * cosLon12));
 
             return earthRadius * s12;
         }
@@ -139,8 +139,8 @@ namespace MapsInMyFolder.MapControl
             var cosAz1 = Math.Cos(az1);
             var sinLat1 = Math.Sin(lat1);
             var cosLat1 = Math.Cos(lat1);
-            var lat2 = Math.Asin(sinLat1 * cosS12 + cosLat1 * sinS12 * cosAz1);
-            var lon2 = lon1 + Math.Atan2(sinS12 * sinAz1, cosLat1 * cosS12 - sinLat1 * sinS12 * cosAz1);
+            var lat2 = Math.Asin((sinLat1 * cosS12) + (cosLat1 * sinS12 * cosAz1));
+            var lon2 = lon1 + Math.Atan2(sinS12 * sinAz1, (cosLat1 * cosS12) - (sinLat1 * sinS12 * cosAz1));
 
             return new Location(lat2 * 180d / Math.PI, lon2 * 180d / Math.PI);
         }

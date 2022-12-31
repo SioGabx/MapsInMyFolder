@@ -37,24 +37,17 @@ namespace MapsInMyFolder
                         await layer_browser.GetMainFrame().EvaluateScriptAsync("search(\"" + layer_searchbar.Text.Replace("\"", "") + "\")");
                         DebugMode.WriteLine("Search");
                     }
-
                 }
             }, null);
         }
 
-
-
-
-
         public void Init_layer_panel()
         {
-
             if (layer_browser is null) { return; }
             try
             {
                 //layer_browser.JavascriptObjectRepository.UnRegisterAll();
                 layer_browser.JavascriptObjectRepository.Register("layer_Csharp_call_from_js", new Layer_Csharp_call_from_js());
-
             }
             catch (Exception ex)
             {
@@ -76,17 +69,23 @@ namespace MapsInMyFolder
             layer_browser.LoadHtml(DB_Layer_Load(), "http://siogabx.fr");
         }
 
+
+        private void Layer_browser_LoadingStateChanged(object sender, CefSharp.LoadingStateChangedEventArgs e)
+        {
+            if (!e.IsLoading)
+            {
+                MainPage._instance.layer_browser.GetMainFrame().EvaluateScriptAsync("selectionner_calque_by_id(" + Settings.layer_startup_id + ")");
+            }
+        }
+
         static List<Layers> DB_Layer_Read(SQLiteConnection conn, string query_command)
         {
-            List<Layers> layersFavorite = new List<Layers>() { };
-            List<Layers> layersClassicSort = new List<Layers>() { };
+            List<Layers> layersFavorite = new List<Layers>();
+            List<Layers> layersClassicSort = new List<Layers>();
             SQLiteDataReader sqlite_datareader;
-            SQLiteCommand sqlite_cmd;
-            sqlite_cmd = conn.CreateCommand();
+            SQLiteCommand sqlite_cmd = conn.CreateCommand();
             sqlite_cmd.CommandText = query_command;
             sqlite_datareader = sqlite_cmd.ExecuteReader();
-
-
 
             while (sqlite_datareader.Read())
             {
@@ -141,7 +140,7 @@ namespace MapsInMyFolder
                     }
 
                     int DB_Layer_ID = GetIntFromOrdinal("ID");
-                    string DB_Layer_DISPLAY_NAME = GetStringFromOrdinal("DISPLAY_NAME");
+                    string DB_Layer_NOM = GetStringFromOrdinal("NOM");
                     bool DB_Layer_FAVORITE = Convert.ToBoolean(GetIntFromOrdinal("FAVORITE"));
                     string DB_Layer_DESCRIPTION = GetStringFromOrdinal("DESCRIPTION");
                     string DB_Layer_CATEGORIE = GetStringFromOrdinal("CATEGORIE");
@@ -173,7 +172,8 @@ namespace MapsInMyFolder
                     }
                     finally
                     {
-                        if (doCreateSpecialsOptionsClass) {
+                        if (doCreateSpecialsOptionsClass)
+                        {
                             DeserializeSpecialsOptions = new Layers.SpecialsOptions();
                         }
                     }
@@ -182,9 +182,9 @@ namespace MapsInMyFolder
                         DB_Layer_TILECOMPUTATIONSCRIPT = Commun.Settings.tileloader_default_script;
                     }
                     DB_Layer_TILECOMPUTATIONSCRIPT = Collectif.HTMLEntities(DB_Layer_TILECOMPUTATIONSCRIPT, true);
-                    Debug.WriteLine("Layer " + DB_Layer_DISPLAY_NAME + " : Tilesize = " + DB_Layer_TILE_SIZE + " id = " + DB_Layer_ID);
-                    Layers calque = new Layers(DB_Layer_ID, DB_Layer_FAVORITE, DB_Layer_DISPLAY_NAME, DB_Layer_DESCRIPTION, DB_Layer_CATEGORIE, DB_Layer_IDENTIFIANT, DB_Layer_TILE_URL, DB_Layer_SITE, DB_Layer_SITE_URL,  DB_Layer_MIN_ZOOM, DB_Layer_MAX_ZOOM, DB_Layer_FORMAT, DB_Layer_TILE_SIZE, DB_Layer_TILECOMPUTATIONSCRIPT, DeserializeSpecialsOptions);
-                    Debug.WriteLine("Layer " + DB_Layer_DISPLAY_NAME + " : Tilesize = " + DB_Layer_TILE_SIZE);
+                    Debug.WriteLine("Layer " + DB_Layer_NOM + " : Tilesize = " + DB_Layer_TILE_SIZE + " id = " + DB_Layer_ID);
+                    Layers calque = new Layers(DB_Layer_ID, DB_Layer_FAVORITE, DB_Layer_NOM, DB_Layer_DESCRIPTION, DB_Layer_CATEGORIE, DB_Layer_IDENTIFIANT, DB_Layer_TILE_URL, DB_Layer_SITE, DB_Layer_SITE_URL, DB_Layer_MIN_ZOOM, DB_Layer_MAX_ZOOM, DB_Layer_FORMAT, DB_Layer_TILE_SIZE, DB_Layer_TILECOMPUTATIONSCRIPT, DeserializeSpecialsOptions);
+                    Debug.WriteLine("Layer " + DB_Layer_NOM + " : Tilesize = " + DB_Layer_TILE_SIZE);
                     if (DB_Layer_FAVORITE)
                     {
                         layersFavorite.Add(calque);
@@ -214,10 +214,10 @@ namespace MapsInMyFolder
             }
 
             string baseHTML = DB_Layer_CreateHTML(DB_Layer_Read(conn, query), DB_Layer_Read(conn, query2));
-            
+
             conn.Close();
             string finalHTML = baseHTML;
-            if (Commun.Settings.is_in_debug_mode && Commun.Settings.show_layer_devtool)
+            if (Commun.Settings.show_layer_devtool)
             {
                 layer_browser.ShowDevTools();
             }
@@ -235,9 +235,9 @@ namespace MapsInMyFolder
         }
         static string DB_Layer_CreateHTML(List<Layers> layers, List<Layers> editedlayers)
         {
-            Layers.Layers_Dictionnary_List.Clear();
+            Layers.Layers_Dictionary_List.Clear();
             string generated_layers = String.Empty;
-            generated_layers += "<ul class=\"" + Commun.Settings.layerpanel_compactstyle.ToString().ToLower() + "\">";
+            generated_layers += "<ul class=\"" + Commun.Settings.layerpanel_displaystyle.ToString().ToLower() + "\">";
             Dictionary<int, Layers> EditedLayersDictionnary = new Dictionary<int, Layers>();
             foreach (Layers individual_editedlayer in editedlayers)
             {
@@ -261,7 +261,7 @@ namespace MapsInMyFolder
 
                     if (Commun.Settings.layerpanel_put_non_letter_layername_at_the_end)
                     {
-                        if (DoRejectLayer && (string.IsNullOrEmpty(individual_layer_with_replacement.class_display_name) || !Char.IsLetter(individual_layer_with_replacement.class_display_name.Trim()[0])))
+                        if (DoRejectLayer && (string.IsNullOrEmpty(individual_layer_with_replacement.class_name) || !Char.IsLetter(individual_layer_with_replacement.class_name.Trim()[0])))
                         {
                             layersRejected.Add(individual_layer);
                             continue;
@@ -269,11 +269,10 @@ namespace MapsInMyFolder
                     }
                     Dictionary<int, Layers> temp_Layers_dictionnary = new Dictionary<int, Layers> { { Convert.ToInt32(individual_layer_with_replacement.class_id), individual_layer_with_replacement } };
 
-                    Layers.Layers_Dictionnary_List.Add(temp_Layers_dictionnary);
-                
+                    Layers.Layers_Dictionary_List.Add(temp_Layers_dictionnary);
 
                     string orangestar = "";
-                    if (individual_layer_with_replacement.class_favorite == true)
+                    if (individual_layer_with_replacement.class_favorite)
                     {
                         orangestar = @"class=""star orange"" title=""Supprimer le calque des favoris""";
                     }
@@ -282,8 +281,7 @@ namespace MapsInMyFolder
                         orangestar = @"class=""star"" title=""Ajouter le calque aux favoris""";
                     }
 
-                    string imgbase64 = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"; //1 pixel gif transparent -> disable base 
-                    
+                    const string imgbase64 = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"; //1 pixel gif transparent -> disable base 
 
                     string supplement_class = "";
                     if (!Commun.Settings.layerpanel_website_IsVisible)
@@ -295,8 +293,8 @@ namespace MapsInMyFolder
              <div class=""layer_main_div_background_image""></div>
             <div class=""layer_content"" data-layer=""" + individual_layer_with_replacement.class_identifiant + @""" title=""Sélectionner ce calque"" onclick=""selectionner_ce_calque(event, this," + individual_layer.class_id + @")"">
                   <div class=""layer_texte"" title=""" + Collectif.HTMLEntities(individual_layer_with_replacement.class_description) + @""">
-                      <p class=""display_name"">" + Collectif.HTMLEntities(individual_layer_with_replacement.class_display_name) + @"</p>
-                      <p class=""zoom"">[" + individual_layer_with_replacement.class_min_zoom + @"-" + individual_layer_with_replacement.class_max_zoom + @"]</p>
+                      <p class=""display_name"">" + Collectif.HTMLEntities(individual_layer_with_replacement.class_name) + @"</p>
+                      <p class=""zoom"">[" + individual_layer_with_replacement.class_min_zoom + "-" + individual_layer_with_replacement.class_max_zoom + @"]</p>
                       <p class=""layer_website" + supplement_class + @""">" + individual_layer_with_replacement.class_site + @"</p>
                       <p class=""layer_categorie" + supplement_class + @""">" + individual_layer_with_replacement.class_categorie + @"</p>
                   </div>
@@ -312,13 +310,10 @@ namespace MapsInMyFolder
             GenerateHTMLFromLayerList(ListOfLayerRejected, false);
 
             generated_layers += "</ul>";
-            string resource_data = Collectif.ReadResourceString("layer_panel.html");
+            string resource_data = Collectif.ReadResourceString("html/layer_panel.html");
             string final_generated_layers = resource_data.Replace("<!--htmllayerplaceholder-->", generated_layers);
             return final_generated_layers;
         }
-
-
-
 
         public void Set_current_layer(int id)
         {
@@ -331,29 +326,28 @@ namespace MapsInMyFolder
             }
 
             Layers layer = Layers.GetLayerById(id);
-            if (Layers.Layers_Dictionnary_List.Count <= 0)
+            if (Layers.Layers_Dictionary_List.Count == 0)
             {
                 layer = Layers.Empty(0);
                 Dictionary<int, Layers> x = new Dictionary<int, Layers> { { 0, layer } };
-                Layers.Layers_Dictionnary_List.Add(x);
+                Layers.Layers_Dictionary_List.Add(x);
                 DebugMode.WriteLine("Ajout layer vide");
             }
             if (layer is null || layer_startup_id == 0)
             {
-                layer = Layers.GetLayerById(Layers.Layers_Dictionnary_List[0].Keys.First());
+                layer = Layers.GetLayerById(Layers.Layers_Dictionary_List[0].Keys.First());
                 Commun.Settings.layer_startup_id = layer.class_id;
                 if (layer_startup_id == 0)
                 {
                     layer_startup_id = layer.class_id;
                 }
-
             }
             if (layer is not null)
             {
                 try
                 {
                     Layers.Convert.ToCurentLayer(layer);
-                    Debug.WriteLine("Set curent layer " + layer.class_display_name + " = " + layer.class_tiles_size);
+                    Debug.WriteLine("Set curent layer " + layer.class_name + " = " + layer.class_tiles_size);
                     if (layer.class_format == "png")
                     {
                         MapTileLayer_Transparent.TileSource = new TileSource { UriFormat = layer.class_tile_url, LayerID = layer.class_id };
@@ -393,13 +387,13 @@ namespace MapsInMyFolder
                             Description = layer.class_description
                         };
 
-                        MapTileLayer_Transparent.TileSource = new TileSource { };
+                        MapTileLayer_Transparent.TileSource = new TileSource();
                         MapTileLayer_Transparent.Opacity = 0;
                         mapviewer.MapLayer.Opacity = 1;
                         mapviewer.MapLayer = layer_uielement;
                     }
 
-                    if (Commun.Settings.zoom_limite_taille_carte == true)
+                    if (Commun.Settings.zoom_limite_taille_carte)
                     {
                         if (layer.class_min_zoom < 3)
                         {
@@ -419,13 +413,10 @@ namespace MapsInMyFolder
                 }
                 catch (Exception ex)
                 {
-
                     Debug.WriteLine("Erreur changement de calque" + ex.Message);
                 }
             }
         }
-
-
 
         public static void ClearCache(int id, bool ShowMessageBox = true)
         {
@@ -436,7 +427,7 @@ namespace MapsInMyFolder
             try
             {
                 Javascript.EngineDeleteById(id);
-                string temp_dir = Collectif.GetSaveTempDirectory(layers.class_display_name, layers.class_identifiant);
+                string temp_dir = Collectif.GetSaveTempDirectory(layers.class_name, layers.class_identifiant);
                 Debug.WriteLine("Cache path : " + temp_dir);
                 if (Directory.Exists(temp_dir))
                 {
@@ -447,20 +438,14 @@ namespace MapsInMyFolder
 
                 if (ShowMessageBox)
                 {
-                    Message.NoReturnBoxAsync("Le cache du calque \"" + layers.class_display_name + "\" à été vidé", "Opération réussie");
+                    Message.NoReturnBoxAsync("Le cache du calque \"" + layers.class_name + "\" à été vidé", "Opération réussie");
                 }
-
             }
             catch (Exception ex)
             {
                 Debug.WriteLine("Erreur lors du nettoyage du cache : " + ex.Message);
             }
-
-
         }
-
-
-
 
         public static void DBLayerFavorite(int id, int fav_state)
         {
@@ -503,8 +488,6 @@ namespace MapsInMyFolder
             MainWindow._instance.FrameLoad_CustomOrEditLayers(id);
         }
 
-
-
         public string LayerTilePreview_ReturnUrl(int id)
         {
             Layers layer = Layers.GetLayerById(id);
@@ -516,10 +499,8 @@ namespace MapsInMyFolder
                     int layer_startup_id = Commun.Settings.layer_startup_id;
                     if (layer_startup_id == 0)
                     {
-                        layer_startup_id = Layers.GetLayerById(Layers.Layers_Dictionnary_List[0].Keys.First()).class_id;
+                        layer_startup_id = Layers.GetLayerById(Layers.Layers_Dictionary_List[0].Keys.First()).class_id;
                     }
-
-
 
                     string class_tile_url_p1 = layer.class_tile_url;
                     int min_zoom = layer.class_min_zoom;
@@ -538,8 +519,6 @@ namespace MapsInMyFolder
                     if (Zoom < back_min_zoom) { Zoom = Math.Max(back_min_zoom, Zoom); }
                     if (Zoom > back_max_zoom) { Zoom = Math.Min(back_max_zoom, Zoom); }
 
-
-
                     List<int> TileNumber = Collectif.CoordonneesToTile(Latitude, Longitude, Zoom);
                     //string Replacements(string origin)
                     //{
@@ -555,7 +534,7 @@ namespace MapsInMyFolder
                     string class_tile_url_p2 = "";
                     if (StartingLayer is not null)
                     {
-                        class_tile_url_p2 = StartingLayer.class_tile_url.ToString();
+                        class_tile_url_p2 = StartingLayer.class_tile_url;
                     }
                     class_tile_url_p2 = Collectif.Replacements(class_tile_url_p2, TileNumber[0].ToString(), TileNumber[1].ToString(), Zoom.ToString(), id);
                     return class_tile_url_p1 + " " + class_tile_url_p2;
@@ -572,14 +551,8 @@ namespace MapsInMyFolder
             }
             DebugMode.WriteLine("????");
             return "";
-
         }
-
     }
-
-
-
-   
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Marquer les membres comme étant static", Justification = "Used by CEFSHARP, static isnt a option here")]
     public class Layer_Csharp_call_from_js
@@ -594,7 +567,6 @@ namespace MapsInMyFolder
             DebugMode.WriteLine("Adding layer" + id_int + " to favorite");
         }
 
-
         public void Clear_cache(double id = 0)
         {
             int id_int = Convert.ToInt32(id);
@@ -604,7 +576,6 @@ namespace MapsInMyFolder
             }, null);
             DebugMode.WriteLine("Clear_cache layer " + id_int);
         }
-
 
         public void Layer_favorite_remove(double id = 0)
         {
@@ -626,7 +597,6 @@ namespace MapsInMyFolder
             DebugMode.WriteLine("Editing layer" + id_int + " to favorite");
         }
 
-
         public void Layer_set_current(double id = 0)
         {
             int id_int = Convert.ToInt32(id);
@@ -634,7 +604,6 @@ namespace MapsInMyFolder
             {
                 MainWindow._instance.MainPage.Set_current_layer(id_int);
             }, null);
-
         }
         public void Request_search_update()
         {
@@ -642,20 +611,16 @@ namespace MapsInMyFolder
             {
                 MainWindow._instance.MainPage.SearchLayerStart(true);
             }, null);
-
         }
-
 
         public void Refresh_panel()
         {
             App.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
-{
-    MainWindow._instance.MainPage.ReloadPage();
-    MainWindow._instance.MainPage.SearchLayerStart();
-}, null);
-
+            {
+                MainWindow._instance.MainPage.ReloadPage();
+                MainWindow._instance.MainPage.SearchLayerStart();
+            }, null);
         }
-
 
         public string Gettilepreviewurlfromid(double id = 0)
         {
@@ -665,23 +630,12 @@ namespace MapsInMyFolder
             }
             async Task<string> Gettilepreviewurlfromid_interne(double id)
             {
-
                 int id_int = Convert.ToInt32(id);
-                string url_result = "";
-                DispatcherOperation op = App.Current.Dispatcher.BeginInvoke(new Func<string>(() =>
-                {
-                    return MainWindow._instance.MainPage.LayerTilePreview_ReturnUrl(id_int);
-                }));
+                DispatcherOperation op = App.Current.Dispatcher.BeginInvoke(new Func<string>(() => MainWindow._instance.MainPage.LayerTilePreview_ReturnUrl(id_int)));
                 await op;
-                string res = (string)op.Result;
-                DebugMode.WriteLine("tile preview url requested for " + id.ToString());
-                DebugMode.WriteLine("result " + url_result.ToString());
-                DebugMode.WriteLine("result2 " + res.ToString());
-                return res;
+                return op.Result.ToString();
             }
             return Gettilepreviewurlfromid_interne(id).Result;
         }
-
     }
-
 }

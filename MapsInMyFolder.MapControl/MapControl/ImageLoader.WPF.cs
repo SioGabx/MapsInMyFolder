@@ -14,7 +14,6 @@ namespace MapsInMyFolder.MapControl
     {
         public static Task<ImageSource> LoadImageAsync(Stream stream)
         {
-
             Debug.WriteLine("LoadImageAsync from stream task ");
             return Task.Run(() => LoadImage(stream));
         }
@@ -47,7 +46,7 @@ namespace MapsInMyFolder.MapControl
         private static ImageSource LoadImage(Stream stream)
         {
             var bitmapImage = new BitmapImage();
-            try { 
+            try {
             bitmapImage.BeginInit();
             bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
             bitmapImage.StreamSource = stream;

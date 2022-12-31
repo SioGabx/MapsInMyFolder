@@ -103,7 +103,6 @@ namespace MapsInMyFolder.VectorTileRenderer
             public static extern System.IntPtr glGetString(uint value);
         }
 
-
         //public static GRBackendRenderTargetDesc CreateRenderTarget()
         //{
         //    int framebuffer, stencil, samples;
@@ -125,8 +124,6 @@ namespace MapsInMyFolder.VectorTileRenderer
         //        RenderTargetHandle = (IntPtr)framebuffer,
         //    };
 
-
-
         public static GRBackendRenderTarget CreateRenderTarget()
         {
             int framebuffer, stencil, samples;
@@ -137,8 +134,7 @@ namespace MapsInMyFolder.VectorTileRenderer
             int bufferWidth = 0;
             int bufferHeight = 0;
 
-            return new GRBackendRenderTarget(bufferWidth, bufferHeight, samples, new GRVkImageInfo() { });
-
+            return new GRBackendRenderTarget(bufferWidth, bufferHeight, samples, new GRVkImageInfo());
 
             //return new GRBackendRenderTargetDesc
             //{
@@ -151,10 +147,5 @@ namespace MapsInMyFolder.VectorTileRenderer
             //    RenderTargetHandle = (IntPtr)framebuffer,
             //};
         }
-
-
-
-
     }
 }
-

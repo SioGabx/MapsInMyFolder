@@ -6,20 +6,11 @@ using System.Threading.Tasks;
 
 namespace MapsInMyFolder.Commun
 {
-    public class Layers_Dictionnary
-    {
-        
-
-     
-
-    }
-
-
     public class Layers
     {
         public int class_id;
         public bool class_favorite;
-        public string class_display_name;
+        public string class_name;
         public string class_description;
         public string class_categorie;
         public string class_identifiant;
@@ -39,13 +30,11 @@ namespace MapsInMyFolder.Commun
             public string PBFJsonStyle { get; set; }
         }
 
-
-
-        public Layers(int class_id, bool class_favorite, string class_display_name, string class_description, string class_categorie, string class_identifiant, string class_tile_url, string class_site, string class_site_url, int class_min_zoom, int class_max_zoom, string class_format, int class_tiles_size, string class_tilecomputationscript, SpecialsOptions class_specialsoptions)
+        public Layers(int class_id, bool class_favorite, string class_name, string class_description, string class_categorie, string class_identifiant, string class_tile_url, string class_site, string class_site_url, int class_min_zoom, int class_max_zoom, string class_format, int class_tiles_size, string class_tilecomputationscript, SpecialsOptions class_specialsoptions)
         {
             this.class_id = class_id;
             this.class_favorite = class_favorite;
-            this.class_display_name = class_display_name;
+            this.class_name = class_name;
             this.class_description = class_description;
             this.class_categorie = class_categorie;
             this.class_identifiant = class_identifiant;
@@ -62,11 +51,10 @@ namespace MapsInMyFolder.Commun
 
         public static Layers Empty(int LayerId = -1)
         {
-           
             return new Layers(LayerId, false, "Erreur", "Une erreur s'est produite dans la lecture des données. \n Données de secours fournie par OpenStreetMap.", "Erreur", "ERR_LAYER", "http://tile.openstreetmap.org/{z}/{x}/{y}.png", "Erreur", "Erreur", 0, 19, "jpeg", 256, "function main(args){return args;}", new SpecialsOptions());
         }
 
-        public class Convert
+        public static class Convert
         {
             public static Layers CurentLayerToLayer()
             {
@@ -77,7 +65,7 @@ namespace MapsInMyFolder.Commun
             {
                 Curent.Layer.class_id = layer.class_id;
                 Curent.Layer.class_tiles_size = layer.class_tiles_size;
-                Curent.Layer.class_display_name = layer.class_display_name;
+                Curent.Layer.class_name = layer.class_name;
                 Curent.Layer.class_description = layer.class_description;
 
                 Curent.Layer.class_categorie = layer.class_categorie;
@@ -92,21 +80,14 @@ namespace MapsInMyFolder.Commun
 
                 Curent.Layer.class_tilecomputationscript = layer.class_tilecomputationscript;
                 Curent.Layer.class_specialsoptions = layer.class_specialsoptions;
-
+        }
         }
 
-
-
-        }
-
-
-
-
-        public static List<Dictionary<int, Layers>> Layers_Dictionnary_List = new List<Dictionary<int, Layers>>() { };
+        public static List<Dictionary<int, Layers>> Layers_Dictionary_List = new List<Dictionary<int, Layers>>();
 
         public static Layers GetLayerById(int id)
         {
-            foreach (Dictionary<int, Layers> layer_dic in Layers_Dictionnary_List)
+            foreach (Dictionary<int, Layers> layer_dic in Layers_Dictionary_List)
             {
                 try
                 {
@@ -126,13 +107,13 @@ namespace MapsInMyFolder.Commun
 
         public static bool RemoveLayerById(int id)
         {
-            foreach (Dictionary<int, Layers> layer_dic in Layers_Dictionnary_List)
+            foreach (Dictionary<int, Layers> layer_dic in Layers_Dictionary_List)
             {
                 try
                 {
                     if (layer_dic.Keys.First() == id)
                     {
-                        Layers_Dictionnary_List.Remove(layer_dic);
+                        Layers_Dictionary_List.Remove(layer_dic);
                         return true;
                     }
                 }
@@ -144,41 +125,14 @@ namespace MapsInMyFolder.Commun
             return false;
         }
 
-
         public static List<Layers> GetLayersList()
         {
             List<Layers> layers = new List<Layers>();
-            foreach (Dictionary<int, Layers> individualdictionnary in Layers_Dictionnary_List)
+            foreach (Dictionary<int, Layers> individualdictionnary in Layers_Dictionary_List)
             {
                 layers.Add(individualdictionnary.Values.First());
             }
             return layers;
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     }
 }

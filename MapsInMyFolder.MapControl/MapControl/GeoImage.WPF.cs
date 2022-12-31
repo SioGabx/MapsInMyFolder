@@ -92,7 +92,7 @@ namespace MapsInMyFolder.MapControl
 
             colors[transparentPixel] = Colors.Transparent;
 
-            var stride = (source.PixelWidth * source.Format.BitsPerPixel + 7) / 8;
+            var stride = ((source.PixelWidth * source.Format.BitsPerPixel) + 7) / 8;
             var buffer = new byte[stride * source.PixelHeight];
 
             source.CopyPixels(buffer, stride, 0);

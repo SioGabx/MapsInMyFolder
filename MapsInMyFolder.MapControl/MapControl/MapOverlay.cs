@@ -2,10 +2,8 @@
 // © 2022 Clemens Fischer
 // Licensed under the Microsoft Public License (Ms-PL)
 
-
 using System.Windows;
 using System.Windows.Media;
-
 
 namespace MapsInMyFolder.MapControl
 {

@@ -25,7 +25,8 @@ namespace MapsInMyFolder.Commun
             //download
             try
             {
-                if (File.Exists(Commun.Settings.default_database_pathname) && force_download == false)
+                string database_pathname = Path.Combine(Settings.working_folder, Settings.database_pathname);
+                if (File.Exists(database_pathname) && !force_download)
                 {
                     return;
                 }
@@ -33,9 +34,10 @@ namespace MapsInMyFolder.Commun
                 {
                     Directory.CreateDirectory(Commun.Settings.working_folder);
                 }
-                if (File.Exists(Commun.Settings.database_default_path_url))
+                const string database_default_path_url = @"C:\Users\franc\Desktop\MapsInMyFolder_Project\layers_sqlite.db";
+                if (File.Exists(database_default_path_url))
                 {
-                    System.IO.File.Copy(Commun.Settings.database_default_path_url, Commun.Settings.default_database_pathname, true);
+                    System.IO.File.Copy(database_default_path_url, database_pathname, true);
                 }
                 else
                 {
@@ -47,10 +49,7 @@ namespace MapsInMyFolder.Commun
             {
                 Debug.WriteLine("fonction DB_Layer_Download : " + ex.Message);
             }
-
         }
-
-
 
         static public void ExecuteNonQuerySQLCommand(string querry)
         {
@@ -60,8 +59,7 @@ namespace MapsInMyFolder.Commun
                 Debug.WriteLine("La connection à la base de donnée est null");
                 return;
             }
-            SQLiteCommand sqlite_cmd;
-            sqlite_cmd = conn.CreateCommand();
+            SQLiteCommand sqlite_cmd = conn.CreateCommand();
             sqlite_cmd.CommandText = querry;
             sqlite_cmd.ExecuteNonQuery();
         }
@@ -74,28 +72,18 @@ namespace MapsInMyFolder.Commun
                 Debug.WriteLine("La connection à la base de donnée est null");
                 return -1;
             }
-            SQLiteCommand sqlite_cmd;
-            sqlite_cmd = conn.CreateCommand();
+            SQLiteCommand sqlite_cmd = conn.CreateCommand();
             sqlite_cmd.CommandText = querry;
             int RowCount = Convert.ToInt32(sqlite_cmd.ExecuteScalar());
             return RowCount;
         }
-
-
-
-
-
-
-
-
-
 
         //CONNEXION A LA BASE DE DONNEES
         public static SQLiteConnection DB_Connection()
         {
             SQLiteConnection sqlite_conn;
             // Create a new database connection:
-            string dbFile = Settings.selected_database_pathname;
+            string dbFile = Path.Combine(Settings.working_folder, Settings.database_pathname);
             if (System.IO.File.Exists(dbFile))
             {
                 FileInfo filinfo = new FileInfo(dbFile);
@@ -123,12 +111,12 @@ namespace MapsInMyFolder.Commun
                 return null;
             }
             SQLiteCommand sqlite_cmd = sqlite_conn.CreateCommand();
-            string commande_arg = "('ID' INTEGER UNIQUE, 'DISPLAY_NAME' TEXT, 'DESCRIPTION' TEXT, 'CATEGORIE' TEXT, 'IDENTIFIANT' TEXT, 'TILE_URL' TEXT, 'MIN_ZOOM' INTEGER DEFAULT 0, 'MAX_ZOOM' INTEGER DEFAULT 0, 'FORMAT' TEXT, 'SITE' TEXT, 'SITE_URL' TEXT, 'TILE_SIZE' INTEGER DEFAULT 256, 'FAVORITE' INTEGER DEFAULT 0, 'TILECOMPUTATIONSCRIPT' TEXT DEFAULT '', 'SPECIALSOPTIONS' TEXT DEFAULT ''";
-            sqlite_cmd.CommandText = @"CREATE TABLE IF NOT EXISTS 'CUSTOMSLAYERS' " + commande_arg + ");";
+            const string commande_arg = "('ID' INTEGER UNIQUE, 'NOM' TEXT, 'DESCRIPTION' TEXT, 'CATEGORIE' TEXT, 'IDENTIFIANT' TEXT, 'TILE_URL' TEXT, 'MIN_ZOOM' INTEGER DEFAULT 0, 'MAX_ZOOM' INTEGER DEFAULT 0, 'FORMAT' TEXT, 'SITE' TEXT, 'SITE_URL' TEXT, 'TILE_SIZE' INTEGER DEFAULT 256, 'FAVORITE' INTEGER DEFAULT 0, 'TILECOMPUTATIONSCRIPT' TEXT DEFAULT '', 'SPECIALSOPTIONS' TEXT DEFAULT ''";
+            sqlite_cmd.CommandText = "CREATE TABLE IF NOT EXISTS 'CUSTOMSLAYERS' " + commande_arg + ");";
             sqlite_cmd.ExecuteNonQuery();
-            sqlite_cmd.CommandText = @"CREATE TABLE IF NOT EXISTS 'LAYERS' " + commande_arg + ",PRIMARY KEY('ID' AUTOINCREMENT))";
+            sqlite_cmd.CommandText = "CREATE TABLE IF NOT EXISTS 'LAYERS' " + commande_arg + ",PRIMARY KEY('ID' AUTOINCREMENT))";
             sqlite_cmd.ExecuteNonQuery();
-            sqlite_cmd.CommandText = @"CREATE TABLE IF NOT EXISTS 'EDITEDLAYERS' " + commande_arg + ");";
+            sqlite_cmd.CommandText = "CREATE TABLE IF NOT EXISTS 'EDITEDLAYERS' " + commande_arg + ");";
             sqlite_cmd.ExecuteNonQuery();
             return sqlite_conn;
         }
@@ -147,14 +135,12 @@ namespace MapsInMyFolder.Commun
                 //MessageBox.Show("Une erreur s'est produite au niveau de la base de donnée.\n" + e.Message);  
                 Debug.WriteLine("Une erreur s'est produite au niveau de la base de donnée.\n" + e.Message);
             }
-
         }
 
         public static int DB_Download_Write(Status STATE, string FILE_NAME, int NBR_TILES, int ZOOM, double NO_LAT, double NO_LONG, double SE_LAT, double SE_LONG, int LAYER_ID, string TEMP_DIRECTORY, string SAVE_DIRECTORY, string TIMESTAMP, int QUALITY, int REDIMWIDTH, int REDIMHEIGHT)
         {
             //staticc
             //CREATE TABLE IF NOT EXISTS some_table (id INTEGER PRIMARY KEY AUTOINCREMENT,
-
 
             // CREATE TABLE IF NOT EXISTS "DOWNLOADS" ("ID" INTEGER NOT NULL UNIQUE,"STATE" TEXT,"FILE_NAME" TEXT,"NBR_TILES" INTEGER,"ZOOM" INTEGER,"NO_LAT" REAL,"NO_LONG" REAL,"SE_LAT" REAL,"SE_LONG" REAL,"LAYER_ID" INTEGER,"TEMP_DIRECTORY" TEXT,"SAVE_DIRECTORY" TEXT,PRIMARY KEY("ID" AUTOINCREMENT));
             //INSERT INTO "DOWNLOADS" ("STATE","FILE_NAME","NBR_TILES","ZOOM","NO_LAT","NO_LONG","SE_LAT","SE_LONG","LAYER_ID","TEMP_DIRECTORY","SAVE_DIRECTORY") VALUES (\"" + STATE + \"",\"" + FILE_NAME + \"",\"" + NBR_TILES + \"",\"" + ZOOM + \"",\"" + NO_LAT + \"",\"" + NO_LONG + \"",\"" + SE_LAT + \"",\"" + SE_LONG + \"","LAYER_ID + \"",\"" + TEMP_DIRECTORY + \"",\"" + SAVE_DIRECTORY + \"")
@@ -165,17 +151,14 @@ namespace MapsInMyFolder.Commun
                 if (conn is null) { return 0; }
                 SQLiteCommand sqlite_cmd = conn.CreateCommand();
                 DB_Download_Init(conn);
-                sqlite_cmd.CommandText = "INSERT INTO 'DOWNLOADS'('STATE','INFOS', 'FILE_NAME', 'NBR_TILES', 'ZOOM', 'NO_LAT', 'NO_LONG', 'SE_LAT', 'SE_LONG', 'LAYER_ID', 'TEMP_DIRECTORY', 'SAVE_DIRECTORY','TIMESTAMP','QUALITY','REDIMWIDTH','REDIMHEIGHT') VALUES('" + STATE + "','" + "" + "','" + FILE_NAME + "','" + NBR_TILES + "','" + ZOOM + "','" + NO_LAT + "','" + NO_LONG + "','" + SE_LAT + "','" + SE_LONG + "','" + LAYER_ID + "','" + TEMP_DIRECTORY + "','" + SAVE_DIRECTORY + "','" + TIMESTAMP + "','" + QUALITY + "','" + REDIMWIDTH + "','" + REDIMHEIGHT + "');";
+                sqlite_cmd.CommandText = "INSERT INTO 'DOWNLOADS'('STATE','INFOS', 'FILE_NAME', 'NBR_TILES', 'ZOOM', 'NO_LAT', 'NO_LONG', 'SE_LAT', 'SE_LONG', 'LAYER_ID', 'TEMP_DIRECTORY', 'SAVE_DIRECTORY','TIMESTAMP','QUALITY','REDIMWIDTH','REDIMHEIGHT') VALUES('" + STATE + "','','" + FILE_NAME + "','" + NBR_TILES + "','" + ZOOM + "','" + NO_LAT + "','" + NO_LONG + "','" + SE_LAT + "','" + SE_LONG + "','" + LAYER_ID + "','" + TEMP_DIRECTORY + "','" + SAVE_DIRECTORY + "','" + TIMESTAMP + "','" + QUALITY + "','" + REDIMWIDTH + "','" + REDIMHEIGHT + "');";
                 sqlite_cmd.ExecuteNonQuery();
 
                 //sqlite_cmd.
 
-
                 sqlite_cmd.CommandText = "select last_insert_rowid()";
                 Int64 LastRowID64 = (Int64)sqlite_cmd.ExecuteScalar();
                 int LastRowID = (int)LastRowID64;
-
-
 
                 conn.Close();
                 return LastRowID;
@@ -223,11 +206,6 @@ namespace MapsInMyFolder.Commun
                 Debug.WriteLine("fonction DB_Download_Delete : " + ex.Message);
             }
         }
-
-
-       
-
-
 
     }
 }

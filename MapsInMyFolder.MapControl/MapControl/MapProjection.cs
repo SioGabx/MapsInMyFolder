@@ -6,7 +6,6 @@ using System;
 using System.Globalization;
 using System.Windows;
 
-
 namespace MapsInMyFolder.MapControl
 {
     /// <summary>
@@ -101,7 +100,7 @@ namespace MapsInMyFolder.MapControl
         public virtual string GetBboxValue(Rect rect)
         {
             return string.Format(CultureInfo.InvariantCulture,
-                "{0},{1},{2},{3}", rect.X, rect.Y, (rect.X + rect.Width), (rect.Y + rect.Height));
+                "{0},{1},{2},{3}", rect.X, rect.Y, rect.X + rect.Width, rect.Y + rect.Height);
         }
     }
 }

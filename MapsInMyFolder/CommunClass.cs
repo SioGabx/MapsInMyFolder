@@ -20,6 +20,7 @@ using System.Xml.Linq;
 using System.Linq;
 using MapsInMyFolder.Commun;
 using System.Reflection;
+using System.Windows.Media;
 
 namespace MapsInMyFolder
 {
@@ -53,22 +54,17 @@ namespace MapsInMyFolder
     //    partial class MainWindow : Window
     //{
 
-      
-
-
     //}
 
-  
-
-
-    public class Message
+    public static class Message
     {
         public static ContentDialog SetContentDialog(object text, object caption = null, MessageDialogButton messageBoxButton = MessageDialogButton.OK, ContentDialog dialog_arg = null)
         {
-            ContentDialog dialog;
+            ContentDialog dialog = null;
             if (dialog_arg is null || dialog_arg == null)
             {
-                dialog = MainWindow._instance.Dialogue;
+                //dialog = MainWindow._instance.Dialogue;
+                Application.Current.ExecOnUiThread(() => dialog = MainWindow._instance.Dialogue);
             }
             else
             {
@@ -76,17 +72,7 @@ namespace MapsInMyFolder
             }
             Debug.WriteLine("DialogMsg" + text);
             dialog.Content = text;
-
-            dialog.Title = caption;
-            if (caption == null)
-            {
-                dialog.Title = "";
-            }
-            else
-            {
-                dialog.Title = caption;
-            }
-
+            dialog.Title = caption ?? "";
             dialog.CloseButtonText = "";
             dialog.SecondaryButtonText = "";
             dialog.PrimaryButtonText = "";
@@ -144,16 +130,10 @@ namespace MapsInMyFolder
             Debug.WriteLine(ex.Message);
             }
         }
-
     }
 
     public enum MessageDialogButton
     {
         OK, OKCancel, YesNo, YesNoCancel, YesCancel
     }
-
- 
-
-
 }
-

@@ -8,7 +8,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 
-
 namespace MapsInMyFolder.MapControl
 {
     /// <summary>
@@ -128,7 +127,7 @@ namespace MapsInMyFolder.MapControl
         /// </summary>
         public ViewRect GetViewRect(Rect rect)
         {
-            var center = new Point(rect.X + rect.Width / 2d, rect.Y + rect.Height / 2d);
+            var center = new Point(rect.X + (rect.Width / 2d), rect.Y + (rect.Height / 2d));
             var position = parentMap.ViewTransform.MapToView(center);
 
             if (parentMap.MapProjection.IsNormalCylindrical && IsOutsideViewport(position))
@@ -141,8 +140,8 @@ namespace MapsInMyFolder.MapControl
 
             var width = rect.Width * parentMap.ViewTransform.Scale;
             var height = rect.Height * parentMap.ViewTransform.Scale;
-            var x = position.X - width / 2d;
-            var y = position.Y - height / 2d;
+            var x = position.X - (width / 2d);
+            var y = position.Y - (height / 2d);
 
             return new ViewRect(x, y, width, height, parentMap.ViewTransform.Rotation);
         }

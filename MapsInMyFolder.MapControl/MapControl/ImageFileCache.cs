@@ -33,7 +33,6 @@ namespace MapsInMyFolder.MapControl.Caching
             Debug.WriteLine($"Created ImageFileCache in {rootDirectory}");
         }
 
-
         public Task Clean()
         {
             return Task.Factory.StartNew(CleanRootDirectory, TaskCreationOptions.LongRunning);

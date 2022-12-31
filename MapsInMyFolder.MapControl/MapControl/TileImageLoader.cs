@@ -61,7 +61,7 @@ namespace MapsInMyFolder.MapControl
 
                 if (numTasks > 0)
                 {
-                    if (Cache == null || tileSource.UriFormat == null || !tileSource.UriFormat.StartsWith("http"))
+                    if (Cache == null || tileSource.UriFormat?.StartsWith("http") != true)
                     {
                         cacheName = null; // no tile caching
                     }

@@ -34,7 +34,6 @@ namespace MapsInMyFolder
             InitializeComponent();
         }
 
-
         string center_view_city;
         public string default_filename;
         int Last_Redim_HUnit_Selected = 0;
@@ -48,13 +47,12 @@ namespace MapsInMyFolder
             App.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
             {
                 UpdateMigniatureParralele();
-
             }, null);
         }
         private void ZoomSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             UpdateTimer = new System.Timers.Timer(500);
-            UpdateTimer.Elapsed += new ElapsedEventHandler(UpdateTimerElapsed_UpdateMigniatureParralele);
+            UpdateTimer.Elapsed += UpdateTimerElapsed_UpdateMigniatureParralele;
             UpdateTimer.AutoReset = false;
             UpdateTimer.Enabled = true;
 
@@ -69,17 +67,15 @@ namespace MapsInMyFolder
                 ZoomSlider.Value = maximum_zoom;
             }
             Update_Labels();
-
-
         }
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
             //Init();
             System.Windows.Media.SolidColorBrush brush = new System.Windows.Media.SolidColorBrush(
-                System.Windows.Media.Color.FromArgb(255, 
-                (byte)Settings.background_layer_color_R, 
-                (byte)Settings.background_layer_color_G, 
+                System.Windows.Media.Color.FromArgb(255,
+                (byte)Settings.background_layer_color_R,
+                (byte)Settings.background_layer_color_G,
                 (byte)Settings.background_layer_color_B)
                 );
             StackPanel_ImageTilePreview_0.Background = brush;
@@ -96,7 +92,6 @@ namespace MapsInMyFolder
             RedimSwitch.OffContent = "Désactivé";
         }
 
-
         public void Init()
         {
             Update_Labels();
@@ -112,8 +107,8 @@ namespace MapsInMyFolder
             ZoomSlider.Value = MainWindow._instance.MainPage.mapviewer.ZoomLevel;
             TextBox_quality_number.Text = "100";
 
-            int largeur = 128;
-            int stride = largeur / 8;
+            const int largeur = 128;
+            const int stride = largeur / 8;
             BitmapSource EmptyImage = BitmapSource.Create(largeur, largeur, 96, 96, PixelFormats.Indexed1, BitmapPalettes.BlackAndWhiteTransparent, new byte[largeur * stride], stride);
             ImageTilePreview_0_0.Source = EmptyImage;
             ImageTilePreview_1_0.Source = EmptyImage;
@@ -124,7 +119,6 @@ namespace MapsInMyFolder
             StartDownloadButton.Focus();
         }
 
-
         CancellationTokenSource UpdateMigniatureParraleleTokenSource = new CancellationTokenSource();
         CancellationToken UpdateMigniatureParraleleToken = new CancellationToken();
         async void UpdateMigniatureParralele()
@@ -132,7 +126,7 @@ namespace MapsInMyFolder
             Debug.WriteLine("update minia LastResquestZoom " + LastResquestZoom);
             if (!IsInitialized) {
                 Debug.WriteLine("Not ini");
-                return; 
+                return;
             }
             if (LastResquestZoom == ZoomSlider.Value)
             {
@@ -195,7 +189,7 @@ namespace MapsInMyFolder
                                 return;
                             }
                         }
-                        if (httpResponse != null && httpResponse.ResponseMessage.IsSuccessStatusCode)
+                        if (httpResponse?.ResponseMessage.IsSuccessStatusCode == true)
                         {
                             DebugMode.WriteLine("success= " + url.url);
                             DebugMode.WriteLine("index_x= " + url.index_x);
@@ -210,14 +204,10 @@ namespace MapsInMyFolder
                         }
                     });
 
-
-
-
                 //App.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
                 //{
 
                 //}, null);
-
 
             }, UpdateMigniatureParraleleToken);
             }
@@ -235,13 +225,10 @@ namespace MapsInMyFolder
                 PutImage(ToImage(BitmapImageArray[1, 1]), zoom, ImageTilePreview_1_1);
                 PutImage(ToImage(BitmapImageArray[2, 1]), zoom, ImageTilePreview_1_2);
 
-
                 DoubleAnimation show_anim = new DoubleAnimation(1, Commun.Settings.animations_duration * 2)
                 {
                     EasingFunction = new PowerEase { EasingMode = EasingMode.EaseOut }
-
                 };
-
 
                 ImageTilePreview_0_0.BeginAnimation(UIElement.OpacityProperty, show_anim);
                 ImageTilePreview_1_0.BeginAnimation(UIElement.OpacityProperty, show_anim);
@@ -250,11 +237,7 @@ namespace MapsInMyFolder
                 ImageTilePreview_0_2.BeginAnimation(UIElement.OpacityProperty, show_anim);
                 ImageTilePreview_1_2.BeginAnimation(UIElement.OpacityProperty, show_anim);
             }
-
-
         }
-
-
 
         public static BitmapSource ToImage(byte[] array)
         {
@@ -262,12 +245,11 @@ namespace MapsInMyFolder
             {
                 if (array == null)
                 {
-                    Debug.WriteLine("ByteArray is null");
-                    int width = 128;
-                    int height = width;
-                    int stride = width / 8;
+                    DebugMode.WriteLine("ByteArray is null");
+                    const int width = 256;
+                    const int height = width;
+                    const int stride = width / 8;
                     byte[] pixels = new byte[height * stride];
-
 
                     BitmapSource image = BitmapSource.Create(
                         width,
@@ -327,8 +309,6 @@ namespace MapsInMyFolder
             Update_Labels();
         }
 
-
-
         async void GetCenterViewCityName()
         {
             List<Double> NO_PIN_Location = new List<Double>() { MainWindow._instance.MainPage.NO_PIN.Location.Latitude, MainWindow._instance.MainPage.NO_PIN.Location.Longitude };
@@ -341,31 +321,26 @@ namespace MapsInMyFolder
                 {
                     static bool ValidateResult(string center_view_city_arg)
                     {
-                        if (center_view_city_arg != null && !string.IsNullOrEmpty(center_view_city_arg.Trim()))
-                        {
-                            return true;
-                        }
-                        else
-                        {
-                            return false;
-                        }
+                        return center_view_city_arg != null && !string.IsNullOrEmpty(center_view_city_arg.Trim());
                     }
-                    string url = @"https://nominatim.openstreetmap.org/reverse?lat=" + Mloc.Latitude + @"&lon=" + Mloc.Longitude + @"&zoom=18&format=xml&email=siogabx@siogabx.fr";
-                    DebugMode.WriteLine("Recherche ville centre : " + "lat=" + Mloc.Latitude + @" lon=" + Mloc.Longitude + "\nurl=" + url);
+                    string url = "https://nominatim.openstreetmap.org/reverse?lat=" + Mloc.Latitude + "&lon=" + Mloc.Longitude + "&zoom=18&format=xml&email=siogabx@siogabx.fr";
+                    DebugMode.WriteLine("Recherche ville centre : lat=" + Mloc.Latitude + " lon=" + Mloc.Longitude + "\nurl=" + url);
                     using (HttpClient client = new HttpClient())
                     {
                         using (HttpResponseMessage response = client.GetAsync(url).Result)
                         using (Stream responseStream = response.Content.ReadAsStream())
                         {
                             response.EnsureSuccessStatusCode();
-                            Dictionary<string, string> city_name = new Dictionary<string, string>() { };
-                            city_name.Add("village", string.Empty);
-                            city_name.Add("town", string.Empty);
-                            city_name.Add("city", string.Empty);
-                            city_name.Add("city_district", string.Empty);
-                            city_name.Add("municipality", string.Empty);
-                            city_name.Add("county", string.Empty);
-                            city_name.Add("state", string.Empty);
+                            Dictionary<string, string> city_name = new Dictionary<string, string>
+                            {
+                                { "village", string.Empty },
+                                { "town", string.Empty },
+                                { "city", string.Empty },
+                                { "city_district", string.Empty },
+                                { "municipality", string.Empty },
+                                { "county", string.Empty },
+                                { "state", string.Empty }
+                            };
                             using (System.Xml.XmlReader reader = System.Xml.XmlReader.Create(responseStream))
                             {
                                 reader.MoveToContent();
@@ -373,7 +348,7 @@ namespace MapsInMyFolder
                                 {
                                     if (reader.IsStartElement())
                                     {
-                                        string name = reader.Name.ToString();
+                                        string name = reader.Name;
                                         string value = reader.ReadString();
                                         foreach (var city in city_name)
                                         {
@@ -408,7 +383,6 @@ namespace MapsInMyFolder
             });
         }
 
-
         void Update_Labels()
         {
             if (!IsInitialized) { return; }
@@ -423,14 +397,13 @@ namespace MapsInMyFolder
             int lat_tile_number = Math.Abs(SE_tile[0] - NO_tile[0]) + 1;
             int long_tile_number = Math.Abs(SE_tile[1] - NO_tile[1]) + 1;
 
-
             void Update_Label_TileSize()
             {
                 Label_LargeurTuile.Content = Curent.Layer.class_tiles_size;
             }
             void Update_Label_LayerName()
             {
-                Label_NomCalque.Content = Curent.Layer.class_display_name;
+                Label_NomCalque.Content = Curent.Layer.class_name;
             }
 
             void Update_Label_TileSource()
@@ -454,7 +427,7 @@ namespace MapsInMyFolder
                 }
                 else if (TextBox_Redim_WUnit.SelectedIndex == 1)
                 {
-                    final_size_W += Convert.ToInt32(Math.Round((Convert.ToDouble(TextBox_Redim_Width.Text) / 100) * rognage_info["width"]));
+                    final_size_W += Convert.ToInt32(Math.Round(Convert.ToDouble(TextBox_Redim_Width.Text) / 100 * rognage_info["width"]));
                 }
                 int final_size_H = 0;
                 if (TextBox_Redim_HUnit.SelectedIndex == 0)
@@ -463,12 +436,10 @@ namespace MapsInMyFolder
                 }
                 else if (TextBox_Redim_HUnit.SelectedIndex == 1)
                 {
-                    final_size_H += Convert.ToInt32(Math.Round((Convert.ToDouble(TextBox_Redim_Height.Text) / 100) * rognage_info["height"]));
+                    final_size_H += Convert.ToInt32(Math.Round(Convert.ToDouble(TextBox_Redim_Height.Text) / 100 * rognage_info["height"]));
                 }
                 return new List<int>() { final_size_W, final_size_H };
             }
-
-
 
             void Update_Label_Label_ImgSizeF()
             {
@@ -505,7 +476,6 @@ namespace MapsInMyFolder
                 return;
             }
 
-
             void Update_CheckIfSizeInf65000()
             {
                 Dictionary<string, int> ResizedImageSize = GetResizedImageSize();
@@ -532,7 +502,7 @@ namespace MapsInMyFolder
                 {
                     Label_ImgSizeF.Foreground = OKColor;
                 }
-                if (OriginalImageSizeHIsOK || OriginalImageSizeHIsOK || OriginalImageSizeHIsOK || OriginalImageSizeHIsOK)
+                if (OriginalImageSizeHIsOK || OriginalImageSizeWIsOK || ResizedImageSizeHIsOK || ResizedImageSizeWIsOK)
                 {
                     StartDownloadButton.Opacity = 0.5;
                     StartDownloadButton.IsEnabled = false;
@@ -565,12 +535,11 @@ namespace MapsInMyFolder
                 TextBox_Redim_WUnit.Opacity = 1;
                 WrapPanel_Largeur.IsEnabled = true;
                 WrapPanel_Hauteur.IsEnabled = true;
-                SolidColorBrush WhiteColor = (SolidColorBrush)(new BrushConverter().ConvertFrom("#BCBCBC")); //new SolidColorBrush(BrushConverter(BCBCBC);
+                SolidColorBrush WhiteColor = (SolidColorBrush)new BrushConverter().ConvertFrom("#BCBCBC"); //new SolidColorBrush(BrushConverter(BCBCBC);
                 TextBox_Redim_Width.Foreground = WhiteColor;
                 TextBox_Redim_Height.Foreground = WhiteColor;
                 TextBox_Redim_WUnit.Foreground = WhiteColor;
                 TextBox_Redim_HUnit.Foreground = WhiteColor;
-
             }
             else
             {
@@ -587,7 +556,6 @@ namespace MapsInMyFolder
                 TextBox_Redim_WUnit.Foreground = GrayColor;
                 TextBox_Redim_HUnit.Foreground = GrayColor;
             }
-
         }
 
         Dictionary<string, int> GetOriginalImageSize()
@@ -609,7 +577,6 @@ namespace MapsInMyFolder
             Dictionary<string, int> rognage_info = GetOriginalImageSize();
             if (RedimSwitch.IsOn)
             {
-
                 if (TextBox_Redim_HUnit.SelectedIndex == 0)
                 {
                     RedimHeight = Convert.ToInt32(TextBox_Redim_Height.Text);
@@ -761,7 +728,7 @@ namespace MapsInMyFolder
             }
 
             Dictionary<string, int> rognage_info = GetOriginalImageSize();
-            if (RedimSwitch.IsOn == false) { return; }
+            if (!RedimSwitch.IsOn) { return; }
             if (TextBox_Redim_HUnit.SelectedIndex == 0)
             {
                 TextBox_Redim_Height.TextChanged -= TextBox_Redim_Height_TextChanged;
@@ -833,10 +800,9 @@ namespace MapsInMyFolder
                 return;
             }
             // FilterDigitOnlyWhileWritingInTextBox(TextBox_Redim_Width);
-            if (RedimSwitch.IsOn == false) { return; }
+            if (!RedimSwitch.IsOn) { return; }
             if (TextBox_Redim_WUnit.SelectedIndex == 0)
             {
-
                 TextBox_Redim_Width.TextChanged -= TextBox_Redim_Width_TextChanged;
                 Collectif.FilterDigitOnlyWhileWritingInTextBox(TextBox_Redim_Width);
 
@@ -877,7 +843,7 @@ namespace MapsInMyFolder
                 TextBox_Redim_Width.TextChanged += TextBox_Redim_Width_TextChanged;
                 if (string.IsNullOrEmpty(TextBox_Redim_Width.Text.Trim()))
                 { return; }
-                if (Convert.ToDouble(TextBox_Redim_Width.Text) > (65000 / (double)rognage_info["width"]) * 100)
+                if (Convert.ToDouble(TextBox_Redim_Width.Text) > 65000 / (double)rognage_info["width"] * 100)
                 {
                     TextBox_Redim_Width.TextChanged -= TextBox_Redim_Width_TextChanged;
                     TextBox_Redim_Width.Text = Math.Round(65000 / (double)rognage_info["width"] * 100, 2).ToString();
@@ -924,7 +890,7 @@ namespace MapsInMyFolder
                 Last_Redim_HUnit_Selected = 1;
                 TextBox_Redim_WUnit.SelectedIndex = 1;
                 TextBox_Redim_Height.TextChanged -= TextBox_Redim_Height_TextChanged;
-                TextBox_Redim_Height.Text = Math.Round(((double)txtBValue / (double)rognage_info["height"]) * 100, 1).ToString();
+                TextBox_Redim_Height.Text = Math.Round((double)txtBValue / (double)rognage_info["height"] * 100, 1).ToString();
                 TextBox_Redim_Height.TextChanged += TextBox_Redim_Height_TextChanged;
                 Debug.WriteLine(txtBValue.ToString());
                 Debug.WriteLine(rognage_info["height"].ToString());
@@ -949,7 +915,7 @@ namespace MapsInMyFolder
                 Last_Redim_WUnit_Selected = 1;
                 TextBox_Redim_HUnit.SelectedIndex = 1;
                 TextBox_Redim_Width.TextChanged -= TextBox_Redim_Width_TextChanged;
-                TextBox_Redim_Width.Text = Math.Round(((double)txtBValue / (double)rognage_info["width"]) * 100, 1).ToString();
+                TextBox_Redim_Width.Text = Math.Round((double)txtBValue / (double)rognage_info["width"] * 100, 1).ToString();
                 TextBox_Redim_Width.TextChanged += TextBox_Redim_Width_TextChanged;
             }
             else if (TextBox_Redim_WUnit.SelectedIndex == 0 && Last_Redim_WUnit_Selected == 1)
@@ -967,15 +933,15 @@ namespace MapsInMyFolder
             int zoom = Convert.ToInt32(ZoomSlider.Value);
             SaveFileDialog saveFileDialog1 = new SaveFileDialog();
             string filter = "";
-            if (Curent.Layer.class_format.ToLower() == "png")
+            if (string.Equals(Curent.Layer.class_format, "png", StringComparison.OrdinalIgnoreCase))
             {
                 filter = "PNG|*.png";
             }
-            else if (Curent.Layer.class_format.ToLower() == "jpeg")
+            else if (string.Equals(Curent.Layer.class_format, "jpeg", StringComparison.OrdinalIgnoreCase))
             {
                 filter = "JPEG|*.jpg";
             }
-            else if (Curent.Layer.class_format.ToLower() == "pbf")
+            else if (string.Equals(Curent.Layer.class_format, "pbf", StringComparison.OrdinalIgnoreCase))
             {
                 filter = "JPEG|*.jpg";
             }
@@ -1040,7 +1006,7 @@ namespace MapsInMyFolder
                     RedimHeight = -1;
                 }
 
-                Download_Options download_Options = new Download_Options(0, save_directory, format, filename, "", "", 0, zoom, quality, "", NO_PIN_Location, SE_PIN_Location, RedimWidth, RedimHeight) { };
+                Download_Options download_Options = new Download_Options(0, save_directory, format, filename, "", "", 0, zoom, quality, "", NO_PIN_Location, SE_PIN_Location, RedimWidth, RedimHeight);
                 MainWindow._instance.PrepareDownloadBeforeStart(download_Options);
                 ClosePage();
             }
@@ -1050,7 +1016,6 @@ namespace MapsInMyFolder
         {
             ClosePage();
         }
-
 
         private void Page_KeyDown(object sender, KeyEventArgs e)
         {
@@ -1066,7 +1031,6 @@ namespace MapsInMyFolder
             {
                 EasingFunction = new PowerEase { EasingMode = EasingMode.EaseOut },
                 BeginTime = new TimeSpan(0, 0, 0, 0, 500),
-
             };
             ImageTilePreview_0_0.BeginAnimation(UIElement.OpacityProperty, hide_anim);
             ImageTilePreview_1_0.BeginAnimation(UIElement.OpacityProperty, hide_anim);
@@ -1076,7 +1040,6 @@ namespace MapsInMyFolder
             ImageTilePreview_1_2.BeginAnimation(UIElement.OpacityProperty, hide_anim);
             MainWindow._instance.FrameBack();
         }
-
 
         private void GridImagePreviewInfoScrollViewer_SizeChanged(object sender, SizeChangedEventArgs e)
         {
@@ -1093,7 +1056,6 @@ namespace MapsInMyFolder
                 GridImagePreviewInfoScrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Hidden;
                 GridImagePreviewInfo.Margin = new Thickness(0, 0, 0, 70);
             }
-
         }
     }
 }

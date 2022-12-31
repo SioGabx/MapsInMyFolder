@@ -13,10 +13,13 @@ using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Media.Imaging;
 using System.Reflection;
+using System.Net.NetworkInformation;
+using System.Windows;
+using System.Windows.Media;
 
 namespace MapsInMyFolder.Commun
 {
-    public class DebugMode
+    public static class DebugMode
     {
         public static void WriteLine(object text)
         {
@@ -25,13 +28,34 @@ namespace MapsInMyFolder.Commun
                 Debug.WriteLine(text.ToString());
             }
         }
-
     }
+
+
+
+
+
+    public class NameHiddenIdValue
+    {
+        public int Id { get; }
+        public string Name { get; }
+
+        public NameHiddenIdValue(int id, string name)
+        {
+            Id = id;
+            Name = name;
+        }
+
+        public override string ToString()
+        {
+            return Name;
+        }
+    }
+
+
 
     public static class Collectif
     {
-
-        public class GetUrl
+        public static class GetUrl
         {
             public static int numberofurlgenere = 0;
             public static string FromTileXYZ(string urlbase, int x, int y, int z, int LayerID)
@@ -41,11 +65,21 @@ namespace MapsInMyFolder.Commun
                     return urlbase;
                 }
                 string finalurl = urlbase;
+                List<double> location_topleft = Commun.Collectif.TileToCoordonnees(x, y, z);
+                List<double> location_bottomright = Commun.Collectif.TileToCoordonnees(x + 1, y + 1, z);
+                List<double> location = Commun.Collectif.GetCenterBetweenTwoPoints(location_topleft, location_bottomright);
                 Dictionary<string, object> argument = new Dictionary<string, object>()
                 {
                       { "x",  x.ToString() },
                      { "y",  y.ToString() },
                       { "z",  z.ToString() },
+                    { "zoom",  z.ToString() },
+                      { "lat",  location[0].ToString() },
+                      { "lng",  location[1].ToString()},
+                      { "t_lat",  location_topleft[0].ToString() },
+                      { "t_lng",  location_topleft[1].ToString()},
+                      { "b_lat",  location_bottomright[0].ToString() },
+                      { "b_lng",  location_bottomright[1].ToString()},
                       { "layerid",  LayerID.ToString() },
                 };
                 //Jint.Native.JsValue JavascriptMainResult = Commun.Javascript.ExecuteScript("function main() { var js = new TheType(); log(js.TestDoubleReturn(0,0)); return args; }", argument);
@@ -65,7 +99,7 @@ namespace MapsInMyFolder.Commun
                     try
                     {
                         //JavascriptMainResult = Commun.Javascript.ExecuteScript(TileComputationScript, argument, LayerID);
-                        DebugMode.WriteLine("DEBUG JS : " + "LayerId" + LayerID);
+                        DebugMode.WriteLine("DEBUG JS : LayerId" + LayerID);
                         JavascriptMainResult = Commun.Javascript.ExecuteScript(TileComputationScript, argument, LayerID);
                     }
                     catch (Exception ex)
@@ -82,16 +116,14 @@ namespace MapsInMyFolder.Commun
                             string replacementValue = string.Empty;
                             try
                             {
-
                                 if (JavascriptReplacementVar.Value is null)
                                 {
                                     replacementValue = "null";
                                 }
                                 else
                                 {
-                                    replacementValue = JavascriptReplacementVar.Value.ToString();
+                                    replacementValue = JavascriptReplacementVar.Value;
                                 }
-
                             }
                             catch (Exception ex)
                             {
@@ -140,17 +172,17 @@ namespace MapsInMyFolder.Commun
                 int SE_x = SE_tile[0];
                 int SE_y = SE_tile[1];
 
-                List<Url_class> list_of_url_to_download = new List<Url_class>() { };
+                List<Url_class> list_of_url_to_download = new List<Url_class>();
                 int Download_X_tile = 0;
                 int Download_Y_tile = 0;
                 int max_x = Math.Abs(SE_x - NO_x) + 1;
                 int max_y = Math.Abs(SE_y - NO_y) + 1;
-                for (int i = 0; i < (max_y); i++)
+                for (int i = 0; i < max_y; i++)
                 {
-                    for (int a = 0; a < (max_x); a++)
+                    for (int a = 0; a < max_x; a++)
                     {
-                        int tuileX = (NO_x + Download_X_tile);
-                        int tuileY = (NO_y + Download_Y_tile);
+                        int tuileX = NO_x + Download_X_tile;
+                        int tuileY = NO_y + Download_Y_tile;
                         string url_to_add_inside_list = FromTileXYZ(urlbase, tuileX, tuileY, z, LayerID);
                         list_of_url_to_download.Add(new Url_class(url_to_add_inside_list, tuileX, tuileY, z, Status.waitfordownloading, downloadid));
                         DebugMode.WriteLine("Need to download tuileX:" + tuileX + " tuileY:" + tuileY);
@@ -164,50 +196,45 @@ namespace MapsInMyFolder.Commun
         }
 
 
-        public static string ReadResourceString(string filename)
+        //private static void GetAllManifestResourceNames()
+        //{
+        //    Assembly assembly = Assembly.GetEntryAssembly();
+        //    //get assembly ManifestResourceNames
+        //    Debug.WriteLine("get assembly ManifestResourceNames");
+        //    for (int i = 0; i < assembly.GetManifestResourceNames().Length; i++)
+        //    {
+        //        string name = assembly.GetManifestResourceNames()[i];
+        //        Debug.WriteLine("ManifestResourceNames : " + name);
+        //    }
+        //}
+
+        public static string ReadResourceString(string pathWithSlash)
         {
-            Assembly assembly = Assembly.GetCallingAssembly();
-
-            for (int i = 0; i < assembly.GetManifestResourceNames().Length; i++)
+            Stream stream = ReadResourceStream(pathWithSlash);
+            string return_rsx = String.Empty;
+            using (StreamReader reader = new StreamReader(stream, Encoding.UTF8, true))
             {
-                string name = assembly.GetManifestResourceNames()[i];
-                Debug.WriteLine("ManifestResourceNames : " + name);
+                return_rsx = reader.ReadToEnd();
             }
-
-
-
-            string resourceName = "MapsInMyFolder." + filename;
-            Stream stream = assembly.GetManifestResourceStream(resourceName);
-            //Encoding.GetEncoding("iso-8859-1")
-            StreamReader reader = new StreamReader(stream, Encoding.UTF8, true);
-            string return_rsx = reader.ReadToEnd();
-            stream.Close();
-            reader.Close();
-            reader.Dispose();
-            stream.Dispose();
             return return_rsx;
         }
 
-        public static Stream ReadResourceStream(string filename)
+        public static Stream ReadResourceStream(string pathWithSlash)
         {
-            Assembly assembly = Assembly.GetCallingAssembly();
-
-            for (int i = 0; i < assembly.GetManifestResourceNames().Length; i++)
-            {
-                string name = assembly.GetManifestResourceNames()[i];
-                Debug.WriteLine("ManifestResourceNames : " + name);
-            }
-
-
-
-            string resourceName = "MapsInMyFolder." + filename;
-            Stream stream = assembly.GetManifestResourceStream(resourceName);
-            return stream;
+            //GetEntryAssembly return the main instance (MapsInMyFolder)
+            Assembly assembly = Assembly.GetEntryAssembly();
+            //Change path to assembly ressource path
+            string pathWithPoint = pathWithSlash;
+            pathWithPoint = pathWithPoint.Replace("/", ".");
+            pathWithPoint = pathWithPoint.Replace("\\", ".");
+            string resourceName = "MapsInMyFolder." + pathWithPoint;
+            return assembly.GetManifestResourceStream(resourceName);
         }
 
 
 
-        public static string GetSaveTempDirectory(string display_name, string identifiant, int zoom = -1, string temp_folder = "")
+
+        public static string GetSaveTempDirectory(string nom, string identifiant, int zoom = -1, string temp_folder = "")
         {
             string settings_temp_folder;
             if (string.IsNullOrEmpty(temp_folder))
@@ -219,8 +246,8 @@ namespace MapsInMyFolder.Commun
                 settings_temp_folder = temp_folder;
             }
             //Debug.WriteLine(settings_temp_folder);
-            string display_name_charclean = string.Concat(display_name.Split(Path.GetInvalidFileNameChars()));
-            string chemin = System.IO.Path.Combine(settings_temp_folder, display_name_charclean + "_" + identifiant + "\\");
+            string nom_charclean = string.Concat(nom.Split(Path.GetInvalidFileNameChars()));
+            string chemin = System.IO.Path.Combine(settings_temp_folder, nom_charclean + "_" + identifiant + "\\");
             if (zoom != -1)
             {
                 chemin += zoom + "\\";
@@ -228,14 +255,12 @@ namespace MapsInMyFolder.Commun
             return chemin;
         }
 
-
         public static MemoryStream ByteArrayToStream(byte[] input)
         {
             if (input == null) { return null; }
             MemoryStream ms = new MemoryStream(input);
             return ms;
         }
-
 
         public static byte[] GetBytesFromBitmapSource(BitmapSource bmp)
         {
@@ -253,14 +278,10 @@ namespace MapsInMyFolder.Commun
             }
         }
 
-
         public static byte[] GetBytesFromBitmapSource2(BitmapSource bmp)
         {
             return GetBytesFromBitmapSource(bmp);
         }
-
-
-
 
         public static async Task<Stream> StreamDownloadUri(Uri url)
         {
@@ -268,11 +289,9 @@ namespace MapsInMyFolder.Commun
             {
                 using (var responseMessage = await TileGeneratorSettings.HttpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false))
                 {
-
                     if (responseMessage.IsSuccessStatusCode)
                     {
                         return await responseMessage.Content.ReadAsStreamAsync().ConfigureAwait(false);
-
                     }
                     else
                     {
@@ -288,16 +307,12 @@ namespace MapsInMyFolder.Commun
             return null;
         }
 
-
-
-
         public static async Task<HttpResponse> ByteDownloadUri(Uri url, int LayerId)
         {
             HttpResponse response = HttpResponse.HttpResponseError;
 
             int max_retry = Commun.Settings.max_redirection_download_tile;
             int retry = 0;
-
 
             bool do_need_retry;
 
@@ -306,7 +321,6 @@ namespace MapsInMyFolder.Commun
             //    System.Net.HttpStatusCode.Found,
             //};
             Uri parsing_url = url;
-
 
             do
             {
@@ -328,7 +342,7 @@ namespace MapsInMyFolder.Commun
                             byte[] buffer = await responseMessage.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
                             response = new HttpResponse(buffer, responseMessage);
                         }
-                        else if (!(responseMessage is null) && !(responseMessage.Headers is null) && !(responseMessage.Headers.Location is null) && !(string.IsNullOrEmpty(responseMessage.Headers.Location.ToString().Trim())))
+                        else if (!(responseMessage is null) && !(responseMessage.Headers is null) && !(responseMessage.Headers.Location is null) && !string.IsNullOrEmpty(responseMessage.Headers.Location.ToString().Trim()))
                         {
                             // Redirect found (autodetect)  System.Net.HttpStatusCode.Found
                             Uri new_location = responseMessage.Headers.Location;
@@ -339,8 +353,9 @@ namespace MapsInMyFolder.Commun
                         else
                         {
                             Debug.WriteLine($"DownloadByteUrl: {parsing_url}: {(int)responseMessage.StatusCode} {responseMessage.ReasonPhrase}");
-                            if (LayerId == -2) { 
-                            Javascript.PrintError($"DownloadUrl - Error {(int)responseMessage.StatusCode} : {responseMessage.ReasonPhrase}. Url : {parsing_url}");
+                            if (LayerId == -2)
+                            {
+                                Javascript.PrintError($"DownloadUrl - Error {(int)responseMessage.StatusCode} : {responseMessage.ReasonPhrase}. Url : {parsing_url}");
                             }
                             if (Settings.generate_transparent_tiles_on_error)
                             {
@@ -357,17 +372,17 @@ namespace MapsInMyFolder.Commun
                         Javascript.PrintError($"DownloadUrl - Error {ex.Message}. Url : {url}");
                     }
                 }
-
             } while (do_need_retry && (retry < max_retry));
 
             return response;
         }
 
+
+
         public static string ByteArrayToString(byte[] data)
         {
             return Encoding.UTF8.GetString(data, 0, data.Length);
         }
-
 
         public static Boolean CheckIfDownloadIsNeededOrCached(string save_temp_directory, string filename, int settings_max_tiles_cache_days)
         {
@@ -382,7 +397,7 @@ namespace MapsInMyFolder.Commun
                 long size = filinfo.Length;
                 DateTime date_du_telechargement = DateTime.Now;
                 date_du_telechargement = date_du_telechargement.AddDays(-Math.Abs(settings_max_tiles_cache_days));
-                if ((size == 0) || (!(DateTime.Compare(date_du_telechargement, filinfo.LastWriteTime) < 0)))
+                if ((size == 0) || (DateTime.Compare(date_du_telechargement, filinfo.LastWriteTime) >= 0))
                 {
                     System.IO.File.Delete(save_temp_directory + filename);
                     return true;
@@ -398,7 +413,6 @@ namespace MapsInMyFolder.Commun
             }
         }
 
-
         public static void LockPreviousUndo(RichTextBox uIElement)
         {
             int undo_limit = uIElement.UndoLimit;
@@ -411,6 +425,94 @@ namespace MapsInMyFolder.Commun
             int undo_limit = uIElement.UndoLimit;
             uIElement.UndoLimit = 0;
             uIElement.UndoLimit = undo_limit;
+        }
+
+
+
+        public static List<UIElement> FindVisualChildren(UIElement obj, List<System.Type> BlackListNoSearchChildren = null)
+        {
+            List<UIElement> children = new List<UIElement>();
+
+            if (obj != null)
+            {
+                for (int i = 0; i < VisualTreeHelper.GetChildrenCount(obj); i++)
+                {
+                    UIElement objChild = VisualTreeHelper.GetChild(obj, i) as UIElement;
+                    if (!(objChild is null))
+                    {
+                        children.Add(objChild);
+                        if ((BlackListNoSearchChildren is null) || (!BlackListNoSearchChildren.Contains(objChild.GetType())))
+                        {
+                            children = children.Concat(FindVisualChildren(objChild, BlackListNoSearchChildren)).ToList();
+                        }
+                    }
+                }
+            }
+            return children;
+        }
+
+
+        public static int CheckIfInputValueHaveChange(UIElement SourcePanel)
+        {
+
+            List<System.Type> TypeOfSearchElement = new List<System.Type>
+            {
+                typeof(TextBox),
+                typeof(ComboBox),
+                typeof(CheckBox),
+                typeof(RadioButton)
+            };
+
+            var ListOfisualChildren = Commun.Collectif.FindVisualChildren(SourcePanel, TypeOfSearchElement);
+
+            string strHachCode = String.Empty;
+            ListOfisualChildren.ForEach(element =>
+            {
+                if (TypeOfSearchElement.Contains(element.GetType()))
+                {
+                    string elementXName = element.GetName();
+                    if (!string.IsNullOrEmpty(elementXName))
+                    {
+                        int hachCode = 0;
+                        System.Type type = element.GetType();
+                        if (type == typeof(TextBox))
+                        {
+                            TextBox TextBox = (TextBox)element;
+                            string value = TextBox.Text;
+                            if (!string.IsNullOrEmpty(value))
+                            {
+                                hachCode = value.GetHashCode();
+                            }
+                        }
+                        else if (type == typeof(ComboBox))
+                        {
+                            ComboBox ComboBox = (ComboBox)element;
+                            string value = ComboBox.Text;
+                            if (!string.IsNullOrEmpty(value))
+                            {
+                                hachCode = value.GetHashCode();
+                            }
+                        }
+                        else if (type == typeof(CheckBox))
+                        {
+                            CheckBox CheckBox = (CheckBox)element;
+                            hachCode = CheckBox.IsChecked.GetHashCode();
+
+                        }
+                        else if (type == typeof(RadioButton))
+                        {
+                            RadioButton RadioButton = (RadioButton)element;
+                            hachCode = RadioButton.IsChecked.GetHashCode();
+                        }
+                        else
+                        {
+                            throw new System.NotSupportedException("The type " + type.Name + " is not supported by the function");
+                        }
+                        strHachCode += hachCode.ToString();
+                    }
+                }
+            });
+            return strHachCode.GetHashCode();
         }
 
 
@@ -476,10 +578,8 @@ namespace MapsInMyFolder.Commun
 
         public static void SetRichTextBoxText(RichTextBox textBox, string text)
         {
-
             Stream SM = new MemoryStream(Encoding.UTF8.GetBytes(text));
-            TextRange range;
-            range = new TextRange(textBox.Document.ContentStart, textBox.Document.ContentEnd);
+            TextRange range = new TextRange(textBox.Document.ContentStart, textBox.Document.ContentEnd);
             range.Load(SM, System.Windows.DataFormats.Text);
             SM.Close();
         }
@@ -491,9 +591,7 @@ namespace MapsInMyFolder.Commun
             return return_texte;
         }
 
-
-
-        public static void FilterDigitOnlyWhileWritingInTextBox(TextBox textbElement, List<char> char_supplementaire = null)
+        public static bool FilterDigitOnlyWhileWritingInTextBox(TextBox textbElement, List<char> char_supplementaire = null)
         {
             string textboxtext = textbElement.Text;
             var cursor_position = textbElement.SelectionStart;
@@ -502,18 +600,36 @@ namespace MapsInMyFolder.Commun
             if (textboxtext != filtered_string)
             {
                 textbElement.SelectionStart = cursor_position - 1;
+                return false;
             }
             else
             {
                 textbElement.SelectionStart = cursor_position;
+                return true;
             }
-
         }
 
+        public static bool FilterDigitOnlyWhileWritingInTextBox(TextBox textbElement, System.Windows.Controls.TextChangedEventHandler action, int MaxInt = -1)
+        {
+            bool TextHasBeenFilteredAndChanged = false;
+            textbElement.TextChanged -= action;
+            if (Collectif.FilterDigitOnlyWhileWritingInTextBox(textbElement))
+            {
+                if (MaxInt != -1 && Convert.ToUInt32(textbElement.Text) > MaxInt)
+                {
+                    string MaxIntString = MaxInt.ToString();
+                    textbElement.Text = MaxIntString;
+                    textbElement.SelectionStart = MaxIntString.Length;
+                }
+                else
+                {
+                    TextHasBeenFilteredAndChanged = true;
+                }
+            }
+            textbElement.TextChanged += action;
 
-
-
-
+            return TextHasBeenFilteredAndChanged;
+        }
         public static string FilterDigitOnly(string origin, List<char> char_supplementaire)
         {
             //string str = new string((from c in origin where char.IsDigit(c) select c).ToArray());
@@ -552,7 +668,6 @@ namespace MapsInMyFolder.Commun
             //origin_result = origin_result.Replace("{y}", y);
             //origin_result = origin_result.Replace("{z}", z);
             return Collectif.GetUrl.FromTileXYZ(origin, Convert.ToInt32(x), Convert.ToInt32(y), Convert.ToInt32(z), LayerID).Replace(" ", "%20");
-
         }
 
         public static int CheckIfDownloadSuccess(string url)
@@ -563,7 +678,7 @@ namespace MapsInMyFolder.Commun
                 //httpClient.DefaultRequestHeaders.Add("User-Agent", Settings.user_agent);
                 try
                 {
-                    HttpResponse reponseHttpResponse = await Collectif.ByteDownloadUri(new Uri(internalurl), LayerId:0);
+                    HttpResponse reponseHttpResponse = await Collectif.ByteDownloadUri(new Uri(internalurl), LayerId: 0);
                     var reponse = reponseHttpResponse.ResponseMessage;
                     if (reponse.IsSuccessStatusCode)
                     {
@@ -579,7 +694,6 @@ namespace MapsInMyFolder.Commun
                     Debug.WriteLine("Exception CIDS : " + a.Message);
                 }
                 return HttpStatusCode.SeeOther;
-
             }
 
             //MessageBox.Show(url);
@@ -592,35 +706,31 @@ namespace MapsInMyFolder.Commun
                     return 200;
                 default: return -1;
             }
-
-
         }
-
-
 
         public static List<Double> GetCenterBetweenTwoPoints(List<Double> PointA, List<Double> PointB)
         {
             //method midpoint from http://www.geomidpoint.com/ -> Thanks
             double RAD(double dg)
             {
-                return (dg * Math.PI / 180);
+                return dg * Math.PI / 180;
             }
 
             double DEG(double rd)
             {
-                return (rd * 180 / Math.PI);
+                return rd * 180 / Math.PI;
             }
 
             double normalizeLongitude(double lon)
             {
-                var n = Math.PI;
-                if (lon > n)
+                const double Pi = Math.PI;
+                if (lon > Pi)
                 {
-                    lon -= (2 * n); //lon - (2 * n);
+                    lon -= 2 * Pi; //lon - (2 * n);
                 }
-                else if (lon < -n)
+                else if (lon < -Pi)
                 {
-                    lon += (2 * n);//lon + (2 * n);
+                    lon += 2 * Pi;//lon + (2 * n);
                 }
                 return lon;
             }
@@ -662,7 +772,7 @@ namespace MapsInMyFolder.Commun
                 x += normalizeLongitude(latslong[0].Longitude - midlng);
                 x += normalizeLongitude(latslong[1].Longitude - midlng);
                 midlat = y / totdays;
-                midlng = normalizeLongitude(x / totdays + midlng);
+                midlng = normalizeLongitude((x / totdays) + midlng);
                 midlat = DEG(midlat);
                 midlng = DEG(midlng);
                 return new List<Double>() { midlat, midlng };
@@ -676,21 +786,16 @@ namespace MapsInMyFolder.Commun
             {
                 return value * Math.PI / 180;
             }
-            int x = Convert.ToInt32(Math.Floor((((float)Longitude + 180) / 360) * (Math.Pow(2, zoom))));
-            int y = Convert.ToInt32(Math.Floor((1 - (Math.Log(Math.Tan(ValuetoRadians((float)Latitude)) + 1 / Math.Cos(ValuetoRadians((float)Latitude))) / Math.PI)) / 2 * (Math.Pow(2, zoom))));
+            int x = Convert.ToInt32(Math.Floor(((float)Longitude + 180) / 360 * Math.Pow(2, zoom)));
+            int y = Convert.ToInt32(Math.Floor((1 - (Math.Log(Math.Tan(ValuetoRadians((float)Latitude)) + (1 / Math.Cos(ValuetoRadians((float)Latitude)))) / Math.PI)) / 2 * Math.Pow(2, zoom)));
             return new List<int>() { x, y };
         }
 
         public static List<double> TileToCoordonnees(int TileX, int TileY, int zoom)
         {
             double x = (TileX / Math.Pow(2, zoom) * 360) - 180;
-            double y = Math.Atan(Math.Sinh((Math.PI * (1 - 2 * TileY / (Math.Pow(2, zoom)))))) * 180 / Math.PI;
+            double y = Math.Atan(Math.Sinh(Math.PI * (1 - (2 * TileY / Math.Pow(2, zoom))))) * 180 / Math.PI;
             return new List<double>() { x, y };
         }
-
-
-
-
     }
-
 }

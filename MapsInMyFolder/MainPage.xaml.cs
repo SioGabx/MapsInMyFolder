@@ -28,7 +28,6 @@ namespace MapsInMyFolder
             InitializeComponent();
         }
 
-
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
             if (!isInitialised)
@@ -48,7 +47,6 @@ namespace MapsInMyFolder
         }
         void Init()
         {
-           
             Init_download_panel();
             Init_layer_panel();
             isInitialised = true;
@@ -56,16 +54,12 @@ namespace MapsInMyFolder
 
         private void Page_Initialized(object sender, EventArgs e)
         {
-            
         }
-
 
         private void Download_panel_close_button_Click(object sender, RoutedEventArgs e)
         {
-            Download_panel_close();            
+            Download_panel_close();
         }
-
-
 
         private void Layer_searchbar_GotFocus(object sender, RoutedEventArgs e)
         {
@@ -107,12 +101,10 @@ namespace MapsInMyFolder
             }
         }
 
-
         private void Layer_searchbar_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
         {
             SearchLayerStart();
         }
 
-       
     }
 }

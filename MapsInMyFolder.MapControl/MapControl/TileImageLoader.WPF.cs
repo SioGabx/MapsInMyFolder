@@ -30,10 +30,7 @@ namespace MapsInMyFolder.MapControl
     //            TileLoaderGenerator.BaseUrl = baseUrl;
     //        }
 
-
     //    }
-
-
 
     //    public static TileGenerator Get()
     //    {
@@ -42,14 +39,12 @@ namespace MapsInMyFolder.MapControl
 
     //}
 
-
-
     public partial class TileImageLoader
     {
         /// <summary>
         /// Default folder path where an ObjectCache instance may save cached data, i.e. C:\ProgramData\MapControl\TileCache
         /// </summary>
-        /// 
+        ///
         public static string DefaultCacheFolder
         {
             get { return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "MapControl", "TileCache"); }
@@ -61,7 +56,6 @@ namespace MapsInMyFolder.MapControl
         /// </summary>
         public static ObjectCache Cache { get; set; } = MemoryCache.Default;
 
-
         private static async Task LoadCachedTile(Tile tile, string uri, string cacheKey, int LayerId)
         {
             var cacheItem = Cache.Get(cacheKey) as Tuple<byte[], DateTime>;
@@ -69,14 +63,10 @@ namespace MapsInMyFolder.MapControl
 
             if (cacheItem == null || cacheItem.Item2 < DateTime.UtcNow)
             {
-                TileGeneratorSettings.TileLoaderGenerator.Layer = Layers.Convert.CurentLayerToLayer();
-                Layers layers = Layers.GetLayerById(LayerId);
-                if (layers is null)
-                {
-                    layers = Layers.Empty();
-                }
+                //TileGeneratorSettings.TileLoaderGenerator.Layer = Layers.Convert.CurentLayerToLayer();
+                Layers layers = Layers.GetLayerById(LayerId) ?? Layers.Empty();
                 //var response = await TileGeneratorSettings.TileLoaderGenerator.GetImageAsync(TileGeneratorSettings.TileLoaderGenerator.Layer.class_tile_url, tile.XIndex, tile.Y, tile.ZoomLevel).ConfigureAwait(false);
-                var response = await TileGeneratorSettings.TileLoaderGenerator.GetImageAsync(uri, tile.XIndex, tile.Y, tile.ZoomLevel, LayerId, null, Collectif.GetSaveTempDirectory(layers.class_display_name,layers.class_identifiant, tile.ZoomLevel), Commun.Settings.tiles_cache_expire_after_x_days).ConfigureAwait(false);
+                var response = await TileGeneratorSettings.TileLoaderGenerator.GetImageAsync(uri, tile.XIndex, tile.Y, tile.ZoomLevel, LayerId, null, Collectif.GetSaveTempDirectory(layers.class_name,layers.class_identifiant, tile.ZoomLevel), Commun.Settings.tiles_cache_expire_after_x_days).ConfigureAwait(false);
                 if (response != null) // download succeeded
                 {
                     buffer = response.Buffer;
@@ -85,7 +75,7 @@ namespace MapsInMyFolder.MapControl
                 }
             }
 
-            if (buffer != null && buffer.Length > 0)
+            if (buffer?.Length > 0)
             {
                 DebugMode.WriteLine("Loading LoadCachedTile image LayerId=" + LayerId);
                 var image = await ImageLoader.LoadImageAsync(buffer).ConfigureAwait(false);

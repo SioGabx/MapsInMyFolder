@@ -94,9 +94,9 @@ namespace MapsInMyFolder.MapControl
 
                     drawingContext.PushTransform(new RotateTransform(ParentMap.ViewTransform.Rotation, position.X, position.Y));
                     drawingContext.DrawText(latLabel.Text,
-                        new Point(position.X + StrokeThickness / 2d + 2d, position.Y - StrokeThickness / 2d - latLabel.Text.Height));
+                        new Point(position.X + (StrokeThickness / 2d) + 2d, position.Y - (StrokeThickness / 2d) - latLabel.Text.Height));
                     drawingContext.DrawText(lonLabel.Text,
-                        new Point(position.X + StrokeThickness / 2d + 2d, position.Y + StrokeThickness / 2d));
+                        new Point(position.X + (StrokeThickness / 2d) + 2d, position.Y + (StrokeThickness / 2d)));
                     drawingContext.Pop();
                 }
             }

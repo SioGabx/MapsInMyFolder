@@ -21,7 +21,6 @@ namespace MapsInMyFolder.VectorTileRenderer
             Raster,
         }
 
-
         public class ICanvasCollisions
         {
             public Collisions ListOfEntitiesCollisions;
@@ -35,7 +34,6 @@ namespace MapsInMyFolder.VectorTileRenderer
                 this.Roptions = Roptions;
             }
         }
-
 
         public class TextElements
         {
@@ -57,10 +55,8 @@ namespace MapsInMyFolder.VectorTileRenderer
 
         public class Collisions
         {
-
-            public List<int> CollisionEntity = new List<int>() { };
-            public List<TextElements> TextElementsList = new List<TextElements>() { };
-
+            public List<int> CollisionEntity = new List<int>();
+            public List<TextElements> TextElementsList = new List<TextElements>();
         }
 
         public class ROptions
@@ -74,7 +70,6 @@ namespace MapsInMyFolder.VectorTileRenderer
             public int TileSize;
             public int ImgCenterPositionX;
             public int ImgCenterPositionY;
-
 
             public ROptions(int ImgPositionX = 0, int ImgPositionY = 0,int ImgCenterPositionX = 0, int ImgCenterPositionY = 0,int NbrTileHeightWidth = 1, int TileSize = 256, bool GenerateCanvas = true, double OverflowTextCorrectingValue = 0.2, double TextSizeMultiplicateur = 1)
             {
@@ -171,9 +166,6 @@ namespace MapsInMyFolder.VectorTileRenderer
 
         //      });
 
-
-
-
         //    return bitmap;
         //}
 
@@ -210,7 +202,10 @@ namespace MapsInMyFolder.VectorTileRenderer
             }
 
             double actualZoom = 0;
-
+            if (options.TileSize == 0)
+            {
+                options.TileSize = 256;
+            }
             if (options.TileSize < 1024)
             {
                 var ratio = 1024 / options.TileSize;
@@ -221,12 +216,11 @@ namespace MapsInMyFolder.VectorTileRenderer
             //Debug.WriteLine("Zoom ini :" + zoom + "   Zoom act : " + actualZoom);
             double sizeX = options.TileSize;
             double sizeY = options.TileSize;
-            if (options is null || options.GenerateCanvas == true) { 
+            if (options is null || options.GenerateCanvas) {
             canvas.StartDrawing(options.TileSize * options.NbrTileHeightWidth, options.TileSize * options.NbrTileHeightWidth);
             sizeX *= scale;
             sizeY *= scale;
             }
-
 
             var visualLayers = new List<VisualLayer>();
 
@@ -244,70 +238,65 @@ namespace MapsInMyFolder.VectorTileRenderer
                 {
                     if (layer.Source.Type == "vector")
                     {
-                        if (!vectorTileCache.ContainsKey(layer.Source))
+                        if (!vectorTileCache.ContainsKey(layer.Source) && layer.Source.Provider is Sources.IVectorTileSource source)
                         {
-                            if (layer.Source.Provider is Sources.IVectorTileSource)
+                            var vectorTile = await source.GetVectorTile(x, y, (int)zoom);
+
+                            if (vectorTile == null)
                             {
-                                var tile = await (layer.Source.Provider as Sources.IVectorTileSource).GetVectorTile(x, y, (int)zoom);
+                                return null;
+                                // throwing exceptions screws up the performance
+                                throw new FileNotFoundException("Could not load tile : " + x + "," + y + "," + zoom + " of " + layer.SourceName);
+                            }
 
-                                if (tile == null)
+                            // magic sauce! :p
+                            if (vectorTile.IsOverZoomed)
+                            {
+                                canvas.ClipOverflow = false;
+                            }
+
+                            //Debug.WriteLine("Position de la tuile " + options.ImgPositionX + "/" + options.ImgPositionY + " : \n ImgPositionX" + sizeX * options.ImgPositionX + "\n ImgPositionY" + sizeX * options.ImgPositionY);
+                            //canvas.ClipOverflow = true;
+
+                            vectorTileCache[layer.Source] = vectorTile;
+
+                            // normalize the points from 0 to size
+                            foreach (var vectorLayer in vectorTile.Layers)
+                            {
+                                foreach (var feature in vectorLayer.Features)
                                 {
-                                    return null;
-                                    // throwing exceptions screws up the performance
-                                    throw new FileNotFoundException("Could not load tile : " + x + "," + y + "," + zoom + " of " + layer.SourceName);
-                                }
-
-                                // magic sauce! :p
-                                if (tile.IsOverZoomed)
-                                {
-                                    canvas.ClipOverflow = false;
-                                }
-
-                                //Debug.WriteLine("Position de la tuile " + options.ImgPositionX + "/" + options.ImgPositionY + " : \n ImgPositionX" + sizeX * options.ImgPositionX + "\n ImgPositionY" + sizeX * options.ImgPositionY);
-                                //canvas.ClipOverflow = true;
-
-                                vectorTileCache[layer.Source] = tile;
-
-                                // normalize the points from 0 to size
-                                foreach (var vectorLayer in tile.Layers)
-                                {
-                           
-                                    foreach (var feature in vectorLayer.Features)
+                                    feature.OriginalGeometry = feature.Geometry;
+                                    foreach (var geometry in feature.Geometry)
                                     {
-                                        feature.OriginalGeometry = feature.Geometry;
-                                        foreach (var geometry in feature.Geometry)
+                                        for (int i = 0; i < geometry.Count; i++)
                                         {
-                                            for (int i = 0; i < geometry.Count; i++)
-                                            {
-                                               
-                                                var point = geometry[i];
-                                                Double GeoPtx = point.X / feature.Extent * sizeX;
-                                                Double GeoPty = point.Y / feature.Extent * sizeY;
-                                                //Debug.WriteLine("tile.Layers ImgPositionX :" + options.ImgPositionX);
-                                                //Debug.WriteLine("tile.Layers ImgPositionY :" + options.ImgPositionY);
-                                                //Deplacement des points au millieu de la tuile
+                                            var point = geometry[i];
+                                            Double GeoPtx = point.X / feature.Extent * sizeX;
+                                            Double GeoPty = point.Y / feature.Extent * sizeY;
+                                            //Debug.WriteLine("tile.Layers ImgPositionX :" + options.ImgPositionX);
+                                            //Debug.WriteLine("tile.Layers ImgPositionY :" + options.ImgPositionY);
+                                            //Deplacement des points au millieu de la tuile
 
-                                                //Debug.WriteLine("Origine x= " + GeoPtx + " / y=" + GeoPty);
-                                                //Debug.WriteLine("sizeX = " + sizeX + " / ImgPositionX=" + options.ImgPositionX);
-                                                //Debug.WriteLine("sizeY = " + sizeY + " / ImgPositionY=" + options.ImgPositionY);
-                                                GeoPtx += sizeX * options.ImgPositionX;
-                                                GeoPty += sizeY * options.ImgPositionY;
-                                                
-                                                //Debug.WriteLine("Point x= " + GeoPtx + " / y=" + GeoPty);
-                                                geometry[i] = new Point(GeoPtx, GeoPty);
-                                            }
+                                            //Debug.WriteLine("Origine x= " + GeoPtx + " / y=" + GeoPty);
+                                            //Debug.WriteLine("sizeX = " + sizeX + " / ImgPositionX=" + options.ImgPositionX);
+                                            //Debug.WriteLine("sizeY = " + sizeY + " / ImgPositionY=" + options.ImgPositionY);
+                                            GeoPtx += sizeX * options.ImgPositionX;
+                                            GeoPty += sizeY * options.ImgPositionY;
+
+                                            //Debug.WriteLine("Point x= " + GeoPtx + " / y=" + GeoPty);
+                                            geometry[i] = new Point(GeoPtx, GeoPty);
                                         }
                                     }
                                 }
+                            }
 
-                                foreach (var tileLayer in tile.Layers)
+                            foreach (var tileLayer in vectorTile.Layers)
+                            {
+                                if (!categorizedVectorLayers.ContainsKey(tileLayer.Name))
                                 {
-                                    if (!categorizedVectorLayers.ContainsKey(tileLayer.Name))
-                                    {
-                                        categorizedVectorLayers[tileLayer.Name] = new List<VectorTileLayer>();
-                                    }
-                                    categorizedVectorLayers[tileLayer.Name].Add(tileLayer);
+                                    categorizedVectorLayers[tileLayer.Name] = new List<VectorTileLayer>();
                                 }
+                                categorizedVectorLayers[tileLayer.Name].Add(tileLayer);
                             }
                         }
                     }
@@ -319,7 +308,7 @@ namespace MapsInMyFolder.VectorTileRenderer
                             {
                                 if (layer.Source.Provider is Sources.ITileSource)
                                 {
-                                    var tile = await (layer.Source.Provider as Sources.ITileSource).GetTile(x, y, (int)zoom);
+                                    var tile = await layer.Source.Provider.GetTile(x, y, (int)zoom);
 
                                     if (tile == null)
                                     {
@@ -405,15 +394,13 @@ namespace MapsInMyFolder.VectorTileRenderer
                             }
                         }
                     }
-
                 }
                 else if (layer.Type == "background")
                 {
-                    if (options.GenerateCanvas || false) { 
+                    if (options.GenerateCanvas) {
                         var brushes = style.GetStyleByType("background", actualZoom, scale);
                     foreach (var brush in brushes)
                     {
-                       
                         canvas.DrawBackground(brush);
                     }
                     }
@@ -426,7 +413,7 @@ namespace MapsInMyFolder.VectorTileRenderer
                 if (layer.Type == VisualLayerType.Vector)
                 {
                     var feature = layer.VectorTileFeature;
-                    
+
                     var geometry = layer.Geometry;
                     var brush = layer.Brush;
 
@@ -441,18 +428,15 @@ namespace MapsInMyFolder.VectorTileRenderer
                     {
                         if (feature.GeometryType == "Point")
                         {
-                            
                                 foreach (var point in geometry)
                                 {
-                                    canvas.DrawPoint(point.First(), brush);
+                                    canvas.DrawPoint(point[0], brush);
                                 }
-                            
                         }
                         else if (feature.GeometryType == "LineString")
                         {
-                            if (options.GenerateCanvas || false)
+                            if (options.GenerateCanvas)
                             {
-
                                 foreach (var line in geometry)
                                 {
                                     canvas.DrawLineString(line, brush);
@@ -461,9 +445,8 @@ namespace MapsInMyFolder.VectorTileRenderer
                         }
                         else if (feature.GeometryType == "Polygon")
                         {
-                            if (options.GenerateCanvas || false)
+                            if (options.GenerateCanvas)
                             {
-                                
                                 foreach (var polygon in geometry)
                                 {
                                     canvas.DrawPolygon(polygon, brush);
@@ -474,14 +457,10 @@ namespace MapsInMyFolder.VectorTileRenderer
                         {
                             Debug.WriteLine("Draw unknown 2 " + feature.Attributes.ToString());
                             canvas.DrawUnknown(geometry, brush);
-                        } else
-                        {
-
                         }
                     }
                     catch (Exception)
                     {
-
                     }
                 }
                 else if (layer.Type == VisualLayerType.Raster)
@@ -495,7 +474,7 @@ namespace MapsInMyFolder.VectorTileRenderer
                 }
             }
 
-            foreach (var layer in visualLayers.OrderBy(item => item.Brush.ZIndex).Reverse())
+            foreach (var layer in visualLayers.OrderByDescending(item => item.Brush.ZIndex))
             {
                 if (layer.Type == VisualLayerType.Vector)
                 {
@@ -503,10 +482,9 @@ namespace MapsInMyFolder.VectorTileRenderer
                     var geometry = layer.Geometry;
                     var originalgeometry = layer.OriginalGeometry;
                     var brush = layer.Brush;
-                    
+
                     string hatch = brush.Layer.SourceLayer + brush.Text + brush.ZIndex.ToString() + brush.Paint + originalgeometry.ToString();
                     int hatchCode = hatch.GetHashCode();
-
 
                     var attributesDict = feature.Attributes.ToDictionary(key => key.Key, value => value.Value);
 
@@ -523,7 +501,7 @@ namespace MapsInMyFolder.VectorTileRenderer
                             {
                                 //Debug.WriteLine("Write P " + brush.Text);
                                 brush.ZIndex = 999;
-                                collisions = canvas.DrawText(point.First(), brush, options, collisions, hatchCode);
+                                collisions = canvas.DrawText(point[0], brush, options, collisions, hatchCode);
                             }
                         }
                     }
@@ -573,7 +551,5 @@ namespace MapsInMyFolder.VectorTileRenderer
         //    }).ToList();
         //}
 
-
     }
 }
-

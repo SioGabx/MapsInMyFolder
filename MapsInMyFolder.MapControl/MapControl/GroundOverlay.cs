@@ -16,7 +16,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 
-
 namespace MapsInMyFolder.MapControl
 {
     public class GroundOverlay : MapPanel

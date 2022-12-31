@@ -29,7 +29,7 @@ namespace MapsInMyFolder.MapControl
         {
             var lat = location.Latitude * Math.PI / 180d;
             var eSinLat = Wgs84Eccentricity * Math.Sin(lat);
-            var k = Math.Sqrt(1d - eSinLat * eSinLat) / Math.Cos(lat); // p.44 (7-8)
+            var k = Math.Sqrt(1d - (eSinLat * eSinLat)) / Math.Cos(lat); // p.44 (7-8)
 
             return new Vector(k, k);
         }
@@ -62,19 +62,19 @@ namespace MapsInMyFolder.MapControl
 
             var lat = latitude * Math.PI / 180d;
 
-            return Math.Log(Math.Tan(lat / 2d + Math.PI / 4d) * ConformalFactor(lat)) * 180d / Math.PI; // p.44 (7-7)
+            return Math.Log(Math.Tan((lat / 2d) + (Math.PI / 4d)) * ConformalFactor(lat)) * 180d / Math.PI; // p.44 (7-7)
         }
 
         public static double YToLatitude(double y)
         {
             var t = Math.Exp(-y * Math.PI / 180d); // p.44 (7-10)
-            var lat = Math.PI / 2d - 2d * Math.Atan(t); // p.44 (7-11)
+            var lat = (Math.PI / 2d) - (2d * Math.Atan(t)); // p.44 (7-11)
             var relChange = 1d;
 
             for (var i = 0; i < MaxIterations && relChange > ConvergenceTolerance; i++)
             {
-                var newLat = Math.PI / 2d - 2d * Math.Atan(t * ConformalFactor(lat)); // p.44 (7-9)
-                relChange = Math.Abs(1d - newLat / lat);
+                var newLat = (Math.PI / 2d) - (2d * Math.Atan(t * ConformalFactor(lat))); // p.44 (7-9)
+                relChange = Math.Abs(1d - (newLat / lat));
                 lat = newLat;
             }
 

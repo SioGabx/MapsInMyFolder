@@ -9,7 +9,6 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
-
 namespace MapsInMyFolder.MapControl
 {
     /// <summary>
@@ -67,13 +66,13 @@ namespace MapsInMyFolder.MapControl
                        : length / magnitude < 5d ? 5d * magnitude
                        : 10d * magnitude;
 
-                size.Width = length * scale + StrokeThickness + Padding.Left + Padding.Right;
-                size.Height = 1.25 * FontSize + StrokeThickness + Padding.Top + Padding.Bottom;
+                size.Width = (length * scale) + StrokeThickness + Padding.Left + Padding.Right;
+                size.Height = (1.25 * FontSize) + StrokeThickness + Padding.Top + Padding.Bottom;
 
-                var x1 = Padding.Left + StrokeThickness / 2d;
-                var x2 = size.Width - Padding.Right - StrokeThickness / 2d;
+                var x1 = Padding.Left + (StrokeThickness / 2d);
+                var x2 = size.Width - Padding.Right - (StrokeThickness / 2d);
                 var y1 = size.Height / 2d;
-                var y2 = size.Height - Padding.Bottom - StrokeThickness / 2d;
+                var y2 = size.Height - Padding.Bottom - (StrokeThickness / 2d);
 
                 line.Points = new PointCollection
                 {

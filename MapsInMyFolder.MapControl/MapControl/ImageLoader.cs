@@ -21,11 +21,11 @@ namespace MapsInMyFolder.MapControl
         /// </summary>
         public static HttpClient HttpClient { get; set; } = new HttpClient { Timeout = TimeSpan.FromSeconds(30) };
 
-    
+
         public static async Task<ImageSource> LoadImageAsync(Uri uri, int x = 0, int y = 0, int z = -1, TileSource tileSource = null)
         {
             ImageSource image = null;
-            
+
             try
             {
                 if (!uri.IsAbsoluteUri || uri.IsFile)
@@ -43,18 +43,18 @@ namespace MapsInMyFolder.MapControl
                         //todo : what is that ?
                         string SaveTempDir = "";
                         string fileformat = string.Empty;
-                        if (! (tileSource is null) && tileSource.LayerID != 0)
+                        if (!(tileSource is null) && tileSource.LayerID != 0)
                         {
                             Layers layers = Commun.Layers.GetLayerById(tileSource.LayerID);
                             if (layers is null)
                             {
                                 return null;
                             }
-                            SaveTempDir = Commun.Collectif.GetSaveTempDirectory(layers.class_display_name, layers.class_identifiant,z);
+                            SaveTempDir = Commun.Collectif.GetSaveTempDirectory(layers.class_name, layers.class_identifiant, z);
                             fileformat = layers.class_format;
                         }
 
-                        Debug.WriteLine(String.Concat(uri.ToString(),"\n", x, "/", y, "/", z, "\n", tileSource.LayerID, "\n", fileformat, "\n", SaveTempDir, "\n", Commun.Settings.tiles_cache_expire_after_x_days));
+                        //Debug.WriteLine(String.Concat(uri.ToString(), "\n", x, "/", y, "/", z, "\n", tileSource.LayerID, "\n", fileformat, "\n", SaveTempDir, "\n", Commun.Settings.tiles_cache_expire_after_x_days));
                         response = await Commun.TileGeneratorSettings.TileLoaderGenerator.GetImageAsync(uri.ToString(), x, y, z, tileSource.LayerID, fileformat, SaveTempDir, Commun.Settings.tiles_cache_expire_after_x_days);
                     }
                     else
@@ -63,7 +63,7 @@ namespace MapsInMyFolder.MapControl
                         response = new Commun.HttpResponse(resp.Buffer, resp.Reponse);
                         resp = null;
                     }
-                    if (response != null && response.Buffer != null)
+                    if (response?.Buffer != null)
                     {
                         Debug.WriteLine("Load from LoadImageAsync");
                         image = await LoadImageAsync(response.Buffer).ConfigureAwait(false);

@@ -28,6 +28,7 @@
 
   <PropertyGroup>
     <NoWarn>CS8002,NU1701</NoWarn>
+    <ApplicationIcon>icone\icone_v2.ico</ApplicationIcon>
   </PropertyGroup>
 
   
@@ -45,29 +46,36 @@
 
   <ItemGroup>
     <None Remove="closedhand.cur" />
+    <None Remove="download_panel.html" />
     <None Remove="layer_panel.html" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="closedhand.cur" />
+    <Content Include="icone\icone_v2.ico" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="cef.redist.x64" Version="104.4.24" />
-    <PackageReference Include="CefSharp.Common" Version="104.4.240" />
-    <PackageReference Include="CefSharp.Common.NETCore" Version="104.4.240" />
-    <PackageReference Include="CefSharp.Wpf" Version="104.4.240" />
+    <EmbeddedResource Include="cursors\closedhand.cur" />
+    <EmbeddedResource Include="html\download_panel.html" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="cef.redist.x64" Version="107.1.12" />
+    <PackageReference Include="CefSharp.Common" Version="107.1.120" />
+    <PackageReference Include="CefSharp.Common.NETCore" Version="107.1.120" />
+    <PackageReference Include="CefSharp.Wpf" Version="107.1.120" />
     <PackageReference Include="Jint" Version="3.0.0-beta-2043" />
     <PackageReference Include="ModernWpfUis" Version="1.4.0" />
     <PackageReference Include="NetVips" Version="2.2.0" />
-    <PackageReference Include="NetVips.Native" Version="8.13.1" />
-    <PackageReference Include="NetVips.Native.win-x64" Version="8.13.1" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="NetVips.Native" Version="8.13.2" />
+    <PackageReference Include="NetVips.Native.win-x64" Version="8.13.2" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
     <PackageReference Include="System.Data.SQLite" Version="1.0.116" />
+    <PackageReference Include="wix" Version="3.11.2" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="layer_panel.html" />
+    <EmbeddedResource Include="html\layer_panel.html" />
   </ItemGroup>
 
   <ItemGroup>
@@ -78,6 +86,12 @@
     <ProjectReference Include="..\MapsInMyFolder.Common\MapsInMyFolder.Commun.csproj" />
     <ProjectReference Include="..\MapsInMyFolder.MapControl\MapControl\MapsInMyFolder.MapControl.csproj" />
     <ProjectReference Include="..\MapsInMyFolder.VectorTileRenderer\MapsInMyFolder.VectorTileRenderer.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="VC_redist.x64.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <ItemGroup>

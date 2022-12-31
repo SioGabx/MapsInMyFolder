@@ -35,11 +35,6 @@ namespace MapsInMyFolder.MapControl
                 {
                     Image.Opacity = 1d;
                 }
-
-
-                //Image.Source = image;
-
-
                 #region drawborder
                 if (Commun.Settings.map_show_tile_border || Commun.Settings.is_in_debug_mode)
                 {
@@ -59,7 +54,6 @@ namespace MapsInMyFolder.MapControl
                                                                              "Zoom  : " + this.ZoomLevel.ToString();
                                 dc.DrawText(new FormattedText(TileLocationText, System.Globalization.CultureInfo.CurrentCulture, System.Windows.FlowDirection.LeftToRight, new Typeface("Arial"), 12, couleur, 150), new System.Windows.Point(05, 05));
                             }
-
                             Pen pen = new Pen(couleur, 1);
                             dc.DrawRectangle(Brushes.Transparent, pen, new System.Windows.Rect(0, 0, image.Width, image.Height));
                         }

@@ -93,10 +93,10 @@ namespace MapsInMyFolder.VectorTileRenderer
             CoordinatePair retval = new CoordinatePair();
             try
             {
-                retval.X = (mx / this.originShift) * 180.0;
-                retval.Y = (my / this.originShift) * 180.0;
+                retval.X = mx / this.originShift * 180.0;
+                retval.Y = my / this.originShift * 180.0;
 
-                retval.Y = 180 / Math.PI * (2 * Math.Atan(Math.Exp(retval.Y * Math.PI / 180.0)) - Math.PI / 2.0);
+                retval.Y = 180 / Math.PI * ((2 * Math.Atan(Math.Exp(retval.Y * Math.PI / 180.0))) - (Math.PI / 2.0));
                 return retval;
             }
             catch (Exception ex)
@@ -111,8 +111,8 @@ namespace MapsInMyFolder.VectorTileRenderer
             try
             {
                 var res = Resolution(zoom);
-                retval.X = px * res - this.originShift;
-                retval.Y = py * res - this.originShift;
+                retval.X = (px * res) - this.originShift;
+                retval.Y = (py * res) - this.originShift;
                 return retval;
             }
             catch (Exception ex)
@@ -237,7 +237,7 @@ namespace MapsInMyFolder.VectorTileRenderer
             try
             {
                 retval.X = tx;
-                retval.Y = Convert.ToInt32((Math.Pow(2, zoom) - 1) - ty);
+                retval.Y = Convert.ToInt32(Math.Pow(2, zoom) - 1 - ty);
                 return retval;
             }
             catch (Exception ex)
@@ -251,8 +251,7 @@ namespace MapsInMyFolder.VectorTileRenderer
             string retval = "";
             try
             {
-
-                ty = ((1 << zoom) - 1) - ty;
+                ty = (1 << zoom) - 1 - ty;
                 for (var i = zoom; i >= 1; i--)
                 {
                     var digit = 0;
@@ -298,7 +297,7 @@ namespace MapsInMyFolder.VectorTileRenderer
                         ty += mask;
                 }
 
-                ty = ((1 << zoom) - 1) - ty;
+                ty = (1 << zoom) - 1 - ty;
                 retval.X = tx;
                 retval.Y = ty;
                 return retval;
@@ -314,7 +313,6 @@ namespace MapsInMyFolder.VectorTileRenderer
             string retval = "";
             try
             {
-
                 var m = this.LatLonToMeters(lat, lon);
                 var t = this.MetersToTile(m.X, m.Y, zoom);
 
@@ -332,6 +330,5 @@ namespace MapsInMyFolder.VectorTileRenderer
         {
             return this.initialResolution / (1 << zoom);
         }
-
     }
 }

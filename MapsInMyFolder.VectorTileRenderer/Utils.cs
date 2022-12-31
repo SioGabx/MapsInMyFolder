@@ -9,15 +9,15 @@ namespace MapsInMyFolder.VectorTileRenderer
         {
             double NewRange;
             double NewValue;
-            double OldRange = (oldMax - oldMin);
+            double OldRange = oldMax - oldMin;
             if (OldRange == 0)
             {
                 NewValue = newMin;
             }
             else
             {
-                NewRange = (newMax - newMin);
-                NewValue = (((oldValue - oldMin) * NewRange) / OldRange) + newMin;
+                NewRange = newMax - newMin;
+                NewValue = ((oldValue - oldMin) * NewRange / OldRange) + newMin;
             }
 
             if (clamp)

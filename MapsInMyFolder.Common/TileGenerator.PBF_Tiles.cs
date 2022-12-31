@@ -18,18 +18,14 @@ using System.Net.Http;
 
 namespace MapsInMyFolder.Commun
 {
-
-
-
     public partial class TileGenerator
     {
-
         public async Task<HttpResponse> GetTilePBF(int layerID, string urlBase, int TileX, int TileY, int TileZoom, string save_temp_directory, int settings_max_tiles_cache_days, int render_tile_size, int TextSizeMultiplicateur, double OverflowTextCorrectingValue, bool pbfdisableadjacent = false)
         {
             System.Threading.Thread.CurrentThread.Priority = System.Threading.ThreadPriority.Highest;
             //Commun.TileGeneratorSettings.Number_tile_converted++;
             //int convert_number = Commun.TileGeneratorSettings.Number_tile_converted;
-            int convert_number = 0;
+            const int convert_number = 0;
             //Random rnd = new Random();
             //int num = rnd.Next();
             //int hatchcode = (num + urlBase + TileX + TileY + TileZoom + save_temp_directory + settings_max_tiles_cache_days + Commun.TileGeneratorSettings.Number_tile_converted).GetHashCode();
@@ -48,7 +44,7 @@ namespace MapsInMyFolder.Commun
                     return default(T);
                 }
 
-                var somethingTask = PBF_RenderingAsync(convert_number, layerID, urlBase, TileX, TileY, TileZoom, save_temp_directory, settings_max_tiles_cache_days, render_tile_size, TextSizeMultiplicateur, OverflowTextCorrectingValue, pbfdisableadjacent); ;
+                var somethingTask = PBF_RenderingAsync(convert_number, layerID, urlBase, TileX, TileY, TileZoom, save_temp_directory, settings_max_tiles_cache_days, render_tile_size, TextSizeMultiplicateur, OverflowTextCorrectingValue, pbfdisableadjacent);
                 var winner = await Task.WhenAny(somethingTask, DelayedDummyResultTask<HttpResponse>(TimeSpan.FromSeconds(30)));
                 DebugMode.WriteLine("fin de la tache " + convert_number);
                 if (winner == somethingTask)
@@ -77,7 +73,6 @@ namespace MapsInMyFolder.Commun
                 return returnReponse;
             }
 
-
             DebugMode.WriteLine("PBF File end rendering id=" + convert_number);
             //Commun.TileGeneratorSettings.Numbers_tiles_converted.Remove(hatchcode);
 
@@ -89,9 +84,6 @@ namespace MapsInMyFolder.Commun
             //DebugMode.WriteLine("progress : " + progress);
             return returnReponse;
         }
-
-
-
 
         static readonly object PBF_RenderingAsync_Locker = new object();
         static readonly object PBF_SetProviders_Locker = new object();
@@ -111,10 +103,9 @@ namespace MapsInMyFolder.Commun
             {
                 bool do_download_this_tile = true;
 
-                string filename = TileX + "_" + TileY + "." + "pbf";
+                string filename = TileX + "_" + TileY + ".pbf";
                 if (!string.IsNullOrEmpty(save_temp_directory))
                 {
-
                     if (!Directory.Exists(save_temp_directory_rawBPF))
                     {
                         Directory.CreateDirectory(save_temp_directory_rawBPF);
@@ -124,7 +115,6 @@ namespace MapsInMyFolder.Commun
                         cache_tile = true;
                         do_download_this_tile = Collectif.CheckIfDownloadIsNeededOrCached(save_temp_directory_rawBPF, filename, settings_max_tiles_cache_days);
                     }
-
                 }
                 else
                 {
@@ -138,13 +128,12 @@ namespace MapsInMyFolder.Commun
                 if (do_download_this_tile)
                 {
                     Uri uri = new Uri(Collectif.GetUrl.FromTileXYZ(urlBase, TileX, TileY, zoom, layerID));
-                    DebugMode.WriteLine("Tache n°" + tache + " : " + "Telechargement u1");
+                    DebugMode.WriteLine("Tache n°" + tache + " : Telechargement u1");
                     response = await Collectif.ByteDownloadUri(uri, layerID);
                     if (response is null)
                     {
-                        DebugMode.WriteLine("Tache n°" + tache + " : " + "u1 is null");
+                        DebugMode.WriteLine("Tache n°" + tache + " : u1 is null");
                         return null;
-
                     }
 
                     try
@@ -160,7 +149,6 @@ namespace MapsInMyFolder.Commun
                             {
                                 File.WriteAllBytes(save_filename, response.Buffer);
                             }
-
                         }
                     }
                     catch (Exception ex)
@@ -189,7 +177,6 @@ namespace MapsInMyFolder.Commun
                 string stylevalue;
                 try
                 {
-
                     stylevalue = Commun.Layers.GetLayerById(layerID)?.class_specialsoptions?.PBFJsonStyle;
                 }
                 catch (Exception ex)
@@ -208,7 +195,7 @@ namespace MapsInMyFolder.Commun
                     style = new MapsInMyFolder.VectorTileRenderer.Style(stylevalue);
                     {
                         //FontDirectory = @"C:\Users\franc\Documents\SharpDevelop Projects\TestPBFtoBitmapConverter\TestPBFtoBitmapConverter\style\font\"
-                    };
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -229,13 +216,12 @@ namespace MapsInMyFolder.Commun
                     new List<VectorTileRenderer.Sources.PbfTileSource>() { null, null, null }
                 };
 
-
                 async Task<VectorTileRenderer.Sources.PbfTileSource> GetProviderFromXYZ(int TileX_tp, int TileY_tp, int indexA, int indexB)
                 {
-                    DebugMode.WriteLine("Tache n°" + tache + " : " + "GetProvider " + TileX_tp + ", " + TileY_tp);
+                    DebugMode.WriteLine("Tache n°" + tache + " : GetProvider " + TileX_tp + ", " + TileY_tp);
                     if (!(TileX_tp < 0 || TileY_tp < 0 || zoom < 0))
                     {
-                        string prov_filename = TileX_tp + "_" + TileY_tp + "." + "pbf";
+                        string prov_filename = TileX_tp + "_" + TileY_tp + ".pbf";
                         bool do_download_this_tile_provider = true;
                         if (cache_tile)
                         {
@@ -245,20 +231,21 @@ namespace MapsInMyFolder.Commun
                         string prov_save_filename = save_temp_directory_rawBPF + prov_filename;
                         if (do_download_this_tile_provider)
                         {
-                            Uri temp_uri = new Uri(Collectif.GetUrl.FromTileXYZ(urlBase, TileX_tp, TileY_tp, zoom, layerID));
-                            HttpResponse tp_response = await Collectif.ByteDownloadUri(temp_uri, 0).ConfigureAwait(false);
+                            HttpResponse tp_response = HttpResponse.HttpResponseError;
+                            try
+                            {
+                                Uri temp_uri = new Uri(Collectif.GetUrl.FromTileXYZ(urlBase, TileX_tp, TileY_tp, zoom, layerID));
+                            tp_response = await Collectif.ByteDownloadUri(temp_uri, 0).ConfigureAwait(false);
                             if (tp_response is null)
                             {
                                 DebugMode.WriteLine("Erreur loading g");
                                 return null;
                             }
-                            try
-                            {
+
                                 if (!Directory.Exists(save_temp_directory_rawBPF))
                                 {
                                     Directory.CreateDirectory(save_temp_directory_rawBPF);
                                 }
-
 
                                 if (!System.IO.File.Exists(prov_save_filename) && cache_tile)
                                 {
@@ -274,7 +261,6 @@ namespace MapsInMyFolder.Commun
                         }
                         else
                         {
-
                             lock (PBF_RenderingAsync_Locker)
                             {
                                 if (System.IO.File.Exists(prov_save_filename))
@@ -297,7 +283,7 @@ namespace MapsInMyFolder.Commun
                                             success = false;
                                             System.Threading.Thread.SpinWait(500);
                                         }
-                                    } while (success == false && tentatives < Settings.max_retry_download);
+                                    } while (!success && tentatives < Settings.max_retry_download);
                                     if (success)
                                     {
                                         return new VectorTileRenderer.Sources.PbfTileSource(StreamPBFFile);
@@ -308,8 +294,6 @@ namespace MapsInMyFolder.Commun
                     }
                     return null;
                 }
-
-
 
                 Stopwatch stopWatch = new Stopwatch();
                 stopWatch.Start();
@@ -346,7 +330,6 @@ namespace MapsInMyFolder.Commun
                     );
                 }
 
-
                 void SetProviders(int ArrayX, int ArrayY, int ComputedTileX, int ComputedTileY)
                 {
                     VectorTileRenderer.Sources.PbfTileSource pbfTileSource = GetProviderFromXYZ(ComputedTileX, ComputedTileY, ArrayX, ArrayY).Result;
@@ -363,8 +346,6 @@ namespace MapsInMyFolder.Commun
                     }
                 }
 
-
-
                 stopWatch.Stop();
                 DebugMode.WriteLine($"Tache n° {tache} : Telechargement de la tuile en {stopWatch.ElapsedMilliseconds} Milliseconds");
                 stopWatch.Restart();
@@ -379,13 +360,11 @@ namespace MapsInMyFolder.Commun
 
                     providers[1][1] = null;
 
-
                     if (!(ReturnCanvasAndCollisions is null))
                     {
                         bitmap = ReturnCanvasAndCollisions.bitmap;
                         Roptions = ReturnCanvasAndCollisions.Roptions;
                         ListOfEntitiesCollisions = ReturnCanvasAndCollisions.ListOfEntitiesCollisions;
-                        
                     }
                 }
                 else
@@ -393,7 +372,7 @@ namespace MapsInMyFolder.Commun
                     Debug.WriteLine("Error : providers[1][1] was null");
                     return null;
                 }
-                DebugMode.WriteLine("Colistion number " + ListOfEntitiesCollisions.CollisionEntity.Count());
+                DebugMode.WriteLine("Colistion number " + ListOfEntitiesCollisions.CollisionEntity.Count);
                 if (!pbfdisableadjacent)
                 {
                     for (int i = 2; i > -1; i--)
@@ -421,10 +400,8 @@ namespace MapsInMyFolder.Commun
                                 Debug.WriteLine("Tache n°" + tache + " : Erreur " + j + "-" + i + " = " + ex.Message + "\n" + ex.ToString());
                             }
                         }
-
                     }
                 }
-
 
                 bitmap.DrawTextOnCanvas(ListOfEntitiesCollisions, Roptions);
                 ListOfEntitiesCollisions.TextElementsList.Clear();
@@ -437,8 +414,6 @@ namespace MapsInMyFolder.Commun
                     StreamPBFFile.Dispose();
                 }
                 ReturnCanvasAndCollisions = null;
-
-
 
                 stopWatch.Stop();
                 //Debug.WriteLine($"Creation des tuiles en {stopWatch.ElapsedMilliseconds} Milliseconds");
@@ -470,21 +445,22 @@ namespace MapsInMyFolder.Commun
                         return new Renderer.ICanvasCollisions(collisions, bitmapf, null);
                     }
                 }
-                DebugMode.WriteLine("Tache n°" + tache + " : " + "FinishDraw");
+                DebugMode.WriteLine("Tache n°" + tache + " : FinishDraw");
                 SkiaCanvas skiaCanvas = new SkiaCanvas();
                 BitmapSource img = bitmap.FinishDrawing();
                 img.Freeze();
                 BitmapSource img_cropped;
-                if (img.Width == render_tile_size * 3 && true)
+                if (img.Width == render_tile_size * 3)
                 {
                     Int32Rect int32Rect = new Int32Rect(render_tile_size, render_tile_size, render_tile_size, render_tile_size);
                     CroppedBitmap cb = new CroppedBitmap(img, int32Rect);
-                    double scale_transform = (double)256 / (double)render_tile_size;
-                    TransformedBitmap cb_r = new TransformedBitmap(cb, new ScaleTransform(scale_transform, scale_transform));
-                    DebugMode.WriteLine("FINALLLL SIZE TILE W=" + cb_r.Width + " H=" + cb_r.Height + " SCALETRANSFORM=" + scale_transform);
+                    //double scale_transform = (double)256 / (double)render_tile_size;
+                    //TransformedBitmap cb_r = new TransformedBitmap(cb, new ScaleTransform(scale_transform, scale_transform));
+                    //DebugMode.WriteLine("FINALLLL SIZE TILE W=" + cb_r.Width + " H=" + cb_r.Height + " SCALETRANSFORM=" + scale_transform);
                     cb.Freeze();
-                    cb_r.Freeze();
-                    img_cropped = cb_r;
+                    //cb_r.Freeze();
+                    //img_cropped = cb_r;
+                    img_cropped = cb;
                 }
                 else
                 {
@@ -494,7 +470,7 @@ namespace MapsInMyFolder.Commun
                 img = null;
                 stopWatch.Stop();
                 // Debug.WriteLine($"Finalizing in {stopWatch.ElapsedMilliseconds} Milliseconds");
-                DebugMode.WriteLine("Tache n°" + tache + " : " + "Cropping to byte");
+                DebugMode.WriteLine("Tache n°" + tache + " : Cropping to byte");
 
                 return new HttpResponse(Collectif.GetBytesFromBitmapSource(img_cropped), response.ResponseMessage);
             }
@@ -503,8 +479,7 @@ namespace MapsInMyFolder.Commun
                 Debug.WriteLine("Tache n°" + tache + " : Erreur f GetProviderFromXYZ" + ex.Message + "\n" + ex.ToString());
             }
 
-
-            DebugMode.WriteLine("Tache n°" + tache + " : " + "end return null");
+            DebugMode.WriteLine("Tache n°" + tache + " : end return null");
             return null;
         }
     }

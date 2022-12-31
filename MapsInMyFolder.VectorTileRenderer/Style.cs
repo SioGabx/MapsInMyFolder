@@ -3,6 +3,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows;
@@ -148,7 +149,7 @@ namespace MapsInMyFolder.VectorTileRenderer
             {
                 json = path;
             }
-            
+
             dynamic jObject = JObject.Parse(json);
 
             if (jObject["metadata"] != null)
@@ -254,7 +255,6 @@ namespace MapsInMyFolder.VectorTileRenderer
             Hash = Utils.Sha256(json);
             Scale = scale;
         }
-
 
         public void SetSourceProvider(int index, Sources.ITileSource provider)
         {
@@ -408,7 +408,6 @@ namespace MapsInMyFolder.VectorTileRenderer
 
             if (layer.ID == "country_label")
             {
-
             }
 
             if (paintData != null)
@@ -493,7 +492,7 @@ namespace MapsInMyFolder.VectorTileRenderer
 
                 if (paintData.ContainsKey("line-dasharray"))
                 {
-                    var array = (GetValue(paintData["line-dasharray"], attributes) as object[]);
+                    var array = GetValue(paintData["line-dasharray"], attributes) as object[];
                     paint.LineDashArray = array.Select(item => Convert.ToDouble(item) * scale).ToArray();
                 }
 
@@ -598,7 +597,7 @@ namespace MapsInMyFolder.VectorTileRenderer
 
                 if (layoutData.ContainsKey("text-optional"))
                 {
-                    paint.TextOptional = (bool)(GetValue(layoutData["text-optional"], attributes));
+                    paint.TextOptional = (bool)GetValue(layoutData["text-optional"], attributes);
                 }
 
                 if (layoutData.ContainsKey("text-transform"))
@@ -666,7 +665,6 @@ namespace MapsInMyFolder.VectorTileRenderer
 
             if (iColor.GetType() != typeof(string))
             {
-
             }
 
             var colorString = (string)iColor;
@@ -683,12 +681,12 @@ namespace MapsInMyFolder.VectorTileRenderer
                 double s = double.Parse(segments[2]);
                 double l = double.Parse(segments[3]);
 
-                var color = (new ColorMine.ColorSpaces.Hsl()
+                var color = new ColorMine.ColorSpaces.Hsl()
                 {
                     H = h,
                     S = s,
                     L = l,
-                }).ToRgb();
+                }.ToRgb();
 
                 return Color.FromRgb((byte)color.R, (byte)color.G, (byte)color.B);
             }
@@ -701,14 +699,14 @@ namespace MapsInMyFolder.VectorTileRenderer
                 double l = double.Parse(segments[3]);
                 double a = double.Parse(segments[4]) * 255;
 
-                var color = (new ColorMine.ColorSpaces.Hsl()
+                var color = new ColorMine.ColorSpaces.Hsl()
                 {
                     H = h,
                     S = s,
                     L = l,
-                }).ToRgb();
+                }.ToRgb();
 
-                return Color.FromArgb((byte)(a), (byte)color.R, (byte)color.G, (byte)color.B);
+                return Color.FromArgb((byte)a, (byte)color.R, (byte)color.G, (byte)color.B);
             }
 
             if (colorString.StartsWith("rgba("))
@@ -915,7 +913,6 @@ namespace MapsInMyFolder.VectorTileRenderer
                     {
                         if (key == "capital")
                         {
-
                         }
                     }
 
@@ -963,7 +960,6 @@ namespace MapsInMyFolder.VectorTileRenderer
                 return !attributes.ContainsKey(filterArray[1] as string);
             }
 
-
             if (operation == "in")
             {
                 var key = filterArray[1] as string;
@@ -1008,7 +1004,6 @@ namespace MapsInMyFolder.VectorTileRenderer
 
         object GetValue(object token, Dictionary<string, object> attributes = null)
         {
-
             if (token is string && attributes != null)
             {
                 string value = token as string;
@@ -1048,13 +1043,12 @@ namespace MapsInMyFolder.VectorTileRenderer
                     var pointStops = stops.Select(item => new Tuple<double, object>(Convert.ToDouble((item as object[])[0]), (item as object[])[1])).ToList();
 
                     var zoom = (double)attributes["$zoom"];
-                    var minZoom = pointStops.First().Item1;
+                    var minZoom = pointStops[0].Item1;
                     var maxZoom = pointStops.Last().Item1;
                     double power = 1;
 
                     if (minZoom == 5 && maxZoom == 10)
                     {
-
                     }
 
                     double zoomA = minZoom;
@@ -1067,7 +1061,7 @@ namespace MapsInMyFolder.VectorTileRenderer
                     {
                         //zoomA = minZoom;
                         //zoomB = pointStops[1].Item1;
-                        return pointStops.First().Item2;
+                        return pointStops[0].Item2;
                     }
                     else if (zoom >= maxZoom)
                     {
@@ -1095,7 +1089,6 @@ namespace MapsInMyFolder.VectorTileRenderer
                         }
                     }
 
-
                     if (dict.ContainsKey("base"))
                     {
                         power = Convert.ToDouble(GetValue(dict["base"], attributes));
@@ -1104,10 +1097,8 @@ namespace MapsInMyFolder.VectorTileRenderer
                     //var referenceElement = (stops[0] as object[])[1];
 
                     return InterpolateValues(pointStops[zoomAIndex].Item2, pointStops[zoomBIndex].Item2, zoomA, zoomB, zoom, power);
-
                 }
             }
-
 
             //if (token is string)
             //{
@@ -1129,7 +1120,6 @@ namespace MapsInMyFolder.VectorTileRenderer
             //{
             //    return null;
             //}
-
 
             return token;
         }
@@ -1164,7 +1154,6 @@ namespace MapsInMyFolder.VectorTileRenderer
                 {
                     return maxValue;
                 }
-
             }
             else if (startValue.GetType().IsArray)
             {
@@ -1218,7 +1207,6 @@ namespace MapsInMyFolder.VectorTileRenderer
             }
 
             var result = (normalized * (newMax - newMin)) + newMin;
-
 
             return result;
         }

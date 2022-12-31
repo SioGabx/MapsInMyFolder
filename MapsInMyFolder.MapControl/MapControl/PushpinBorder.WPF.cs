@@ -67,8 +67,8 @@ namespace MapsInMyFolder.MapControl
 
         protected override Size MeasureOverride(Size constraint)
         {
-            var width = 2d * BorderWidth + Padding.Left + Padding.Right;
-            var height = 2d * BorderWidth + Padding.Top + Padding.Bottom;
+            var width = (2d * BorderWidth) + Padding.Left + Padding.Right;
+            var height = (2d * BorderWidth) + Padding.Top + Padding.Bottom;
 
             if (Child != null)
             {

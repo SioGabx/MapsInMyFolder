@@ -12,7 +12,6 @@ namespace MapsInMyFolder.MapControl
     /// A collection of Locations with support for string parsing
     /// and calculation of great circle and rhumb line locations.
     /// </summary>
-
     [System.ComponentModel.TypeConverter(typeof(LocationCollectionConverter))]
     public class LocationCollection : List<Location>
     {
@@ -82,9 +81,9 @@ namespace MapsInMyFolder.MapControl
             var cosLon12 = Math.Cos(lon2 - lon1);
             var sinLon12 = Math.Sin(lon2 - lon1);
 
-            var a = cosLat1 * sinLat2 - sinLat1 * cosLat2 * cosLon12;
+            var a = (cosLat1 * sinLat2) - (sinLat1 * cosLat2 * cosLon12);
             var b = cosLat2 * sinLon12;
-            var s12 = Math.Atan2(Math.Sqrt(a * a + b * b), sinLat1 * sinLat2 + cosLat1 * cosLat2 * cosLon12);
+            var s12 = Math.Atan2(Math.Sqrt((a * a) + (b * b)), (sinLat1 * sinLat2) + (cosLat1 * cosLat2 * cosLon12));
 
             var n = (int)Math.Ceiling(s12 / resolution * 180d / Math.PI); // s12 in radians
 
@@ -92,11 +91,11 @@ namespace MapsInMyFolder.MapControl
 
             if (n > 1)
             {
-                var az1 = Math.Atan2(sinLon12, cosLat1 * sinLat2 / cosLat2 - sinLat1 * cosLon12);
+                var az1 = Math.Atan2(sinLon12, (cosLat1 * sinLat2 / cosLat2) - (sinLat1 * cosLon12));
                 var cosAz1 = Math.Cos(az1);
                 var sinAz1 = Math.Sin(az1);
 
-                var az0 = Math.Atan2(sinAz1 * cosLat1, Math.Sqrt(cosAz1 * cosAz1 + sinAz1 * sinAz1 * sinLat1 * sinLat1));
+                var az0 = Math.Atan2(sinAz1 * cosLat1, Math.Sqrt((cosAz1 * cosAz1) + (sinAz1 * sinAz1 * sinLat1 * sinLat1)));
                 var sinAz0 = Math.Sin(az0);
                 var cosAz0 = Math.Cos(az0);
 
@@ -105,10 +104,10 @@ namespace MapsInMyFolder.MapControl
 
                 for (var i = 1; i < n; i++)
                 {
-                    var s = s01 + i * s12 / n;
+                    var s = s01 + (i * s12 / n);
                     var sinS = Math.Sin(s);
                     var cosS = Math.Cos(s);
-                    var lat = Math.Atan2(cosAz0 * sinS, Math.Sqrt(cosS * cosS + sinAz0 * sinAz0 * sinS * sinS));
+                    var lat = Math.Atan2(cosAz0 * sinS, Math.Sqrt((cosS * cosS) + (sinAz0 * sinAz0 * sinS * sinS)));
                     var lon = Math.Atan2(sinAz0 * sinS, cosS) + lon0;
 
                     locations.Add(lat * 180d / Math.PI, lon * 180d / Math.PI);
@@ -161,7 +160,7 @@ namespace MapsInMyFolder.MapControl
             // beta = atan(dlon,dy)
             // sec(beta) = 1 / cos(atan(dlon,dy)) = sqrt(1 + (dlon/dy)^2)
 
-            var sec = Math.Sqrt(1d + dlon * dlon / (dy * dy));
+            var sec = Math.Sqrt(1d + (dlon * dlon / (dy * dy)));
 
             const double secLimit = 1000d; // beta approximately +/-90°
 
@@ -186,8 +185,8 @@ namespace MapsInMyFolder.MapControl
             {
                 for (var i = 1; i < n; i++)
                 {
-                    var lon = lon1 + i * dlon / n;
-                    var lat = WebMercatorProjection.YToLatitude(y1 + i * dy / n);
+                    var lon = lon1 + (i * dlon / n);
+                    var lat = WebMercatorProjection.YToLatitude(y1 + (i * dy / n));
                     locations.Add(lat, lon);
                 }
             }
@@ -195,8 +194,8 @@ namespace MapsInMyFolder.MapControl
             {
                 for (var i = 1; i < n; i++)
                 {
-                    var lat = lat1 + i * dlat / n;
-                    var lon = lon1 + dlon * (WebMercatorProjection.LatitudeToY(lat) - y1) / dy;
+                    var lat = lat1 + (i * dlat / n);
+                    var lon = lon1 + (dlon * (WebMercatorProjection.LatitudeToY(lat) - y1) / dy);
                     locations.Add(lat, lon);
                 }
             }

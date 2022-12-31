@@ -16,13 +16,9 @@ using System.Windows.Media.Animation;
 
 namespace MapsInMyFolder
 {
-
-
     public partial class MainPage : System.Windows.Controls.Page
     {
         // int settings_max_download_simult;
-
-
 
         void DB_Download_Load()
         {
@@ -42,8 +38,7 @@ namespace MapsInMyFolder
             }
             Database.DB_Download_Init(conn);
             SQLiteDataReader sqlite_datareader;
-            SQLiteCommand sqlite_cmd;
-            sqlite_cmd = conn.CreateCommand();
+            SQLiteCommand sqlite_cmd = conn.CreateCommand();
             sqlite_cmd.CommandText = "SELECT * FROM 'DOWNLOADS' ORDER BY 'TIMESTAMP' ASC";
             sqlite_datareader = sqlite_cmd.ExecuteReader();
 
@@ -52,11 +47,7 @@ namespace MapsInMyFolder
                 try
                 {
                     int DB_Download_LAYER_ID = sqlite_datareader.GetInt32(sqlite_datareader.GetOrdinal("LAYER_ID"));
-                    Layers layers = Layers.GetLayerById(DB_Download_LAYER_ID);
-                    if (layers is null)
-                    {
-                        layers = Layers.Empty();
-                    }
+                    Layers layers = Layers.GetLayerById(DB_Download_LAYER_ID) ?? Layers.Empty();
                     int DB_Download_ID = sqlite_datareader.GetInt32(sqlite_datareader.GetOrdinal("ID"));
                     int DB_Download_ZOOM = sqlite_datareader.GetInt32(sqlite_datareader.GetOrdinal("ZOOM"));
                     int DB_Download_NBR_TILES = sqlite_datareader.GetInt32(sqlite_datareader.GetOrdinal("NBR_TILES"));
@@ -159,13 +150,13 @@ namespace MapsInMyFolder
                         }
                     }
                     DownloadClass engine = new DownloadClass(downloadid, DB_Download_ID, DB_Download_LAYER_ID, urls, tokenSource2, ct, format, final_saveformat, DB_Download_ZOOM, DB_Download_TEMP_DIRECTORY, DB_Download_SAVE_DIRECTORY, DB_Download_FILE_NAME, filetempname, location, REDIMWIDTH, REDIMHEIGHT, new TileGenerator(), DB_Download_NBR_TILES, layers.class_tile_url, layers.class_identifiant, engine_status, layers.class_tiles_size, quality: DB_Download_QUALITY);
-                    DebugMode.WriteLine("Set DownloadClass : layer id" + layers.class_id + " / " + layers.class_display_name + " tile size is " + layers.class_tiles_size);
-                    engine.TileLoaderGenerator.Layer = Layers.GetLayerById(DB_Download_LAYER_ID);
+                    DebugMode.WriteLine("Set DownloadClass : layer id" + layers.class_id + " / " + layers.class_name + " tile size is " + layers.class_tiles_size);
+                   // engine.TileLoaderGenerator.Layer = Layers.GetLayerById(DB_Download_LAYER_ID);
                     DownloadClass.Add(engine, downloadid);
-                    string commande_add = @"add_download(" + downloadid + @",""" + engine_status.ToString() + @""",""" + DB_Download_FILE_NAME + @""",0," + DB_Download_NBR_TILES + @",""" + Download_INFOS + @""",""" + DB_Download_TIMESTAMP + @""");";
+                    string commande_add = "add_download(" + downloadid + @",""" + engine_status.ToString() + @""",""" + DB_Download_FILE_NAME + @""",0," + DB_Download_NBR_TILES + @",""" + Download_INFOS + @""",""" + DB_Download_TIMESTAMP + @""");";
                     if (engine_status == Status.error)
                     {
-                        commande_add += @"updateprogress(" + downloadid + @", ""100"");";
+                        commande_add += "updateprogress(" + downloadid + @", ""100"");";
                     }
 
                     download_panel_browser.ExecuteScriptAsyncWhenPageLoaded(commande_add);
@@ -183,10 +174,11 @@ namespace MapsInMyFolder
             //  });
         }
 
-
         public void Init_download_panel()
         {
-            download_panel_browser.Load(Commun.Settings.working_folder + @"\download_panel.html");
+            string resource_data = Collectif.ReadResourceString("html/download_panel.html");
+            download_panel_browser.LoadHtml(resource_data);
+            //download_panel_browser.Load(Commun.Settings.working_folder + @"\download_panel.html");
             //read file xml
             if (download_panel_browser is null) { return; }
             try
@@ -199,12 +191,11 @@ namespace MapsInMyFolder
                 DebugMode.WriteLine(ex.Message);
             }
             DB_Download_Load();
-            if (Commun.Settings.is_in_debug_mode && Commun.Settings.show_download_devtool)
+            if (Commun.Settings.show_download_devtool)
             {
                 download_panel_browser.ShowDevTools();
             }
         }
-
 
         private void Download_panel_open_overlay_MouseDown(object sender, MouseButtonEventArgs e)
         {
@@ -219,10 +210,7 @@ namespace MapsInMyFolder
             {
                 EasingFunction = new PowerEase { EasingMode = EasingMode.EaseInOut }
             };
-            hide_anim.Completed += (s, e) =>
-            {
-                download_panel.Visibility = Visibility.Hidden;
-            };
+            hide_anim.Completed += (s, e) => download_panel.Visibility = Visibility.Hidden;
             download_panel.BeginAnimation(UIElement.OpacityProperty, hide_anim);
         }
 
@@ -240,15 +228,6 @@ namespace MapsInMyFolder
             download_panel_browser.Focus();
         }
     }
-
-
-
-
-
-
-
-
-
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Marquer les membres comme étant static", Justification = "Used by CEFSHARP, static isnt a option here")]
     public class Download_Csharp_call_from_js
@@ -269,7 +248,7 @@ namespace MapsInMyFolder
                     {
                         if (engine.state == Status.success)
                         {
-                            MainWindow._instance.UpdateDownloadPanel(id, "Introuvable.", isimportant: true, state: Status.deleted);
+                            MainWindow.UpdateDownloadPanel(id, "Introuvable.", isimportant: true, state: Status.deleted);
                         }
                     }
                 }
@@ -281,7 +260,6 @@ namespace MapsInMyFolder
             return false;
         }
 
-
         public void Download_stop(double id)
         {
             int id_int = Convert.ToInt32(id);
@@ -291,7 +269,7 @@ namespace MapsInMyFolder
                 {
                     try
                     {
-                        MainWindow._instance.StopingDownload(id_int);
+                        MainWindow.StopingDownload(id_int);
                     }
                     catch (Exception ex)
                     {
@@ -311,7 +289,7 @@ namespace MapsInMyFolder
                 {
                     try
                     {
-                        MainWindow._instance.CancelDownload(id_int);
+                        MainWindow.CancelDownload(id_int);
                     }
                     catch (Exception ex)
                     {
@@ -398,9 +376,6 @@ namespace MapsInMyFolder
             }
         }
 
-
-
-
         public void Download_openfile(double id)
         {
             int id_int = Convert.ToInt32(id);
@@ -433,8 +408,8 @@ namespace MapsInMyFolder
                 {
                     try
                     {
-                        MainWindow._instance.UpdateDownloadPanel(id_int, "Supprimé", "0", true, Status.deleted);
-                        Database.DB_Download_Update(id_int, "STATE", Status.deleted.ToString());
+                        MainWindow.UpdateDownloadPanel(id_int, "Supprimé", "0", true, Status.deleted);
+                        Database.DB_Download_Update(id_int, "STATE", nameof(Status.deleted));
                     }
                     catch (Exception ex)
                     {
@@ -443,14 +418,12 @@ namespace MapsInMyFolder
                     }
                 }, null);
 
-
                 foreach (DownloadClass eng in DownloadClass.GetEngineList())
                 {
                     if (eng.state == Status.success)
                     {
                         IsFileOk(eng.id);
                     }
-
                 }
             }
         }
@@ -462,9 +435,7 @@ namespace MapsInMyFolder
             if (engine is null) return;
             if (System.IO.Directory.Exists(engine.save_temp_directory))
             {
-
                 Process.Start("explorer.exe", "\"" + engine.save_temp_directory + "\"");
-
             }
             else
             {
@@ -563,7 +534,6 @@ namespace MapsInMyFolder
             Status engineinitialstate = engine.state;
             if (engine is null) return;
 
-
             List<Status> RunningState = new List<Status>() { Status.progress, Status.enregistrement, Status.rognage, Status.waitfordownloading };
 
             if (RunningState.Contains(engine.state) || engine.state == Status.pause)
@@ -584,7 +554,6 @@ namespace MapsInMyFolder
                             }
 
                             MainWindow._instance.MainPage.download_panel_browser.ExecuteScriptAsync("download_js_delete_db(" + id_int.ToString() + ");");
-
                         }
                         catch (Exception ex)
                         {
@@ -598,9 +567,7 @@ namespace MapsInMyFolder
                         {
                             Download_restart(id_int);
                         }
-
                     }
-
                 }, null);
             }
             else
@@ -608,8 +575,5 @@ namespace MapsInMyFolder
                 MainWindow._instance.MainPage.download_panel_browser.ExecuteScriptAsync("download_js_delete_db(" + id_int.ToString() + ");");
             }
         }
-
-
-
     }
 }

@@ -8,7 +8,6 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 
-
 namespace MapsInMyFolder.MapControl
 {
     public interface IMapLayer : IMapElement
@@ -356,7 +355,7 @@ namespace MapsInMyFolder.MapControl
         public void ZoomToBounds(BoundingBox boundingBox)
         {
             var rect = MapProjection.BoundingBoxToRect(boundingBox);
-            var center = new Point(rect.X + rect.Width / 2d, rect.Y + rect.Height / 2d);
+            var center = new Point(rect.X + (rect.Width / 2d), rect.Y + (rect.Height / 2d));
             var scale = Math.Min(RenderSize.Width / rect.Width, RenderSize.Height / rect.Height);
 
             TargetZoomLevel = ViewTransform.ScaleToZoomLevel(scale);
@@ -370,11 +369,11 @@ namespace MapsInMyFolder.MapControl
 
             if (offset > 180d)
             {
-                longitude = Center.Longitude - 360d + offset % 360d;
+                longitude = Center.Longitude - 360d + (offset % 360d);
             }
             else if (offset < -180d)
             {
-                longitude = Center.Longitude + 360d + offset % 360d;
+                longitude = Center.Longitude + 360d + (offset % 360d);
             }
 
             return longitude;

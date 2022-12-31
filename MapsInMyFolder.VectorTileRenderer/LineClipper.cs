@@ -33,8 +33,8 @@ namespace MapsInMyFolder.VectorTileRenderer
 
         private static Point CalculateIntersection(Rect r, Point p1, Point p2, OutCode clipTo)
         {
-            var dx = (p2.X - p1.X);
-            var dy = (p2.Y - p1.Y);
+            var dx = p2.X - p1.X;
+            var dy = p2.Y - p1.Y;
 
             var slopeY = dx / dy; // slope to use for possibly-vertical lines
             var slopeX = dy / dx; // slope to use for possibly-horizontal lines
@@ -42,14 +42,14 @@ namespace MapsInMyFolder.VectorTileRenderer
             if (clipTo.HasFlag(OutCode.Top))
             {
                 return new Point(
-                    p1.X + slopeY * (r.Top - p1.Y),
+                    p1.X + (slopeY * (r.Top - p1.Y)),
                     r.Top
                     );
             }
             if (clipTo.HasFlag(OutCode.Bottom))
             {
                 return new Point(
-                    p1.X + slopeY * (r.Bottom - p1.Y),
+                    p1.X + (slopeY * (r.Bottom - p1.Y)),
                     r.Bottom
                     );
             }
@@ -57,14 +57,14 @@ namespace MapsInMyFolder.VectorTileRenderer
             {
                 return new Point(
                     r.Right,
-                    p1.Y + slopeX * (r.Right - p1.X)
+                    p1.Y + (slopeX * (r.Right - p1.X))
                     );
             }
             if (clipTo.HasFlag(OutCode.Left))
             {
                 return new Point(
                     r.Left,
-                    p1.Y + slopeX * (r.Left - p1.X)
+                    p1.Y + (slopeX * (r.Left - p1.X))
                     );
             }
             throw new ArgumentOutOfRangeException("clipTo = " + clipTo);
@@ -195,14 +195,10 @@ namespace MapsInMyFolder.VectorTileRenderer
                     }
                 } else
                 {
-
                 }
             }
 
             return newLine;
-
         }
-
-
     }
 }

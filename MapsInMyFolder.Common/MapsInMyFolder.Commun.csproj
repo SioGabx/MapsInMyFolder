@@ -58,6 +58,9 @@
     <LangVersion>7.3</LangVersion>
     <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>icone_v2.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="clipper_library, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\clipper_library.6.2.1\lib\net40\clipper_library.dll</HintPath>
@@ -91,7 +94,7 @@
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\packages\Newtonsoft.Json.13.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
@@ -137,20 +140,26 @@
     <Compile Include="Collectif.cs" />
     <Compile Include="CurentLayer.cs" />
     <Compile Include="Database.cs" />
+    <Compile Include="Extensions.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Javascript.cs" />
     <Compile Include="Layers.cs" />
+    <Compile Include="Network.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="TileGenerator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TileGenerator.PBF_Tiles.cs" />
     <Compile Include="TileLocationCalculator.cs" />
+    <Compile Include="Update.cs" />
     <Compile Include="XMLParser.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="TileGenerator.GenericFileFormat_Tiles.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\.editorconfig">
+      <Link>.editorconfig</Link>
+    </None>
     <None Include="app.config" />
     <None Include="MapsInMyFolder.snk" />
     <None Include="packages.config" />
@@ -161,7 +170,9 @@
       <Name>MapsInMyFolder.VectorTileRenderer</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Content Include="icone_v2.ico" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

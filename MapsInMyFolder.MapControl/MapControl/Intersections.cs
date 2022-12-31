@@ -5,7 +5,6 @@
 using System;
 using System.Windows;
 
-
 namespace MapsInMyFolder.MapControl
 {
     public static class Intersections
@@ -23,13 +22,13 @@ namespace MapsInMyFolder.MapControl
             var x13 = p3.X - p1.X;
             var y13 = p3.Y - p1.Y;
 
-            var d = x12 * y34 - x34 * y12;
-            var s = (x13 * y12 - y13 * x12) / d;
-            var t = (x13 * y34 - y13 * x34) / d;
+            var d = (x12 * y34) - (x34 * y12);
+            var s = ((x13 * y12) - (y13 * x12)) / d;
+            var t = ((x13 * y34) - (y13 * x34)) / d;
 
             if (s >= 0d && s <= 1d && t >= 0d && t <= 1d)
             {
-                return new Point(p1.X + t * x12, p1.Y + t * y12);
+                return new Point(p1.X + (t * x12), p1.Y + (t * y12));
             }
 
             return null;

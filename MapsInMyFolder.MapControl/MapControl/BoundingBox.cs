@@ -10,7 +10,6 @@ namespace MapsInMyFolder.MapControl
     /// <summary>
     /// A geographic bounding box with south and north latitude and west and east longitude values in degrees.
     /// </summary>
-
     [System.ComponentModel.TypeConverter(typeof(BoundingBoxConverter))]
     public class BoundingBox
     {

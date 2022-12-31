@@ -34,7 +34,7 @@ namespace MapsInMyFolder.VectorTileRenderer.Sources
                 .Replace("{z}", zoom.ToString());
             return File.Open(qualifiedPath, FileMode.Open, FileAccess.Read, FileShare.Read);
         }
-        
+
         public async Task<VectorTile> GetVectorTile(int x, int y, int zoom)
         {
             if(Path != "")
@@ -54,25 +54,26 @@ namespace MapsInMyFolder.VectorTileRenderer.Sources
 
         private async Task<VectorTile> UnzipStream(Stream stream)
         {
-            if (IsGZipped(stream))
-            {
-                using (var zipStream = new GZipStream(stream, CompressionMode.Decompress))
-                using (var resultStream = new MemoryStream())
-                {
-                    zipStream.CopyTo(resultStream);
-                    resultStream.Seek(0, SeekOrigin.Begin);
-                    return await LoadStream(resultStream);
-                }
-            }
-            else
-            {
-                return await LoadStream(stream);
-            }
+            //if (IsGZipped(stream))
+            //{
+            //    using (var zipStream = new GZipStream(stream, CompressionMode.Decompress))
+            //    using (var resultStream = new MemoryStream())
+            //    {
+            //        zipStream.CopyTo(resultStream);
+            //        resultStream.Seek(0, SeekOrigin.Begin);
+            //        return await LoadStream(resultStream);
+            //    }
+            //}
+            //else
+            //{
+            //    return await LoadStream(stream);
+            //}
+            return await LoadStream(stream);
         }
-        
+
         private async Task<VectorTile> LoadStream(Stream stream)
         {
-            var mbLayers = new Mapbox.VectorTile.VectorTile(ReadTillEnd(stream));
+            var mbLayers = new Mapbox.VectorTile.VectorTile(ReadTillEnd(stream), false);
 
             return await BaseTileToVector(mbLayers);
         }
@@ -91,7 +92,6 @@ namespace MapsInMyFolder.VectorTileRenderer.Sources
                 return "Polygon";
             } else
             {
-                
                 return "Unknown";
             }
         }
@@ -154,7 +154,7 @@ namespace MapsInMyFolder.VectorTileRenderer.Sources
 
             return result;
         }
-        
+
         byte[] ReadTillEnd(Stream input)
         {
             byte[] buffer = new byte[16 * 1024];
@@ -169,9 +169,9 @@ namespace MapsInMyFolder.VectorTileRenderer.Sources
             }
         }
 
-        bool IsGZipped(Stream stream)
-        {
-            return false;// IsZipped(stream, 3, "1F-8B-08");
+       // bool IsGZipped(Stream stream)
+      //  {
+       //     return false;// IsZipped(stream, 3, "1F-8B-08");
 
             //A tester en cas de GZIP ?
             //public static bool IsGZipHeader(byte[] arr)
@@ -180,29 +180,25 @@ namespace MapsInMyFolder.VectorTileRenderer.Sources
             //        arr[0] == 31 &&
             //        arr[1] == 139;
             //}
-        }
+      //  }
 
-
-
-
-
-        bool IsZipped(Stream stream, int signatureSize = 4, string expectedSignature = "50-4B-03-04")
-        {
-            if (stream.Length < signatureSize)
-                return false;
-            byte[] signature = new byte[signatureSize];
-            int bytesRequired = signatureSize;
-            int index = 0;
-            while (bytesRequired > 0)
-            {
-                int bytesRead = stream.Read(signature, index, bytesRequired);
-                bytesRequired -= bytesRead;
-                index += bytesRead;
-            }
-            stream.Seek(0, SeekOrigin.Begin);
-            string actualSignature = BitConverter.ToString(signature);
-            if (actualSignature == expectedSignature) return true;
-            return false;
-        }
+        //bool IsZipped(Stream stream, int signatureSize = 4, string expectedSignature = "50-4B-03-04")
+        //{
+        //    if (stream.Length < signatureSize)
+        //        return false;
+        //    byte[] signature = new byte[signatureSize];
+        //    int bytesRequired = signatureSize;
+        //    int index = 0;
+        //    while (bytesRequired > 0)
+        //    {
+        //        int bytesRead = stream.Read(signature, index, bytesRequired);
+        //        bytesRequired -= bytesRead;
+        //        index += bytesRead;
+        //    }
+        //    stream.Seek(0, SeekOrigin.Begin);
+        //    string actualSignature = BitConverter.ToString(signature);
+        //    if (actualSignature == expectedSignature) return true;
+        //    return false;
+        //}
     }
 }

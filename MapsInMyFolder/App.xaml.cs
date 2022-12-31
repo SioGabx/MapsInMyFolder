@@ -28,13 +28,11 @@ namespace MapsInMyFolder
             }
             catch (System.UnauthorizedAccessException)
             {
-
                 return false;
             }
 
             return true;
         }
-
 
         public App()
         {
@@ -43,13 +41,13 @@ namespace MapsInMyFolder
                 Thread.CurrentThread.CurrentCulture = new CultureInfo("en");
                 //Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
 
-                var settings = new CefSharp.Wpf.CefSettings() { };
-                string BrowserSubprocessPathPath = System.IO.Path.GetFullPath(@"CefSharp.BrowserSubprocess.exe");
+                var settings = new CefSharp.Wpf.CefSettings();
+                string BrowserSubprocessPathPath = System.IO.Path.GetFullPath("CefSharp.BrowserSubprocess.exe");
                 if (File.Exists(BrowserSubprocessPathPath))
                 {
-                    settings.BrowserSubprocessPath = System.IO.Path.GetFullPath(@"CefSharp.BrowserSubprocess.exe");
+                    settings.BrowserSubprocessPath = System.IO.Path.GetFullPath("CefSharp.BrowserSubprocess.exe");
                 }
-
+                settings.CachePath = Commun.Settings.temp_folder;
 
                 if (!Directory.Exists(Commun.Settings.working_folder))
                 {
@@ -73,13 +71,12 @@ namespace MapsInMyFolder
                     }
                     catch (Exception)
                     {
-
+                        DebugMode.WriteLine("Erreur creation du dossier working_folder : " + Commun.Settings.working_folder);
                     }
-
-
                 }
 
-
+                settings.UserDataPath = Commun.Settings.temp_folder;
+                settings.LogFile = Path.Combine(Commun.Settings.temp_folder, "internalBrowserLogs.log");
                 settings.RegisterScheme(new CefCustomScheme
                 {
                     SchemeName = "localfolder",
@@ -105,11 +102,7 @@ namespace MapsInMyFolder
                 Message.NoReturnBoxAsync(ex.ToString(), "Erreur");
                 System.Windows.Application.Current.Shutdown();
             }
-
-
         }
-
-
 
         protected override void OnStartup(StartupEventArgs e)
         {
@@ -146,8 +139,5 @@ namespace MapsInMyFolder
             System.IO.File.WriteAllText(ex.Message + Environment.NewLine + ex.StackTrace, "log.txt");
             //En cas d'erreur CEFSHARP.CORE.RUNTIME introuvable alors intaller vc_redist.x64 (https://aka.ms/vs/17/release/vc_redist.x64.exe)
         }
-
-
-
     }
 }

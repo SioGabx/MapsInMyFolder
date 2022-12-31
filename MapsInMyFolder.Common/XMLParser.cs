@@ -4,22 +4,14 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Xml;
 using System.Xml.Linq;
 
 namespace MapsInMyFolder.Commun
 {
-    public class XMLParser
+    public static class XMLParser
     {
-        public static string GetSettingsPath()
-        {
-            string strExeFilePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
-            string strWorkPath = System.IO.Path.GetDirectoryName(strExeFilePath);
-            string strSettingsXmlFilePath = System.IO.Path.Combine(strWorkPath, "Settings.xml");
-            return strSettingsXmlFilePath;
-        }
-
-
         public static string Read(string key_arg)
         {
             string key = key_arg;
@@ -32,7 +24,7 @@ namespace MapsInMyFolder.Commun
                 key = key_arg.Trim();
             }
 
-            string strSettingsXmlFilePath = GetSettingsPath();
+            string strSettingsXmlFilePath = Settings.SettingsPath();
             if (!File.Exists(strSettingsXmlFilePath))
             {
                 Create();
@@ -47,26 +39,24 @@ namespace MapsInMyFolder.Commun
             return null;
         }
 
-
         public static void Create()
         {
-            string strSettingsXmlFilePath = GetSettingsPath();
+            string strSettingsXmlFilePath = Settings.SettingsPath();
             if (!File.Exists(strSettingsXmlFilePath))
             {
                 var sts = new XmlWriterSettings()
                 {
                     Indent = true,
                 };
-                XmlWriter xmlWriter = XmlWriter.Create(strSettingsXmlFilePath, sts);
+                string newPath = Settings.SettingsPath(true);
+                XmlWriter xmlWriter = XmlWriter.Create(newPath, sts);
                 xmlWriter.WriteStartDocument();
                 xmlWriter.WriteStartElement("Settings");
                 xmlWriter.WriteEndElement();
                 xmlWriter.WriteEndDocument();
                 xmlWriter.Close();
             }
-            return;
         }
-
 
         public static void Write(string key_arg, string value_arg = null, string description_arg = null)
         {
@@ -89,12 +79,22 @@ namespace MapsInMyFolder.Commun
             {
                 description = String.Empty;
             }
-            string strSettingsXmlFilePath = GetSettingsPath();
+            string strSettingsXmlFilePath = Settings.SettingsPath();
             if (!File.Exists(strSettingsXmlFilePath))
             {
                 Create();
             }
-            XDocument doc = XDocument.Load(strSettingsXmlFilePath);
+            XDocument doc;
+            try
+            {
+                doc = XDocument.Load(strSettingsXmlFilePath);
+            }
+            catch (FileNotFoundException)
+            {
+                Settings.SettingsPath(true);
+                Create();
+                doc = XDocument.Load(strSettingsXmlFilePath);
+            }
             XElement KeyElement = doc.Descendants(key).FirstOrDefault<XElement>();
             if (KeyElement != null)
             {
@@ -117,7 +117,6 @@ namespace MapsInMyFolder.Commun
                     {
                         XComment xRoleComment = new XComment(description);
                         Settings.Add(xRoleComment);
-
                     }
                     Settings.Add(xElement);
                 }

@@ -404,6 +404,16 @@
             padding: 0px !important;
         }
 
+        ul.list .select p,
+        ul.list_alternat .select p {
+            color: #F18712!important;
+        }
+
+        ul.list li:has(.select),
+        ul.list_alternat li:has(.select) {
+            color: #F18712 !important;
+        }
+
         ul.list li,
         ul.list_alternat li {
             list-style: disc !important;
@@ -600,6 +610,13 @@
             } catch (error) {
                 console.error(error);
             }
+        }
+
+        function selectionner_calque_by_id(id) {
+            console.log("selectionner_calque_by_id" + id);
+            let element = document.getElementById(id).querySelector(".layer_main_div");
+            element.classList.add("select");
+            lastelement = element;
         }
 
         function cleantxt(source) {

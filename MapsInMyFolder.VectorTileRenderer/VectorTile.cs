@@ -12,7 +12,7 @@ namespace MapsInMyFolder.VectorTileRenderer
         {
             VectorTile newTile = new VectorTile();
             newTile.IsOverZoomed = this.IsOverZoomed;
-            
+
             foreach(var layer in Layers)
             {
                 var vectorLayer = new VectorTileLayer();
@@ -32,7 +32,6 @@ namespace MapsInMyFolder.VectorTileRenderer
 
                         foreach (var point in geometry)
                         {
-
                             var newX = Utils.ConvertRange(point.X, extent.Left, extent.Right, 0, vectorFeature.Extent);
                             var newY = Utils.ConvertRange(point.Y, extent.Top, extent.Bottom, 0, vectorFeature.Extent);
 
@@ -70,6 +69,5 @@ namespace MapsInMyFolder.VectorTileRenderer
         public Dictionary<string, object> Attributes = new Dictionary<string, object>();
 
         public List<List<Point>> Geometry = new List<List<Point>>();
-
     }
 }

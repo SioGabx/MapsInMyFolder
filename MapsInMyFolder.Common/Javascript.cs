@@ -5,16 +5,10 @@ using System.Diagnostics;
 using System.Threading;
 using System.Windows;
 
-
-
-
-
 namespace MapsInMyFolder.Commun
 {
-
     public class Javascript
     {
-
         #region logs
         //Register logger to the CustomOrEditPage
         public static Javascript JavascriptInstance = new Javascript();
@@ -24,7 +18,7 @@ namespace MapsInMyFolder.Commun
             public string Logs { get; set; }
         }
         public delegate void LogsChangedHandler(object source, LogsEventArgs e);
-        public event LogsChangedHandler LogsChanged;
+        public event EventHandler<LogsEventArgs> LogsChanged;
         protected virtual void OnLogsChanged()
         {
             LogsChanged?.Invoke(this, new LogsEventArgs { Logs = _logs });
@@ -50,10 +44,10 @@ namespace MapsInMyFolder.Commun
             public Dictionary<string, double> Location { get; set; }
         }
         public delegate void LocationChangedHandler(object source, LocationEventArgs e);
-        public event LocationChangedHandler LocationChanged;
+        public event EventHandler<LocationEventArgs> LocationChanged;
         protected virtual void OnLocationChanged()
         {
-            LocationChanged?.Invoke(this, new LocationEventArgs { });
+            LocationChanged?.Invoke(this, new LocationEventArgs());
         }
         public Dictionary<string, double> Location
         {
@@ -65,12 +59,8 @@ namespace MapsInMyFolder.Commun
                 {
                     OnLocationChanged();
                 }
-
             }
         }
-
-
-
 
         private static Engine SetupEngine(int LayerId)
         {
@@ -83,33 +73,35 @@ namespace MapsInMyFolder.Commun
                 {
                     JsListCancelTocken.Add(LayerId, JsCancelToken);
                 }
-                catch (Exception) { }
+                catch (Exception ex) {
+                    Debug.WriteLine("Error JsListCancelTocken " + ex.Message);
+                }
                 options.CancellationToken(JsCancelToken.Token);
             });
-            Action<object> PrintAction = (stringtext => Javascript.Print(String.Concat(">", stringtext), LayerId));
+            Action<object> PrintAction = stringtext => Javascript.Print(String.Concat(">", stringtext), LayerId);
             add.SetValue("print", PrintAction);
-            Action<object> AlertAction = (stringtext => Javascript.Alert(stringtext, LayerId));
+            Action<object> AlertAction = stringtext => Javascript.Alert(stringtext, LayerId);
             add.SetValue("alert", AlertAction);
-            Action<object> PrintClearAction = (stringtext => Javascript.PrintClear());
+            Action<object> PrintClearAction = _ => Javascript.PrintClear();
             add.SetValue("printClear", PrintClearAction);
-            Action<object> helpAction = (stringtext => Javascript.Help(LayerId));
+            Action<object> helpAction = _ => Javascript.Help(LayerId);
             add.SetValue("help", helpAction);
             Action<object, object> setVarAction = (variable, value) => Javascript.SetVar(variable, value, LayerId);
             add.SetValue("setVar", setVarAction); //setVar("variable1","valeur1")
-            Func<object, object> getVarFunction = (variablename) => { return GetVar(variablename, LayerId); };
+            Func<object, object> getVarFunction = (variablename) => GetVar(variablename, LayerId);
             add.SetValue("getVar", getVarFunction); //getVar("variable1")
 
-            Func<object, object, object, object> getTileNumberAction = (latitude, longitude, zoom) => { return CoordonneesToTile(latitude, longitude, zoom); };
+            Func<object, object, object, object> getTileNumberAction = (latitude, longitude, zoom) => CoordonneesToTile(latitude, longitude, zoom);
             add.SetValue("getTileNumber", getTileNumberAction); //setVar("variable1","valeur1")
 
-            Func<object, object, object, object> getLatLongAction = (TileX, TileY, zoom) => { return TileToCoordonnees(TileX, TileY, zoom); };
+            Func<object, object, object, object> getLatLongAction = (TileX, TileY, zoom) => TileToCoordonnees(TileX, TileY, zoom);
             add.SetValue("getLatLong", getLatLongAction); //setVar("variable1","valeur1")
 
             Action<double, double, double, double, bool> setSelectionAction = (NO_Latitude, NO_Longitude, SE_Latitude, SE_Longitude, ZoomToNewLocation) =>
             SetSelection(NO_Latitude, NO_Longitude, SE_Latitude, SE_Longitude, ZoomToNewLocation, LayerId);
             add.SetValue("setSelection", setSelectionAction);
 
-            Func<object> getSelectionAction = () => { return GetSelection(); };
+            Func<object> getSelectionAction = () => GetSelection();
             add.SetValue("getSelection", getSelectionAction);
             return add;
         }
@@ -131,22 +123,21 @@ namespace MapsInMyFolder.Commun
 
             if (DictionnaryOfVariablesKeyLayerId.TryGetValue(LayerId, out Dictionary<string, object> VariableKeyAndValue))
             {
-                if (VariableKeyAndValue.ContainsKey(variablenameString))
-                {
-                    VariableKeyAndValue[variablenameString] = value;
-                }
-                else
-                {
-                    VariableKeyAndValue.Add(variablenameString, value);
-                }
+                //if (VariableKeyAndValue.ContainsKey(variablenameString))
+                //{
+                //    VariableKeyAndValue[variablenameString] = value;
+                //}
+                //else
+                //{
+                //    VariableKeyAndValue.Add(variablenameString, value);
+                //} 
+                VariableKeyAndValue[variablenameString] = value;
             }
             else
             {
                 DictionnaryOfVariablesKeyLayerId.Add(LayerId, new Dictionary<string, object>() { { variablenameString, value } });
             }
-
         }
-
 
         //todo add get / set parameters + add option to print error from DownloadByteUrl
         static public object GetVar(object variablename, int LayerId = 0)
@@ -188,10 +179,8 @@ namespace MapsInMyFolder.Commun
             {
                 PrintError("La variable " + variablename + " n'existe pas");
             }
-
         }
         #endregion
-
 
         public static void SetSelection(double NO_Latitude, double NO_Longitude, double SE_Latitude, double SE_Longitude, bool ZoomToNewLocation, int LayerId)
         {
@@ -209,21 +198,27 @@ namespace MapsInMyFolder.Commun
 
         public static Dictionary<string, Dictionary<string, double>> GetSelection()
         {
-            var ReturnDic = new Dictionary<string, Dictionary<string, double>>() { };
-            ReturnDic.Add("SE", new Dictionary<string, double>() {
+            var ReturnDic = new Dictionary<string, Dictionary<string, double>>
+            {
+                {
+                    "SE",
+                    new Dictionary<string, double>() {
             {"lat",Curent.Selection.SE_Latitude },
             {"long",Curent.Selection.SE_Longitude }
-            });
+            }
+                },
 
-            ReturnDic.Add("NO", new Dictionary<string, double>() {
+                {
+                    "NO",
+                    new Dictionary<string, double>() {
             {"lat",Curent.Selection.NO_Latitude },
             {"long",Curent.Selection.NO_Longitude }
-            });
+            }
+                }
+            };
 
             return ReturnDic;
         }
-
-
 
         public static Dictionary<string, int> CoordonneesToTile(object latitude, object longitude, object zoom)
         {
@@ -255,15 +250,13 @@ namespace MapsInMyFolder.Commun
         {
             if (!string.IsNullOrEmpty(print))
             {
-                Debug.WriteLine(print);
+                    DebugMode.WriteLine("Javascript print : " + LayerId + " " + print);
                 if (LayerId == -2 && Commun.TileGeneratorSettings.AcceptJavascriptPrint)
                 {
                     Javascript.JavascriptInstance.Logs = String.Concat(Javascript.JavascriptInstance.Logs, "\n", print);
                     return;
                 }
-
             }
-            DebugMode.WriteLine("print abord" + LayerId);
         }
 
         static public void PrintClear()
@@ -319,7 +312,6 @@ print("lat : " + locations.lat + " / long : " + locations.long)
              
              */
             Debug.WriteLine("help triggered" + LayerId);
-
         }
 
         static public void PrintError(string print, int LayerId = -2)
@@ -337,9 +329,7 @@ print("lat : " + locations.lat + " / long : " + locations.long)
                     MessageBox.Show(text, "MapsInMyFolder");
                 }
             }
-
         }
-
 
         #region engines
         private static readonly Dictionary<int, CancellationTokenSource> JsListCancelTocken = new Dictionary<int, CancellationTokenSource>();
@@ -361,7 +351,6 @@ print("lat : " + locations.lat + " / long : " + locations.long)
                 tockensource.Cancel();
             }
         }
-
 
         static readonly object locker = new object();
         public static Engine EngineGetById(int LayerId, string script)
@@ -414,26 +403,26 @@ print("lat : " + locations.lat + " / long : " + locations.long)
         #endregion
         public static Jint.Native.JsValue ExecuteScript(string script, Dictionary<string, object> arguments, int LayerId)
         {
-            DebugMode.WriteLine("DEBUG JS : Lock" + "LayerId" + LayerId);
+            DebugMode.WriteLine("DEBUG JS : LockLayerId" + LayerId);
             lock (locker)
             {
-                DebugMode.WriteLine("DEBUG JS : GetEngine" + "LayerId" + LayerId);
+                DebugMode.WriteLine("DEBUG JS : GetEngineLayerId" + LayerId);
                 Engine add = EngineGetById(LayerId, script);
-                DebugMode.WriteLine("DEBUG JS : Engine got" + "LayerId" + LayerId);
+                DebugMode.WriteLine("DEBUG JS : Engine gotLayerId" + LayerId);
 
                 if (add is null)
                 {
-                    DebugMode.WriteLine("DEBUG JS : engine null" + "LayerId" + LayerId);
+                    DebugMode.WriteLine("DEBUG JS : engine nullLayerId" + LayerId);
                     return null;
                 }
                 Jint.Native.JsValue jsValue = null;
                 try
                 {
-                    DebugMode.WriteLine("DEBUG JS : call main" + "LayerId" + LayerId);
+                    DebugMode.WriteLine("DEBUG JS : call mainLayerId" + LayerId);
                     jsValue = add.Invoke("main", arguments);
                     //add.SetValue("args", arguments);
                     //jsValue = add.Evaluate("main(args)");
-                    DebugMode.WriteLine("DEBUG JS : end call main" + "LayerId" + LayerId);
+                    DebugMode.WriteLine("DEBUG JS : end call mainLayerId" + LayerId);
                 }
                 catch (Exception ex)
                 {
@@ -447,14 +436,13 @@ print("lat : " + locations.lat + " / long : " + locations.long)
                         PrintError(ex.Message);
                     }
                 }
-                DebugMode.WriteLine("DEBUG JS : update engine" + "LayerId" + LayerId);
+                DebugMode.WriteLine("DEBUG JS : update engineLayerId" + LayerId);
                 EngineUpdate(add, LayerId);
-                DebugMode.WriteLine("DEBUG JS : return" + "LayerId" + LayerId);
+                DebugMode.WriteLine("DEBUG JS : returnLayerId" + LayerId);
 
                 return jsValue;
             }
         }
-
 
         public static void ExecuteCommand(string command, int LayerId)
         {
@@ -463,7 +451,6 @@ print("lat : " + locations.lat + " / long : " + locations.long)
             try
             {
                 add.Evaluate(command);
-
             }
             catch (Exception ex)
             {
@@ -471,8 +458,5 @@ print("lat : " + locations.lat + " / long : " + locations.long)
                 PrintError(ex.Message);
             }
         }
-
-
     }
-
 }

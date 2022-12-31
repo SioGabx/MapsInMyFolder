@@ -9,13 +9,11 @@ using System.Threading.Tasks;
 
 using System.Windows.Media;
 
-
 namespace MapsInMyFolder.MapControl
 {
     /// <summary>
     /// Provides the download Uri or ImageSource of map tiles.
     /// </summary>
-
     [System.ComponentModel.TypeConverter(typeof(TileSourceConverter))]
     public class TileSource
     {

@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 
-
 namespace MapsInMyFolder.MapControl
 {
     /// <summary>
@@ -95,8 +94,8 @@ namespace MapsInMyFolder.MapControl
                 foreach (var tile in Tiles)
                 {
                     var tileSize = TileSize << (TileMatrix.ZoomLevel - tile.ZoomLevel);
-                    var x = tileSize * tile.X - TileSize * TileMatrix.XMin;
-                    var y = tileSize * tile.Y - TileSize * TileMatrix.YMin;
+                    var x = (tileSize * tile.X) - (TileSize * TileMatrix.XMin);
+                    var y = (tileSize * tile.Y) - (TileSize * TileMatrix.YMin);
 
                     tile.Image.Width = tileSize;
                     tile.Image.Height = tileSize;
