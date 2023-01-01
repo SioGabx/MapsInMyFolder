@@ -251,9 +251,11 @@ namespace MapsInMyFolder
                     await dialog.ShowAsync();
                     return;
                 }
+                DefaultValuesHachCode = Commun.Collectif.CheckIfInputValueHaveChange(SettingsScrollViewer);
                 dialog = Message.SetContentDialog("MapsInMyFolder nécessite de redémarrer...\n Fermeture de l'application.", "Information", MessageDialogButton.OK);
                 await dialog.ShowAsync();
-                Application.Current.Shutdown();
+
+                Collectif.RestartApplication();
             }
         }
 

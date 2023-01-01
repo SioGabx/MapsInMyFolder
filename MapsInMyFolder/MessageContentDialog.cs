@@ -26,7 +26,7 @@ namespace MapsInMyFolder
                 IsPrimaryButtonEnabled = false,
                 IsSecondaryButtonEnabled = false,
                 DefaultButton = ContentDialogButton.Primary,
-                Background = Collectif.HexValueToSolidColorBrush("171719")
+                Background = Collectif.HexValueToSolidColorBrush("#171719")
             };
 
             Debug.WriteLine("DialogMsg" + text);

@@ -231,6 +231,25 @@ namespace MapsInMyFolder.Commun
             return assembly.GetManifestResourceStream(resourceName);
         }
 
+        public static void RestartApplication()
+        {
+            string applicationPath = Process.GetCurrentProcess().MainModule.FileName;
+            Process process = new Process()
+            {
+                StartInfo = new ProcessStartInfo(applicationPath)
+                {
+                    WindowStyle = ProcessWindowStyle.Normal,
+                    WorkingDirectory = Path.GetDirectoryName(applicationPath)
+                }
+            };
+
+            process.Start();
+
+            Application.Current.Shutdown();
+        }
+
+
+
         public static SolidColorBrush HexValueToSolidColorBrush(string hexvalue)
         {
             //"#BCBCBC"

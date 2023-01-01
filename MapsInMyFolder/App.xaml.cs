@@ -2,6 +2,7 @@
 using CefSharp.SchemeHandler;
 using MapsInMyFolder.Commun;
 using System;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Reflection;
@@ -100,7 +101,7 @@ namespace MapsInMyFolder
                 //MessageBox.Show("Erreur de lancement : " + ex.Message + "\n\n StackTrace :  \n" + ex.StackTrace + "\n\n InnerException :  \n" + ex.InnerException);
                 //MessageBox.Show(ex.ToString(), "Erreur de lancement", MessageBoxButton.OK, MessageBoxImage.Error);
                 Message.NoReturnBoxAsync(ex.ToString(), "Erreur");
-                System.Windows.Application.Current.Shutdown();
+                Collectif.RestartApplication();
             }
         }
 
@@ -129,7 +130,7 @@ namespace MapsInMyFolder
             }
             finally
             {
-                Application.Current.Shutdown();
+                Collectif.RestartApplication();
             }
         }
 
