@@ -591,13 +591,13 @@
         </Grid>
 
 
-        <ui:ContentDialog x:Name="Dialogue"
+        <!--<ui:ContentDialog x:Name="Dialogue"
     Title="title"
     PrimaryButtonText="primary button"
     SecondaryButtonText="secondary button"
     CloseButtonText="Cancel"
     DefaultButton="Primary" d:IsHidden="True" Background="#171719">
-        </ui:ContentDialog>
+        </ui:ContentDialog>-->
         
     </Grid>
 </Window>

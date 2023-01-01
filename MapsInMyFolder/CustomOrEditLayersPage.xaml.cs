@@ -782,7 +782,7 @@ namespace MapsInMyFolder
             if (label_element.IsEnabled)
             {
                 label_element.Cursor = Cursors.Hand;
-                label_element.Foreground = (SolidColorBrush)new BrushConverter().ConvertFrom("#b4b4b4");
+                label_element.Foreground = Collectif.HexValueToSolidColorBrush("#b4b4b4");
             }
             else
             {
@@ -793,12 +793,12 @@ namespace MapsInMyFolder
         private void ClickableLabel_MouseLeave(object sender, MouseEventArgs e)
         {
             Label label_element = sender as Label;
-            label_element.Foreground = (SolidColorBrush)new BrushConverter().ConvertFrom("#888989");
+            label_element.Foreground = Collectif.HexValueToSolidColorBrush("#888989");
         }
 
         private void ClickableLabel_MouseUp(object sender, MouseButtonEventArgs e)
         {
-            ClickableLabel.Foreground = (SolidColorBrush)new BrushConverter().ConvertFrom("#888989");
+            ClickableLabel.Foreground = Collectif.HexValueToSolidColorBrush("#888989");
             AutoDetectZoom();
         }
 

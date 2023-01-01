@@ -234,13 +234,16 @@ namespace MapsInMyFolder
 
         private async void ResetSettings_Click(object sender, RoutedEventArgs e)
         {
-            var dialog = Message.SetContentDialog("Voullez-vous vraiment restaurer les paramètres par défaut ? Cette action est irréversible !", "Confirmer", MessageDialogButton.YesCancel);
+            var dialog = Message.SetContentDialog("Voullez-vous vraiment restaurer les paramètres par défaut ? Cette action est irréversible et entrainera un redémarrage de l'application!", "Confirmer", MessageDialogButton.YesCancel);
             ContentDialogResult result = await dialog.ShowAsync();
             if (result == ContentDialogResult.Primary)
             {
                 try
                 {
-                    System.IO.File.Delete(Settings.SettingsPath());
+                    if (System.IO.File.Exists(Settings.SettingsPath()))
+                    {
+                        System.IO.File.Delete(Settings.SettingsPath());
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -248,7 +251,7 @@ namespace MapsInMyFolder
                     await dialog.ShowAsync();
                     return;
                 }
-                dialog = Message.SetContentDialog("MapsInMyFolder nécessite de redémarrer... Fermeture de l'application", "Information", MessageDialogButton.OK);
+                dialog = Message.SetContentDialog("MapsInMyFolder nécessite de redémarrer...\n Fermeture de l'application.", "Information", MessageDialogButton.OK);
                 await dialog.ShowAsync();
                 Application.Current.Shutdown();
             }
@@ -425,8 +428,15 @@ namespace MapsInMyFolder
             if (DefaultValuesHachCode != ValuesHachCode)
             {
                 e.Cancel = true;
-                var dialog = Message.SetContentDialog("Voullez-vous enregistrer vos modifications ? Les modifications non enregistrée seront perdues.", "Confirmer", MessageDialogButton.YesNo, Dialogue);
-                result = await dialog.ShowAsync();
+                var dialog = Message.SetContentDialog("Voullez-vous enregistrer vos modifications ? Les modifications non enregistrée seront perdues.", "Confirmer", MessageDialogButton.YesNo);
+                try
+                {
+                    result = await dialog.ShowAsync();
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex.ToString());
+                }
             }
             if (result == ContentDialogResult.Primary)
             {
@@ -434,7 +444,7 @@ namespace MapsInMyFolder
                 SaveSettings();
 
                 //Want to restart ?
-                var dialog = Message.SetContentDialog("Un redémarrage de l'application est recommandé. Voullez-vous redemarrer MapsInMyFolder ?\nSans redémarrage, la redéfinition de certains parametres peut entrainer certaines instabilitées.", "Information", MessageDialogButton.YesNo, Dialogue);
+                var dialog = Message.SetContentDialog("Un redémarrage de l'application est recommandé. Voullez-vous redemarrer MapsInMyFolder ?\nSans redémarrage, la redéfinition de certains parametres peut entrainer certaines instabilitées.", "Information", MessageDialogButton.YesNo);
                 ContentDialogResult result2 = await dialog.ShowAsync();
 
                 if (result2 == ContentDialogResult.Primary)
@@ -458,8 +468,14 @@ namespace MapsInMyFolder
             }
             else if (result == ContentDialogResult.Secondary)
             {
+                Debug.WriteLine(result.ToString());
                 DefaultValuesHachCode = ValuesHachCode;
                 this.Close();
+            }
+            else
+            {
+                //if user ESCAPE
+                return;
             }
 
 

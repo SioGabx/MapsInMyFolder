@@ -82,7 +82,7 @@ namespace MapsInMyFolder
             StackPanel_ImageTilePreview_1.Background = brush;
             StackPanel_ImageTilePreview_2.Background = brush;
             SolidColorBrush GrayColor = new SolidColorBrush(Color.FromRgb(136, 137, 137));
-            SolidColorBrush WhiteColor = (SolidColorBrush)new BrushConverter().ConvertFrom("#BCBCBC");
+            SolidColorBrush WhiteColor = Collectif.HexValueToSolidColorBrush("#BCBCBC");
             TextBox_Redim_Width.Foreground = GrayColor;
             TextBox_Redim_Height.Foreground = GrayColor;
             TextBox_Redim_WUnit.Foreground = GrayColor;
@@ -484,8 +484,8 @@ namespace MapsInMyFolder
                 bool ResizedImageSizeWIsOK = ResizedImageSize["width"] >= 65000;
                 bool OriginalImageSizeHIsOK = OriginalImageSize["height"] >= 65000;
                 bool OriginalImageSizeWIsOK = OriginalImageSize["width"] >= 65000;
-                SolidColorBrush OKColor = (SolidColorBrush)new BrushConverter().ConvertFrom("#888989");
-                SolidColorBrush WrongColor = (SolidColorBrush)new BrushConverter().ConvertFrom("#FF953C32");
+                SolidColorBrush OKColor = Collectif.HexValueToSolidColorBrush("#888989");
+                SolidColorBrush WrongColor = Collectif.HexValueToSolidColorBrush("#FF953C32");
                 if (OriginalImageSizeHIsOK || OriginalImageSizeWIsOK)
                 {
                     Label_ImgSize.Foreground = WrongColor;
@@ -535,7 +535,7 @@ namespace MapsInMyFolder
                 TextBox_Redim_WUnit.Opacity = 1;
                 WrapPanel_Largeur.IsEnabled = true;
                 WrapPanel_Hauteur.IsEnabled = true;
-                SolidColorBrush WhiteColor = (SolidColorBrush)new BrushConverter().ConvertFrom("#BCBCBC"); //new SolidColorBrush(BrushConverter(BCBCBC);
+                SolidColorBrush WhiteColor = Collectif.HexValueToSolidColorBrush("#BCBCBC"); //new SolidColorBrush(BrushConverter(BCBCBC);
                 TextBox_Redim_Width.Foreground = WhiteColor;
                 TextBox_Redim_Height.Foreground = WhiteColor;
                 TextBox_Redim_WUnit.Foreground = WhiteColor;

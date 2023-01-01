@@ -58,26 +58,41 @@ namespace MapsInMyFolder
 
     public static class Message
     {
+
         public static ContentDialog SetContentDialog(object text, object caption = null, MessageDialogButton messageBoxButton = MessageDialogButton.OK, ContentDialog dialog_arg = null)
         {
-            ContentDialog dialog = null;
-            if (dialog_arg is null || dialog_arg == null)
+            //ContentDialog dialog = null;
+            //if (dialog_arg is null || dialog_arg == null)
+            //{
+            //    //dialog = MainWindow._instance.Dialogue;
+            //    Application.Current.ExecOnUiThread(() => dialog = MainWindow._instance.Dialogue);
+            //}
+            //else
+            //{
+            //    dialog = dialog_arg;
+            //}
+
+            ContentDialog dialog = new ContentDialog
             {
-                //dialog = MainWindow._instance.Dialogue;
-                Application.Current.ExecOnUiThread(() => dialog = MainWindow._instance.Dialogue);
-            }
-            else
-            {
-                dialog = dialog_arg;
-            }
+                Title = caption ?? "",
+                Content = text,
+                CloseButtonText = "",
+                PrimaryButtonText = "",
+                SecondaryButtonText = "",
+                IsPrimaryButtonEnabled = false,
+                IsSecondaryButtonEnabled = false,
+                DefaultButton = ContentDialogButton.Primary,
+                Background = Collectif.HexValueToSolidColorBrush("171719")
+            };
+
             Debug.WriteLine("DialogMsg" + text);
-            dialog.Content = text;
-            dialog.Title = caption ?? "";
-            dialog.CloseButtonText = "";
-            dialog.SecondaryButtonText = "";
-            dialog.PrimaryButtonText = "";
-            dialog.IsPrimaryButtonEnabled = false;
-            dialog.IsSecondaryButtonEnabled = false;
+            //dialog.Content = text;
+            //dialog.Title = caption ?? "";
+            //dialog.CloseButtonText = "";
+            //dialog.SecondaryButtonText = "";
+            //dialog.PrimaryButtonText = "";
+            //dialog.IsPrimaryButtonEnabled = false;
+            //dialog.IsSecondaryButtonEnabled = false;
 
             switch (messageBoxButton)
             {
@@ -126,8 +141,9 @@ namespace MapsInMyFolder
             {
                 await Message.SetContentDialog(text, caption, MessageDialogButton.OK, dialog_arg).ShowAsync().ConfigureAwait(false);
             }
-            catch (Exception ex) {
-            Debug.WriteLine(ex.Message);
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
             }
         }
     }

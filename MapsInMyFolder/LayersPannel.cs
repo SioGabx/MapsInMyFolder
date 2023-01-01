@@ -74,7 +74,7 @@ namespace MapsInMyFolder
         {
             if (!e.IsLoading)
             {
-                MainPage._instance.layer_browser.GetMainFrame().EvaluateScriptAsync("selectionner_calque_by_id(" + Settings.layer_startup_id + ")");
+                layer_browser.GetMainFrame().EvaluateScriptAsync("selectionner_calque_by_id(" + Settings.layer_startup_id + ")");
             }
         }
 

@@ -7,8 +7,10 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 
+
 namespace MapsInMyFolder.Commun
 {
+
     public static class Extensions
     {
         public static bool Contains(this String str, String substring, StringComparison comp)
