@@ -236,8 +236,6 @@ namespace MapsInMyFolder.Commun
             //"#BCBCBC"
             return (SolidColorBrush)new BrushConverter().ConvertFrom(hexvalue);
         }
-       
-
 
         public static string GetSaveTempDirectory(string nom, string identifiant, int zoom = -1, string temp_folder = "")
         {
