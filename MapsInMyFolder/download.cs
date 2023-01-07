@@ -627,7 +627,7 @@ namespace MapsInMyFolder
                     {
                         foreach (Url_class urclass in download_main_engine_class_args.urls)
                         {
-                            if ((urclass.status != Status.no_data) || (!Commun.Settings.generate_transparent_tiles_on_404) || (!Commun.Settings.generate_transparent_tiles_on_error))
+                            if ((urclass.status != Status.no_data) || ((Commun.Settings.generate_transparent_tiles_on_404) == false && (Commun.Settings.generate_transparent_tiles_on_error) == false))
                             {
                                 if (urclass.status == Status.waitfordownloading)
                                 {
@@ -843,6 +843,7 @@ namespace MapsInMyFolder
                         {
                             try
                             {
+                                Debug.WriteLine("Loading " + filename);
                                 tempsimage = NetVips.Image.NewFromFile(filename);
                                 if (tempsimage.Width != settings_tile_size)
                                 {
@@ -887,9 +888,12 @@ namespace MapsInMyFolder
                         }
                         else
                         {
+                            Debug.WriteLine("Image not exist, generating empty tile : " + filename);
                             try
                             {
-                                tempsimage = NetVips.Image.Black(settings_tile_size, settings_tile_size) + new double[] { 0, 0, 0, 0 };
+                                //tempsimage = NetVips.Image.Black(settings_tile_size, settings_tile_size,4) + new double[] { 255, 255, 255, 255 };
+                                tempsimage = NetVips.Image.Black(settings_tile_size, settings_tile_size) + new double[] { 0,0,0,0 };
+                               
                             }
                             catch (Exception ex)
                             {
@@ -903,7 +907,10 @@ namespace MapsInMyFolder
                     }
                     try
                     {
+
                         Vertical_Array.Add(NetVips.Image.Arrayjoin(Horizontal_Array.ToArray(), background: new double[] { 255, 255, 255, 255 }));
+                        //MessageBox.Show(Vertical_Array[Vertical_Array.Count - 1].Xres.ToString());
+                       // Vertical_Array[Vertical_Array.Count - 1].Resize()
                     }
                     catch (Exception ex)
                     {
@@ -925,7 +932,29 @@ namespace MapsInMyFolder
                 Task.Factory.StartNew(() => Thread.Sleep(300));
                 try
                 {
+                    #region fix_dpi_issue_if_vertical_array_is_completly_black
+                    double max_res = 0;
+                    for (int i = 0; i < Vertical_Array.Count; i++)
+                    {
+                        if (Vertical_Array[i].Xres > max_res)
+                        {
+                            max_res = Vertical_Array[i].Xres;
+                            Debug.WriteLine(Vertical_Array[i].Xres);
+                        }
+                    }
+                    Debug.WriteLine("max res = " + max_res);
+
+                    for (int i = 0; i < Vertical_Array.Count; i++)
+                    {
+                        if (Vertical_Array[i].Xres != max_res)
+                        {
+                            Vertical_Array[i] = NetVips.Image.Black(settings_tile_size, settings_tile_size);
+                        }
+                        Debug.WriteLine(Vertical_Array[i].Xres);
+                    }
+                    #endregion
                     image = NetVips.Image.Arrayjoin(Vertical_Array.ToArray(), across: 1);
+                    image.WriteToFile(@"C:\Users\franc\AppData\Local\Temp\MapsInMyFolder\Google Maps Panorama_GMAP_PANO\5\debug_final.jpeg");
                 }
                 catch (Exception ex)
                 {
@@ -937,6 +966,9 @@ namespace MapsInMyFolder
                 NetVips.Image image_rogner = NetVips.Image.Black(rognage_info["width"], rognage_info["height"]);
                 image_rogner = image_rogner.Insert(image, -rognage_info["NO_decalage_x"], -rognage_info["NO_decalage_y"]);
                 image.Dispose();
+
+                //image_rogner = image_rogner.Colourspace(Enums.Interpretation.Bw);
+                //image_rogner = image_rogner.Colourspace(Enums.Interpretation.Grey16);
                 try
                 {
                     if (curent_engine.RedimWidth != -1 && curent_engine.RedimHeignt != -1)
@@ -1189,15 +1221,25 @@ namespace MapsInMyFolder
                         else
                         {
                             Thread.Sleep(200);
-                            if (httpResponse.ResponseMessage.StatusCode == HttpStatusCode.NotFound)
+                            
+                            if (httpResponse.ResponseMessage.StatusCode == HttpStatusCode.NotFound && (Settings.generate_transparent_tiles_on_404 || Settings.generate_transparent_tiles_on_error))
                             {
                                 url.status = Status.no_data;
                             }
-                            if (!Network.IsNetworkAvailable())
+                            else if (!Network.IsNetworkAvailable())
                             {
                                 url.status = Status.waitfordownloading;
                             }
+                            else if (Settings.generate_transparent_tiles_on_error)
+                            {
+                                url.status = Status.no_data;
+                            }
+                            else
+                            {
+                                url.status = Status.error;
+                            }
                             Debug.WriteLine($"Download Fail: {url.url}: {(int)httpResponse.ResponseMessage.StatusCode} {httpResponse.ResponseMessage.ReasonPhrase}");
+                            Debug.WriteLine("url.status is " + url.status);
                         }
                     }
                     catch (Exception a)

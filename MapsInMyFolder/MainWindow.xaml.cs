@@ -102,7 +102,20 @@ namespace MapsInMyFolder
             Javascript JavascriptLocationInstance = Javascript.JavascriptInstance;
             JavascriptLocationInstance.LocationChanged += (o, e) => MainPage.MapViewerSetSelection(Javascript.JavascriptInstance.Location, Javascript.JavascriptInstance.ZoomToNewLocation);
             Network.IsNetworkNowAvailable += (o, e) => CheckIfReadyToStartDownloadAfterNetworkChange();
+            Database.RefreshPanels += (o, e) => RefreshAllPanels();
         }
+
+        public static void RefreshAllPanels()
+        {
+            _instance.Init();
+            _instance.MainPage.MapLoad();
+            _instance.MainPage.Init_layer_panel();
+            _instance.MainPage.ReloadPage();
+            _instance.MainPage.SearchLayerStart();
+            _instance.MainPage.Init_download_panel();
+            _instance.MainPage.Set_current_layer(Commun.Settings.layer_startup_id);
+        }
+
 
         private void Window_ContentRendered(object sender, EventArgs e)
         {

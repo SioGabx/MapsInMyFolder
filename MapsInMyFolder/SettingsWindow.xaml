@@ -537,6 +537,26 @@
                             <StackPanel x:Name="UpdateSettings">
                                 <Label x:Name="UpdateSettingsLabel"  Content="Mises à jour : " HorizontalAlignment="Left" Margin="0,20,0,0" VerticalAlignment="Top" Width="Auto" Height="25" FontSize="16.5" FontFamily="Segoe UI Semilight" Foreground="#FFE2E2E1"/>
                                 <Label Content="Non implémenté" Foreground="#888989"></Label>
+
+                                <Grid Margin="0,10,0,0">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="20"/>
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+                                    <Label Content="Github repository URL" Foreground="#888989" Grid.Row="0"></Label>
+                                    <TextBox x:Name="github_repository_url" HorizontalAlignment="Stretch" Grid.Row="1" Style="{DynamicResource TextBoxCleanStyle_13}" Cursor="IBeam" Height="21"></TextBox>
+                                </Grid>
+                                <Grid Margin="0,10,0,0">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="20"/>
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+                                    <Label Content="Nom du fichier database sur github (release panel)" Foreground="#888989" Grid.Row="0"></Label>
+                                    <TextBox x:Name="github_database_name" HorizontalAlignment="Stretch" Grid.Row="1" Style="{DynamicResource TextBoxCleanStyle_13}" Cursor="IBeam" Height="21"></TextBox>
+                                </Grid>
+                                
                             </StackPanel>
 
                             <StackPanel x:Name="AProposSettings">

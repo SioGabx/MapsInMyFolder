@@ -95,6 +95,10 @@ namespace MapsInMyFolder
             //layer_startup_id
             foreach (Layers layer in Layers.GetLayersList())
             {
+                if (layer.class_id == -1)
+                {
+                    continue;
+                }
                 if (string.Equals(layer.class_format, "JPEG", StringComparison.InvariantCultureIgnoreCase))
                 {
                     int index = layer_startup_id.Items.Add(new NameHiddenIdValue(layer.class_id, layer.class_name));
@@ -219,6 +223,12 @@ namespace MapsInMyFolder
             //database_pathname
             selection_rectangle_resize_angle_gap.Text = Settings.selection_rectangle_resize_angle_gap.ToString();
 
+            //github_repository_url
+            github_repository_url.Text = Settings.github_repository_url;
+
+            //github_database_name
+            github_database_name.Text = Settings.github_database_name;
+
             //is_in_debug_mode
             is_in_debug_mode.IsChecked = Settings.is_in_debug_mode;
 
@@ -264,7 +274,10 @@ namespace MapsInMyFolder
         {
             //layer_startup_id = ;
             NameHiddenIdValue layer_startup_idSelectedItem = (NameHiddenIdValue)layer_startup_id.SelectedItem;
-            Settings.layer_startup_id = layer_startup_idSelectedItem.Id;
+            if (layer_startup_idSelectedItem != null)
+            {
+                Settings.layer_startup_id = layer_startup_idSelectedItem.Id;
+            }
 
             //background_layer_opacity = ;
             Settings.background_layer_opacity = Convert.ToDouble(background_layer_opacity.Text.Replace("%", "").Trim()) / 100;
@@ -397,6 +410,11 @@ namespace MapsInMyFolder
             //map_show_tile_border = ;
             Settings.map_show_tile_border = map_show_tile_border.IsChecked ?? false;
 
+            //github_repository_url
+            Settings.github_repository_url = github_repository_url.Text;
+
+            //github_repository_url
+            Settings.github_database_name = github_database_name.Text;
 
             string actualSettingsPath = Settings.SettingsPath();
             string newSettingsPath = Settings.SettingsPath(true);
@@ -404,6 +422,7 @@ namespace MapsInMyFolder
             {
                 if (System.IO.File.Exists(actualSettingsPath))
                 {
+                    System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(newSettingsPath));
                     System.IO.File.Copy(actualSettingsPath, newSettingsPath);
                 }
             }
@@ -412,16 +431,7 @@ namespace MapsInMyFolder
             Settings.SaveSettings();
         }
 
-        private static void RefreshAllPanels()
-        {
-            MainWindow._instance.Init();
-            MainWindow._instance.MainPage.MapLoad();
-            MainWindow._instance.MainPage.Init_layer_panel();
-            MainWindow._instance.MainPage.ReloadPage();
-            MainWindow._instance.MainPage.SearchLayerStart();
-            MainWindow._instance.MainPage.Init_download_panel();
-            MainWindow._instance.MainPage.Set_current_layer(Commun.Settings.layer_startup_id);
-        }
+   
 
         private async void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
@@ -457,7 +467,7 @@ namespace MapsInMyFolder
                 {
                     //if user dont want to restart
                     DefaultValuesHachCode = ValuesHachCode;
-                    RefreshAllPanels();
+                    MainWindow.RefreshAllPanels();
                     this.Close();
                     return;
                 }
@@ -494,7 +504,7 @@ namespace MapsInMyFolder
             {
                 //CTRL + S
                 SaveSettings();
-                RefreshAllPanels();
+                MainWindow.RefreshAllPanels();
                 DefaultValuesHachCode = Commun.Collectif.CheckIfInputValueHaveChange(SettingsScrollViewer);
             }
         }

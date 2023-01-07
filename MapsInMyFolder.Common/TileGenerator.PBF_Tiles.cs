@@ -129,8 +129,8 @@ namespace MapsInMyFolder.Commun
                 {
                     Uri uri = new Uri(Collectif.GetUrl.FromTileXYZ(urlBase, TileX, TileY, zoom, layerID));
                     DebugMode.WriteLine("Tache n°" + tache + " : Telechargement u1");
-                    response = await Collectif.ByteDownloadUri(uri, layerID);
-                    if (response is null)
+                    response = await Collectif.ByteDownloadUri(uri, layerID, true);
+                    if (response?.Buffer is null)
                     {
                         DebugMode.WriteLine("Tache n°" + tache + " : u1 is null");
                         return null;
@@ -175,9 +175,10 @@ namespace MapsInMyFolder.Commun
                 //string stylevalue = Commun.Collectif.ByteArrayToString(Commun.Collectif.ByteDownloadUri(new Uri(urlorpathorstring), layerID).Result.Buffer);
                 //C:\Users\franc\Documents\SharpDevelop Projects\TestPBFtoBitmapConverter\TestPBFtoBitmapConverter\style\accentue.json
                 string stylevalue;
+                Layers layers = Commun.Layers.GetLayerById(layerID);
                 try
                 {
-                    stylevalue = Commun.Layers.GetLayerById(layerID)?.class_specialsoptions?.PBFJsonStyle;
+                    stylevalue = layers?.class_specialsoptions?.PBFJsonStyle;
                 }
                 catch (Exception ex)
                 {
@@ -192,6 +193,65 @@ namespace MapsInMyFolder.Commun
                 MapsInMyFolder.VectorTileRenderer.Style style = null;
                 try
                 {
+                    //if this is a url, then download the style and save it
+                    if (Uri.IsWellFormedUriString(stylevalue, UriKind.Absolute) && Collectif.IsUrlValid(stylevalue))
+                    {
+                        string path = Path.Combine(Collectif.GetSaveTempDirectory(layers.class_name, layers.class_identifiant), "layerstyle", stylevalue.GetHashCode().ToString() + ".json");
+                        if (System.IO.File.Exists(path))
+                        {
+                            stylevalue = path;
+                        }
+                        else
+                        {
+                            //if file not exist, then download it ONCE
+                            lock (PBF_RenderingAsync_Locker)
+                            {
+                                //maybe after the lock the file exist now
+                                if (System.IO.File.Exists(path))
+                                {
+                                    stylevalue = path;
+                                }
+                                else
+                                {
+                                    Debug.WriteLine("Load style from url :" + path);
+                                    try
+                                    {
+                                        HttpResponse httpResponse = Collectif.ByteDownloadUri(new Uri(stylevalue), layerID, true).Result;
+                                        if (httpResponse != null && httpResponse.ResponseMessage.IsSuccessStatusCode)
+                                        {
+                                            if (httpResponse.Buffer != null)
+                                            {
+                                                stylevalue = Collectif.ByteArrayToString(httpResponse.Buffer);
+                                                if (!string.IsNullOrEmpty(stylevalue))
+                                                {
+                                                    //save filetodisk
+                                                    string path_dir = Path.GetDirectoryName(path);
+                                                    if (!System.IO.Directory.Exists(path_dir))
+                                                    {
+                                                        System.IO.Directory.CreateDirectory(path_dir);
+                                                    }
+                                                    File.WriteAllText(path, stylevalue);
+                                                }
+                                            }
+                                            else
+                                            {
+                                                Debug.WriteLine("VectorTileRenderer.Style buffer from url is null");
+                                            }
+                                        }
+                                        else
+                                        {
+                                            Debug.WriteLine("VectorTileRenderer.Style response from url is null");
+                                        }
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        Debug.WriteLine(ex.Message);
+                                    }
+                                }
+                            }
+                        }
+                    }
+
                     style = new MapsInMyFolder.VectorTileRenderer.Style(stylevalue);
                     {
                         //FontDirectory = @"C:\Users\franc\Documents\SharpDevelop Projects\TestPBFtoBitmapConverter\TestPBFtoBitmapConverter\style\font\"
@@ -235,12 +295,12 @@ namespace MapsInMyFolder.Commun
                             try
                             {
                                 Uri temp_uri = new Uri(Collectif.GetUrl.FromTileXYZ(urlBase, TileX_tp, TileY_tp, zoom, layerID));
-                            tp_response = await Collectif.ByteDownloadUri(temp_uri, 0).ConfigureAwait(false);
-                            if (tp_response is null)
-                            {
-                                DebugMode.WriteLine("Erreur loading g");
-                                return null;
-                            }
+                                tp_response = await Collectif.ByteDownloadUri(temp_uri, 0, true).ConfigureAwait(false);
+                                if (tp_response?.Buffer is null)
+                                {
+                                    DebugMode.WriteLine("Erreur loading g");
+                                    return null;
+                                }
 
                                 if (!Directory.Exists(save_temp_directory_rawBPF))
                                 {

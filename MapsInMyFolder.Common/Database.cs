@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ModernWpf.Controls;
+using System;
 using System.Collections.Generic;
 using System.Data.SQLite;
 using System.Diagnostics;
@@ -11,39 +12,129 @@ namespace MapsInMyFolder.Commun
 {
     public static class Database
     {
+        public static event EventHandler RefreshPanels;
         //public static string selected_database_pathname = "";
-       // public static string database_default_path_url = "";
-       // public static string default_database_pathname = "";
+        // public static string database_default_path_url = "";
+        // public static string default_database_pathname = "";
         //public static string working_folder = "";
-        public static void DB_Download(bool force_download = false)
+        public static async void DB_Download(bool force_download = false)
         {
-            //staticc
-
-            //url :
-            //todo : dowload db here and check for personnal setting db path
-            //todo : if db illisible alors forcer le retélechargement apres confirmation user or create  from scratch
-            //download
+            //https://api.github.com/repos/SioGabx/MapsInMyFolder/releases
+            //https://api.github.com/repos/SioGabx/MapsInMyFolder/releases/latest
             try
             {
-                string database_pathname = Path.Combine(Settings.working_folder, Settings.database_pathname);
-                if (File.Exists(database_pathname) && !force_download)
+                ContentDialogResult result;
+                string database_pathname = String.Empty;
+                while (true)
                 {
-                    return;
+                    database_pathname = Path.Combine(Settings.working_folder, Settings.database_pathname);
+                    if (File.Exists(database_pathname) && !force_download)
+                    {
+                        //Si le fichier existe et que force dowbload == false alors return
+                        return;
+                    }
+                    var dialog = Message.SetContentDialog("La base de données n'as pas été trouvée à partir du chemin \"" + database_pathname + "\".\nVoullez-vous en crée une nouvelle depuis la ressource en ligne ?", "Confirmer", MessageDialogButton.YesNoRetry);
+                    result = await dialog.ShowAsync();
+                    if (result == ContentDialogResult.Secondary)
+                    {
+                        SQLiteConnection.CreateFile(database_pathname);
+                        DB_CreateTables(database_pathname);
+                        RefreshPanels.Invoke(null, new EventArgs());
+                        return;
+                    }
+                    else if (result == ContentDialogResult.Primary)
+                    {
+                        break;
+                    }
                 }
+
+
                 if (!Directory.Exists(Commun.Settings.working_folder))
                 {
                     Directory.CreateDirectory(Commun.Settings.working_folder);
                 }
-                const string database_default_path_url = @"C:\Users\franc\Desktop\MapsInMyFolder_Project\layers_sqlite.db";
-                if (File.Exists(database_default_path_url))
+
+                //Ask if we want to download remote database or create empty
+
+                while (true)
                 {
-                    System.IO.File.Copy(database_default_path_url, database_pathname, true);
+                    if (Network.IsNetworkAvailable())
+                    {
+                        GitHubFile githubAssets = GetGithubAssets.GetContentAssetsFromGithub(new Uri(Settings.github_repository_url).PathAndQuery, String.Empty, Settings.github_database_name);
+                        if (!(githubAssets is null))
+                        {
+                            string database_url = githubAssets.Download_url;
+                            Debug.WriteLine("database_github_url : " + database_url);
+                            HttpResponse response = await Collectif.ByteDownloadUri(new Uri(database_url), 0, true);
+                            if (response?.Buffer != null && response.ResponseMessage.IsSuccessStatusCode)
+                            {
+                                byte[] arrBytes = response.Buffer;
+                                File.WriteAllBytes(database_pathname, arrBytes);
+                                RefreshPanels.Invoke(null, new EventArgs());
+                                return;
+                            }
+                            else
+                            {
+                                var dialog = Message.SetContentDialog("Une erreur s'est produite lors du téléchargement.\nError StatusCode :" + response.ResponseMessage.StatusCode + ".\nVoullez-vous reessayer ou annuler et crée une database vide ?", "Confirmer", MessageDialogButton.RetryCancel);
+                                ContentDialogResult result2 = ContentDialogResult.None;
+                                try
+                                {
+                                    result2 = await dialog.ShowAsync();
+                                }
+                                catch (Exception ex)
+                                {
+                                    Debug.WriteLine(ex.ToString());
+                                }
+
+                                if (result2 != ContentDialogResult.Primary)
+                                {
+                                    break;
+                                }
+                            }
+                        }
+
+                        var dialog2 = Message.SetContentDialog("Une erreur s'est produite lors du téléchargement.\nVoullez-vous reessayer ou annuler et crée une database vide ?", "Confirmer", MessageDialogButton.RetryCancel);
+                        ContentDialogResult result3 = ContentDialogResult.None;
+                        try
+                        {
+                            result3 = await dialog2.ShowAsync();
+                        }
+                        catch (Exception ex)
+                        {
+                            Debug.WriteLine(ex.ToString());
+                        }
+
+                        if (result3 != ContentDialogResult.Primary)
+                        {
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        //print network not available
+                        var dialog = Message.SetContentDialog("Impossible de télécharger la dernière base de données en ligne car vous n'êtes pas connecter à internet. Voullez-vous reessayer ?", "Confirmer", MessageDialogButton.YesNo);
+                        ContentDialogResult result2 = ContentDialogResult.None;
+                        try
+                        {
+                            result2 = await dialog.ShowAsync();
+                        }
+                        catch (Exception ex)
+                        {
+                            Debug.WriteLine(ex.ToString());
+                        }
+
+                        if (result2 != ContentDialogResult.Primary)
+                        {
+                            break;
+                        }
+                    }
                 }
-                else
-                {
-                    Debug.WriteLine("Base de données introuvable", "Erreur");
-                    //MessageBox.Show("Base de données introuvable");
-                }
+
+
+
+                SQLiteConnection.CreateFile(database_pathname);
+                DB_CreateTables(database_pathname);
+                RefreshPanels.Invoke(null, new EventArgs());
             }
             catch (Exception ex)
             {
@@ -90,7 +181,7 @@ namespace MapsInMyFolder.Commun
                 if (filinfo.Length == 0)
                 {
                     Debug.WriteLine("DB Taille corrompu");
-                    DB_Download();
+                    DB_Download(true);
                     return null;
                 }
             }
@@ -100,7 +191,14 @@ namespace MapsInMyFolder.Commun
                 DB_Download();
                 return null;
             }
-            sqlite_conn = new SQLiteConnection("Data Source=" + dbFile + "; Version = 3; New = True; Compress = True; ");
+            sqlite_conn = DB_CreateTables(dbFile);
+            return sqlite_conn;
+        }
+
+
+        public static SQLiteConnection DB_CreateTables(string datasource)
+        {
+            SQLiteConnection sqlite_conn = new SQLiteConnection("Data Source=" + datasource + "; Version = 3; New = True; Compress = True; ");
             // Open the connection:
             try
             {
@@ -118,6 +216,7 @@ namespace MapsInMyFolder.Commun
             sqlite_cmd.ExecuteNonQuery();
             sqlite_cmd.CommandText = "CREATE TABLE IF NOT EXISTS 'EDITEDLAYERS' " + commande_arg + ");";
             sqlite_cmd.ExecuteNonQuery();
+
             return sqlite_conn;
         }
 

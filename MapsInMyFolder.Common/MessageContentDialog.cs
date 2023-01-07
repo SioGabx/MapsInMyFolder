@@ -7,11 +7,26 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MapsInMyFolder
+namespace MapsInMyFolder.Commun
 {
 
     public static class Message
     {
+        public static async Task<ContentDialogResult> ShowContentDialogAsync(ContentDialog dialog)
+        {
+            ContentDialogResult result2 = ContentDialogResult.None;
+            try
+            {
+                result2 = await dialog.ShowAsync();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.ToString());
+            }
+            return result2;
+        }
+
+
 
         public static ContentDialog SetContentDialog(object text, object caption = null, MessageDialogButton messageBoxButton = MessageDialogButton.OK)
         {
@@ -49,25 +64,38 @@ namespace MapsInMyFolder
                     ShowButtonSecondary("Non");
                     ShowButtonCancel("Annuler");
                     break;
+                case MessageDialogButton.YesNoRetry:
+                    ShowButtonPrimary("Oui");
+                    ShowButtonSecondary("Non");
+                    ShowButtonCancel("Réessayer");
+                    break;
                 case MessageDialogButton.YesCancel:
                     ShowButtonPrimary("Oui");
                     ShowButtonCancel("Annuler");
                     break;
+                case MessageDialogButton.YesRetry:
+                    ShowButtonPrimary("Oui");
+                    ShowButtonCancel("Réessayer");
+                    break;
+                case MessageDialogButton.RetryCancel:
+                    ShowButtonCancel("Annuler");
+                    ShowButtonPrimary("Réessayer");
+                    break;
             }
 
-            void ShowButtonPrimary(string text)
+            void ShowButtonPrimary(string text_args)
             {
-                dialog.PrimaryButtonText = text;
+                dialog.PrimaryButtonText = text_args;
                 dialog.IsPrimaryButtonEnabled = true;
             }
-            void ShowButtonSecondary(string text)
+            void ShowButtonSecondary(string text_args)
             {
-                dialog.SecondaryButtonText = text;
+                dialog.SecondaryButtonText = text_args;
                 dialog.IsSecondaryButtonEnabled = true;
             }
-            void ShowButtonCancel(string text)
+            void ShowButtonCancel(string text_args)
             {
-                dialog.CloseButtonText = text;
+                dialog.CloseButtonText = text_args;
             }
             return dialog;
         }
@@ -87,6 +115,6 @@ namespace MapsInMyFolder
 
     public enum MessageDialogButton
     {
-        OK, OKCancel, YesNo, YesNoCancel, YesCancel
+        OK, OKCancel, YesNo, YesNoCancel, YesCancel, YesNoRetry, YesRetry, RetryCancel
     }
 }

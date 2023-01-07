@@ -210,7 +210,7 @@ namespace MapsInMyFolder
             SQLiteConnection conn = Database.DB_Connection();
             if (conn is null)
             {
-                return "<p style=\"color:white;font-family:Arial;font-size:13px\">Aucune base de données trouvée. Veuillez relancer l'application.</p><p style=\"color:white;font-family:Arial;font-size:13px\">Si le problème persiste, veuillez réessayer ultérieurement</p>";
+                return "<style>p{font-family: \"Segoe UI\";color:#888989;font-size:14px;}</style><p>Aucune base de données trouvée. Veuillez relancer l'application.</p><p>Si le problème persiste, veuillez réessayer ultérieurement</p>";
             }
 
             string baseHTML = DB_Layer_CreateHTML(DB_Layer_Read(conn, query), DB_Layer_Read(conn, query2));
@@ -507,8 +507,14 @@ namespace MapsInMyFolder
                     int max_zoom = layer.class_max_zoom;
 
                     Layers StartingLayer = Layers.GetLayerById(layer_startup_id);
-                    int back_min_zoom = StartingLayer.class_min_zoom;
-                    int back_max_zoom = StartingLayer.class_max_zoom;
+
+                    int back_min_zoom = min_zoom;
+                    int back_max_zoom = max_zoom;
+                    if (StartingLayer is not null)
+                    {
+                        back_min_zoom = StartingLayer.class_min_zoom;
+                        back_max_zoom = StartingLayer.class_max_zoom;
+                    }
 
                     double Latitude = mapviewer.Center.Latitude;
                     double Longitude = mapviewer.Center.Longitude;

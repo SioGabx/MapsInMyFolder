@@ -46,7 +46,7 @@ namespace MapsInMyFolder
             TextboxLayerScriptConsole.Text = String.Empty;
             GenerateTempLayerInDicList();
             SQLiteConnection conn = Database.DB_Connection();
-            DB_Download_Init(conn);
+            //DB_Download_Init(conn);
             System.Windows.Media.SolidColorBrush brush = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(255, (byte)Commun.Settings.background_layer_color_R, (byte)Commun.Settings.background_layer_color_G, (byte)Commun.Settings.background_layer_color_B));
             mapviewerappercu.Background = brush;
             Init_LayerEditableTextbox();
@@ -169,6 +169,12 @@ namespace MapsInMyFolder
                 TextboxLayerFormat.SelectedIndex = TextboxLayerFormat.Items.Add(LayerInEditMode.class_format.ToUpperInvariant());
             }
 
+            string tileSize = LayerInEditMode.class_tiles_size.ToString();
+            if (string.IsNullOrEmpty(tileSize.Trim()))
+            {
+                tileSize = "256";
+            }
+
             TextBoxSetValueAndLock(TextboxLayerIdentifiant, LayerInEditMode.class_identifiant);
             TextBoxSetValueAndLock(TextboxLayerDescriptif, LayerInEditMode.class_description);
             TextBoxSetValueAndLock(TextboxLayerScript, LayerInEditMode.class_tilecomputationscript);
@@ -176,7 +182,7 @@ namespace MapsInMyFolder
             TextBoxSetValueAndLock(TextBoxLayerMinZoom, LayerInEditMode.class_min_zoom.ToString());
             TextBoxSetValueAndLock(TextBoxLayerMaxZoom, LayerInEditMode.class_max_zoom.ToString());
             TextBoxSetValueAndLock(TextboxLayerTileUrl, LayerInEditMode.class_tile_url);
-            TextBoxSetValueAndLock(TextboxLayerTileWidth, LayerInEditMode.class_tiles_size.ToString());
+            TextBoxSetValueAndLock(TextboxLayerTileWidth, tileSize);
             TextBoxSetValueAndLock(TextboxSpecialOptionBackgroundColor, LayerInEditMode.class_specialsoptions.BackgroundColor);
             TextBoxSetValueAndLock(TextboxSpecialOptionPBFJsonStyle, LayerInEditMode.class_specialsoptions.PBFJsonStyle);
 
@@ -273,25 +279,25 @@ namespace MapsInMyFolder
             }
         }
 
-        static void DB_Download_Init(SQLiteConnection conn)
-        {
-            try
-            {
-                SQLiteCommand sqlite_cmd = conn.CreateCommand();
-                sqlite_cmd.CommandText = @"CREATE TABLE IF NOT EXISTS 'EDITEDLAYERS' ('ID' INTEGER UNIQUE, 'NOM' TEXT, 'DESCRIPTION' TEXT, 'CATEGORIE' TEXT, 'IDENTIFIANT' TEXT, 
-                'TILE_URL' TEXT, 'MIN_ZOOM' INTEGER DEFAULT 0, 'MAX_ZOOM' INTEGER DEFAULT 0, 'FORMAT' TEXT, 'SITE' TEXT, 'SITE_URL' TEXT,
-                'TILE_SIZE' INTEGER DEFAULT 256, 'FAVORITE' INTEGER DEFAULT 0, 'TILECOMPUTATIONSCRIPT'	TEXT DEFAULT '', 'SPECIALSOPTIONS'   TEXT DEFAULT '')";
-                sqlite_cmd.ExecuteNonQuery();
-                sqlite_cmd.CommandText = @"CREATE TABLE IF NOT EXISTS 'CUSTOMSLAYERS' ('ID' INTEGER UNIQUE, 'NOM' TEXT, 'DESCRIPTION' TEXT, 'CATEGORIE' TEXT, 'IDENTIFIANT' TEXT, 
-                'TILE_URL' TEXT, 'MIN_ZOOM' INTEGER DEFAULT 0, 'MAX_ZOOM' INTEGER DEFAULT 0, 'FORMAT' TEXT, 'SITE' TEXT, 'SITE_URL' TEXT, 
-                'TILE_SIZE' INTEGER DEFAULT 256, 'FAVORITE' INTEGER DEFAULT 0, 'TILECOMPUTATIONSCRIPT'	TEXT DEFAULT '', 'SPECIALSOPTIONS'   TEXT DEFAULT '')";
-                sqlite_cmd.ExecuteNonQuery();
-            }
-            catch (Exception e)
-            {
-                MessageBox.Show("Une erreur s'est produite au niveau de la base de donnée.\n" + e.Message);
-            }
-        }
+        //static void DB_Download_Init(SQLiteConnection conn)
+        //{
+        //    try
+        //    {
+        //        SQLiteCommand sqlite_cmd = conn.CreateCommand();
+        //        sqlite_cmd.CommandText = @"CREATE TABLE IF NOT EXISTS 'EDITEDLAYERS' ('ID' INTEGER UNIQUE, 'NOM' TEXT, 'DESCRIPTION' TEXT, 'CATEGORIE' TEXT, 'IDENTIFIANT' TEXT, 
+        //        'TILE_URL' TEXT, 'MIN_ZOOM' INTEGER DEFAULT 0, 'MAX_ZOOM' INTEGER DEFAULT 0, 'FORMAT' TEXT, 'SITE' TEXT, 'SITE_URL' TEXT,
+        //        'TILE_SIZE' INTEGER DEFAULT 256, 'FAVORITE' INTEGER DEFAULT 0, 'TILECOMPUTATIONSCRIPT'	TEXT DEFAULT '', 'SPECIALSOPTIONS'   TEXT DEFAULT '')";
+        //        sqlite_cmd.ExecuteNonQuery();
+        //        sqlite_cmd.CommandText = @"CREATE TABLE IF NOT EXISTS 'CUSTOMSLAYERS' ('ID' INTEGER UNIQUE, 'NOM' TEXT, 'DESCRIPTION' TEXT, 'CATEGORIE' TEXT, 'IDENTIFIANT' TEXT, 
+        //        'TILE_URL' TEXT, 'MIN_ZOOM' INTEGER DEFAULT 0, 'MAX_ZOOM' INTEGER DEFAULT 0, 'FORMAT' TEXT, 'SITE' TEXT, 'SITE_URL' TEXT, 
+        //        'TILE_SIZE' INTEGER DEFAULT 256, 'FAVORITE' INTEGER DEFAULT 0, 'TILECOMPUTATIONSCRIPT'	TEXT DEFAULT '', 'SPECIALSOPTIONS'   TEXT DEFAULT '')";
+        //        sqlite_cmd.ExecuteNonQuery();
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        MessageBox.Show("Une erreur s'est produite au niveau de la base de donnée.\n" + e.Message);
+        //    }
+        //}
 
         private void TextboxLayerTileUrl_TextChanged(object sender, TextChangedEventArgs e)
         {
@@ -315,30 +321,6 @@ namespace MapsInMyFolder
             {
                 SetAppercuLayers();
             }
-            //try
-            //{
-            //    TextBoxLayerMinZoom.TextChanged -= TextBoxLayerMinZoom_TextChanged;
-            //    if (Collectif.FilterDigitOnlyWhileWritingInTextBox(TextBoxLayerMinZoom))
-            //    {
-            //        if (Convert.ToUInt32(TextBoxLayerMinZoom.Text) > 1000)
-            //        {
-            //            TextBoxLayerMinZoom.Text = "1000";
-            //            TextBoxLayerMinZoom.SelectionStart = 4;
-            //            return;
-            //        }
-            //        Debug.WriteLine("Setappercu");
-            //        SetAppercuLayers();
-            //    }
-
-            //}
-            //catch (Exception ex)
-            //{
-            //    DebugMode.WriteLine(ex.Message);
-            //}
-            //finally
-            //{
-            //    TextBoxLayerMinZoom.TextChanged += TextBoxLayerMinZoom_TextChanged;
-            //}
         }
 
         private void TextBoxLayerMaxZoom_TextChanged(object sender, TextChangedEventArgs e)
@@ -347,28 +329,6 @@ namespace MapsInMyFolder
             {
                 SetAppercuLayers();
             }
-            //try
-            //{
-            //    TextBoxLayerMaxZoom.TextChanged -= TextBoxLayerMaxZoom_TextChanged;
-            //    if (Collectif.FilterDigitOnlyWhileWritingInTextBox(TextBoxLayerMaxZoom))
-            //    {
-            //        if (Convert.ToUInt32(TextBoxLayerMaxZoom.Text) > 1000)
-            //        {
-            //            TextBoxLayerMaxZoom.Text = "1000";
-            //            TextBoxLayerMaxZoom.SelectionStart = 4;
-            //            return;
-            //        }
-            //        SetAppercuLayers();
-            //    }
-            //}
-            //catch (Exception ex)
-            //{
-            //    DebugMode.WriteLine(ex.Message);
-            //}
-            //finally
-            //{
-            //    TextBoxLayerMaxZoom.TextChanged += TextBoxLayerMaxZoom_TextChanged;
-            //}
         }
 
         Boolean HasErrorZoomLevelMinZoom = false;
@@ -477,26 +437,6 @@ namespace MapsInMyFolder
             {
                 Message.NoReturnBoxAsync("Une erreur s'est produite lors de l'enregistrement, veuillez réessayer.");
             }
-            //string NOM = Collectif.HTMLEntities(TextboxLayerName.Text.Trim());
-            //string DESCRIPTION = Collectif.HTMLEntities(TextboxLayerDescriptif.Text.Trim());
-            //string CATEGORIE = Collectif.HTMLEntities(GetComboBoxValue(TextboxLayerCategories));
-            //string IDENTIFIANT = Collectif.HTMLEntities(TextboxLayerIdentifiant.Text.Trim());
-            //string TILE_URL = Collectif.HTMLEntities(TextboxLayerTileUrl.Text.Trim());
-            //int MIN_ZOOM = GetIntValueFromTextBox(TextBoxLayerMinZoom);
-            //int MAX_ZOOM = GetIntValueFromTextBox(TextBoxLayerMaxZoom);
-            //string FORMAT = Collectif.HTMLEntities(TextboxLayerFormat.Text.Trim().ToLowerInvariant());
-            //string SITE = Collectif.HTMLEntities(TextboxLayerSite.Text.Trim());
-            //string SITE_URL = Collectif.HTMLEntities(TextboxLayerSiteUrl.Text.Trim());
-            //int TILE_SIZE = GetIntValueFromTextBox(TextboxLayerTileWidth);
-            //string TILECOMPUTATIONSCRIPT = Collectif.HTMLEntities(TextboxLayerScript.Text.Trim());
-            //Layers.SpecialsOptions specialsOptionsClass = new Layers.SpecialsOptions()
-            //{
-            //    BackgroundColor = TextboxSpecialOptionBackgroundColor.Text,
-            //    PBFJsonStyle = TextboxSpecialOptionPBFJsonStyle.Text,
-
-            //};
-            //string SPECIALSOPTIONS = JsonSerializer.Serialize<Layers.SpecialsOptions>(specialsOptionsClass);
-
             string NOM = layers.class_name;
             string DESCRIPTION = layers.class_description;
             string CATEGORIE = layers.class_categorie;
@@ -596,14 +536,20 @@ namespace MapsInMyFolder
             layers.class_format = FORMAT;
             layers.class_site = SITE;
             layers.class_site_url = SITE_URL;
-            layers.class_tiles_size = TILE_SIZE;
+            if (!string.IsNullOrEmpty(TILE_SIZE.ToString()))
+            {
+                layers.class_tiles_size = TILE_SIZE;
+            }
+            else
+            {
+                layers.class_tiles_size = 256;
+            }
             layers.class_tilecomputationscript = TILECOMPUTATIONSCRIPT;
-            Layers.SpecialsOptions specialsOptionsClass = new Layers.SpecialsOptions()
+            layers.class_specialsoptions = new Layers.SpecialsOptions()
             {
                 BackgroundColor = TextboxSpecialOptionBackgroundColor.Text,
                 PBFJsonStyle = TextboxSpecialOptionPBFJsonStyle.Text,
             };
-            layers.class_specialsoptions = specialsOptionsClass;
             Dictionary<int, Layers> DicLayers = new Dictionary<int, Layers>
             {
                 { -2, layers }

@@ -302,8 +302,36 @@ namespace MapsInMyFolder
 
         public void Pushpin_stop_mooving()
         {
+            void CheckPositionOutOfBound(Pushpin pushpin)
+            {
+                if (pushpin.Location.Latitude > 85)
+                {
+                    pushpin.Location.Latitude = 85;
+                }
+
+                if (pushpin.Location.Latitude < -85)
+                {
+                    pushpin.Location.Latitude = -85;
+                }
+
+                if (pushpin.Location.Longitude > 180)
+                {
+                    pushpin.Location.Longitude = 180;
+                }
+
+                if (pushpin.Location.Longitude < -180)
+                {
+                    pushpin.Location.Longitude = -180;
+                }
+            }
+
+           CheckPositionOutOfBound(NO_PIN);
+            CheckPositionOutOfBound(SE_PIN);
+
             Location NO_PIN_Temp_Loc = NO_PIN.Location;
             Location SE_PIN_Temp_Loc = SE_PIN.Location;
+
+
             if (NO_PIN.Location.Latitude < SE_PIN.Location.Latitude)
             {
                 NO_PIN.Location = new Location(SE_PIN_Temp_Loc.Latitude, NO_PIN.Location.Longitude);

@@ -38,7 +38,7 @@ namespace MapsInMyFolder.Commun
         public static int background_layer_color_G = 230;                                    //Defini la couleur du fond de carte.
         public static int background_layer_color_B = 230;                                    //Defini la couleur du fond de carte.
 
-        public static string working_folder = @"C:\Users\franc\Desktop\AppData_MapsInMyFolder\";
+        public static string working_folder = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), @"MapsInMyFolder\");//@"C:\Users\franc\Desktop\AppData_MapsInMyFolder\";
         public static string temp_folder = System.IO.Path.GetTempPath() + @"MapsInMyFolder\";   //chemin temporaire pour enregistrer les fichiers | Default=System.IO.Path.GetTempPath() + @"MapsInMyFolder\"
         public static int max_retry_download = 3;                                               //Nombre max de passe lors du telechargement d'un calque | Default=3
         public static int max_redirection_download_tile = 5;                                               //Nombre max de passe de redirection d'une tuile
@@ -68,7 +68,7 @@ namespace MapsInMyFolder.Commun
 
         public static LayersSort layers_Sort = LayersSort.NOM;//LayersSort.ID; 
         public static LayersOrder Layers_Order = LayersOrder.ASC;//LayersSort.ID; 
-        public static string database_pathname = "layers_sqlite.db";
+        public static string database_pathname = "MapsInMyFolder_Database.db";
         public static Visibility visibility_pins = Visibility.Hidden;
         public static double selection_rectangle_resize_tblr_gap = 15;
         public static double selection_rectangle_resize_angle_gap = 20;
@@ -76,6 +76,9 @@ namespace MapsInMyFolder.Commun
         public static int maps_margin_ZoomToBounds = 100;
         public static bool disable_selection_rectangle_moving = false;
         public static bool map_show_tile_border = false;
+
+        public static string github_repository_url = "https://github.com/SioGabx/MapsInMyFolder";
+        public static string github_database_name = "MapsInMyFolder_Database.db";
 
         //public static Dictionary<string, SettingsProperty> DictionaryCategorieProperty = new Dictionary<string, SettingsProperty>()
         //{
@@ -112,7 +115,7 @@ namespace MapsInMyFolder.Commun
                 string value = String.Empty;
                 if (okey != null)
                 {
-                    value = okey.GetValue(regKey).ToString();
+                    value = okey.GetValue(regKey)?.ToString();
                     okey.Close();
                 }
                 if (string.IsNullOrEmpty(value))
@@ -125,8 +128,6 @@ namespace MapsInMyFolder.Commun
                 }
             }
         }
-
-
 
         public static void LoadSetting()
         {

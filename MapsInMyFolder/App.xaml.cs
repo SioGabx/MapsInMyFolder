@@ -119,7 +119,7 @@ namespace MapsInMyFolder
             try
             {
                 e.Handled = true;
-                System.IO.File.WriteAllText("crash.log", e.Exception.Message + Environment.NewLine + e.Exception.StackTrace + Environment.NewLine + Environment.NewLine + "Error string \n" + e.Exception.ToString(), System.Text.Encoding.UTF8);
+                System.IO.File.WriteAllText(Path.Combine(Commun.Settings.working_folder,"crash.log"), e.Exception.Message + Environment.NewLine + e.Exception.StackTrace + Environment.NewLine + Environment.NewLine + "Error string \n" + e.Exception.ToString(), System.Text.Encoding.UTF8);
                 DebugMode.WriteLine(e.Exception.ToString());
                 MessageBox.Show("Une erreur innatendu s'est produite, l'application va devoir se fermer. \n" + e.Exception.ToString(), "Erreur fatale");
                 //Message.NoReturnBoxAsync("Une erreur innatendu s'est produite, l'application va devoir se fermer", "Erreur");

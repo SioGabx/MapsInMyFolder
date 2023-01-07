@@ -240,7 +240,7 @@
 
         .item {
             padding: 7px 48px;
-            padding-right: 35px;
+            padding-right: 20px;
             position: relative;
             transition: background-color ease 125ms;
         }
@@ -379,7 +379,19 @@
             cursor: default;
         }
 
+        .nolayermessage {
+            display: none;
+        }
 
+            .nolayermessage p {
+                font-size: 14px;
+                font-family: "Segoe UI";
+                color: #888989;
+            }
+
+        body:has(ul:empty) .nolayermessage {
+            display: block;
+        }
 
 
         /*  ------------------ CONTEXT MENU ------------------ */
@@ -434,10 +446,18 @@
             position: initial;
         }
 
+		.menu.item.shiftkeydownrequired{
+			display: none;
+		}
+
+		.context_menu.shiftkeydown:not([data-layer_binding="0"]) .menu.item.shiftkeydownrequired{
+			display:block;
+		}
     </style>
 </head>
 
 <body>
+    <div class="nolayermessage"><p>La base de donnée des calques est vide.</p><br /><p>Pour commencer à ajouter des calques, faites clic-droit, puis cliquez sur "ajouter un calque"</p></div>
     <!--  ------------------ CONTENT ------------------ -->
     <!--htmllayerplaceholder-->
     <!--  ------------------ CONTENT ------------------ -->
@@ -539,15 +559,26 @@
                 <a href="#">Ajouter un calque</a>
             </div>
         </div>
-<!--        <div class="item_hr"></div>-->
+        <div class="menu item shiftkeydownrequired" id="ajouter_calque_template">
+            <div class="item-content">
+                <div class="icon">
+                    <svg width="141.73" height="141.73" version="1.1" viewBox="0 0 141.73 141.73" xmlns="http://www.w3.org/2000/svg">
+                        <line x1="71" y1="134" x2="71" y2="8" />
+                        <line x1="8" y1="71" x2="134" y2="71" />
+                    </svg>
+                </div>
+                <a href="#">Ajouter un calque [comme template]</a>
+            </div>
+        </div>
+        <!--        <div class="item_hr"></div>-->
         <div class="menu item" id="actualiser_panel">
             <div class="item-content">
                 <div class="icon">
 
                     <svg version="1.2" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 141.7 141.7" overflow="visible" xml:space="preserve">
 
-                        <g id="Calque_2">
-                            <path d="
+                    <g id="Calque_2">
+                    <path d="
 		M135.5,61.9c5.2,36.9-20.5,71-57.4,76.2c-0.4,0-0.7,0.1-1.1,0.1C39.9,140.5,7.9,112.2,5.7,75c-0.1-1.8-0.1-3.5-0.1-5.3
 		C6.9,33.8,35.5,5,71.3,3.4c21.2,0.6,41,10.8,53.8,27.8l2.9,4.4H95.9" />
                         </g>
@@ -592,7 +623,7 @@
                     event.preventDefault();
                     event.stopPropagation();
                 }
-                document.querySelectorAll('.select').forEach(function(layer) {
+                document.querySelectorAll('.select').forEach(function (layer) {
                     layer.classList.remove("select");
                     lastelement = layer;
                 });
@@ -678,8 +709,8 @@
 
         function StartObserving() {
             isObserving = true;
-            let observer = new IntersectionObserver(function(observables) {
-                observables.forEach(function(observable) {
+            let observer = new IntersectionObserver(function (observables) {
+                observables.forEach(function (observable) {
                     try {
                         // L'élément devient visible
                         if (observable.intersectionRatio > 0) {
@@ -710,7 +741,7 @@
 
             // On observe nos éléments
             let items = document.querySelectorAll("li")
-            items.forEach(function(item) {
+            items.forEach(function (item) {
                 item.classList.remove('inview')
                 observer.observe(item)
             });
@@ -724,7 +755,7 @@
             if (element_fiup !== null) {
                 let mainDiv = element_fiup.querySelector(".layer_main_div");
                 let id = parseInt(mainDiv.id);
-                layer_Csharp_call_from_js.gettilepreviewurlfromid(id).then(function(urlResult) {
+                layer_Csharp_call_from_js.gettilepreviewurlfromid(id).then(function (urlResult) {
                     let urlResultSplit = urlResult.split(" ");
                     let css = "url(\"" + urlResultSplit[0] + "\")";
                     let css_opti = "url(\"" + urlResultSplit[0] + "\")";
@@ -733,14 +764,14 @@
                         //console.log(css);
                         const img = new Image(); // width, height
                         img.src = urlResultSplit[0];
-                        img.addEventListener('load', function() {
+                        img.addEventListener('load', function () {
                             //console.log("Preview : " + id + "loaded");
                             if (element_fiup.classList.contains("inview")) {
                                 mainDiv.style.backgroundImage = "url(" + img.src + ")";
                                 mainDiv.querySelector(".layer_main_div_background_image").style.backgroundImage = "url(" + urlResultSplit[1] + ")";
                             }
                         });
-                        img.addEventListener('error', function() {
+                        img.addEventListener('error', function () {
                             if (element_fiup.classList.contains("inview")) {
                                 console.log("Preview : " + id + "error");
                                 mainDiv.style.backgroundImage = "url(data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7)"; //transparent 1pixel gif
@@ -759,7 +790,7 @@
         function UpdatePreview() {
             try {
                 let inviewelements = document.querySelectorAll(".inview");
-                inviewelements.forEach(function(element_up) {
+                inviewelements.forEach(function (element_up) {
                     InternalUpdatePreview(element_up);
 
                 });
@@ -789,7 +820,7 @@
         var all_item_element = document.querySelectorAll(".context_menu .item .item-content:not(.have-sous-menu) a");
         //init fonction
         //si la souris bouge sur l'un des item du context menu, alors on passe en mode souris et on enregistre sa position
-        document.querySelectorAll(".context_menu .item").forEach(element_qsaci => element_qsaci.addEventListener("mousemove", function(event) {
+        document.querySelectorAll(".context_menu .item").forEach(element_qsaci => element_qsaci.addEventListener("mousemove", function (event) {
             get_context_menu_element().setAttribute("data-navtype", "mouse");
 
             var temp_tab_index = parseInt(event.target.closest(".item").getAttribute("data-selectable-id"));
@@ -809,10 +840,10 @@
         }));
 
         //on enregistre l'event de click sur chaque items et on leur ajoute un index
-        all_item_element.forEach(function(item, index) {
+        all_item_element.forEach(function (item, index) {
             var parent_item = item.parentElement.parentElement;
 
-            parent_item.addEventListener("click", function(event) {
+            parent_item.addEventListener("click", function (event) {
                 event.preventDefault();
                 item_context_menu_clicked(event.target);
             });
@@ -833,7 +864,7 @@
         }
 
         function unclicked() {
-            document.querySelectorAll(".clickfocus").forEach(function(selected_items) {
+            document.querySelectorAll(".clickfocus").forEach(function (selected_items) {
                 selected_items.classList.remove("clickfocus");
             });
         }
@@ -915,7 +946,7 @@
 
         function unselect_all() {
             //on retire à tout les items le tag séléctionné
-            document.querySelectorAll(".selected").forEach(function(selected_items) {
+            document.querySelectorAll(".selected").forEach(function (selected_items) {
                 selected_items.classList.remove("selected");
             });
         }
@@ -983,8 +1014,12 @@
             }
             //toute les exceptions on été traité, si la fonction est toujours ok alors on masque
             get_context_menu_element().style.display = "none";
+            
+            if (get_context_menu_element().classList.contains("shiftkeydown")) {
+                get_context_menu_element().classList.remove("shiftkeydown");
+            }
 
-            document.querySelectorAll(".hover").forEach(function(selected_items) {
+            document.querySelectorAll(".hover").forEach(function (selected_items) {
                 selected_items.classList.remove("hover");
             });
             unclicked();
@@ -993,7 +1028,7 @@
 
         function update_lock_state(id, lock) {
             if (id == "*") {
-                all_item_element.forEach(function(item, index) {
+                all_item_element.forEach(function (item, index) {
                     var parent_item = item.parentElement.parentElement;
                     if (lock) {
                         parent_item.classList.add("lock");
@@ -1031,6 +1066,10 @@
                     //en cas de click droit et que ce n'est pas sur le menu lui-meme alors on le masque
                     if (get_context_menu_element().contains(e.target)) {
                         return false;
+                    }
+
+                    if (e.shiftKey) {
+                        get_context_menu_element().classList.add("shiftkeydown");
                     }
 
                     if (e.target) {

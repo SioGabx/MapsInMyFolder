@@ -69,12 +69,20 @@ namespace MapsInMyFolder.Commun
                 options.TimeoutInterval(TimeSpan.FromSeconds(15));
                 options.MaxStatements(5000);
                 CancellationTokenSource JsCancelToken = new CancellationTokenSource();
-                try
+                if (!JsListCancelTocken.ContainsKey(LayerId))
                 {
-                    JsListCancelTocken.Add(LayerId, JsCancelToken);
+                    try
+                    {
+                        JsListCancelTocken.Add(LayerId, JsCancelToken);
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine("Error JsListCancelTocken " + ex.Message);
+                    }
                 }
-                catch (Exception ex) {
-                    Debug.WriteLine("Error JsListCancelTocken " + ex.Message);
+                else
+                {
+                    Debug.WriteLine("JsListCancelTocken - An item with the same key has already been added. Key: " + LayerId);
                 }
                 options.CancellationToken(JsCancelToken.Token);
             });
@@ -250,7 +258,7 @@ namespace MapsInMyFolder.Commun
         {
             if (!string.IsNullOrEmpty(print))
             {
-                    DebugMode.WriteLine("Javascript print : " + LayerId + " " + print);
+                DebugMode.WriteLine("Javascript print : " + LayerId + " " + print);
                 if (LayerId == -2 && Commun.TileGeneratorSettings.AcceptJavascriptPrint)
                 {
                     Javascript.JavascriptInstance.Logs = String.Concat(Javascript.JavascriptInstance.Logs, "\n", print);

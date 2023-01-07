@@ -67,7 +67,7 @@ namespace MapsInMyFolder.MapControl
                 Layers layers = Layers.GetLayerById(LayerId) ?? Layers.Empty();
                 //var response = await TileGeneratorSettings.TileLoaderGenerator.GetImageAsync(TileGeneratorSettings.TileLoaderGenerator.Layer.class_tile_url, tile.XIndex, tile.Y, tile.ZoomLevel).ConfigureAwait(false);
                 var response = await TileGeneratorSettings.TileLoaderGenerator.GetImageAsync(uri, tile.XIndex, tile.Y, tile.ZoomLevel, LayerId, null, Collectif.GetSaveTempDirectory(layers.class_name,layers.class_identifiant, tile.ZoomLevel), Commun.Settings.tiles_cache_expire_after_x_days).ConfigureAwait(false);
-                if (response != null) // download succeeded
+                if (!(response?.Buffer is null) && response.ResponseMessage.IsSuccessStatusCode) // download succeeded
                 {
                     buffer = response.Buffer;
                     cacheItem = Tuple.Create(buffer, GetExpiration(response.ResponseMessage.Headers.CacheControl?.MaxAge));

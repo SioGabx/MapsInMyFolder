@@ -184,11 +184,19 @@ namespace MapsInMyFolder
             try
             {
                 download_panel_browser.JavascriptObjectRepository.Register("download_Csharp_call_from_js", new Download_Csharp_call_from_js());
-                download_panel_browser.ExecuteScriptAsync("CefSharp.BindObjectAsync(\"download_Csharp_call_from_js\");");
             }
             catch (Exception ex)
             {
                 DebugMode.WriteLine(ex.Message);
+            } 
+            
+            try
+            {
+                download_panel_browser.ExecuteScriptAsync("CefSharp.BindObjectAsync(\"download_Csharp_call_from_js\");");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("CefSharp.BindObjectAsync(\"download_Csharp_call_from_js\");" + ex.Message);
             }
             DB_Download_Load();
             if (Commun.Settings.show_download_devtool)

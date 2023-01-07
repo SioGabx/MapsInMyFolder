@@ -16,6 +16,7 @@ using System.Reflection;
 using System.Net.NetworkInformation;
 using System.Windows;
 using System.Windows.Media;
+using System.Text.RegularExpressions;
 
 namespace MapsInMyFolder.Commun
 {
@@ -329,7 +330,7 @@ namespace MapsInMyFolder.Commun
             return null;
         }
 
-        public static async Task<HttpResponse> ByteDownloadUri(Uri url, int LayerId)
+        public static async Task<HttpResponse> ByteDownloadUri(Uri url, int LayerId, bool getRealRequestMessage = false)
         {
             HttpResponse response = HttpResponse.HttpResponseError;
 
@@ -362,7 +363,7 @@ namespace MapsInMyFolder.Commun
                         if (responseMessage.IsSuccessStatusCode)
                         {
                             byte[] buffer = await responseMessage.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
-                            response = new HttpResponse(buffer, responseMessage);
+                            return new HttpResponse(buffer, responseMessage);
                         }
                         else if (!(responseMessage is null) && !(responseMessage.Headers is null) && !(responseMessage.Headers.Location is null) && !string.IsNullOrEmpty(responseMessage.Headers.Location.ToString().Trim()))
                         {
@@ -381,9 +382,21 @@ namespace MapsInMyFolder.Commun
                             }
                             if (Settings.generate_transparent_tiles_on_error)
                             {
-                                return new HttpResponse(null, new System.Net.Http.HttpResponseMessage(System.Net.HttpStatusCode.NotFound));
+                                if (getRealRequestMessage)
+                                {
+                                    return new HttpResponse(null, responseMessage);
+                                }
+                                else
+                                {
+                                    return new HttpResponse(null, new System.Net.Http.HttpResponseMessage(System.Net.HttpStatusCode.NotFound));
+                                }
                             }
                         }
+                        if (getRealRequestMessage)
+                        {
+                            response = new HttpResponse(response.Buffer, responseMessage);
+                        }
+
                     }
                 }
                 catch (Exception ex)
@@ -598,6 +611,14 @@ namespace MapsInMyFolder.Commun
             return return_texte;
         }
 
+        public static bool IsUrlValid(string url)
+        {
+
+            string pattern = @"(http|https|ftp|)\:\/\/[0-9a-zA-Z]([-.\w]*[0-9a-zA-Z])*(:(0-9)*)*(\/?)([a-zA-Z0-9\-\.\?\,\'\/\\\+&%\$#_]*)?([a-zA-Z0-9\-\?\,\'\/\+&%\$#_]+)";
+            Regex reg = new Regex(pattern, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            return reg.IsMatch(url);
+        }
+
         public static void SetRichTextBoxText(RichTextBox textBox, string text)
         {
             Stream SM = new MemoryStream(Encoding.UTF8.GetBytes(text));
@@ -700,8 +721,12 @@ namespace MapsInMyFolder.Commun
                 //httpClient.DefaultRequestHeaders.Add("User-Agent", Settings.user_agent);
                 try
                 {
-                    HttpResponse reponseHttpResponse = await Collectif.ByteDownloadUri(new Uri(internalurl), LayerId: 0);
-                    var reponse = reponseHttpResponse.ResponseMessage;
+                    HttpResponse reponseHttpResponse = await Collectif.ByteDownloadUri(new Uri(internalurl), 0, true);
+                    if (reponseHttpResponse is null || reponseHttpResponse.ResponseMessage is null)
+                    {
+                        return HttpStatusCode.SeeOther;
+                    }
+                    HttpResponseMessage reponse = reponseHttpResponse.ResponseMessage;
                     if (reponse.IsSuccessStatusCode)
                     {
                         return HttpStatusCode.OK;

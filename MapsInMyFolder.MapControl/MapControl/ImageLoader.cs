@@ -63,7 +63,8 @@ namespace MapsInMyFolder.MapControl
                         response = new Commun.HttpResponse(resp.Buffer, resp.Reponse);
                         resp = null;
                     }
-                    if (response?.Buffer != null)
+
+                    if (response?.Buffer != null && response.ResponseMessage.IsSuccessStatusCode)
                     {
                         Debug.WriteLine("Load from LoadImageAsync");
                         image = await LoadImageAsync(response.Buffer).ConfigureAwait(false);

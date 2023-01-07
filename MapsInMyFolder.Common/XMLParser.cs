@@ -24,13 +24,7 @@ namespace MapsInMyFolder.Commun
                 key = key_arg.Trim();
             }
 
-            string strSettingsXmlFilePath = Settings.SettingsPath();
-            if (!File.Exists(strSettingsXmlFilePath))
-            {
-                Create();
-            }
-
-            XDocument doc = XDocument.Load(strSettingsXmlFilePath);
+            XDocument doc = XDocument.Load(GetPathAndCreateIfNotExist());
             XElement KeyElement = doc.Descendants(key).FirstOrDefault<XElement>();
             if (KeyElement != null)
             {
@@ -39,11 +33,12 @@ namespace MapsInMyFolder.Commun
             return null;
         }
 
-        public static void Create()
+        public static string GetPathAndCreateIfNotExist()
         {
             string strSettingsXmlFilePath = Settings.SettingsPath();
             if (!File.Exists(strSettingsXmlFilePath))
             {
+                System.IO.Directory.CreateDirectory(Path.GetDirectoryName(strSettingsXmlFilePath));
                 var sts = new XmlWriterSettings()
                 {
                     Indent = true,
@@ -55,7 +50,9 @@ namespace MapsInMyFolder.Commun
                 xmlWriter.WriteEndElement();
                 xmlWriter.WriteEndDocument();
                 xmlWriter.Close();
+                return newPath;
             }
+            return strSettingsXmlFilePath;
         }
 
         public static void Write(string key_arg, string value_arg = null, string description_arg = null)
@@ -80,20 +77,16 @@ namespace MapsInMyFolder.Commun
                 description = String.Empty;
             }
             string strSettingsXmlFilePath = Settings.SettingsPath();
-            if (!File.Exists(strSettingsXmlFilePath))
-            {
-                Create();
-            }
             XDocument doc;
             try
             {
-                doc = XDocument.Load(strSettingsXmlFilePath);
+                doc = XDocument.Load(GetPathAndCreateIfNotExist());
             }
             catch (FileNotFoundException)
             {
                 Settings.SettingsPath(true);
-                Create();
-                doc = XDocument.Load(strSettingsXmlFilePath);
+                
+                doc = XDocument.Load(GetPathAndCreateIfNotExist());
             }
             XElement KeyElement = doc.Descendants(key).FirstOrDefault<XElement>();
             if (KeyElement != null)
