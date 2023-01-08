@@ -103,7 +103,10 @@ namespace MapsInMyFolder
             JavascriptLocationInstance.LocationChanged += (o, e) => MainPage.MapViewerSetSelection(Javascript.JavascriptInstance.Location, Javascript.JavascriptInstance.ZoomToNewLocation);
             Network.IsNetworkNowAvailable += (o, e) => CheckIfReadyToStartDownloadAfterNetworkChange();
             Database.RefreshPanels += (o, e) => RefreshAllPanels();
+
         }
+
+
 
         public static void RefreshAllPanels()
         {

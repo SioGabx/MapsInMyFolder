@@ -254,6 +254,9 @@ namespace MapsInMyFolder.Commun
         public static SolidColorBrush HexValueToSolidColorBrush(string hexvalue)
         {
             //"#BCBCBC"
+            if (!hexvalue.StartsWith("#")) { 
+                hexvalue = "#" + hexvalue;
+            }
             return (SolidColorBrush)new BrushConverter().ConvertFrom(hexvalue);
         }
 

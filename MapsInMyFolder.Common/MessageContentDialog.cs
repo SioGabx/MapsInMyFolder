@@ -5,7 +5,11 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Threading;
 
 namespace MapsInMyFolder.Commun
 {
@@ -26,11 +30,38 @@ namespace MapsInMyFolder.Commun
             return result2;
         }
 
+        //public static string InputBoxDialog(object text, object caption = null, MessageDialogButton messageBoxButton = MessageDialogButton.OK, DispatcherFrame frame = null)
+        //{
+        //    ContentDialog dialog = SetContentDialog(text, caption, messageBoxButton);
+        //    //alert("Veuillez indiquer l'adresse URL du panorama à télécharger :","Google Maps")
+        //    StackPanel stackPanel = new StackPanel();
+        //    TextBlock textBlock = new TextBlock();
+        //    if (!string.IsNullOrEmpty(text?.ToString()))
+        //    {
+        //        textBlock.Text = text.ToString();
+        //        textBlock.TextWrapping = TextWrapping.Wrap;
+        //    }
+        //    TextBox textBox = new TextBox() { };
+        //    textBox.Style = (Style)Application.Current.Resources["TextBoxCleanStyle_13"];
+        //    textBox.HorizontalAlignment = HorizontalAlignment.Stretch;
+        //    textBox.Margin = new Thickness(0, 10, 0, 0);
+        //    stackPanel.Children.Add(textBlock);
+        //    stackPanel.Children.Add(textBox);
+        //    dialog.Content = stackPanel;
 
+        //    if (frame != null)
+        //    {
+        //        dialog.Closed += (_, __) =>
+        //        {
+        //            frame.Continue = false; // stops the frame
+        //        };
+        //    }
 
-        public static ContentDialog SetContentDialog(object text, object caption = null, MessageDialogButton messageBoxButton = MessageDialogButton.OK)
+        //    dialog.ShowAsync();
+        //    return textBox.Text;
+        //}
+        public static ContentDialog SetContentDialog(object text, object caption = null, MessageDialogButton messageBoxButton = MessageDialogButton.OK, bool showTextbox = false)
         {
-
             ContentDialog dialog = new ContentDialog
             {
                 Title = caption ?? "",
@@ -43,6 +74,26 @@ namespace MapsInMyFolder.Commun
                 DefaultButton = ContentDialogButton.Primary,
                 Background = Collectif.HexValueToSolidColorBrush("#171719")
             };
+
+            if (showTextbox)
+            {
+                //alert("Veuillez indiquer l'adresse URL du panorama à télécharger :","Google Maps")
+                StackPanel stackPanel = new StackPanel();
+                TextBlock textBlock = new TextBlock();
+                if (!string.IsNullOrEmpty(text?.ToString()))
+                {
+                    textBlock.Text = text.ToString();
+                    textBlock.TextWrapping = TextWrapping.Wrap; 
+                }
+                TextBox textBox = new TextBox() { };
+                textBox.Style = (Style)Application.Current.Resources["TextBoxCleanStyle_13"];
+                textBox.HorizontalAlignment = HorizontalAlignment.Stretch; 
+                textBox.Margin = new Thickness(0,10,0,0);
+                stackPanel.Children.Add(textBlock);
+                stackPanel.Children.Add(textBox);
+                dialog.Content = stackPanel;
+            }
+
 
             Debug.WriteLine("DialogMsg" + text);
 

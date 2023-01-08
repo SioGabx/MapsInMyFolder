@@ -1,9 +1,16 @@
 ﻿using Jint;
+using Jint.Native;
+using Jint.Runtime.Interop;
+using ModernWpf.Controls;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Reflection;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Threading;
 
 namespace MapsInMyFolder.Commun
 {
@@ -64,7 +71,7 @@ namespace MapsInMyFolder.Commun
 
         private static Engine SetupEngine(int LayerId)
         {
-            var add = new Engine(options =>
+            Engine add = new Engine(options =>
             {
                 options.TimeoutInterval(TimeSpan.FromSeconds(15));
                 options.MaxStatements(5000);
@@ -88,10 +95,11 @@ namespace MapsInMyFolder.Commun
             });
             Action<object> PrintAction = stringtext => Javascript.Print(String.Concat(">", stringtext), LayerId);
             add.SetValue("print", PrintAction);
-            Action<object> AlertAction = stringtext => Javascript.Alert(stringtext, LayerId);
-            add.SetValue("alert", AlertAction);
+            //Action<object> AlertAction = stringtext => Javascript.Alert(stringtext, LayerId);
+            //add.SetValue("alert", AlertAction);
             Action<object> PrintClearAction = _ => Javascript.PrintClear();
             add.SetValue("printClear", PrintClearAction);
+            add.SetValue("cls", PrintClearAction);
             Action<object> helpAction = _ => Javascript.Help(LayerId);
             add.SetValue("help", helpAction);
             Action<object, object> setVarAction = (variable, value) => Javascript.SetVar(variable, value, LayerId);
@@ -111,6 +119,11 @@ namespace MapsInMyFolder.Commun
 
             Func<object> getSelectionAction = () => GetSelection();
             add.SetValue("getSelection", getSelectionAction);
+
+            Action<object, object> alertAction = (texte, caption) => Alert(LayerId, texte, caption);
+            add.SetValue("alert", alertAction);
+            Func<object, object, object> inputboxAction = (texte, caption) => InputBox(LayerId, texte, caption);
+            add.SetValue("inputbox", inputboxAction);
             return add;
         }
 
@@ -189,6 +202,10 @@ namespace MapsInMyFolder.Commun
             }
         }
         #endregion
+
+
+
+
 
         public static void SetSelection(double NO_Latitude, double NO_Longitude, double SE_Latitude, double SE_Longitude, bool ZoomToNewLocation, int LayerId)
         {
@@ -276,6 +293,75 @@ namespace MapsInMyFolder.Commun
             }
         }
 
+        static readonly object JSLocker = new object();
+        static public string InputBox(int LayerId, object texte, object caption = null)
+        {
+            string returnvalue = "undefined";
+            lock (JSLocker)
+            {
+                //alert("pos");
+                if (string.IsNullOrEmpty(caption?.ToString()))
+                {
+                    caption = Collectif.HTMLEntities(Layers.GetLayerById(LayerId).class_name, true) + " indique :";
+                }
+                /*
+
+                let x = alert("pos"); print(x);
+
+                */
+                ContentDialog dialog;
+                var frame = new DispatcherFrame();
+                dialog = Application.Current.Dispatcher.Invoke(new Func<ContentDialog>(() =>
+                {
+                    var dialog_internal = Message.SetContentDialog(texte, caption, showTextbox:true);
+                    dialog_internal.Closed += (_, __) =>
+                    {
+                        frame.Continue = false; // stops the frame
+                    };
+                    dialog_internal.ShowAsync();
+                    return dialog_internal;
+                }));
+                Dispatcher.PushFrame(frame);
+
+                List<UIElement> uIElements = Collectif.FindVisualChildren(dialog.Content as UIElement);
+                foreach (UIElement element in uIElements)
+                {
+                    if (element.GetType() == typeof(TextBox))
+                    {
+                        TextBox textBox = (TextBox)element;
+                        returnvalue = textBox.Text;
+                        return returnvalue;
+                    }
+                }
+
+            }
+            return returnvalue;
+        }
+
+        static public void Alert(int LayerId, object texte, object caption = null)
+        {
+            lock (JSLocker)
+            {
+                //alert("pos");
+                if (string.IsNullOrEmpty(caption?.ToString()))
+                {
+                    caption = Collectif.HTMLEntities(Layers.GetLayerById(LayerId).class_name, true) + " indique :";
+                }
+
+                var frame = new DispatcherFrame();
+                Application.Current.Dispatcher.Invoke(new Action(() =>
+                {
+                    var dialog = Message.SetContentDialog(texte, caption);
+                    dialog.Closed += (_, __) =>
+                    {
+                        frame.Continue = false; // stops the frame
+                    };
+                    dialog.ShowAsync();
+                }));
+                Dispatcher.PushFrame(frame);
+            }
+        }
+
         static public void Help(int LayerId)
         {
             Print(
@@ -327,17 +413,17 @@ print("lat : " + locations.lat + " / long : " + locations.long)
             Print("Error : " + print, LayerId);
         }
 
-        static void Alert(object Message, int LayerId)
-        {
-            if (Curent.Layer.class_id == LayerId)
-            {
-                string text = Message.ToString();
-                if (!string.IsNullOrEmpty(text))
-                {
-                    MessageBox.Show(text, "MapsInMyFolder");
-                }
-            }
-        }
+        //static void Alert(object Message, int LayerId)
+        //{
+        //    if (Curent.Layer.class_id == LayerId)
+        //    {
+        //        string text = Message.ToString();
+        //        if (!string.IsNullOrEmpty(text))
+        //        {
+        //            MessageBox.Show(text, "MapsInMyFolder");
+        //        }
+        //    }
+        //}
 
         #region engines
         private static readonly Dictionary<int, CancellationTokenSource> JsListCancelTocken = new Dictionary<int, CancellationTokenSource>();
