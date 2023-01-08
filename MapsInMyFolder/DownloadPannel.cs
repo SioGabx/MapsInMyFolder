@@ -188,8 +188,8 @@ namespace MapsInMyFolder
             catch (Exception ex)
             {
                 DebugMode.WriteLine(ex.Message);
-            } 
-            
+            }
+
             try
             {
                 download_panel_browser.ExecuteScriptAsync("CefSharp.BindObjectAsync(\"download_Csharp_call_from_js\");");

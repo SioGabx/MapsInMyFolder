@@ -83,12 +83,14 @@ namespace MapsInMyFolder.Commun
                 if (!string.IsNullOrEmpty(text?.ToString()))
                 {
                     textBlock.Text = text.ToString();
-                    textBlock.TextWrapping = TextWrapping.Wrap; 
+                    textBlock.TextWrapping = TextWrapping.Wrap;
                 }
-                TextBox textBox = new TextBox() { };
-                textBox.Style = (Style)Application.Current.Resources["TextBoxCleanStyle_13"];
-                textBox.HorizontalAlignment = HorizontalAlignment.Stretch; 
-                textBox.Margin = new Thickness(0,10,0,0);
+                TextBox textBox = new TextBox
+                {
+                    Style = (Style)Application.Current.Resources["TextBoxCleanStyle_13"],
+                    HorizontalAlignment = HorizontalAlignment.Stretch,
+                    Margin = new Thickness(0, 10, 0, 0)
+                };
                 stackPanel.Children.Add(textBlock);
                 stackPanel.Children.Add(textBox);
                 dialog.Content = stackPanel;

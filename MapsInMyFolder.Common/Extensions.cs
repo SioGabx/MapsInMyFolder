@@ -49,8 +49,7 @@ namespace MapsInMyFolder.Commun
         public static string GetName(this UIElement obj)
         {
             // First see if it is a FrameworkElement
-            FrameworkElement element = obj as FrameworkElement;
-            if (element != null)
+            if (obj is FrameworkElement element)
             {
                 return element.Name;
             }

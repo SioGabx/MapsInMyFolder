@@ -271,7 +271,7 @@ namespace MapsInMyFolder
 
         static void CheckIfReadyToStartDownloadAfterNetworkChange()
         {
-           //Network is back
+            //Network is back
             CheckIfReadyToStartDownload();
         }
 
@@ -412,7 +412,7 @@ namespace MapsInMyFolder
                 if (Network.IsNetworkAvailable())
                 {
                     info = "En attente... (0/" + nbr_of_tiles + ")";
-                    status =  Status.progress;
+                    status = Status.progress;
                 }
                 else
                 {
@@ -566,21 +566,21 @@ namespace MapsInMyFolder
                                              Debug.WriteLine("cant be cancel");
                                          }
                                      }
-                                 if (IsNetworkNotAvailable)
-                                  {
-                                         UpdateDownloadPanel(download_main_engine_class_args.id, "En attente d'une connexion internet", state: Status.noconnection);
-                                     App.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
+                                     if (IsNetworkNotAvailable)
                                      {
-                                         TaskbarItemInfo.ProgressState = System.Windows.Shell.TaskbarItemProgressState.Paused;
-                                     }, null);
-                                     Thread.Sleep(250);
-                                 }
-                             } while (IsNetworkNotAvailable) ;
+                                         UpdateDownloadPanel(download_main_engine_class_args.id, "En attente d'une connexion internet", state: Status.noconnection);
+                                         App.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
+                                         {
+                                             TaskbarItemInfo.ProgressState = System.Windows.Shell.TaskbarItemProgressState.Paused;
+                                         }, null);
+                                         Thread.Sleep(250);
+                                     }
+                                 } while (IsNetworkNotAvailable);
 
-                            App.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
-                                 {
-                                     TaskbarItemInfo.ProgressState = System.Windows.Shell.TaskbarItemProgressState.Normal;
-                                 }, null);
+                                 App.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
+                                      {
+                                          TaskbarItemInfo.ProgressState = System.Windows.Shell.TaskbarItemProgressState.Normal;
+                                      }, null);
 
 
                                  DebugMode.WriteLine("start new DownloadUrlAsync");
@@ -627,7 +627,7 @@ namespace MapsInMyFolder
                     {
                         foreach (Url_class urclass in download_main_engine_class_args.urls)
                         {
-                            if ((urclass.status != Status.no_data) || ((Commun.Settings.generate_transparent_tiles_on_404) == false && (Commun.Settings.generate_transparent_tiles_on_error) == false))
+                            if ((urclass.status != Status.no_data) || ((!Settings.generate_transparent_tiles_on_404) && (!Settings.generate_transparent_tiles_on_error)))
                             {
                                 if (urclass.status == Status.waitfordownloading)
                                 {
@@ -892,8 +892,7 @@ namespace MapsInMyFolder
                             try
                             {
                                 //tempsimage = NetVips.Image.Black(settings_tile_size, settings_tile_size,4) + new double[] { 255, 255, 255, 255 };
-                                tempsimage = NetVips.Image.Black(settings_tile_size, settings_tile_size) + new double[] { 0,0,0,0 };
-                               
+                                tempsimage = NetVips.Image.Black(settings_tile_size, settings_tile_size) + new double[] { 0, 0, 0, 0 };
                             }
                             catch (Exception ex)
                             {
@@ -910,7 +909,7 @@ namespace MapsInMyFolder
 
                         Vertical_Array.Add(NetVips.Image.Arrayjoin(Horizontal_Array.ToArray(), background: new double[] { 255, 255, 255, 255 }));
                         //MessageBox.Show(Vertical_Array[Vertical_Array.Count - 1].Xres.ToString());
-                       // Vertical_Array[Vertical_Array.Count - 1].Resize()
+                        // Vertical_Array[Vertical_Array.Count - 1].Resize()
                     }
                     catch (Exception ex)
                     {
@@ -1221,7 +1220,6 @@ namespace MapsInMyFolder
                         else
                         {
                             Thread.Sleep(200);
-                            
                             if (httpResponse.ResponseMessage.StatusCode == HttpStatusCode.NotFound && (Settings.generate_transparent_tiles_on_404 || Settings.generate_transparent_tiles_on_error))
                             {
                                 url.status = Status.no_data;

@@ -85,7 +85,6 @@ namespace MapsInMyFolder.Commun
             catch (FileNotFoundException)
             {
                 Settings.SettingsPath(true);
-                
                 doc = XDocument.Load(GetPathAndCreateIfNotExist());
             }
             XElement KeyElement = doc.Descendants(key).FirstOrDefault<XElement>();

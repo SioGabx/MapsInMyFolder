@@ -217,7 +217,7 @@ namespace MapsInMyFolder.Commun
                                     try
                                     {
                                         HttpResponse httpResponse = Collectif.ByteDownloadUri(new Uri(stylevalue), layerID, true).Result;
-                                        if (httpResponse != null && httpResponse.ResponseMessage.IsSuccessStatusCode)
+                                        if (httpResponse?.ResponseMessage.IsSuccessStatusCode == true)
                                         {
                                             if (httpResponse.Buffer != null)
                                             {
@@ -276,7 +276,7 @@ namespace MapsInMyFolder.Commun
                     new List<VectorTileRenderer.Sources.PbfTileSource>() { null, null, null }
                 };
 
-                async Task<VectorTileRenderer.Sources.PbfTileSource> GetProviderFromXYZ(int TileX_tp, int TileY_tp, int indexA, int indexB)
+                async Task<VectorTileRenderer.Sources.PbfTileSource> GetProviderFromXYZ(int TileX_tp, int TileY_tp)
                 {
                     DebugMode.WriteLine("Tache n°" + tache + " : GetProvider " + TileX_tp + ", " + TileY_tp);
                     if (!(TileX_tp < 0 || TileY_tp < 0 || zoom < 0))
@@ -392,7 +392,7 @@ namespace MapsInMyFolder.Commun
 
                 void SetProviders(int ArrayX, int ArrayY, int ComputedTileX, int ComputedTileY)
                 {
-                    VectorTileRenderer.Sources.PbfTileSource pbfTileSource = GetProviderFromXYZ(ComputedTileX, ComputedTileY, ArrayX, ArrayY).Result;
+                    VectorTileRenderer.Sources.PbfTileSource pbfTileSource = GetProviderFromXYZ(ComputedTileX, ComputedTileY).Result;
                     lock (PBF_SetProviders_Locker)
                     {
                         try

@@ -254,7 +254,8 @@ namespace MapsInMyFolder.Commun
         public static SolidColorBrush HexValueToSolidColorBrush(string hexvalue)
         {
             //"#BCBCBC"
-            if (!hexvalue.StartsWith("#")) { 
+            if (!hexvalue.StartsWith("#"))
+            {
                 hexvalue = "#" + hexvalue;
             }
             return (SolidColorBrush)new BrushConverter().ConvertFrom(hexvalue);
@@ -475,11 +476,11 @@ namespace MapsInMyFolder.Commun
             {
                 for (int i = 0; i < VisualTreeHelper.GetChildrenCount(obj); i++)
                 {
-                    UIElement objChild = VisualTreeHelper.GetChild(obj, i) as UIElement;
+                    UIElement objChild = (UIElement)VisualTreeHelper.GetChild(obj, i);
                     if (!(objChild is null))
                     {
                         children.Add(objChild);
-                        if ((BlackListNoSearchChildren is null) || (!BlackListNoSearchChildren.Contains(objChild.GetType())))
+                        if (BlackListNoSearchChildren?.Contains(objChild.GetType()) != true)
                         {
                             children = children.Concat(FindVisualChildren(objChild, BlackListNoSearchChildren)).ToList();
                         }
@@ -617,7 +618,7 @@ namespace MapsInMyFolder.Commun
         public static bool IsUrlValid(string url)
         {
 
-            string pattern = @"(http|https|ftp|)\:\/\/[0-9a-zA-Z]([-.\w]*[0-9a-zA-Z])*(:(0-9)*)*(\/?)([a-zA-Z0-9\-\.\?\,\'\/\\\+&%\$#_]*)?([a-zA-Z0-9\-\?\,\'\/\+&%\$#_]+)";
+            const string pattern = @"(http|https|ftp|)\:\/\/[0-9a-zA-Z]([-.\w]*[0-9a-zA-Z])*(:(0-9)*)*(\/?)([a-zA-Z0-9\-\.\?\,\'\/\\\+&%\$#_]*)?([a-zA-Z0-9\-\?\,\'\/\+&%\$#_]+)";
             Regex reg = new Regex(pattern, RegexOptions.Compiled | RegexOptions.IgnoreCase);
             return reg.IsMatch(url);
         }

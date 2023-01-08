@@ -39,7 +39,7 @@ namespace MapsInMyFolder.Commun
                     {
                         SQLiteConnection.CreateFile(database_pathname);
                         DB_CreateTables(database_pathname);
-                        RefreshPanels.Invoke(null, new EventArgs());
+                        RefreshPanels.Invoke(null, EventArgs.Empty);
                         return;
                     }
                     else if (result == ContentDialogResult.Primary)
@@ -70,7 +70,7 @@ namespace MapsInMyFolder.Commun
                             {
                                 byte[] arrBytes = response.Buffer;
                                 File.WriteAllBytes(database_pathname, arrBytes);
-                                RefreshPanels.Invoke(null, new EventArgs());
+                                RefreshPanels.Invoke(null, EventArgs.Empty);
                                 return;
                             }
                             else
@@ -134,7 +134,7 @@ namespace MapsInMyFolder.Commun
 
                 SQLiteConnection.CreateFile(database_pathname);
                 DB_CreateTables(database_pathname);
-                RefreshPanels.Invoke(null, new EventArgs());
+                RefreshPanels.Invoke(null, EventArgs.Empty);
             }
             catch (Exception ex)
             {
@@ -172,7 +172,6 @@ namespace MapsInMyFolder.Commun
         //CONNEXION A LA BASE DE DONNEES
         public static SQLiteConnection DB_Connection()
         {
-            SQLiteConnection sqlite_conn;
             // Create a new database connection:
             string dbFile = Path.Combine(Settings.working_folder, Settings.database_pathname);
             if (System.IO.File.Exists(dbFile))
@@ -191,8 +190,7 @@ namespace MapsInMyFolder.Commun
                 DB_Download();
                 return null;
             }
-            sqlite_conn = DB_CreateTables(dbFile);
-            return sqlite_conn;
+            return DB_CreateTables(dbFile);
         }
 
 

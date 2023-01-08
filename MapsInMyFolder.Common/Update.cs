@@ -16,9 +16,5 @@ namespace MapsInMyFolder.Commun
 
             return false;
         }
-
-        
-
-
     }
 }

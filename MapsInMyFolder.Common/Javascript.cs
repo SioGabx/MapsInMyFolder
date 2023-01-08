@@ -296,7 +296,6 @@ namespace MapsInMyFolder.Commun
         static readonly object JSLocker = new object();
         static public string InputBox(int LayerId, object texte, object caption = null)
         {
-            string returnvalue = "undefined";
             lock (JSLocker)
             {
                 //alert("pos");
@@ -329,13 +328,12 @@ namespace MapsInMyFolder.Commun
                     if (element.GetType() == typeof(TextBox))
                     {
                         TextBox textBox = (TextBox)element;
-                        returnvalue = textBox.Text;
-                        return returnvalue;
+                        return textBox.Text;
                     }
                 }
 
             }
-            return returnvalue;
+            return "undefined";
         }
 
         static public void Alert(int LayerId, object texte, object caption = null)
