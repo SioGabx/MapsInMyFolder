@@ -166,7 +166,7 @@ namespace MapsInMyFolder.Commun
             string variablenameString;
             if (variablename is null)
             {
-                PrintError("Le nom de la variable n'est pas défini !");
+                PrintError("Le nom de la variable n'est pas défini !", LayerId);
                 return null;
             }
             else
@@ -180,7 +180,7 @@ namespace MapsInMyFolder.Commun
                     return VariableKeyAndValue[variablenameString];
                 }
             }
-            PrintError("La variable " + variablenameString + " n'est pas défini !");
+            PrintError("La variable " + variablenameString + " n'est pas défini", LayerId);
             return null;
         }
 
@@ -305,6 +305,42 @@ namespace MapsInMyFolder.Commun
                 }
                 /*
 
+                let x = inputbox("pos"); print(x);
+
+                */
+                TextBox TextBox;
+                var frame = new DispatcherFrame();
+                TextBox = Application.Current.Dispatcher.Invoke(new Func<TextBox>(() =>
+                {
+                    var dialog_internal_turple = Message.SetInputBoxDialog(texte, caption);
+                    var dialog_internal = dialog_internal_turple.dialog;
+                    dialog_internal.Closed += (_, __) =>
+                    {
+                        frame.Continue = false; // stops the frame
+                    };
+                    dialog_internal.ShowAsync();
+                    return dialog_internal_turple.textBox;
+                }));
+                Dispatcher.PushFrame(frame);
+                return Application.Current.Dispatcher.Invoke(new Func<string>(() =>
+                {
+                    return TextBox.Text;
+                }));
+            }
+        }
+
+
+        static public string InputBox2(int LayerId, object texte, object caption = null)
+        {
+            lock (JSLocker)
+            {
+                //alert("pos");
+                if (string.IsNullOrEmpty(caption?.ToString()))
+                {
+                    caption = Collectif.HTMLEntities(Layers.GetLayerById(LayerId).class_name, true) + " indique :";
+                }
+                /*
+
                 let x = alert("pos"); print(x);
 
                 */
@@ -312,7 +348,7 @@ namespace MapsInMyFolder.Commun
                 var frame = new DispatcherFrame();
                 dialog = Application.Current.Dispatcher.Invoke(new Func<ContentDialog>(() =>
                 {
-                    var dialog_internal = Message.SetContentDialog(texte, caption, showTextbox:true);
+                    var dialog_internal = Message.SetContentDialog(texte, caption, showTextbox: true);
                     dialog_internal.Closed += (_, __) =>
                     {
                         frame.Continue = false; // stops the frame
@@ -383,12 +419,12 @@ namespace MapsInMyFolder.Commun
                 "AIDE FUNCTIONS PERSONALISÉE" + "\n" +
                 "print(string) : Affiche un message dans la console" + "\n" +
                 "alert(string) : Affiche une boite de dialogue" + "\n" +
-                "printClear(string) : Efface la console" +
-                "help() : Affiche cette aide" +
-                "setVar(\"nom_variable\",\"valeur\") : Defini la valeur de la variable. Cette variable est conservé durant l'entiéreté de l'execution de l'application" +
-                "getVar(\"nom_variable\") : Obtiens la valeur de la variable." +
-                "getTileNumber(latitude, longitude, zoom) : Converti les coordonnées en tiles" +
-                "getLatLong(TileX, TileY, zoom) : Converti les numero de tiles en coordonnées" +
+                "printClear(string) : Efface la console" + "\n" +
+                "help() : Affiche cette aide" + "\n" +
+                "setVar(\"nom_variable\",\"valeur\") : Defini la valeur de la variable. Cette variable est conservé durant l'entiéreté de l'execution de l'application" + "\n" +
+                "getVar(\"nom_variable\") : Obtiens la valeur de la variable." + "\n" +
+                "getTileNumber(latitude, longitude, zoom) : Converti les coordonnées en tiles" + "\n" +
+                "getLatLong(TileX, TileY, zoom) : Converti les numero de tiles en coordonnées" + "\n" +
                 "", LayerId);
 
             /*//

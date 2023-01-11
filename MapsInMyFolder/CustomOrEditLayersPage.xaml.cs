@@ -301,7 +301,10 @@ namespace MapsInMyFolder
 
         private void TextboxLayerTileUrl_TextChanged(object sender, TextChangedEventArgs e)
         {
-            SetAppercuLayers(TextboxLayerTileUrl.Text);
+            App.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
+            {
+                SetAppercuLayers(TextboxLayerTileUrl.Text);
+            }, null);
         }
 
         private void BackgroundSwitch_Toggled(object sender, RoutedEventArgs e)

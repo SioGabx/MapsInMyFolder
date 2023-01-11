@@ -136,9 +136,9 @@ namespace MapsInMyFolder
                 this.TileLoaderGenerator = TileLoaderGenerator;
 
 
-                this.SkippedPanelUpdate = 0;
-                this.last_command = String.Empty;
-                this.last_command_non_important = String.Empty;
+                SkippedPanelUpdate = 0;
+                last_command = String.Empty;
+                last_command_non_important = String.Empty;
             }
         }
 
@@ -266,12 +266,8 @@ namespace MapsInMyFolder
         }
 
 
-
-
-
         static void CheckIfReadyToStartDownloadAfterNetworkChange()
         {
-            //Network is back
             CheckIfReadyToStartDownload();
         }
 
@@ -279,8 +275,6 @@ namespace MapsInMyFolder
 
         static void CheckIfReadyToStartDownload()
         {
-            DebugMode.WriteLine("Checking... From : number : " + DownloadClass.Number_of_download);
-
             int settings_max_download_simult = Commun.Settings.max_download_project_in_parralele;
             if (DownloadClass.Number_of_download < settings_max_download_simult)
             {
@@ -335,24 +329,6 @@ namespace MapsInMyFolder
 
         void StartDownload(Download_Options download_Options)
         {
-            //string check_path_end_with_slash(string path)
-            //{
-            //    string edited_path = path;
-            //    if (!path.EndsWith("\\"))
-            //    {
-            //        edited_path += "\\";
-            //    }
-            //    return edited_path;
-            //}
-            //string Get_save_temp_directory(string identifiant, string style, int zoom)
-            //{
-            //    string settings_temp_folder = Settings.temp_folder;
-            //    Debug.WriteLine(settings_temp_folder);
-            //    settings_temp_folder = check_path_end_with_slash(settings_temp_folder);
-            //    string chemin = settings_temp_folder + identifiant + "_" + style + "\\" + zoom + "\\";
-            //    return chemin;
-            //}
-
             int downloadid = DownloadClass.GetId();
             string format = Curent.Layer.class_format;
             string final_saveformat = download_Options.format;
@@ -382,7 +358,6 @@ namespace MapsInMyFolder
                 int nbr_of_tiles = lat_tile_number * long_tile_number;
                 if (lat_tile_number * tile_size >= 65500 || long_tile_number * tile_size >= 65500)
                 {
-                    //MessageBox.Show("Impossible de télécharger la zone, l'image générée ne peux pas faire plus de 65000 pixel de largeur / hauteur");
                     Message.NoReturnBoxAsync("Impossible de télécharger la zone, l'image générée ne peux pas faire plus de 65000 pixel de largeur / hauteur", "Erreur");
                     return;
                 }
@@ -395,16 +370,11 @@ namespace MapsInMyFolder
                 };
 
                 List<Url_class> urls = Collectif.GetUrl.GetListOfUrlFromLocation(location, z, urlbase, Curent.Layer.class_id, downloadid);
-                //foreach(Url_class url in urls)
-                //{
-                //    Debug.WriteLine("patare : " +url.url);
-                //}
                 CancellationTokenSource tokenSource2 = new CancellationTokenSource();
                 CancellationToken ct = tokenSource2.Token;
                 string timestamp = Convert.ToString(new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds());
                 int dbid = Database.DB_Download_Write(Status.waitfordownloading, filename, nbr_of_tiles, z, download_Options.NO_PIN_Location.Latitude, download_Options.NO_PIN_Location.Longitude, download_Options.SE_PIN_Location.Latitude, download_Options.SE_PIN_Location.Longitude, download_Options.id_layer, save_temp_directory, save_directory, timestamp, download_Options.quality, download_Options.RedimWidth, download_Options.RedimHeignt);
                 DownloadClass engine = new DownloadClass(downloadid, dbid, Curent.Layer.class_id, urls, tokenSource2, ct, format, final_saveformat, z, save_temp_directory, save_directory, filename, filetempname, location, download_Options.RedimWidth, download_Options.RedimHeignt, new TileGenerator(), nbr_of_tiles, urlbase, identifiant, Status.waitfordownloading, tile_size, nbr_of_tiles, quality);
-                //engine.TileLoaderGenerator.Layer = Layers.Convert.CurentLayerToLayer();
                 DownloadClass.Add(engine, downloadid);
 
                 Status status;
@@ -423,14 +393,12 @@ namespace MapsInMyFolder
                 MainPage.download_panel_browser?.ExecuteScriptAsync(commande_add);
                 if (DownloadClass.GetEngineById(downloadid) != engine)
                 {
-                    //MessageBox.Show("Intégrité rompu de l'engine de téléchargement. Veuillez relancer l'application (erreur fatale)");
                     Message.NoReturnBoxAsync("Intégrité rompu de l'engine de téléchargement. Veuillez relancer l'application (erreur fatale)", "Erreur");
                 }
                 CheckIfReadyToStartDownload();
             }
             else
             {
-                //MessageBox.Show("Impossible de télécharger la carte car une erreur s'est produite, verifier la base de données...");
                 Message.NoReturnBoxAsync("Impossible de télécharger la carte car une erreur s'est produite, verifier la base de données...", "Erreur");
             }
         }
@@ -522,149 +490,17 @@ namespace MapsInMyFolder
                 }
             }
         }
+
+
         async void DownloadThisEngine(DownloadClass download_main_engine_class_args)
         {
             DownloadClass.Number_of_download++;
             download_main_engine_class_args.state = Status.progress;
             CheckIfReadyToStartDownload();
-            List<Url_class> urls = download_main_engine_class_args.urls;
-            CancellationTokenSource CancellationTokenSource = download_main_engine_class_args.cancellation_token_source;
-            CancellationToken CancellationToken = download_main_engine_class_args.cancellation_token;
+
             if (Commun.Settings.max_download_tiles_in_parralele == 0)
             {
                 Commun.Settings.max_download_tiles_in_parralele = 1;
-            }
-            async Task start_download_task()
-            {
-                async Task download_task()
-                {
-                    try
-                    {
-                        Task t = Task.Run(() =>
-                        {
-                            DebugMode.WriteLine("Téléchargement en parralele des fichiers");
-                            Parallel.ForEach(urls, new ParallelOptions { MaxDegreeOfParallelism = Commun.Settings.max_download_tiles_in_parralele }, url =>
-                             {
-                                 bool IsNetworkNotAvailable;
-                                 do
-                                 {
-                                     IsNetworkNotAvailable = !Network.FastIsNetworkAvailable();
-
-                                     if (CancellationToken.IsCancellationRequested)
-                                     {
-                                         if (CancellationToken.CanBeCanceled)
-                                         {
-                                             CancellationTokenSource.Cancel();
-                                             App.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
-                                             {
-                                                 TaskbarItemInfo.ProgressValue = 0;
-                                             }, null);
-                                             return;
-                                         }
-                                         else
-                                         {
-                                             Debug.WriteLine("cant be cancel");
-                                         }
-                                     }
-                                     if (IsNetworkNotAvailable)
-                                     {
-                                         UpdateDownloadPanel(download_main_engine_class_args.id, "En attente d'une connexion internet", state: Status.noconnection);
-                                         App.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
-                                         {
-                                             TaskbarItemInfo.ProgressState = System.Windows.Shell.TaskbarItemProgressState.Paused;
-                                         }, null);
-                                         Thread.Sleep(250);
-                                     }
-                                 } while (IsNetworkNotAvailable);
-
-                                 App.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
-                                      {
-                                          TaskbarItemInfo.ProgressState = System.Windows.Shell.TaskbarItemProgressState.Normal;
-                                      }, null);
-
-
-                                 DebugMode.WriteLine("start new DownloadUrlAsync");
-                                 DownloadUrlAsync(url).Wait();
-                                 DebugMode.WriteLine("end new DownloadUrlAsync");
-                             });
-                        }, CancellationTokenSource.Token);
-
-                        await t;
-                        Debug.WriteLine("Parallel DownloadUrlAsync end");
-                    }
-                    catch (Exception e)
-                    {
-                        Debug.WriteLine("Téléchargement echec : " + e.Message);
-                    }
-                }
-                try
-                {
-                    await download_task();
-                }
-                catch (OperationCanceledException e)
-                {
-                    Debug.WriteLine("Téléchargement annulé oce : " + e.Message);
-                }
-                catch (AggregateException e)
-                {
-                    Debug.WriteLine("Téléchargement annulé ae : " + e.Message);
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine("Téléchargement annulé gex : " + ex.Message);
-                }
-            }
-
-            int CheckDownloadIsComplete()
-            {
-                if (download_main_engine_class_args.nbr_of_tiles_waiting_for_downloading == 0)
-                {
-                    DebugMode.WriteLine("Verification du téléchargement...");
-                    UpdateDownloadPanel(download_main_engine_class_args.id, "Verification du téléchargement...", "0", true, Status.progress);
-                    Task.Factory.StartNew(() => Thread.Sleep(500));
-                    int number_of_url_class_waiting_for_downloading = 0;
-                    if (download_main_engine_class_args.state != Status.pause && download_main_engine_class_args.state != Status.cancel)
-                    {
-                        foreach (Url_class urclass in download_main_engine_class_args.urls)
-                        {
-                            if ((urclass.status != Status.no_data) || ((!Settings.generate_transparent_tiles_on_404) && (!Settings.generate_transparent_tiles_on_error)))
-                            {
-                                if (urclass.status == Status.waitfordownloading)
-                                {
-                                    number_of_url_class_waiting_for_downloading++;
-                                }
-                                string filename = download_main_engine_class_args.save_temp_directory + urclass.x + "_" + urclass.y + "." + download_main_engine_class_args.format;
-                                if (System.IO.File.Exists(filename))
-                                {
-                                    FileInfo filinfo = new FileInfo(filename);
-                                    if (filinfo.Length == 0)
-                                    {
-                                        urclass.status = Status.waitfordownloading;
-                                        DebugMode.WriteLine("Tile Taille corrompu");
-                                        number_of_url_class_waiting_for_downloading++;
-                                    }
-                                }
-                                else
-                                {
-                                    DebugMode.WriteLine("Le fichier n'existe pas");
-                                    urclass.status = Status.waitfordownloading;
-                                    number_of_url_class_waiting_for_downloading++;
-                                }
-                            }
-                            else
-                            {
-                                DebugMode.WriteLine("Tuile no_data");
-                            }
-                        }
-                    }
-                    else
-                    {
-                        number_of_url_class_waiting_for_downloading++;
-                    }
-                    download_main_engine_class_args.nbr_of_tiles_waiting_for_downloading = number_of_url_class_waiting_for_downloading;
-                    return number_of_url_class_waiting_for_downloading;
-                }
-                return download_main_engine_class_args.nbr_of_tiles_waiting_for_downloading;
             }
 
             int settings_max_retry_download = Commun.Settings.max_retry_download;
@@ -677,21 +513,19 @@ namespace MapsInMyFolder
                 {
                     UpdateDownloadPanel(download_main_engine_class_args.id, "Erreur, tentative de téléchargement " + nbr_pass + "/" + settings_max_retry_download + " ...", isimportant: true, state: Status.progress);
                 }
-                DebugMode.WriteLine("start_download_task start");
-                await start_download_task();
-                DebugMode.WriteLine("start_download_task ended");
-                DebugMode.WriteLine("check_download_complete() =" + CheckDownloadIsComplete());
-            } while ((CheckDownloadIsComplete() != 0) && (download_main_engine_class_args.state == Status.progress) && (nbr_pass < settings_max_retry_download));
+                await ParallelDownloadTilesTask(download_main_engine_class_args);
+                //DebugMode.WriteLine("check_download_complete() =" + CheckDownloadIsComplete(download_main_engine_class_args));
+            } while ((CheckDownloadIsComplete(download_main_engine_class_args) != 0) && (download_main_engine_class_args.state == Status.progress) && (nbr_pass < settings_max_retry_download));
 
-            if (nbr_pass == settings_max_retry_download)
-            {
-                UpdateDownloadPanel(download_main_engine_class_args.id, "Erreur lors du téléchargement (" + settings_max_retry_download.ToString() + " reprises).", "100", true, Status.error);
-                download_main_engine_class_args.state = Status.error;
-            }
-
-            if (CheckDownloadIsComplete() == 0)
+            if (CheckDownloadIsComplete(download_main_engine_class_args) == 0 || Settings.generate_transparent_tiles_on_error)
             {
                 await Assemblage(download_main_engine_class_args.id);
+            }
+            else if (nbr_pass == settings_max_retry_download)
+            {
+
+                UpdateDownloadPanel(download_main_engine_class_args.id, "Erreur lors du téléchargement (" + settings_max_retry_download.ToString() + " reprises).", "100", true, Status.error);
+                download_main_engine_class_args.state = Status.error;
             }
             DownloadClass.Number_of_download--;
             CheckifMultipleDownloadInProgress();
@@ -703,6 +537,124 @@ namespace MapsInMyFolder
             CheckIfReadyToStartDownload();
         }
 
+        private async Task ParallelDownloadTilesTask(DownloadClass DownloadEngineClass)
+        {
+            List<Url_class> urls = DownloadEngineClass.urls;
+            CancellationTokenSource CancellationTokenSource = DownloadEngineClass.cancellation_token_source;
+            CancellationToken CancellationToken = DownloadEngineClass.cancellation_token;
+
+            try
+            {
+                await Task.Run(() =>
+                {
+                    DebugMode.WriteLine("Téléchargement en parralele des fichiers");
+                    Parallel.ForEach(urls, new ParallelOptions { MaxDegreeOfParallelism = Commun.Settings.max_download_tiles_in_parralele }, url =>
+                    {
+                        bool IsNetworkNotAvailable;
+                        do
+                        {
+                            IsNetworkNotAvailable = !Network.FastIsNetworkAvailable();
+
+                            if (CancellationToken.IsCancellationRequested)
+                            {
+                                if (CancellationToken.CanBeCanceled)
+                                {
+                                    CancellationTokenSource.Cancel();
+                                    App.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
+                                    {
+                                        TaskbarItemInfo.ProgressValue = 0;
+                                    }, null);
+                                    return;
+                                }
+                                else
+                                {
+                                    Debug.WriteLine("cant be cancel");
+                                }
+                            }
+                            if (IsNetworkNotAvailable)
+                            {
+                                UpdateDownloadPanel(DownloadEngineClass.id, "En attente d'une connexion internet", state: Status.noconnection);
+                                App.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
+                                {
+                                    TaskbarItemInfo.ProgressState = System.Windows.Shell.TaskbarItemProgressState.Paused;
+                                }, null);
+                                Thread.Sleep(250);
+                            }
+                        } while (IsNetworkNotAvailable);
+
+                        App.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
+                        {
+                            TaskbarItemInfo.ProgressState = System.Windows.Shell.TaskbarItemProgressState.Normal;
+                        }, null);
+
+
+                        DebugMode.WriteLine("start new DownloadUrlAsync");
+                        DownloadUrlAsync(url).Wait();
+                        DebugMode.WriteLine("end new DownloadUrlAsync");
+                    });
+                }, CancellationTokenSource.Token);
+                Debug.WriteLine("Parallel DownloadUrlAsync end");
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine("Téléchargement echec : " + e.Message);
+            }
+        }
+
+        static private int CheckDownloadIsComplete(DownloadClass DownloadEngineClass)
+        {
+            if (DownloadEngineClass.nbr_of_tiles_waiting_for_downloading == 0)
+            {
+                DebugMode.WriteLine("Verification du téléchargement...");
+                UpdateDownloadPanel(DownloadEngineClass.id, "Verification du téléchargement...", "0", true, Status.progress);
+                Task.Factory.StartNew(() => Thread.Sleep(500));
+                int NumberOfUrlClassWaitingForDownloading = 0;
+                if (DownloadEngineClass.state != Status.pause && DownloadEngineClass.state != Status.cancel)
+                {
+                    foreach (Url_class urclass in DownloadEngineClass.urls)
+                    {
+                        if ((urclass.status != Status.no_data) || !Settings.generate_transparent_tiles_on_404)
+                        {
+                            if (urclass.status == Status.waitfordownloading)
+                            {
+                                NumberOfUrlClassWaitingForDownloading++;
+                            }
+                            string filename = DownloadEngineClass.save_temp_directory + urclass.x + "_" + urclass.y + "." + DownloadEngineClass.format;
+                            if (System.IO.File.Exists(filename))
+                            {
+                                FileInfo filinfo = new FileInfo(filename);
+                                if (filinfo.Length == 0)
+                                {
+                                    urclass.status = Status.waitfordownloading;
+                                    DebugMode.WriteLine("Tile Taille corrompu");
+                                    NumberOfUrlClassWaitingForDownloading++;
+                                }
+                            }
+                            else
+                            {
+                                DebugMode.WriteLine("Le fichier n'existe pas");
+                                urclass.status = Status.waitfordownloading;
+                                NumberOfUrlClassWaitingForDownloading++;
+                            }
+                        }
+                        else
+                        {
+                            DebugMode.WriteLine("Tuile no_data");
+                        }
+                    }
+                }
+                else
+                {
+                    NumberOfUrlClassWaitingForDownloading++;
+                }
+                DownloadEngineClass.nbr_of_tiles_waiting_for_downloading = NumberOfUrlClassWaitingForDownloading;
+                return NumberOfUrlClassWaitingForDownloading;
+            }
+            return DownloadEngineClass.nbr_of_tiles_waiting_for_downloading;
+        }
+
+
+
         static void DownloadFinish(int id)
         {
             DownloadClass curent_engine = DownloadClass.GetEngineById(id);
@@ -711,17 +663,10 @@ namespace MapsInMyFolder
                 curent_engine.state = Status.success;
             }
 
-            //try
-            //{
             App.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
             {
                 UpdateDownloadPanel(id, "Terminé.", "100", true, Status.success);
             }, null);
-            //}
-            //catch (Exception)
-            //{
-            //    Debug.WriteLine("Erreur UpdateDownloadPanel")
-            //}
         }
 
         public static async void UpdateDownloadPanel(int id, string info = "", string progress = "", bool isimportant = false, Status state = Status.no_data)
@@ -801,166 +746,23 @@ namespace MapsInMyFolder
             DebugMode.WriteLine("Assemblage");
             UpdateDownloadPanel(id, "Assemblage...  1/2", "0", true, Status.assemblage);
             DownloadClass curent_engine = DownloadClass.GetEngineById(id);
-            int settings_tile_size = curent_engine.tile_size;
-            List<int> NO_tile = Collectif.CoordonneesToTile(curent_engine.location["NO_Latitude"], curent_engine.location["NO_Longitude"], curent_engine.zoom);
-            List<int> SE_tile = Collectif.CoordonneesToTile(curent_engine.location["SE_Latitude"], curent_engine.location["SE_Longitude"], curent_engine.zoom);
+            //int settings_tile_size = curent_engine.tile_size;
             string format = curent_engine.format;
-            string save_temp_directory = curent_engine.save_temp_directory;
             string save_directory = curent_engine.save_directory;
             string save_temp_filename = curent_engine.file_temp_name;
             string save_filename = curent_engine.file_name;
-            int tile_size = settings_tile_size;
-            DebugMode.WriteLine(format + " ***" + save_temp_directory + " " + save_directory + " " + save_temp_filename + " " + save_filename + " " + tile_size);
-            int NO_x = NO_tile[0];
-            int NO_y = NO_tile[1];
-            int SE_x = SE_tile[0];
-            int SE_y = SE_tile[1];
-            int decalage_x = SE_x - NO_x;
-            int decalage_y = SE_y - NO_y;
+            int tile_size = curent_engine.tile_size;
+
+
             Dictionary<string, int> rognage_info = GetRognageValue(curent_engine.location["NO_Latitude"], curent_engine.location["NO_Longitude"], curent_engine.location["SE_Latitude"], curent_engine.location["SE_Longitude"], curent_engine.zoom, tile_size);
 
             await Task.Run(() =>
             {
                 if (curent_engine.state == Status.error) { return; }
-                NetVips.Cache.Max = 0;
-                NetVips.Cache.MaxFiles = 0;
-                NetVips.Cache.MaxMem = 0;
-                NetVips.Image image = NetVips.Image.Black((decalage_x * settings_tile_size) + 1, 1);
-                List<NetVips.Image> Vertical_Array = new List<NetVips.Image>();
-                for (int decalage_boucle_for_y = 0; decalage_boucle_for_y <= decalage_y; decalage_boucle_for_y++)
-                {
-                    int tuile_x = NO_x;
-                    int tuile_y = NO_y + decalage_boucle_for_y;
-                    string filename = save_temp_directory + tuile_x + "_" + tuile_y + "." + format;
-                    NetVips.Image tempsimage = NetVips.Image.Black(1, 1);
-                    List<NetVips.Image> Horizontal_Array = new List<NetVips.Image>();
-                    for (int decalage_boucle_for_x = 0; decalage_boucle_for_x <= decalage_x; decalage_boucle_for_x++)
-                    {
-                        tuile_x = NO_x + decalage_boucle_for_x;
-                        filename = save_temp_directory + tuile_x + "_" + tuile_y + "." + format;
-                        FileInfo filinfo = new FileInfo(filename);
-                        if (filinfo.Exists && filinfo.Length != 0)
-                        {
-                            try
-                            {
-                                Debug.WriteLine("Loading " + filename);
-                                tempsimage = NetVips.Image.NewFromFile(filename);
-                                if (tempsimage.Width != settings_tile_size)
-                                {
-                                    double shrinkvalue = settings_tile_size / tempsimage.Width;
-                                    tempsimage = tempsimage.Resize(shrinkvalue);
-                                }
-                                //if (tempsimage.Interpretation != Enums.Interpretation.Srgb)
-                                //{
-                                //    tempsimage.Colourspace(Enums.Interpretation.Srgb);
-                                //}
-                                if (tempsimage.Bands < 3)
-                                {
-                                    tempsimage = tempsimage.Colourspace(Enums.Interpretation.Srgb);
-                                }
-                                if (tempsimage.Bands == 3)
-                                {
-                                    tempsimage = tempsimage.Bandjoin(255);
-                                }
 
-                                /*
-                                 * 
-                                if page.bands < 3:
-        page = page.colourspace("srgb")
-    # make sure there's an alpha
-    if page.bands == 3:
-        page = page.bandjoin(255)
-                                 */
+                NetVips.Image image = GetImageFromTiles(curent_engine);
+                if (image == null) { return; }
 
-                                if (Settings.is_in_debug_mode)
-                                {
-                                    var text = Image.Text(tuile_x + " / " + tuile_y, dpi: 150);
-                                    tempsimage = tempsimage.Composite2(text, Enums.BlendMode.Atop, 0, 0);
-                                }
-                            }
-                            catch (Exception ex)
-                            {
-                                Debug.WriteLine("Erreur NetVips : " + ex.ToString());
-                                //curent_engine.state = Status.error;
-                                UpdateDownloadPanel(curent_engine.id, "Erreur fatale lors de l'assemblage P1", "", true, state: Status.error);
-                                return;
-                            }
-                        }
-                        else
-                        {
-                            Debug.WriteLine("Image not exist, generating empty tile : " + filename);
-                            try
-                            {
-                                //tempsimage = NetVips.Image.Black(settings_tile_size, settings_tile_size,4) + new double[] { 255, 255, 255, 255 };
-                                tempsimage = NetVips.Image.Black(settings_tile_size, settings_tile_size) + new double[] { 0, 0, 0, 0 };
-                            }
-                            catch (Exception ex)
-                            {
-                                Debug.WriteLine("Erreur NetVips : " + ex.ToString());
-                                //curent_engine.state = Status.error;
-                                UpdateDownloadPanel(curent_engine.id, "Erreur fatale lors de l'assemblage P2", "", true, state: Status.error);
-                                return;
-                            }
-                        }
-                        Horizontal_Array.Add(tempsimage);
-                    }
-                    try
-                    {
-
-                        Vertical_Array.Add(NetVips.Image.Arrayjoin(Horizontal_Array.ToArray(), background: new double[] { 255, 255, 255, 255 }));
-                        //MessageBox.Show(Vertical_Array[Vertical_Array.Count - 1].Xres.ToString());
-                        // Vertical_Array[Vertical_Array.Count - 1].Resize()
-                    }
-                    catch (Exception ex)
-                    {
-                        UpdateDownloadPanel(id, "Erreur fatale lors de l'assemblage horizontal", "", true, Status.error);
-                        Debug.WriteLine(ex.Message);
-                        return;
-                    }
-                    double progress_value = 0;
-                    double operation_pourcentage_denominateur = decalage_y * decalage_boucle_for_y;
-
-                    if (operation_pourcentage_denominateur != 0)
-                    {
-                        progress_value = (double)(100 / decalage_y * decalage_boucle_for_y);
-                    }
-                    Horizontal_Array.Clear();
-                }
-
-                UpdateDownloadPanel(id, "Assemblage...  2/2", "0", true, Status.assemblage);
-                Task.Factory.StartNew(() => Thread.Sleep(300));
-                try
-                {
-                    #region fix_dpi_issue_if_vertical_array_is_completly_black
-                    double max_res = 0;
-                    for (int i = 0; i < Vertical_Array.Count; i++)
-                    {
-                        if (Vertical_Array[i].Xres > max_res)
-                        {
-                            max_res = Vertical_Array[i].Xres;
-                            Debug.WriteLine(Vertical_Array[i].Xres);
-                        }
-                    }
-                    Debug.WriteLine("max res = " + max_res);
-
-                    for (int i = 0; i < Vertical_Array.Count; i++)
-                    {
-                        if (Vertical_Array[i].Xres != max_res)
-                        {
-                            Vertical_Array[i] = NetVips.Image.Black(settings_tile_size, settings_tile_size);
-                        }
-                        Debug.WriteLine(Vertical_Array[i].Xres);
-                    }
-                    #endregion
-                    image = NetVips.Image.Arrayjoin(Vertical_Array.ToArray(), across: 1);
-                    image.WriteToFile(@"C:\Users\franc\AppData\Local\Temp\MapsInMyFolder\Google Maps Panorama_GMAP_PANO\5\debug_final.jpeg");
-                }
-                catch (Exception ex)
-                {
-                    UpdateDownloadPanel(id, "Erreur fatale lors de l'assemblage vertical", "", true, Status.error);
-                    Debug.WriteLine(ex.Message);
-                }
-                Vertical_Array.Clear();
                 UpdateDownloadPanel(id, "Rognage...", "0", true, Status.rognage);
                 NetVips.Image image_rogner = NetVips.Image.Black(rognage_info["width"], rognage_info["height"]);
                 image_rogner = image_rogner.Insert(image, -rognage_info["NO_decalage_x"], -rognage_info["NO_decalage_y"]);
@@ -968,149 +770,309 @@ namespace MapsInMyFolder
 
                 //image_rogner = image_rogner.Colourspace(Enums.Interpretation.Bw);
                 //image_rogner = image_rogner.Colourspace(Enums.Interpretation.Grey16);
-                try
-                {
-                    if (curent_engine.RedimWidth != -1 && curent_engine.RedimHeignt != -1)
-                    {
-                        UpdateDownloadPanel(id, "Redimensionnement...", "0", true, Status.rognage);
-                        double hrink = (double)curent_engine.RedimHeignt / (double)rognage_info["height"];
-                        double Vrink = (double)curent_engine.RedimWidth / (double)rognage_info["width"];
-                        DebugMode.WriteLine("hrink : " + curent_engine.RedimHeignt + "/" + rognage_info["height"] + " = " + hrink.ToString());
-                        DebugMode.WriteLine("Vrink : " + curent_engine.RedimWidth + "/" + rognage_info["width"] + " = " + Vrink.ToString());
+                image_rogner = RedimImage(curent_engine, image_rogner, rognage_info);
+                if (curent_engine.state == Status.error) { return; }
 
-                        if ((curent_engine.RedimHeignt == Math.Round((double)rognage_info["height"] * Vrink)) || (curent_engine.RedimWidth == Math.Round((double)rognage_info["width"] * hrink)))
-                        {
-                            DebugMode.WriteLine("Uniform resizing");
-                            image_rogner = image_rogner.Resize(hrink);
-                        }
-                        else
-                        {
-                            DebugMode.WriteLine("ThumbnailImage resizing");
-                            image_rogner = image_rogner.ThumbnailImage(curent_engine.RedimWidth, curent_engine.RedimHeignt, size: Enums.Size.Force);
-                        }
+                SaveImage(curent_engine, image_rogner);
+
+                UpdateDownloadPanel(id, "Libération des ressources..", "100", false, Status.progress);
+                curent_engine.urls.Clear();
+                image_rogner.Dispose();
+                GC.Collect();
+            });
+            DownloadFinish(id);
+            await App.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
+            {
+                CheckifMultipleDownloadInProgress();
+                //TaskbarItemInfo.ProgressState = System.Windows.Shell.TaskbarItemProgressState.Normal;
+                TaskbarItemInfo.ProgressValue = 0;
+            }, null);
+
+        }
+
+
+        static private NetVips.Image RedimImage(DownloadClass curent_engine, NetVips.Image image_rogner, Dictionary<string, int> rognage_info)
+        {
+            try
+            {
+                if (curent_engine.RedimWidth != -1 && curent_engine.RedimHeignt != -1)
+                {
+                    UpdateDownloadPanel(curent_engine.id, "Redimensionnement...", "0", true, Status.rognage);
+                    double hrink = (double)curent_engine.RedimHeignt / (double)rognage_info["height"];
+                    double Vrink = (double)curent_engine.RedimWidth / (double)rognage_info["width"];
+
+                    if ((curent_engine.RedimHeignt == Math.Round((double)rognage_info["height"] * Vrink)) || (curent_engine.RedimWidth == Math.Round((double)rognage_info["width"] * hrink)))
+                    {
+                        DebugMode.WriteLine("Uniform resizing");
+                        return image_rogner.Resize(hrink);
+                    }
+                    else
+                    {
+                        DebugMode.WriteLine("Deform resizing");
+                        return image_rogner.ThumbnailImage(curent_engine.RedimWidth, curent_engine.RedimHeignt, size: Enums.Size.Force);
                     }
                 }
-                catch (Exception ex)
+            }
+            catch (Exception)
+            {
+                UpdateDownloadPanel(curent_engine.id, "Erreur redimensionnement du fichier", "", true, Status.error);
+            }
+            return image_rogner;
+        }
+
+
+        private void SaveImage(DownloadClass curent_engine, NetVips.Image image_rogner)
+        {
+            int tile_size = curent_engine.tile_size;
+            string save_temp_directory = curent_engine.save_temp_directory;
+            string save_directory = curent_engine.save_directory;
+            string save_temp_filename = curent_engine.file_temp_name;
+            string save_filename = curent_engine.file_name;
+
+            UpdateDownloadPanel(curent_engine.id, "Enregistrement...", "0", true, Status.enregistrement);
+            Thread.Sleep(500);
+            var progress = new Progress<int>(percent => UpdateDownloadPanel(curent_engine.id, "", Convert.ToString(percent)));
+            image_rogner.SetProgress(progress);
+            string image_temps_assemblage_path = save_temp_directory + save_temp_filename;
+
+            if (Directory.Exists(save_temp_directory))
+            {
+                if (File.Exists(image_temps_assemblage_path))
                 {
-                    UpdateDownloadPanel(id, "Erreur redimensionnement du fichier", "", true, Status.error);
-                    DebugMode.WriteLine("Erreur redimensionnement du fichier" + ex.Message);
+                    System.IO.File.Delete(image_temps_assemblage_path);
                 }
+            }
+            else
+            {
+                Directory.CreateDirectory(save_temp_directory);
+            }
 
-                if (curent_engine.state == Status.error) { return; }
-                UpdateDownloadPanel(id, "Enregistrement...", "0", true, Status.enregistrement);
-                Thread.Sleep(500);
-                var progress = new Progress<int>(percent => UpdateDownloadPanel(id, "", Convert.ToString(percent)));
-                image_rogner.SetProgress(progress);
-                string image_temps_assemblage_path = save_temp_directory + save_temp_filename;
-
-                if (Directory.Exists(save_temp_directory))
-                {
-                    if (File.Exists(image_temps_assemblage_path))
+            VOption saving_options;
+            if (curent_engine.final_saveformat == "png")
+            {
+                saving_options = new VOption
                     {
-                        System.IO.File.Delete(image_temps_assemblage_path);
+                        { "Q", curent_engine.quality },
+                        { "compression", 100 },
+                        { "interlace", true }
+                    };
+            }
+            else if (curent_engine.final_saveformat == "jpeg")
+            {
+                saving_options = new VOption
+                    {
+                        { "Q", curent_engine.quality },
+                        { "interlace", true },
+                        { "optimize_coding", false }
+                    };
+            }
+            else if (curent_engine.final_saveformat == "tiff")
+            {
+                saving_options = new VOption
+                    {
+                        { "Q", curent_engine.quality },
+                        { "tileWidth", tile_size },
+                        { "tileHeight", tile_size },
+                        { "compression", "jpeg" },
+                        { "interlace", true },
+                        { "tile", true },
+                        { "pyramid", true },
+                        { "bigtif", true }
+                    };
+            }
+            else
+            {
+                saving_options = new VOption();
+            }
+            try
+            {
+                image_rogner.WriteToFile(image_temps_assemblage_path, saving_options);
+            }
+            catch (Exception ex)
+            {
+                UpdateDownloadPanel(curent_engine.id, "Erreur enregistrement du fichier", "", true, Status.error);
+                DebugMode.WriteLine("Erreur enregistrement du fichier" + ex.Message);
+            }
+            DebugMode.WriteLine(image_temps_assemblage_path);
+            if (File.Exists(image_temps_assemblage_path))
+            {
+                UpdateDownloadPanel(curent_engine.id, "Déplacement..", "", true, Status.progress);
+                System.IO.FileInfo assemblage_image_file_info = new System.IO.FileInfo(image_temps_assemblage_path);
+                if (Directory.Exists(save_directory))
+                {
+                    string targetFilePath = save_directory + save_filename;
+                    if (File.Exists(save_directory + save_filename))
+                    {
+                        System.IO.File.Delete(save_directory + save_filename);
+
+                        foreach (DownloadClass eng in DownloadClass.GetEngineList())
+                        {
+                            string engineFilePath = eng.save_directory + eng.file_name;
+                            if (eng.state == Status.success && engineFilePath == targetFilePath)
+                            {
+                                UpdateDownloadPanel(eng.id, "Remplacé", "0", true, Status.deleted);
+                                Database.DB_Download_Update(eng.dbid, "INFOS", "Remplacé");
+                            }
+                        }
                     }
                 }
                 else
                 {
-                    Directory.CreateDirectory(save_temp_directory);
+                    Directory.CreateDirectory(save_directory);
                 }
+                assemblage_image_file_info.MoveTo(save_directory + save_filename);
+            }
+            else
+            {
+                //MessageBox.Show("Une erreur fatale est survenu lors de l'assemblage du fichier \"" + save_filename + "\"");
+                App.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
+                {
+                    Message.NoReturnBoxAsync("Une erreur fatale est survenu lors de l'assemblage du fichier \"" + save_filename + "\"", "Erreur");
+                }, null);
+            }
+        }
 
-                VOption saving_options = new VOption();
-                if (curent_engine.final_saveformat == "png")
-                {
-                    saving_options.Add("Q", curent_engine.quality);
-                    saving_options.Add("compression", 100);
-                    saving_options.Add("interlace", true);
-                }
-                else if (curent_engine.final_saveformat == "jpeg")
-                {
-                    saving_options.Add("Q", curent_engine.quality);
-                    saving_options.Add("interlace", true);
-                    saving_options.Add("optimize_coding", false);
-                }
-                else if (curent_engine.final_saveformat == "tiff")
-                {
-                    saving_options.Add("Q", curent_engine.quality);
-                    saving_options.Add("tileWidth", settings_tile_size);
-                    saving_options.Add("tileHeight", settings_tile_size);
-                    saving_options.Add("compression", "jpeg");
-                    saving_options.Add("interlace", true);
-                    saving_options.Add("tile", true);
-                    saving_options.Add("pyramid", true);
-                    saving_options.Add("bigtif", true);
+        private NetVips.Image GetImageFromTiles(DownloadClass curent_engine)
+        {
+            string format = curent_engine.format;
+            string save_temp_directory = curent_engine.save_temp_directory;
+            string save_directory = curent_engine.save_directory;
+            string save_temp_filename = curent_engine.file_temp_name;
+            string save_filename = curent_engine.file_name;
+            int tile_size = curent_engine.tile_size;
 
-                    ///compression: NetVips.Enums.ForeignTiffCompression.Jpeg, pyramid: true, tile: true, tileWidth: 256, tileHeight: 256
-                }
-                try
+            List<int> NO_tile = Collectif.CoordonneesToTile(curent_engine.location["NO_Latitude"], curent_engine.location["NO_Longitude"], curent_engine.zoom);
+            List<int> SE_tile = Collectif.CoordonneesToTile(curent_engine.location["SE_Latitude"], curent_engine.location["SE_Longitude"], curent_engine.zoom);
+            int NO_x = NO_tile[0];
+            int NO_y = NO_tile[1];
+            int SE_x = SE_tile[0];
+            int SE_y = SE_tile[1];
+            int decalage_x = SE_x - NO_x;
+            int decalage_y = SE_y - NO_y;
+
+            NetVips.Cache.Max = 0;
+            NetVips.Cache.MaxFiles = 0;
+            NetVips.Cache.MaxMem = 0;
+            NetVips.Image image = NetVips.Image.Black((decalage_x * tile_size) + 1, 1);
+            List<NetVips.Image> Vertical_Array = new List<NetVips.Image>();
+            for (int decalage_boucle_for_y = 0; decalage_boucle_for_y <= decalage_y; decalage_boucle_for_y++)
+            {
+                int tuile_x = NO_x;
+                int tuile_y = NO_y + decalage_boucle_for_y;
+                string filename = save_temp_directory + tuile_x + "_" + tuile_y + "." + format;
+                NetVips.Image tempsimage = NetVips.Image.Black(1, 1);
+                List<NetVips.Image> Horizontal_Array = new List<NetVips.Image>();
+                for (int decalage_boucle_for_x = 0; decalage_boucle_for_x <= decalage_x; decalage_boucle_for_x++)
                 {
-                    image_rogner.WriteToFile(image_temps_assemblage_path, saving_options);
-                }
-                catch (Exception ex)
-                {
-                    UpdateDownloadPanel(id, "Erreur enregistrement du fichier", "", true, Status.error);
-                    DebugMode.WriteLine("Erreur enregistrement du fichier" + ex.Message);
-                }
-                DebugMode.WriteLine(image_temps_assemblage_path);
-                if (File.Exists(image_temps_assemblage_path))
-                {
-                    UpdateDownloadPanel(id, "Déplacement..", "", true, Status.progress);
-                    System.IO.FileInfo assemblage_image_file_info = new System.IO.FileInfo(image_temps_assemblage_path);
-                    if (Directory.Exists(save_directory))
+                    tuile_x = NO_x + decalage_boucle_for_x;
+                    filename = save_temp_directory + tuile_x + "_" + tuile_y + "." + format;
+                    FileInfo filinfo = new FileInfo(filename);
+                    if (filinfo.Exists && filinfo.Length != 0)
                     {
-                        if (File.Exists(save_directory + save_filename))
+                        try
                         {
-                            System.IO.File.Delete(save_directory + save_filename);
-
-                            foreach (DownloadClass eng in DownloadClass.GetEngineList())
+                            tempsimage = NetVips.Image.NewFromFile(filename);
+                            if (tempsimage.Width != tile_size)
                             {
-                                if ((eng.save_directory + eng.file_name) == (save_directory + save_filename))
-                                {
-                                    if (eng.state == Status.success)
-                                    {
-                                        UpdateDownloadPanel(eng.id, "Remplacé", "0", true, Status.deleted);
-                                        Database.DB_Download_Update(eng.dbid, "INFOS", "Remplacé");
-                                    }
-                                }
+                                double shrinkvalue = tile_size / tempsimage.Width;
+                                tempsimage = tempsimage.Resize(shrinkvalue);
                             }
+                            if (tempsimage.Bands < 3)
+                            {
+                                tempsimage = tempsimage.Colourspace(Enums.Interpretation.Srgb);
+                            }
+                            if (tempsimage.Bands == 3)
+                            {
+                                tempsimage = tempsimage.Bandjoin(255);
+                            }
+                            if (Settings.is_in_debug_mode)
+                            {
+                                var text = Image.Text(tuile_x + " / " + tuile_y, dpi: 150);
+                                tempsimage = tempsimage.Composite2(text, Enums.BlendMode.Atop, 0, 0);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Debug.WriteLine("Erreur NetVips : " + ex.ToString());
+                            //curent_engine.state = Status.error;
+                            UpdateDownloadPanel(curent_engine.id, "Erreur fatale lors de l'assemblage P1", "", true, state: Status.error);
+                            return null;
                         }
                     }
                     else
                     {
-                        Directory.CreateDirectory(save_directory);
+                        Debug.WriteLine("Image not exist, generating empty tile : " + filename);
+                        try
+                        {
+                            //tempsimage = NetVips.Image.Black(settings_tile_size, settings_tile_size,4) + new double[] { 255, 255, 255, 255 };
+                            tempsimage = NetVips.Image.Black(tile_size, tile_size) + new double[] { 0, 0, 0, 0 };
+                        }
+                        catch (Exception ex)
+                        {
+                            Debug.WriteLine("Erreur NetVips : " + ex.ToString());
+                            //curent_engine.state = Status.error;
+                            UpdateDownloadPanel(curent_engine.id, "Erreur fatale lors de l'assemblage P2", "", true, state: Status.error);
+                            return null;
+                        }
                     }
-                    assemblage_image_file_info.MoveTo(save_directory + save_filename);
+                    Horizontal_Array.Add(tempsimage);
                 }
-                else
+                try
                 {
-                    //MessageBox.Show("Une erreur fatale est survenu lors de l'assemblage du fichier \"" + save_filename + "\"");
-                    App.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
-                    {
-                        Message.NoReturnBoxAsync("Une erreur fatale est survenu lors de l'assemblage du fichier \"" + save_filename + "\"", "Erreur");
-                    }, null);
+                    Vertical_Array.Add(NetVips.Image.Arrayjoin(Horizontal_Array.ToArray(), background: new double[] { 255, 255, 255, 255 }));
                 }
+                catch (Exception ex)
+                {
+                    UpdateDownloadPanel(curent_engine.id, "Erreur fatale lors de l'assemblage horizontal", "", true, Status.error);
+                    Debug.WriteLine(ex.Message);
+                    return null;
+                }
+                double progress_value = 0;
+                double operation_pourcentage_denominateur = decalage_y * decalage_boucle_for_y;
 
-                UpdateDownloadPanel(id, "Libération des ressources..", "100", false, Status.progress);
-                curent_engine.urls.Clear();
-                curent_engine.urls = null;
-                image_rogner.Dispose();
-            });
-            DebugMode.WriteLine("End");
-            DownloadFinish(id);
+                if (operation_pourcentage_denominateur != 0)
+                {
+                    progress_value = (double)(100 / decalage_y * decalage_boucle_for_y);
+                }
+                Horizontal_Array.Clear();
+            }
+
+            UpdateDownloadPanel(curent_engine.id, "Assemblage...  2/2", "0", true, Status.assemblage);
+            Task.Factory.StartNew(() => Thread.Sleep(300));
             try
             {
-                await App.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
+                #region fix_dpi_issue_if_vertical_array_is_completly_black
+                double max_res = 0;
+                for (int i = 0; i < Vertical_Array.Count; i++)
                 {
-                    CheckifMultipleDownloadInProgress();
-                    //TaskbarItemInfo.ProgressState = System.Windows.Shell.TaskbarItemProgressState.Normal;
-                    TaskbarItemInfo.ProgressValue = 0;
-                }, null);
+                    if (Vertical_Array[i].Xres > max_res)
+                    {
+                        max_res = Vertical_Array[i].Xres;
+                        Debug.WriteLine(Vertical_Array[i].Xres);
+                    }
+                }
+
+                for (int i = 0; i < Vertical_Array.Count; i++)
+                {
+                    if (Vertical_Array[i].Xres != max_res)
+                    {
+                        Vertical_Array[i] = NetVips.Image.Black(tile_size, tile_size);
+                    }
+                    Debug.WriteLine(Vertical_Array[i].Xres);
+                }
+                #endregion
+                image = NetVips.Image.Arrayjoin(Vertical_Array.ToArray(), across: 1);
             }
             catch (Exception ex)
             {
-                Debug.WriteLine("fonction Assemblage : " + ex.Message);
+                UpdateDownloadPanel(curent_engine.id, "Erreur fatale lors de l'assemblage vertical", "", true, Status.error);
+                Debug.WriteLine(ex.Message);
             }
-            GC.Collect();
+            Vertical_Array.Clear();
+            return image;
         }
+
+
 
         public async Task DownloadUrlAsync(Url_class url)
         {

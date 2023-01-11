@@ -124,7 +124,8 @@ namespace MapsInMyFolder
         async void UpdateMigniatureParralele()
         {
             Debug.WriteLine("update minia LastResquestZoom " + LastResquestZoom);
-            if (!IsInitialized) {
+            if (!IsInitialized)
+            {
                 Debug.WriteLine("Not ini");
                 return;
             }
@@ -180,7 +181,7 @@ namespace MapsInMyFolder
                             }
                         }
                         DebugMode.WriteLine("telechargement url = " + url.url);
-                        HttpResponse httpResponse = TileGeneratorSettings.TileLoaderGenerator.GetImageAsync(url.url, TileX + url.index_x, TileY + url.index_y, zoom, LayerID, pbfdisableadjacent:true).Result;
+                        HttpResponse httpResponse = TileGeneratorSettings.TileLoaderGenerator.GetImageAsync(url.url, TileX + url.index_x, TileY + url.index_y, zoom, LayerID, pbfdisableadjacent: true).Result;
                         if (UpdateMigniatureParraleleToken.IsCancellationRequested)
                         {
                             if (UpdateMigniatureParraleleToken.CanBeCanceled)
@@ -194,8 +195,8 @@ namespace MapsInMyFolder
                             DebugMode.WriteLine("success= " + url.url);
                             DebugMode.WriteLine("index_x= " + url.index_x);
                             DebugMode.WriteLine("index_y= " + url.index_y);
-                        //BitmapSource img = ToImage(httpResponse.Buffer);
-                        BitmapImageArray[url.index_x, url.index_y] = httpResponse.Buffer;
+                            //BitmapSource img = ToImage(httpResponse.Buffer);
+                            BitmapImageArray[url.index_x, url.index_y] = httpResponse.Buffer;
                         }
                         else
                         {
@@ -204,12 +205,12 @@ namespace MapsInMyFolder
                         }
                     });
 
-                //App.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
-                //{
+                    //App.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
+                    //{
 
-                //}, null);
+                    //}, null);
 
-            }, UpdateMigniatureParraleleToken);
+                }, UpdateMigniatureParraleleToken);
             }
             catch (Exception ex)
             {
@@ -933,19 +934,26 @@ namespace MapsInMyFolder
             int zoom = Convert.ToInt32(ZoomSlider.Value);
             SaveFileDialog saveFileDialog1 = new SaveFileDialog();
             string filter = "";
+            const string pngfilter = "PNG|*.png";
+            const string jpgfilter = "JPEG|*.jpg";
+            const string tifffilter = "TIFF|*.tif";
+            string filterconcat(string filter1, string filter2)
+            {
+                return filter1 + "|" + filter2;
+            }
             if (string.Equals(Curent.Layer.class_format, "png", StringComparison.OrdinalIgnoreCase))
             {
-                filter = "PNG|*.png";
+                filter = pngfilter;
             }
             else if (string.Equals(Curent.Layer.class_format, "jpeg", StringComparison.OrdinalIgnoreCase))
             {
-                filter = "JPEG|*.jpg";
+                filter = jpgfilter;
             }
             else if (string.Equals(Curent.Layer.class_format, "pbf", StringComparison.OrdinalIgnoreCase))
             {
-                filter = "JPEG|*.jpg";
+                filter = filterconcat(jpgfilter, pngfilter);
             }
-            saveFileDialog1.Filter = filter + "|TIFF|*.tif";
+            saveFileDialog1.Filter = filterconcat(filter, tifffilter);
             saveFileDialog1.Title = "Selectionnez un emplacement de sauvegarde :";
             saveFileDialog1.RestoreDirectory = true;
             saveFileDialog1.OverwritePrompt = true;

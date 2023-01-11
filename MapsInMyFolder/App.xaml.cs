@@ -130,7 +130,7 @@ namespace MapsInMyFolder
             }
             finally
             {
-                Collectif.RestartApplication();
+                //Collectif.RestartApplication();
             }
         }
 

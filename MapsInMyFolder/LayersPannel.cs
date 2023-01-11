@@ -348,12 +348,14 @@ namespace MapsInMyFolder
                 {
                     Layers.Convert.ToCurentLayer(layer);
                     Debug.WriteLine("Set curent layer " + layer.class_name + " = " + layer.class_tiles_size);
-                    if (layer.class_format == "png")
+                    List<string> listoftransparentformat = new List<string> { "png", "pbf2" };
+
+                    if (listoftransparentformat.Contains(layer.class_format))
                     {
                         MapTileLayer_Transparent.TileSource = new TileSource { UriFormat = layer.class_tile_url, LayerID = layer.class_id };
                         MapTileLayer_Transparent.Opacity = 1;
 
-                        if (last_format != "png" && last_format.Trim() != "" && layer.class_identifiant is not null)
+                        if ((!listoftransparentformat.Contains(last_format)) && last_format.Trim() != "" && layer.class_identifiant is not null)
                         {
                             try
                             {

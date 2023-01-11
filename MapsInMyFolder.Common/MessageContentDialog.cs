@@ -60,6 +60,29 @@ namespace MapsInMyFolder.Commun
         //    dialog.ShowAsync();
         //    return textBox.Text;
         //}
+
+        public static (TextBox textBox, ContentDialog dialog) SetInputBoxDialog(object text, object caption = null, MessageDialogButton messageBoxButton = MessageDialogButton.OK)
+        {
+            ContentDialog dialog = SetContentDialog(text, caption, messageBoxButton);
+            StackPanel stackPanel = new StackPanel();
+            TextBlock textBlock = new TextBlock();
+            if (!string.IsNullOrEmpty(text?.ToString()))
+            {
+                textBlock.Text = text.ToString();
+                textBlock.TextWrapping = TextWrapping.Wrap;
+            }
+            TextBox textBox = new TextBox
+            {
+                Style = (Style)Application.Current.Resources["TextBoxCleanStyle_13"],
+                HorizontalAlignment = HorizontalAlignment.Stretch,
+                Margin = new Thickness(0, 10, 0, 0)
+            };
+            stackPanel.Children.Add(textBlock);
+            stackPanel.Children.Add(textBox);
+            dialog.Content = stackPanel;
+            return (textBox, dialog);
+        }
+
         public static ContentDialog SetContentDialog(object text, object caption = null, MessageDialogButton messageBoxButton = MessageDialogButton.OK, bool showTextbox = false)
         {
             ContentDialog dialog = new ContentDialog
