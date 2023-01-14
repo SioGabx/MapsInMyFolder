@@ -43,6 +43,8 @@ namespace MapsInMyFolder.Commun
         public static int max_retry_download = 3;                                               //Nombre max de passe lors du telechargement d'un calque | Default=3
         public static int max_redirection_download_tile = 5;                                               //Nombre max de passe de redirection d'une tuile
         public static int tiles_cache_expire_after_x_days = 1;                                  //Nombre de jours apres lequel retelecharger les tuiles | Default=1
+        public static bool nettoyer_cache_browser_au_demarrage = true;
+        public static bool nettoyer_cache_layers_au_demarrage = false;
         public static int max_download_project_in_parralele = 1;                                //Nombre telechargement en para | Default=1
         public static int max_download_tiles_in_parralele = 10;                                 //Nombre telechargement de tuile en para | Default=10
         public static int waiting_before_start_another_tile_download = 0;                        //Nombre de milisecondes entre chaque téléchargement d'une tuile (seulement si max_download_tiles_in_parralele = 1 de préférence)
@@ -62,7 +64,7 @@ namespace MapsInMyFolder.Commun
         public static double SE_PIN_starting_location_longitude = 6.45085;
         public static int map_defaut_zoom_level = 18;
         public static bool zoom_limite_taille_carte = false;                                    //Empeche de zoomer au dela de la limite de la carte
-        public static string tileloader_default_script = "//default script\nfunction main(args) {\n   return args;\n}"; //todo : https in github 
+        public static string tileloader_default_script = "//default script\nfunction getTile(args) {\n   return args;\n}"; 
         public static string user_agent = "Mozilla/4.0 (Compatible; Windows NT 5.1; MSIE 6.0) (compatible; MSIE 6.0; Windows NT 5.1; .NET CLR 1.1.4322; .NET CLR 2.0.50727)";
         //public static string user_agent = @"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.114 Safari/537.36 Edg/103.0.1264.62";
 

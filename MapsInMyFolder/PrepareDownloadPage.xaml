@@ -31,7 +31,7 @@
             </Grid.RowDefinitions>
 
             <Label Grid.Row="0" Content="Téléchargement" HorizontalAlignment="Left" Margin="28,10,0,0" VerticalAlignment="Top" Width="Auto" Height="50" FontSize="30" FontFamily="Segoe UI Light" Foreground="#FFE2E2E1"/>
-            <ScrollViewer  Padding="0,0,0,30"  VerticalScrollBarVisibility="Auto" Grid.Row="1" Grid.Column="0" Height="{Binding ElementName=MainContentScrollRow, Path=Height}"  Width="{Binding ElementName=MainContentScrollColumn, Path=Width}">
+            <ScrollViewer  Padding="0,0,0,30"  VerticalScrollBarVisibility="Auto" Grid.Row="1" Grid.Column="0">
 
                 <Grid Grid.Row="1"  Margin="15,10,5,0">
                     <Grid.ColumnDefinitions>

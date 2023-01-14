@@ -56,52 +56,62 @@ namespace MapsInMyFolder.Commun
 
     public static class Collectif
     {
+
         public static class GetUrl
         {
-            public static int numberofurlgenere = 0;
-            public static string FromTileXYZ(string urlbase, int x, int y, int z, int LayerID)
+            public enum InvokeFunction { getTile, getPreview, getPreviewFallback }
+            public static string FromTileXYZ(string urlbase, int Tilex, int Tiley, int z, int LayerID, InvokeFunction InvokeFunction)
             {
                 if (LayerID == -1)
                 {
                     return urlbase;
                 }
-                string finalurl = urlbase;
-                List<double> location_topleft = Commun.Collectif.TileToCoordonnees(x, y, z);
-                List<double> location_bottomright = Commun.Collectif.TileToCoordonnees(x + 1, y + 1, z);
+
+                Layers calque = Layers.GetLayerById(LayerID);
+                if (calque is null)
+                {
+                    return string.Empty;
+                }
+                string finalurl;
+                if (string.IsNullOrEmpty(urlbase))
+                {
+                    finalurl = calque.class_tile_url;
+                }
+                else
+                {
+                    finalurl = urlbase;
+                }
+                List<double> location_topleft = Commun.Collectif.TileToCoordonnees(Tilex, Tiley, z);
+                List<double> location_bottomright = Commun.Collectif.TileToCoordonnees(Tilex + 1, Tiley + 1, z);
                 List<double> location = Commun.Collectif.GetCenterBetweenTwoPoints(location_topleft, location_bottomright);
+
                 Dictionary<string, object> argument = new Dictionary<string, object>()
                 {
-                      { "x",  x.ToString() },
-                     { "y",  y.ToString() },
+                      { "x",  Tilex.ToString() },
+                      { "y",  Tiley.ToString() },
                       { "z",  z.ToString() },
-                    { "zoom",  z.ToString() },
+                      { "zoom",  z.ToString() },
                       { "lat",  location[0].ToString() },
                       { "lng",  location[1].ToString()},
+
                       { "t_lat",  location_topleft[0].ToString() },
                       { "t_lng",  location_topleft[1].ToString()},
                       { "b_lat",  location_bottomright[0].ToString() },
                       { "b_lng",  location_bottomright[1].ToString()},
+
                       { "layerid",  LayerID.ToString() },
+                      { "url",  urlbase },
                 };
                 //Jint.Native.JsValue JavascriptMainResult = Commun.Javascript.ExecuteScript("function main() { var js = new TheType(); log(js.TestDoubleReturn(0,0)); return args; }", argument);
-                Layers calque = Layers.GetLayerById(LayerID);
-                string TileComputationScript;
-                if (calque is null)
-                {
-                    return "";
-                }
-                else
-                {
-                    TileComputationScript = calque.class_tilecomputationscript;
-                }
+
+                string TileComputationScript = calque.class_tilecomputationscript;
+
                 if (!string.IsNullOrEmpty(TileComputationScript))
                 {
                     Jint.Native.JsValue JavascriptMainResult = null;
                     try
                     {
-                        //JavascriptMainResult = Commun.Javascript.ExecuteScript(TileComputationScript, argument, LayerID);
-                        DebugMode.WriteLine("DEBUG JS : LayerId" + LayerID);
-                        JavascriptMainResult = Commun.Javascript.ExecuteScript(TileComputationScript, argument, LayerID);
+                        JavascriptMainResult = Commun.Javascript.ExecuteScript(TileComputationScript, argument, LayerID, InvokeFunction);
                     }
                     catch (Exception ex)
                     {
@@ -112,6 +122,15 @@ namespace MapsInMyFolder.Commun
                         object JavascriptMainResultObject = JavascriptMainResult.ToObject();
                         var JavascriptMainResultJson = JsonConvert.SerializeObject(JavascriptMainResultObject);
                         var JavascriptMainResultDictionary = JsonConvert.DeserializeObject<Dictionary<string, string>>(JavascriptMainResultJson);
+
+                        if (JavascriptMainResultDictionary.TryGetValue("url", out string urlResult))
+                        {
+                            if (!string.IsNullOrEmpty(urlResult))
+                            {
+                                finalurl = urlResult;
+                            }
+                        }
+
                         foreach (var JavascriptReplacementVar in JavascriptMainResultDictionary)
                         {
                             string replacementValue = string.Empty;
@@ -138,7 +157,6 @@ namespace MapsInMyFolder.Commun
                         }
                     }
                 }
-                numberofurlgenere++;
                 return finalurl;
             }
 
@@ -184,7 +202,7 @@ namespace MapsInMyFolder.Commun
                     {
                         int tuileX = NO_x + Download_X_tile;
                         int tuileY = NO_y + Download_Y_tile;
-                        string url_to_add_inside_list = FromTileXYZ(urlbase, tuileX, tuileY, z, LayerID);
+                        string url_to_add_inside_list = FromTileXYZ(urlbase, tuileX, tuileY, z, LayerID, InvokeFunction.getTile);
                         list_of_url_to_download.Add(new Url_class(url_to_add_inside_list, tuileX, tuileY, z, Status.waitfordownloading, downloadid));
                         DebugMode.WriteLine("Need to download tuileX:" + tuileX + " tuileY:" + tuileY);
                         List<int> next_num_list = NextNumberFromPara(Download_X_tile, Download_Y_tile, max_x, max_y);
@@ -274,7 +292,7 @@ namespace MapsInMyFolder.Commun
             }
             //Debug.WriteLine(settings_temp_folder);
             string nom_charclean = string.Concat(nom.Split(Path.GetInvalidFileNameChars()));
-            string chemin = System.IO.Path.Combine(settings_temp_folder, nom_charclean + "_" + identifiant + "\\");
+            string chemin = System.IO.Path.Combine(settings_temp_folder, "layers", nom_charclean + "_" + identifiant + "\\");
             if (zoom != -1)
             {
                 chemin += zoom + "\\";
@@ -708,13 +726,14 @@ namespace MapsInMyFolder.Commun
             return str;
         }
 
-        public static string Replacements(string origin, string x, string y, string z, int LayerID)
+        public static string Replacements(string tileBaseUrl, string x, string y, string z, int LayerID, Collectif.GetUrl.InvokeFunction invokeFunction)
         {
             //string origin_result = origin;
             //origin_result = origin_result.Replace("{x}", x);
             //origin_result = origin_result.Replace("{y}", y);
             //origin_result = origin_result.Replace("{z}", z);
-            return Collectif.GetUrl.FromTileXYZ(origin, Convert.ToInt32(x), Convert.ToInt32(y), Convert.ToInt32(z), LayerID).Replace(" ", "%20");
+            if (string.IsNullOrEmpty(tileBaseUrl)) { return String.Empty; }
+            return Collectif.GetUrl.FromTileXYZ(tileBaseUrl, Convert.ToInt32(x), Convert.ToInt32(y), Convert.ToInt32(z), LayerID, invokeFunction).Replace(" ", "%20");
         }
 
         public static int CheckIfDownloadSuccess(string url)

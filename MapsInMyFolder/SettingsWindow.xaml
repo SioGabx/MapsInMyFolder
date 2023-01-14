@@ -529,6 +529,23 @@
                                     </Grid.RowDefinitions>
                                     <CheckBox x:Name="show_download_devtool" Foreground="#888989" Grid.Row="0">Afficher les devtool pour le panneau "Téléchargements"</CheckBox>
                                 </Grid>
+                                
+                                
+                                <Grid Margin="0,10,0,0">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="20"/>
+                                        <RowDefinition Height="*" />
+                                    </Grid.RowDefinitions>
+                                    <CheckBox x:Name="nettoyer_cache_browser_au_demarrage" Foreground="#888989" Grid.Row="0">Supprimer le cache des panneaux au démarrage</CheckBox>
+                                </Grid>
+                                
+                                <Grid Margin="0,10,0,0">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="20"/>
+                                        <RowDefinition Height="*" />
+                                    </Grid.RowDefinitions>
+                                    <CheckBox x:Name="nettoyer_cache_layers_au_demarrage" Foreground="#888989" Grid.Row="0">Supprimer le cache des tuiles au démarrage</CheckBox>
+                                </Grid>
 
 
                                 <Button x:Name="resetSettings" Content="Restaurer les paramètres par défaut" Margin="0,10,0,0" Foreground="#BCBCBC" Click="ResetSettings_Click"></Button>

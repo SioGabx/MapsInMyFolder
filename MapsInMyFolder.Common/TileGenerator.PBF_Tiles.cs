@@ -127,7 +127,7 @@ namespace MapsInMyFolder.Commun
                 string save_filename = save_temp_directory_rawBPF + filename;
                 if (do_download_this_tile)
                 {
-                    Uri uri = new Uri(Collectif.GetUrl.FromTileXYZ(urlBase, TileX, TileY, zoom, layerID));
+                    Uri uri = new Uri(Collectif.GetUrl.FromTileXYZ(urlBase, TileX, TileY, zoom, layerID, Collectif.GetUrl.InvokeFunction.getTile));
                     DebugMode.WriteLine("Tache n°" + tache + " : Telechargement u1");
                     response = await Collectif.ByteDownloadUri(uri, layerID, true);
                     if (response?.Buffer is null)
@@ -294,7 +294,7 @@ namespace MapsInMyFolder.Commun
                             HttpResponse tp_response = HttpResponse.HttpResponseError;
                             try
                             {
-                                Uri temp_uri = new Uri(Collectif.GetUrl.FromTileXYZ(urlBase, TileX_tp, TileY_tp, zoom, layerID));
+                                Uri temp_uri = new Uri(Collectif.GetUrl.FromTileXYZ(urlBase, TileX_tp, TileY_tp, zoom, layerID, Collectif.GetUrl.InvokeFunction.getTile));
                                 tp_response = await Collectif.ByteDownloadUri(temp_uri, 0, true).ConfigureAwait(false);
                                 if (tp_response?.Buffer is null)
                                 {

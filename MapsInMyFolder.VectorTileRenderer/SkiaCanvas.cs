@@ -546,12 +546,6 @@ namespace MapsInMyFolder.VectorTileRenderer
                 var angle = Math.Atan2(vector.Y, vector.X);
                 var angleDiff = Math.Abs(GetAbsoluteDiff2Angles(angle, previousAngle));
 
-                //var length = vector.Length / textHeight;
-                //var curve = angleDiff / length;
-                //maxCurve = Math.Max(curve, maxCurve);
-
-                //todo : add custom setting ici pour gerer la toelrence
-                //if (angleDiff > Math.PI / 3)
                 if (angleDiff > Math.PI / 2)
                 {
                     return true;

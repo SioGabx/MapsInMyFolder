@@ -123,10 +123,8 @@ namespace MapsInMyFolder
         CancellationToken UpdateMigniatureParraleleToken = new CancellationToken();
         async void UpdateMigniatureParralele()
         {
-            Debug.WriteLine("update minia LastResquestZoom " + LastResquestZoom);
             if (!IsInitialized)
             {
-                Debug.WriteLine("Not ini");
                 return;
             }
             if (LastResquestZoom == ZoomSlider.Value)
@@ -164,52 +162,35 @@ namespace MapsInMyFolder
                     {
                         for (int index_y = 0; index_y < 2; index_y++)
                         {
-                            string urlbase = Collectif.GetUrl.FromTileXYZ(Curent.Layer.class_tile_url, TileX + index_x, TileY + index_y, zoom, LayerID);
-                            DebugMode.WriteLine("Add " + urlbase + " to the list");
+                            string urlbase = Collectif.GetUrl.FromTileXYZ(Curent.Layer.class_tile_url, TileX + index_x, TileY + index_y, zoom, LayerID, Collectif.GetUrl.InvokeFunction.getTile);
                             ListOfUrls.Add(new { url = urlbase, index_x, index_y });
                         }
                     }
-                    DebugMode.WriteLine("Téléchargement en parralele des fichiers");
+                    //Téléchargement en parralele des fichiers
                     Parallel.ForEach(ListOfUrls, new ParallelOptions { MaxDegreeOfParallelism = Commun.Settings.max_download_tiles_in_parralele }, url =>
                     {
-                        if (UpdateMigniatureParraleleToken.IsCancellationRequested)
+                        if (UpdateMigniatureParraleleToken.IsCancellationRequested && UpdateMigniatureParraleleToken.CanBeCanceled)
                         {
-                            if (UpdateMigniatureParraleleToken.CanBeCanceled)
-                            {
-                                Debug.WriteLine("Cancel Parallel ListOfUrls UpdateMigniatureParralele");
-                                return;
-                            }
+                            //Cancel Parallel ListOfUrls UpdateMigniatureParralele
+                            return;
                         }
-                        DebugMode.WriteLine("telechargement url = " + url.url);
                         HttpResponse httpResponse = TileGeneratorSettings.TileLoaderGenerator.GetImageAsync(url.url, TileX + url.index_x, TileY + url.index_y, zoom, LayerID, pbfdisableadjacent: true).Result;
-                        if (UpdateMigniatureParraleleToken.IsCancellationRequested)
+                        if (UpdateMigniatureParraleleToken.IsCancellationRequested && UpdateMigniatureParraleleToken.CanBeCanceled)
                         {
-                            if (UpdateMigniatureParraleleToken.CanBeCanceled)
-                            {
-                                DebugMode.WriteLine("Cancel Parallel ListOfUrls UpdateMigniatureParralele");
-                                return;
-                            }
+                            //Cancel Parallel ListOfUrls UpdateMigniatureParralele
+                            return;
                         }
+
                         if (httpResponse?.ResponseMessage.IsSuccessStatusCode == true)
                         {
-                            DebugMode.WriteLine("success= " + url.url);
-                            DebugMode.WriteLine("index_x= " + url.index_x);
-                            DebugMode.WriteLine("index_y= " + url.index_y);
-                            //BitmapSource img = ToImage(httpResponse.Buffer);
                             BitmapImageArray[url.index_x, url.index_y] = httpResponse.Buffer;
                         }
                         else
                         {
-                            DebugMode.WriteLine("fail = " + url.url);
+                            //download fail
                             BitmapImageArray[url.index_x, url.index_y] = null;
                         }
                     });
-
-                    //App.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
-                    //{
-
-                    //}, null);
-
                 }, UpdateMigniatureParraleleToken);
             }
             catch (Exception ex)
@@ -246,7 +227,6 @@ namespace MapsInMyFolder
             {
                 if (array == null)
                 {
-                    DebugMode.WriteLine("ByteArray is null");
                     const int width = 256;
                     const int height = width;
                     const int stride = width / 8;

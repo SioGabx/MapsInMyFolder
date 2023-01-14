@@ -34,13 +34,9 @@ namespace MapsInMyFolder.MapControl
                 }
                 else if (uri.Scheme == "http" || uri.Scheme == "https")
                 {
-                    Debug.WriteLine("Download tile g           " + uri.ToString());
-                    //var response = await GetHttpResponseAsync(uri);
-                    //
                     Commun.HttpResponse response;
                     if (z != -1)
                     {
-                        //todo : what is that ?
                         string SaveTempDir = "";
                         string fileformat = string.Empty;
                         if (!(tileSource is null) && tileSource.LayerID != 0)
@@ -66,7 +62,6 @@ namespace MapsInMyFolder.MapControl
 
                     if (response?.Buffer != null && response.ResponseMessage.IsSuccessStatusCode)
                     {
-                        Debug.WriteLine("Load from LoadImageAsync");
                         image = await LoadImageAsync(response.Buffer).ConfigureAwait(false);
                     }
                 }

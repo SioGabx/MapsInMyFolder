@@ -435,9 +435,6 @@ namespace MapsInMyFolder
                 {
                     Directory.Delete(temp_dir, true);
                 }
-                //TODO : Fixe error : L'objet Visual spécifié est déjà un enfant d'un autre objet Visual ou la racine d'une classe CompositionTarget.
-                //Generate dinamicly and not set 
-
                 if (ShowMessageBox)
                 {
                     Message.NoReturnBoxAsync("Le cache du calque \"" + layers.class_name + "\" à été vidé", "Opération réussie");
@@ -494,71 +491,71 @@ namespace MapsInMyFolder
         {
             Layers layer = Layers.GetLayerById(id);
 
-            if (layer is not null)
+            if (layer is null)
             {
-                try
-                {
-                    int layer_startup_id = Commun.Settings.layer_startup_id;
-                    if (layer_startup_id == 0)
-                    {
-                        layer_startup_id = Layers.GetLayerById(Layers.Layers_Dictionary_List[0].Keys.First()).class_id;
-                    }
-
-                    string class_tile_url_p1 = layer.class_tile_url;
-                    int min_zoom = layer.class_min_zoom;
-                    int max_zoom = layer.class_max_zoom;
-
-                    Layers StartingLayer = Layers.GetLayerById(layer_startup_id);
-
-                    int back_min_zoom = min_zoom;
-                    int back_max_zoom = max_zoom;
-                    if (StartingLayer is not null)
-                    {
-                        back_min_zoom = StartingLayer.class_min_zoom;
-                        back_max_zoom = StartingLayer.class_max_zoom;
-                    }
-
-                    double Latitude = mapviewer.Center.Latitude;
-                    double Longitude = mapviewer.Center.Longitude;
-                    int Zoom = Convert.ToInt32(Math.Round(mapviewer.TargetZoomLevel));
-                    if (Zoom < min_zoom) { Zoom = min_zoom; }
-                    if (Zoom > max_zoom) { Zoom = max_zoom; }
-
-                    if (Zoom < back_min_zoom) { Zoom = Math.Max(back_min_zoom, Zoom); }
-                    if (Zoom > back_max_zoom) { Zoom = Math.Min(back_max_zoom, Zoom); }
-
-                    List<int> TileNumber = Collectif.CoordonneesToTile(Latitude, Longitude, Zoom);
-                    //string Replacements(string origin)
-                    //{
-                    //    string origin_result = origin;
-                    //    origin_result = origin_result.Replace("{x}", TileNumber[0].ToString());
-                    //    origin_result = origin_result.Replace("{y}", TileNumber[1].ToString());
-                    //    origin_result = origin_result.Replace("{z}", Zoom.ToString());
-                    //    origin_result = origin_result.Replace(" ", "%20");
-                    //    return origin_result;
-                    //}
-                    class_tile_url_p1 = Collectif.Replacements(class_tile_url_p1, TileNumber[0].ToString(), TileNumber[1].ToString(), Zoom.ToString(), id);
-
-                    string class_tile_url_p2 = "";
-                    if (StartingLayer is not null)
-                    {
-                        class_tile_url_p2 = StartingLayer.class_tile_url;
-                    }
-                    class_tile_url_p2 = Collectif.Replacements(class_tile_url_p2, TileNumber[0].ToString(), TileNumber[1].ToString(), Zoom.ToString(), id);
-                    return class_tile_url_p1 + " " + class_tile_url_p2;
-                }
-                catch (Exception ex)
-                {
-                    DebugMode.WriteLine("error exception " + ex.Message);
-                }
-            }
-            else
-            {
-                DebugMode.WriteLine("layer is null");
                 return "";
             }
-            DebugMode.WriteLine("????");
-            return "";
+
+            try
+            {
+                int layer_startup_id = Commun.Settings.layer_startup_id;
+                Layers StartingLayer = Layers.GetLayerById(layer_startup_id);
+
+                int min_zoom = layer.class_min_zoom;
+                int max_zoom = layer.class_max_zoom;
+                int back_min_zoom = min_zoom;
+                int back_max_zoom = max_zoom;
+
+                if (StartingLayer is not null)
+                {
+                    back_min_zoom = StartingLayer.class_min_zoom;
+                    back_max_zoom = StartingLayer.class_max_zoom;
+                }
+                int Zoom = Convert.ToInt32(Math.Round(mapviewer.TargetZoomLevel));
+                if (Zoom < min_zoom) { Zoom = min_zoom; }
+                if (Zoom > max_zoom) { Zoom = max_zoom; }
+
+                if (Zoom < back_min_zoom) { Zoom = Math.Max(back_min_zoom, Zoom); }
+                if (Zoom > back_max_zoom) { Zoom = Math.Min(back_max_zoom, Zoom); }
+
+
+
+                double Latitude = mapviewer.Center.Latitude;
+                double Longitude = mapviewer.Center.Longitude;
+                List<int> TileNumber = Collectif.CoordonneesToTile(Latitude, Longitude, Zoom);
+
+                Collectif.GetUrl.InvokeFunction invokeFunction = Collectif.GetUrl.InvokeFunction.getTile;
+                if (Javascript.CheckIfFunctionExist(id, Collectif.GetUrl.InvokeFunction.getPreview.ToString(), null))
+                {
+                    invokeFunction = Collectif.GetUrl.InvokeFunction.getPreview;
+                }
+                string previewLayerImageUrl = Collectif.Replacements(layer.class_tile_url, TileNumber[0].ToString(), TileNumber[1].ToString(), Zoom.ToString(), id, invokeFunction);
+                
+                if (string.IsNullOrEmpty(previewLayerImageUrl) && invokeFunction == Collectif.GetUrl.InvokeFunction.getPreview)
+                {
+                    Debug.WriteLine("Trahison" + previewLayerImageUrl);
+                    previewLayerImageUrl = Collectif.Replacements(layer.class_tile_url, TileNumber[0].ToString(), TileNumber[1].ToString(), Zoom.ToString(), id, Collectif.GetUrl.InvokeFunction.getTile);
+                }
+
+
+                string previewBackgroundImageUrl = Collectif.Replacements(StartingLayer?.class_tile_url, TileNumber[0].ToString(), TileNumber[1].ToString(), Zoom.ToString(), id, Collectif.GetUrl.InvokeFunction.getTile);
+                string previewFallbackLayerImageUrl = String.Empty;
+                if (Javascript.CheckIfFunctionExist(id, Collectif.GetUrl.InvokeFunction.getPreviewFallback.ToString(), null))
+                {
+                    previewFallbackLayerImageUrl = Collectif.Replacements(layer.class_tile_url, TileNumber[0].ToString(), TileNumber[1].ToString(), Zoom.ToString(), id, Collectif.GetUrl.InvokeFunction.getPreviewFallback); 
+                    if (!string.IsNullOrEmpty(previewFallbackLayerImageUrl))
+                    {
+                        previewFallbackLayerImageUrl = " " + previewFallbackLayerImageUrl;
+                    }
+                }
+                return previewLayerImageUrl + " " + previewBackgroundImageUrl + previewFallbackLayerImageUrl;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("Error getPreview exception :" + ex.Message);
+            }
+            return String.Empty;
+
         }
     }
 

@@ -1255,11 +1255,10 @@ namespace MapsInMyFolder
                 double longitude_coins_haut_gauche_next_tileX = NextCoinsHautGaucheLocationFromTile[0];
                 double latitude_coins_haut_gauche_next_tileY = NextCoinsHautGaucheLocationFromTile[1];
 
-                double latitude_decalage = Math.Abs(Latitude - latitude_coins_haut_gauche_curent_tileY) * 100 / Math.Abs(latitude_coins_haut_gauche_curent_tileY - latitude_coins_haut_gauche_next_tileY) / 100;
                 double longitude_decalage = Math.Abs(Longitude - longitude_coins_haut_gauche_curent_tileX) * 100 / Math.Abs(longitude_coins_haut_gauche_curent_tileX - longitude_coins_haut_gauche_next_tileX) / 100;
-                int decalage_y = Math.Abs(Convert.ToInt32(Math.Round(latitude_decalage * tile_width, 0)));
+                double latitude_decalage = Math.Abs(Latitude - latitude_coins_haut_gauche_curent_tileY) * 100 / Math.Abs(latitude_coins_haut_gauche_curent_tileY - latitude_coins_haut_gauche_next_tileY) / 100;
                 int decalage_x = Math.Abs(Convert.ToInt32(Math.Round(longitude_decalage * tile_width, 0)));
-                DebugMode.WriteLine("Décalage en px : X = " + decalage_x + " Y = " + decalage_y);
+                int decalage_y = Math.Abs(Convert.ToInt32(Math.Round(latitude_decalage * tile_width, 0)));
                 return new List<int>() { decalage_x, decalage_y };
             }
 

@@ -2,3 +2,9 @@
 
 # RCS1036: Remove unnecessary blank line.
 dotnet_diagnostic.RCS1036.severity = silent
+
+# Default severity for all analyzer diagnostics
+dotnet_analyzer_diagnostic.severity = silent
+
+# CS8002: L'assembly référencé 'clipper_library, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null' n'a pas de nom fort.
+dotnet_diagnostic.CS8002.severity = silent

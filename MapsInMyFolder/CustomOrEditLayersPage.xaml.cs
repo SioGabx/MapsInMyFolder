@@ -440,16 +440,16 @@ namespace MapsInMyFolder
             {
                 Message.NoReturnBoxAsync("Une erreur s'est produite lors de l'enregistrement, veuillez réessayer.");
             }
-            string NOM = layers.class_name;
-            string DESCRIPTION = layers.class_description;
-            string CATEGORIE = layers.class_categorie;
-            string IDENTIFIANT = layers.class_identifiant;
-            string TILE_URL = layers.class_tile_url;
+            string NOM = Collectif.HTMLEntities(layers.class_name);
+            string DESCRIPTION = Collectif.HTMLEntities(layers.class_description);
+            string CATEGORIE = Collectif.HTMLEntities(layers.class_categorie);
+            string IDENTIFIANT = Collectif.HTMLEntities(layers.class_identifiant);
+            string TILE_URL = Collectif.HTMLEntities(layers.class_tile_url);
             int MIN_ZOOM = layers.class_min_zoom;
             int MAX_ZOOM = layers.class_max_zoom;
-            string FORMAT = layers.class_format;
-            string SITE = layers.class_site;
-            string SITE_URL = layers.class_site_url;
+            string FORMAT = Collectif.HTMLEntities(layers.class_format);
+            string SITE = Collectif.HTMLEntities(layers.class_site);
+            string SITE_URL = Collectif.HTMLEntities(layers.class_site_url);
             int TILE_SIZE = layers.class_tiles_size;
             string TILECOMPUTATIONSCRIPT = Collectif.HTMLEntities(layers.class_tilecomputationscript);
             string SPECIALSOPTIONS = JsonSerializer.Serialize<Layers.SpecialsOptions>(layers.class_specialsoptions);
@@ -510,16 +510,16 @@ namespace MapsInMyFolder
             Debug.WriteLine("UpdateMoinsUnLayer");
             Javascript.JavascriptInstance.Logs = String.Empty;
             Javascript.EngineClearList();
-            string NOM = Collectif.HTMLEntities(TextboxLayerName.Text.Trim());
-            string DESCRIPTION = Collectif.HTMLEntities(TextboxLayerDescriptif.Text.Trim());
-            string CATEGORIE = Collectif.HTMLEntities(GetComboBoxValue(TextboxLayerCategories));
-            string IDENTIFIANT = Collectif.HTMLEntities(TextboxLayerIdentifiant.Text.Trim());
-            string TILE_URL = Collectif.HTMLEntities(TextboxLayerTileUrl.Text.Trim());
+            string NOM = TextboxLayerName.Text.Trim();
+            string DESCRIPTION = TextboxLayerDescriptif.Text.Trim();
+            string CATEGORIE = GetComboBoxValue(TextboxLayerCategories);
+            string IDENTIFIANT = TextboxLayerIdentifiant.Text.Trim();
+            string TILE_URL = TextboxLayerTileUrl.Text.Trim();
             int MIN_ZOOM = GetIntValueFromTextBox(TextBoxLayerMinZoom);
             int MAX_ZOOM = GetIntValueFromTextBox(TextBoxLayerMaxZoom);
-            string FORMAT = Collectif.HTMLEntities(TextboxLayerFormat.Text.Trim().ToLowerInvariant());
-            string SITE = Collectif.HTMLEntities(TextboxLayerSite.Text.Trim());
-            string SITE_URL = Collectif.HTMLEntities(TextboxLayerSiteUrl.Text.Trim());
+            string FORMAT = TextboxLayerFormat.Text.Trim().ToLowerInvariant();
+            string SITE = TextboxLayerSite.Text.Trim();
+            string SITE_URL = TextboxLayerSiteUrl.Text.Trim();
             int TILE_SIZE = GetIntValueFromTextBox(TextboxLayerTileWidth);
             string TILECOMPUTATIONSCRIPT = TextboxLayerScript.Text.Trim();
             Layers layers = Layers.GetLayerById(-2);
@@ -586,7 +586,7 @@ namespace MapsInMyFolder
                     }, null);
                     List<int> TileNumber = Collectif.CoordonneesToTile(location.Latitude, location.Longitude, i);
                     Javascript.Print(infotext, -2);
-                    string url = Collectif.Replacements(TextboxLayerTileUrl.Text, TileNumber[0].ToString(), TileNumber[1].ToString(), i.ToString(), InternalEditorId);
+                    string url = Collectif.Replacements(TextboxLayerTileUrl.Text, TileNumber[0].ToString(), TileNumber[1].ToString(), i.ToString(), InternalEditorId, Collectif.GetUrl.InvokeFunction.getTile);
 
                     Task search_zoom_level = Task.Run(() =>
                     {

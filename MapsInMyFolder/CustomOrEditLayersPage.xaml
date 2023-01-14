@@ -34,7 +34,7 @@
                 <ColumnDefinition Width="0"/>
             </Grid.ColumnDefinitions>
             <Label Grid.Row="0" x:Name="CalqueType" Content="Nouveau calque" HorizontalAlignment="Left" Margin="28,10,0,0" VerticalAlignment="Top" Width="Auto" Height="50" FontSize="30" FontFamily="Segoe UI Light" Foreground="#FFE2E2E1"/>
-            <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.Row="1" Grid.Column="0" Height="{Binding ElementName=MainContentScrollRow, Path=Height}"  Width="{Binding ElementName=MainContentScrollColumn, Path=Width}">
+            <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.Row="1" Grid.Column="0">
                 <StackPanel Margin="17,0,32,0" x:Name="EditeurStackPanel">
                     <Label x:Name="EditeurType" Content="Editeur : " HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" Width="Auto" Height="25" FontSize="16.5" FontFamily="Segoe UI Semilight" Foreground="#FFE2E2E1"/>
 
@@ -105,7 +105,7 @@
                         </Grid.RowDefinitions>
                         <Label Content="Script :" Foreground="#888989" Grid.Row="0"></Label>
                         <!--<RichTextBox x:Name="TextboxLayerScript" HorizontalAlignment="Stretch" Grid.Row="1" Style="{DynamicResource RichTextBoxCleanStyle}" VerticalScrollBarVisibility="Hidden" Cursor="IBeam" Height="Auto" MinHeight="80" TextChanged="TextboxLayerScript_TextChanged" KeyUp="TextboxLayerScript_KeyUp" AutoWordSelection="False"></RichTextBox>-->
-                        <TextBox x:Name="TextboxLayerScript" Height="Auto"  HorizontalAlignment="Stretch" TextWrapping="NoWrap" Grid.Row="1" Style="{DynamicResource TextBoxCleanStyle_13}" Cursor="IBeam" AcceptsReturn="True" AcceptsTab="True" AutoWordSelection="False" HorizontalScrollBarVisibility="Auto" MinHeight="80" SpellCheck.IsEnabled="False"  VerticalContentAlignment="Top" KeyUp="TextboxLayerScript_KeyUp"></TextBox>
+                        <TextBox x:Name="TextboxLayerScript" Height="Auto"  HorizontalAlignment="Stretch" TextWrapping="NoWrap" Grid.Row="1" Style="{DynamicResource TextBoxCleanStyle_13}" Cursor="IBeam" AcceptsReturn="True" AcceptsTab="True" AutoWordSelection="False" HorizontalScrollBarVisibility="Auto" MinHeight="80" SpellCheck.IsEnabled="False"  VerticalContentAlignment="Top" KeyUp="TextboxLayerScript_KeyUp" Padding="0,0,0,20"></TextBox>
 
                     </Grid>
 
@@ -285,7 +285,7 @@
                 <Label Grid.Row="4" Grid.Column="0" Content="Console : " HorizontalAlignment="Left" Margin="0,-4,0,0" VerticalAlignment="Top" Width="Auto" FontSize="16.5" FontFamily="Segoe UI Semilight" Foreground="#FFE2E2E1"/>
 
                 
-                <TextBox x:Name="TextboxLayerScriptConsole" IsReadOnly="True"  VerticalAlignment="Stretch" Height="Auto" HorizontalAlignment="Stretch" Grid.Row="5" Style="{DynamicResource TextBoxCleanStyleNoBorder}" Padding="5,5,13,15"
+                <TextBox x:Name="TextboxLayerScriptConsole" IsReadOnly="True"  VerticalAlignment="Stretch" Height="Auto" HorizontalAlignment="Stretch" Grid.Row="5" Style="{DynamicResource TextBoxCleanStyleNoBorder}" Padding="0,5,13,15"
                          ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" Cursor="IBeam" MinHeight="20" ScrollViewer.CanContentScroll="True" SpellCheck.IsEnabled="False" TextWrapping="NoWrap" VerticalContentAlignment="Bottom">
                     <TextBox.Resources>
                         <Style TargetType="{x:Type ScrollBar}"

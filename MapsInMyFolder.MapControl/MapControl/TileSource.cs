@@ -55,8 +55,7 @@ namespace MapsInMyFolder.MapControl
                 //    .Replace("{x}", x.ToString())
                 //    .Replace("{y}", y.ToString())
                 //    .Replace("{z}", zoomLevel.ToString());
-
-                var uriString = Collectif.GetUrl.FromTileXYZ(UriFormat, x, y, zoomLevel, LayerID);
+                var uriString = Collectif.GetUrl.FromTileXYZ(UriFormat, x, y, zoomLevel, LayerID, Collectif.GetUrl.InvokeFunction.getTile);
 
                 if (Subdomains != null && Subdomains.Length > 0)
                 {

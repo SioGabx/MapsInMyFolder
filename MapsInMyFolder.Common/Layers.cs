@@ -51,7 +51,7 @@ namespace MapsInMyFolder.Commun
 
         public static Layers Empty(int LayerId = -1)
         {
-            return new Layers(LayerId, false, "", "Une erreur s'est produite dans la lecture des données. \n Données de secours fournie par OpenStreetMap.", "", "", "http://tile.openstreetmap.org/{z}/{x}/{y}.png", "", "", 0, 19, "jpeg", 256, "function main(args){return args;}", new SpecialsOptions());
+            return new Layers(LayerId, false, "", "Une erreur s'est produite dans la lecture des données. \n Données de secours fournie par OpenStreetMap.", "", "", "http://tile.openstreetmap.org/{z}/{x}/{y}.png", "", "", 0, 19, "jpeg", 256, "function getTile(args){return args;}", new SpecialsOptions());
         }
 
         public static class Convert

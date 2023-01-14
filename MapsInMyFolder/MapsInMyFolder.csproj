@@ -22,7 +22,7 @@
     
     <Prefer32Bit>false</Prefer32Bit>
     <ErrorReport>prompt</ErrorReport>
-    <SignAssembly>True</SignAssembly>
+    <SignAssembly>False</SignAssembly>
     <AssemblyOriginatorKeyFile>MapsInMyFolder.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 

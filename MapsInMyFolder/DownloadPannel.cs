@@ -22,15 +22,7 @@ namespace MapsInMyFolder
 
         void DB_Download_Load()
         {
-            // await Task.Run(() =>
-            // {
-            //Thread.Sleep(300);
             DebugMode.WriteLine("Loading downloads");
-            //App.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
-            //{
-            //on load, add each with id = id* -1
-            //Download_main_engine_class engine = new Download_main_engine_class(id, urls, tokenSource2, ct, format, z, save_temp_directory, save_directory, filename, filetempname, location, nbr_of_tiles, urlbase, identifiant, style, Status.waitfordownloading, tile_size);
-            //download_temp_engine_class.Add(engine, id);
             SQLiteConnection conn = Database.DB_Connection();
             if (conn is null)
             {
@@ -69,12 +61,12 @@ namespace MapsInMyFolder
                     string format = layers.class_format;
                     string filetempname = "file_id=" + downloadid + "." + final_saveformat;
                     Dictionary<string, double> location = new Dictionary<string, double>
-            {
-                { "NO_Latitude", DB_Download_NO_LAT },
-                { "NO_Longitude", DB_Download_NO_LONG },
-                { "SE_Latitude", DB_Download_SE_LAT },
-                { "SE_Longitude", DB_Download_SE_LONG }
-            };
+                    {
+                        { "NO_Latitude", DB_Download_NO_LAT },
+                        { "NO_Longitude", DB_Download_NO_LONG },
+                        { "SE_Latitude", DB_Download_SE_LAT },
+                        { "SE_Longitude", DB_Download_SE_LONG }
+                    };
 
                     //List<Url_class> urls = Collectif.GetUrl.GetListOfUrlFromLocation(location, DB_Download_ZOOM, layers.class_tile_url, DB_Download_LAYER_ID, downloadid);
                     List<Url_class> urls = null;
@@ -84,43 +76,24 @@ namespace MapsInMyFolder
                     string Download_INFOS = "Annulé.";
                     switch (DB_Download_STATE)
                     {
-                        case "waitfordownloading":
-                            // engine_status = Status.waitfordownloading;
-                            engine_status = Status.cancel;
-                            break;
                         case "error":
                             engine_status = Status.error;
                             Download_INFOS = DB_Download_INFOS;
                             break;
                         case "cancel":
+                        case "progress":
+                        case "waitfordownloading":
+                        case "assemblage":
+                        case "rognage":
+                        case "enregistrement":
                             engine_status = Status.cancel;
                             break;
                         case "success":
                             engine_status = Status.success;
                             Download_INFOS = "Téléchargé.";
                             break;
-                        case "pause":
-                            //engine_status = Status.pause;
-                            engine_status = Status.cancel;
-                            break;
-                        case "progress":
-                            //engine_status = Status.progress;
-                            engine_status = Status.cancel;
-                            break;
                         case "no_data":
                             engine_status = Status.no_data;
-                            break;
-                        case "assemblage":
-                            //engine_status = Status.assemblage;
-                            engine_status = Status.cancel;
-                            break;
-                        case "rognage":
-                            //engine_status = Status.rognage;
-                            engine_status = Status.cancel;
-                            break;
-                        case "enregistrement":
-                            // engine_status = Status.enregistrement;
-                            engine_status = Status.cancel;
                             break;
                         case "deleted":
                             // engine_status = Status.enregistrement;
@@ -133,10 +106,8 @@ namespace MapsInMyFolder
                             {
                                 Download_INFOS = DB_Download_INFOS;
                             }
-
                             break;
                         default:
-                            // engine_status = Status.waitfordownloading;
                             engine_status = Status.cancel;
                             break;
                     }
@@ -150,8 +121,6 @@ namespace MapsInMyFolder
                         }
                     }
                     DownloadClass engine = new DownloadClass(downloadid, DB_Download_ID, DB_Download_LAYER_ID, urls, tokenSource2, ct, format, final_saveformat, DB_Download_ZOOM, DB_Download_TEMP_DIRECTORY, DB_Download_SAVE_DIRECTORY, DB_Download_FILE_NAME, filetempname, location, REDIMWIDTH, REDIMHEIGHT, new TileGenerator(), DB_Download_NBR_TILES, layers.class_tile_url, layers.class_identifiant, engine_status, layers.class_tiles_size, quality: DB_Download_QUALITY);
-                    DebugMode.WriteLine("Set DownloadClass : layer id" + layers.class_id + " / " + layers.class_name + " tile size is " + layers.class_tiles_size);
-                   // engine.TileLoaderGenerator.Layer = Layers.GetLayerById(DB_Download_LAYER_ID);
                     DownloadClass.Add(engine, downloadid);
                     string commande_add = "add_download(" + downloadid + @",""" + engine_status.ToString() + @""",""" + DB_Download_FILE_NAME + @""",0," + DB_Download_NBR_TILES + @",""" + Download_INFOS + @""",""" + DB_Download_TIMESTAMP + @""");";
                     if (engine_status == Status.error)
@@ -169,17 +138,12 @@ namespace MapsInMyFolder
             }
 
             conn.Close();
-            // }, null);
-            // 
-            //  });
         }
 
         public void Init_download_panel()
         {
             string resource_data = Collectif.ReadResourceString("html/download_panel.html");
             download_panel_browser.LoadHtml(resource_data);
-            //download_panel_browser.Load(Commun.Settings.working_folder + @"\download_panel.html");
-            //read file xml
             if (download_panel_browser is null) { return; }
             try
             {
@@ -252,12 +216,9 @@ namespace MapsInMyFolder
                     {
                         return true;
                     }
-                    else
+                    else if (engine.state == Status.success)
                     {
-                        if (engine.state == Status.success)
-                        {
-                            MainWindow.UpdateDownloadPanel(id, "Introuvable.", isimportant: true, state: Status.deleted);
-                        }
+                        MainWindow.UpdateDownloadPanel(id, "Introuvable.", isimportant: true, state: Status.deleted);
                     }
                 }
                 else

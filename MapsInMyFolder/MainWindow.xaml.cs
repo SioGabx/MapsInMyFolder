@@ -92,7 +92,6 @@ namespace MapsInMyFolder
             TitleTextBox.Text = "MapsInMyFolder";
             //Settings.SaveSettings();
             //Settings.LoadSettingsAsync();
-            Commun.Settings.LoadSetting();
             Database.DB_Download();
             ThemeManager.Current.ApplicationTheme = ApplicationTheme.Dark;
             ImageLoader.HttpClient.DefaultRequestHeaders.Add("User-Agent", Commun.Settings.user_agent);

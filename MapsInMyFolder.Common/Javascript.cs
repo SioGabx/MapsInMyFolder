@@ -2,6 +2,7 @@
 using Jint.Native;
 using Jint.Runtime.Interop;
 using ModernWpf.Controls;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -87,20 +88,16 @@ namespace MapsInMyFolder.Commun
                         Debug.WriteLine("Error JsListCancelTocken " + ex.Message);
                     }
                 }
-                else
-                {
-                    Debug.WriteLine("JsListCancelTocken - An item with the same key has already been added. Key: " + LayerId);
-                }
                 options.CancellationToken(JsCancelToken.Token);
             });
-            Action<object> PrintAction = stringtext => Javascript.Print(String.Concat(">", stringtext), LayerId);
+            Action<object> PrintAction = stringtext => Print(stringtext, LayerId);
             add.SetValue("print", PrintAction);
             //Action<object> AlertAction = stringtext => Javascript.Alert(stringtext, LayerId);
             //add.SetValue("alert", AlertAction);
-            Action<object> PrintClearAction = _ => Javascript.PrintClear();
+            Action<object> PrintClearAction = _ => PrintClear();
             add.SetValue("printClear", PrintClearAction);
             add.SetValue("cls", PrintClearAction);
-            Action<object> helpAction = _ => Javascript.Help(LayerId);
+            Action<object> helpAction = _ => Help(LayerId);
             add.SetValue("help", helpAction);
             Action<object, object> setVarAction = (variable, value) => Javascript.SetVar(variable, value, LayerId);
             add.SetValue("setVar", setVarAction); //setVar("variable1","valeur1")
@@ -160,7 +157,6 @@ namespace MapsInMyFolder.Commun
             }
         }
 
-        //todo add get / set parameters + add option to print error from DownloadByteUrl
         static public object GetVar(object variablename, int LayerId = 0)
         {
             string variablenameString;
@@ -194,7 +190,7 @@ namespace MapsInMyFolder.Commun
             if (DictionnaryOfVariablesKeyLayerId.TryGetValue(LayerId, out Dictionary<string, object> VariableKeyAndValue))
             {
                 VariableKeyAndValue.Remove(variablename);
-                Print("Info : La variable à été disposée");
+                Print("< Info : La variable à été disposée");
             }
             else
             {
@@ -271,22 +267,34 @@ namespace MapsInMyFolder.Commun
             return returnLocationNumber;
         }
 
-        public static void Print(string print, int LayerId = 0)
+        private static string ConvertJSObjectToString(object supposedString)
         {
-            if (!string.IsNullOrEmpty(print))
+
+            string returnString = supposedString.ToString();
+            if ((supposedString.GetType() == typeof(System.Object) || supposedString.GetType() == typeof(System.Object[]) || supposedString.GetType() == typeof(System.Dynamic.ExpandoObject) || supposedString.GetType() == typeof(Dictionary<string, string>) || supposedString.GetType() == typeof(Dictionary<string, object>))
+                && (supposedString.GetType().FullName != "Jint.Runtime.Interop.DelegateWrapper"))
             {
-                DebugMode.WriteLine("Javascript print : " + LayerId + " " + print);
+                Debug.WriteLine(supposedString.GetType().FullName);
+                returnString = JsonConvert.SerializeObject(supposedString);
+            }
+            return returnString;
+        }
+
+
+        public static void Print(object print, int LayerId = 0)
+        {
+            string printString = ConvertJSObjectToString(print);
+            if (!string.IsNullOrEmpty(printString))
+            {
                 if (LayerId == -2 && Commun.TileGeneratorSettings.AcceptJavascriptPrint)
                 {
-                    Javascript.JavascriptInstance.Logs = String.Concat(Javascript.JavascriptInstance.Logs, "\n", print);
-                    return;
+                    Javascript.JavascriptInstance.Logs = String.Concat(Javascript.JavascriptInstance.Logs, "\n", printString);
                 }
             }
         }
 
         static public void PrintClear()
         {
-            DebugMode.WriteLine("JSClear console");
             if (Commun.TileGeneratorSettings.AcceptJavascriptPrint)
             {
                 Javascript.JavascriptInstance.Logs = String.Empty;
@@ -303,73 +311,22 @@ namespace MapsInMyFolder.Commun
                 {
                     caption = Collectif.HTMLEntities(Layers.GetLayerById(LayerId).class_name, true) + " indique :";
                 }
-                /*
-
-                let x = inputbox("pos"); print(x);
-
-                */
                 TextBox TextBox;
                 var frame = new DispatcherFrame();
                 TextBox = Application.Current.Dispatcher.Invoke(new Func<TextBox>(() =>
                 {
-                    var dialog_internal_turple = Message.SetInputBoxDialog(texte, caption);
-                    var dialog_internal = dialog_internal_turple.dialog;
-                    dialog_internal.Closed += (_, __) =>
+                    var (textBox, dialog) = Message.SetInputBoxDialog(texte, caption);
+                    dialog.Closed += (_, __) =>
                     {
-                        frame.Continue = false; // stops the frame
+                        // stops the frame
+                        frame.Continue = false; 
                     };
-                    dialog_internal.ShowAsync();
-                    return dialog_internal_turple.textBox;
+                    dialog.ShowAsync();
+                    return textBox;
                 }));
                 Dispatcher.PushFrame(frame);
-                return Application.Current.Dispatcher.Invoke(new Func<string>(() =>
-                {
-                    return TextBox.Text;
-                }));
+                return Application.Current.Dispatcher.Invoke(new Func<string>(() => TextBox.Text));
             }
-        }
-
-
-        static public string InputBox2(int LayerId, object texte, object caption = null)
-        {
-            lock (JSLocker)
-            {
-                //alert("pos");
-                if (string.IsNullOrEmpty(caption?.ToString()))
-                {
-                    caption = Collectif.HTMLEntities(Layers.GetLayerById(LayerId).class_name, true) + " indique :";
-                }
-                /*
-
-                let x = alert("pos"); print(x);
-
-                */
-                ContentDialog dialog;
-                var frame = new DispatcherFrame();
-                dialog = Application.Current.Dispatcher.Invoke(new Func<ContentDialog>(() =>
-                {
-                    var dialog_internal = Message.SetContentDialog(texte, caption, showTextbox: true);
-                    dialog_internal.Closed += (_, __) =>
-                    {
-                        frame.Continue = false; // stops the frame
-                    };
-                    dialog_internal.ShowAsync();
-                    return dialog_internal;
-                }));
-                Dispatcher.PushFrame(frame);
-
-                List<UIElement> uIElements = Collectif.FindVisualChildren(dialog.Content as UIElement);
-                foreach (UIElement element in uIElements)
-                {
-                    if (element.GetType() == typeof(TextBox))
-                    {
-                        TextBox textBox = (TextBox)element;
-                        return textBox.Text;
-                    }
-                }
-
-            }
-            return "undefined";
         }
 
         static public void Alert(int LayerId, object texte, object caption = null)
@@ -400,7 +357,7 @@ namespace MapsInMyFolder.Commun
         {
             Print(
                 "\n\nAIDE CALCUL TUILE" + "\n" +
-                "A chaque chargement de tuile, la function main est appelée avec des arguments\n" +
+                "A chaque chargement de tuile, la function getTile est appelée avec des arguments\n" +
                 "et dois retourner un objet contenant les remplacements à effectués.\n" +
                 "Les arguments qui sont envoyé à la fonction de base sont les suivants : " + "\n" +
                 " - X : Représente en WMTS le numero de la tuile X" + "\n" +
@@ -408,7 +365,7 @@ namespace MapsInMyFolder.Commun
                 " - Z : Représente le niveau de zoom" + "\n" +
                 " - layerid : Représente l'ID du calque sélectionnée" + "\n" +
                 "Exemple pour l'url \"https://tile.openstreetmap.org/{NiveauZoom}/{TuileX}/{TuileY}.png\":" + "\n" +
-                "function main(args) {" + "\n" +
+                "function getTile(args) {" + "\n" +
                 "var returnvalue = new Object;" + "\n" +
                 "returnvalue.TuileX = args.x;" + "\n" +
                 "returnvalue.TuileY = args.y;" + "\n" +
@@ -427,37 +384,25 @@ namespace MapsInMyFolder.Commun
                 "getLatLong(TileX, TileY, zoom) : Converti les numero de tiles en coordonnées" + "\n" +
                 "", LayerId);
 
-            /*//
-            var lat = 48.1995382391003;
-var long = 6.42831455369568;
-
-var tiles = getTileNumber(lat, long, 18)
-print("x : " + tiles.x + " / y : " + tiles.y)
-
-var locations = getLatLong(tiles.x, tiles.y, 18)
-print("lat : " + locations.lat + " / long : " + locations.long)
-             
-             
-             */
-            Debug.WriteLine("help triggered" + LayerId);
         }
 
         static public void PrintError(string print, int LayerId = -2)
         {
-            Print("Error : " + print, LayerId);
+            string errorType;
+            if (print.EndsWith(" is not defined"))
+            {
+                errorType = "Uncaught ReferenceError";
+            }
+            else if (print.EndsWith("Unexpected token ILLEGAL"))
+            {
+                errorType = "Uncaught SyntaxError";
+            }
+            else
+            {
+                errorType = "Uncaught Error";
+            }
+            Print("< " + errorType + " : " + print, LayerId);
         }
-
-        //static void Alert(object Message, int LayerId)
-        //{
-        //    if (Curent.Layer.class_id == LayerId)
-        //    {
-        //        string text = Message.ToString();
-        //        if (!string.IsNullOrEmpty(text))
-        //        {
-        //            MessageBox.Show(text, "MapsInMyFolder");
-        //        }
-        //    }
-        //}
 
         #region engines
         private static readonly Dictionary<int, CancellationTokenSource> JsListCancelTocken = new Dictionary<int, CancellationTokenSource>();
@@ -467,7 +412,6 @@ print("lat : " + locations.lat + " / long : " + locations.long)
         {
             foreach (KeyValuePair<int, CancellationTokenSource> tockensource in JsListCancelTocken)
             {
-                DebugMode.WriteLine("Canceled JSengine " + tockensource.Key);
                 tockensource.Value.Cancel();
             }
         }
@@ -475,7 +419,6 @@ print("lat : " + locations.lat + " / long : " + locations.long)
         {
             if (JsListCancelTocken.TryGetValue(LayerId, out CancellationTokenSource tockensource))
             {
-                DebugMode.WriteLine("Canceled JSengine " + LayerId);
                 tockensource.Cancel();
             }
         }
@@ -489,17 +432,25 @@ print("lat : " + locations.lat + " / long : " + locations.long)
             }
             else
             {
-                DebugMode.WriteLine("CreateEngine " + LayerId);
-                if (ListOfEngines.Count > 100)
+                if (ListOfEngines.Count > 200)
                 {
-                    DebugMode.WriteLine("ClearEngine >100");
+                    //todo : add setting for that
                     EngineClearList();
                 }
                 Engine add = SetupEngine(LayerId);
                 try
                 {
-                    add.Execute(script);
-                    return add;
+                    add = add.Execute(script);
+                    if (CheckIfFunctionExist(add, Collectif.GetUrl.InvokeFunction.getTile.ToString()))
+                    {
+                        return add;
+                    }
+                    else
+                    {
+                        add = add.Execute(Settings.tileloader_default_script);
+                        return add;
+                    }
+
                 }
                 catch (Exception ex)
                 {
@@ -513,7 +464,6 @@ print("lat : " + locations.lat + " / long : " + locations.long)
 
         public static void EngineDeleteById(int LayerId)
         {
-            DebugMode.WriteLine("RemoveEngine " + LayerId);
             ListOfEngines.Remove(LayerId);
             JsListCancelTocken.Remove(LayerId);
         }
@@ -524,61 +474,105 @@ print("lat : " + locations.lat + " / long : " + locations.long)
 
         public static void EngineClearList()
         {
-            DebugMode.WriteLine("ClearEngine");
             ListOfEngines.Clear();
             JsListCancelTocken.Clear();
         }
         #endregion
-        public static Jint.Native.JsValue ExecuteScript(string script, Dictionary<string, object> arguments, int LayerId)
+
+
+        public static bool CheckIfFunctionExist(Engine add, string functionName)
         {
-            DebugMode.WriteLine("DEBUG JS : LockLayerId" + LayerId);
+            if (string.IsNullOrEmpty(functionName))
+            {
+                return false;
+            }
+            JsValue evaluateValue = add.Evaluate("typeof " + functionName + " === 'function'");
+            return evaluateValue.AsBoolean();
+        }
+
+        public static bool CheckIfFunctionExist(int LayerId, string functionName, string script = null)
+        {
+            if (string.IsNullOrEmpty(functionName))
+            {
+                return false;
+            }
+            if (string.IsNullOrEmpty(script))
+            {
+                script = Layers.GetLayerById(LayerId).class_tilecomputationscript;
+            }
+
             lock (locker)
             {
-                DebugMode.WriteLine("DEBUG JS : GetEngineLayerId" + LayerId);
                 Engine add = EngineGetById(LayerId, script);
-                DebugMode.WriteLine("DEBUG JS : Engine gotLayerId" + LayerId);
-
                 if (add is null)
                 {
-                    DebugMode.WriteLine("DEBUG JS : engine nullLayerId" + LayerId);
+                    return false;
+                }
+                JsValue evaluateValue = add.Evaluate("typeof " + functionName + " === 'function'");
+
+                return evaluateValue.AsBoolean();
+            }
+        }
+
+
+        public static Jint.Native.JsValue ExecuteScript(string script, Dictionary<string, object> arguments, int LayerId, Collectif.GetUrl.InvokeFunction InvokeFunction)
+        {
+            string InvokeFunctionString = InvokeFunction.ToString();
+            lock (locker)
+            {
+                Engine add = EngineGetById(LayerId, script);
+                if (add is null)
+                {
                     return null;
                 }
                 Jint.Native.JsValue jsValue = null;
                 try
                 {
-                    DebugMode.WriteLine("DEBUG JS : call mainLayerId" + LayerId);
-                    jsValue = add.Invoke("main", arguments);
-                    //add.SetValue("args", arguments);
-                    //jsValue = add.Evaluate("main(args)");
-                    DebugMode.WriteLine("DEBUG JS : end call mainLayerId" + LayerId);
+                    jsValue = add.Invoke(InvokeFunctionString, arguments);
                 }
                 catch (Exception ex)
                 {
                     Debug.WriteLine(ex.Message);
                     if (ex.Message == "Can only invoke functions")
                     {
-                        PrintError("No main function fund. Use \"function main(args) {}\"");
+                        //PrintError("No main function fund. Use \"function getT(args) {}\"");
+                        PrintError("La fontion " + InvokeFunction.ToString() + " n'as pas été trouvé dans le script. Faite help() pour obtenir de l'aide sur cette commande.");
                     }
                     else
                     {
                         PrintError(ex.Message);
                     }
                 }
-                DebugMode.WriteLine("DEBUG JS : update engineLayerId" + LayerId);
                 EngineUpdate(add, LayerId);
-                DebugMode.WriteLine("DEBUG JS : returnLayerId" + LayerId);
-
                 return jsValue;
             }
         }
 
         public static void ExecuteCommand(string command, int LayerId)
         {
-            Debug.WriteLine("ExecuteCommand LayerId" + LayerId);
             var add = EngineGetById(LayerId, "");
             try
             {
-                add.Evaluate(command);
+                Print("> " + command, LayerId);
+                string evaluateResultString = string.Empty;// add.Evaluate(command).ToString();
+                JsValue evaluateResult = add.Evaluate(command);
+                if ((evaluateResult.IsArray() || evaluateResult.IsObject()) && evaluateResult.GetType().FullName != "Jint.Runtime.Interop.DelegateWrapper")
+                {
+                    evaluateResultString = evaluateResult.ToString().Replace("[]", "") + JsonConvert.SerializeObject(evaluateResult.ToObject());
+                }
+                else
+                {
+                    evaluateResultString = evaluateResult.ToString();
+                    if (evaluateResult.IsString())
+                    {
+                        evaluateResultString = "\"" + evaluateResultString + "\"";
+                    }
+
+                }
+                if (!string.IsNullOrEmpty(evaluateResultString) && evaluateResultString != "null")
+                {
+                    Print("< " + evaluateResultString, LayerId);
+                }
             }
             catch (Exception ex)
             {

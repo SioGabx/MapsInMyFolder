@@ -25,7 +25,7 @@ namespace MapsInMyFolder.Commun
 
                 try
                 {
-                    Uri uri = new Uri(Collectif.GetUrl.FromTileXYZ(urlBase, TileX, TileY, zoom, layerID));
+                    Uri uri = new Uri(Collectif.GetUrl.FromTileXYZ(urlBase, TileX, TileY, zoom, layerID, Collectif.GetUrl.InvokeFunction.getTile));
                     return await Collectif.ByteDownloadUri(uri, layerID, true);
                 }
                 catch (Exception ex)

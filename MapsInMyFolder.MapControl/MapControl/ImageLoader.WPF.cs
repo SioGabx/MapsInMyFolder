@@ -14,7 +14,7 @@ namespace MapsInMyFolder.MapControl
     {
         public static Task<ImageSource> LoadImageAsync(Stream stream)
         {
-            Debug.WriteLine("LoadImageAsync from stream task ");
+            //LoadImageAsync from stream task
             return Task.Run(() => LoadImage(stream));
         }
 
@@ -23,7 +23,7 @@ namespace MapsInMyFolder.MapControl
             return Task.Run(() =>
             {
                 using var stream = new MemoryStream(buffer);
-                Commun.DebugMode.WriteLine("LoadImageAsync from buffer ");
+                //Loading tile from buffer
                 return LoadImage(stream);
             });
         }
@@ -38,7 +38,7 @@ namespace MapsInMyFolder.MapControl
                 }
 
                 using var stream = File.OpenRead(path);
-                Commun.DebugMode.WriteLine("LoadImageAsync read file path " + path);
+                //LoadImageAsync read file path
                 return LoadImage(stream);
             });
         }
@@ -46,16 +46,19 @@ namespace MapsInMyFolder.MapControl
         private static ImageSource LoadImage(Stream stream)
         {
             var bitmapImage = new BitmapImage();
-            try {
-            bitmapImage.BeginInit();
-            bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
-            bitmapImage.StreamSource = stream;
-            bitmapImage.EndInit();
-            bitmapImage.Freeze();
-            }catch(System.NotSupportedException ex)
+            try
+            {
+                bitmapImage.BeginInit();
+                bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+                bitmapImage.StreamSource = stream;
+                bitmapImage.EndInit();
+                bitmapImage.Freeze();
+            }
+            catch (System.NotSupportedException ex)
             {
                 Debug.WriteLine("Erreur, ce format d'image n'est pas supporté : " + ex.Message);
-            }catch(System.Exception ex)
+            }
+            catch (System.Exception ex)
             {
                 Debug.WriteLine("Erreur lors du chargement de l'apperçu : " + ex.Message);
             }

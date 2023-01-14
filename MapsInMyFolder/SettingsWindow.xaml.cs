@@ -238,6 +238,12 @@ namespace MapsInMyFolder
             //show_download_devtool
             show_download_devtool.IsChecked = Settings.show_download_devtool;
 
+            //nettoyer_cache_browser_au_demarrage
+            nettoyer_cache_browser_au_demarrage.IsChecked = Settings.nettoyer_cache_browser_au_demarrage;
+
+            //nettoyer_cache_browser_au_demarrage
+            nettoyer_cache_layers_au_demarrage.IsChecked = Settings.nettoyer_cache_layers_au_demarrage;
+
             DefaultValuesHachCode = Commun.Collectif.CheckIfInputValueHaveChange(SettingsScrollViewer);
         }
 
@@ -334,6 +340,12 @@ namespace MapsInMyFolder
 
             //show_download_devtool = ;
             Settings.show_download_devtool = show_download_devtool.IsChecked ?? false;
+
+            //show_download_devtool = ;
+            Settings.nettoyer_cache_browser_au_demarrage = nettoyer_cache_browser_au_demarrage.IsChecked ?? false;
+
+            //show_download_devtool = ;
+            Settings.nettoyer_cache_layers_au_demarrage = nettoyer_cache_layers_au_demarrage.IsChecked ?? false;
 
             //layerpanel_website_IsVisible = ;
             //layerpanel_livepreview = ;
