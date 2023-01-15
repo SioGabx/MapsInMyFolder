@@ -210,7 +210,7 @@
             </Button>
 
 
-            <ScrollViewer  x:Name="GridImagePreviewInfoScrollViewer" VerticalScrollBarVisibility="Auto" Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="1" Grid.RowSpan="4" Margin="0,60,00,0" SizeChanged="GridImagePreviewInfoScrollViewer_SizeChanged" Padding="10,0,15,0">
+            <ScrollViewer  x:Name="GridImagePreviewInfoScrollViewer" VerticalScrollBarVisibility="Auto" Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="1" Grid.RowSpan="4" Margin="0,0,00,0" SizeChanged="GridImagePreviewInfoScrollViewer_SizeChanged" Padding="10,60,15,0">
           
                
                 <Grid x:Name="GridImagePreviewInfo" Grid.Row="1" Grid.Column="0" Background="Transparent" Margin="0,0,0,0">
@@ -238,9 +238,9 @@
                     <StackPanel x:Name="StackPanel_ImageTilePreview_2" Background="#171719" Grid.Row="0" Grid.Column="2">
                         <Image x:Name="ImageTilePreview_0_2" HorizontalAlignment="Stretch" VerticalAlignment="Top" Stretch="Fill" Height="{Binding ElementName=ImageTilePreview_0_2, Path=ActualWidth}" Opacity="0"/>
                         <Image x:Name="ImageTilePreview_1_2" HorizontalAlignment="Stretch" VerticalAlignment="Top" Stretch="Fill" Height="{Binding ElementName=ImageTilePreview_1_2, Path=ActualWidth}" Opacity="0"/>
-
                     </StackPanel>
 
+                    <Label  x:Name="ImageIsLoading" Grid.Row="0" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="5" Visibility="Visible" FontFamily="Segoe UI" Foreground="#888989" Background="#99000000" Padding="5,2,5,2">Chargement...</Label>
                     <StackPanel Grid.ColumnSpan="2"  Grid.Row="1" HorizontalAlignment="Stretch" Background="Transparent" Margin="0,10,0,0">
                         <Grid  Background="Transparent">
                             <Grid.ColumnDefinitions>

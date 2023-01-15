@@ -11,8 +11,6 @@
 >
 
 
-
-
     <Style x:Key="TextBoxCleanStyleDefault" TargetType="{x:Type TextBox}">
         <Setter Property="Foreground" Value="#5A5A5A"></Setter>
         <Setter Property="BorderBrush" Value="#5A5A5A"/>

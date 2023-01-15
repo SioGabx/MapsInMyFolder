@@ -67,6 +67,7 @@ namespace MapsInMyFolder
                 ZoomSlider.Value = maximum_zoom;
             }
             Update_Labels();
+
         }
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
@@ -131,6 +132,7 @@ namespace MapsInMyFolder
             {
                 return;
             }
+            ImageIsLoading.Visibility = Visibility.Visible;
             LastResquestZoom = ZoomSlider.Value;
             int LayerID = Curent.Layer.class_id;
             List<Double> NO_PIN_Location = new List<Double>() { MainWindow._instance.MainPage.NO_PIN.Location.Latitude, MainWindow._instance.MainPage.NO_PIN.Location.Longitude };
@@ -192,6 +194,7 @@ namespace MapsInMyFolder
                         }
                     });
                 }, UpdateMigniatureParraleleToken);
+               
             }
             catch (Exception ex)
             {
@@ -211,13 +214,13 @@ namespace MapsInMyFolder
                 {
                     EasingFunction = new PowerEase { EasingMode = EasingMode.EaseOut }
                 };
-
                 ImageTilePreview_0_0.BeginAnimation(UIElement.OpacityProperty, show_anim);
                 ImageTilePreview_1_0.BeginAnimation(UIElement.OpacityProperty, show_anim);
                 ImageTilePreview_0_1.BeginAnimation(UIElement.OpacityProperty, show_anim);
                 ImageTilePreview_1_1.BeginAnimation(UIElement.OpacityProperty, show_anim);
                 ImageTilePreview_0_2.BeginAnimation(UIElement.OpacityProperty, show_anim);
                 ImageTilePreview_1_2.BeginAnimation(UIElement.OpacityProperty, show_anim);
+                ImageIsLoading.Visibility = Visibility.Hidden;
             }
         }
 

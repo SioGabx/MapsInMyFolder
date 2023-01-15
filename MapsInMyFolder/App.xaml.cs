@@ -160,7 +160,7 @@ namespace MapsInMyFolder
                 Debug.WriteLine(e.Exception.ToString());
                 e.Handled = true;
                 System.IO.File.WriteAllText(Path.Combine(Commun.Settings.working_folder, "crash.log"), e.Exception.Message + Environment.NewLine + e.Exception.StackTrace + Environment.NewLine + Environment.NewLine + "Error string \n" + e.Exception.ToString(), System.Text.Encoding.UTF8);
-                MessageBox.Show("Une erreur innatendu s'est produite, l'application va devoir se fermer. \n" + e.Exception.ToString(), "Erreur fatale");
+                MessageBox.Show("Une erreur innatendu s'est produite, l'application va peut-être devoir se fermer ! \n" + e.Exception.ToString(), "Erreur fatale");
                 //Message.NoReturnBoxAsync("Une erreur innatendu s'est produite, l'application va devoir se fermer", "Erreur");
             }
             catch (Exception ex)

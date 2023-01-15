@@ -21,6 +21,7 @@ using System.Linq;
 using MapsInMyFolder.Commun;
 using System.Reflection;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace MapsInMyFolder
 {
@@ -50,4 +51,7 @@ namespace MapsInMyFolder
             throw new NotImplementedException();
         }
     }
+
+   
+
 }
