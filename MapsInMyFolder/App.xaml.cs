@@ -5,7 +5,6 @@ using System;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
-using System.Reflection;
 using System.Threading;
 using System.Windows;
 
@@ -39,7 +38,7 @@ namespace MapsInMyFolder
         {
             try
             {
-                Commun.Settings.LoadSetting();
+                Settings.LoadSetting();
             }
             catch (Exception ex)
             {
@@ -51,12 +50,12 @@ namespace MapsInMyFolder
                 //Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
 
                 var settings = new CefSharp.Wpf.CefSettings();
-                string BrowserSubprocessPathPath = System.IO.Path.GetFullPath("CefSharp.BrowserSubprocess.exe");
+                string BrowserSubprocessPathPath = Path.GetFullPath("CefSharp.BrowserSubprocess.exe");
                 if (File.Exists(BrowserSubprocessPathPath))
                 {
-                    settings.BrowserSubprocessPath = System.IO.Path.GetFullPath("CefSharp.BrowserSubprocess.exe");
+                    settings.BrowserSubprocessPath = Path.GetFullPath("CefSharp.BrowserSubprocess.exe");
                 }
-                string cefsharpTempFolderPath = Path.Combine(Commun.Settings.temp_folder, "panel");
+                string cefsharpTempFolderPath = Path.Combine(Settings.temp_folder, "panel");
                 if (Settings.nettoyer_cache_browser_au_demarrage)
                 {
                     try
@@ -71,7 +70,7 @@ namespace MapsInMyFolder
                         Debug.WriteLine("Impossible de nettoyer le cache" + cefsharpTempFolderPath + "\n" + ex.Message);
                     }
                 }
-                string layersTempFolderPath = Path.Combine(Commun.Settings.temp_folder, "layers");
+                string layersTempFolderPath = Path.Combine(Settings.temp_folder, "layers");
                 if (Settings.nettoyer_cache_layers_au_demarrage)
                 {
                     try
@@ -89,29 +88,29 @@ namespace MapsInMyFolder
                 Directory.CreateDirectory(cefsharpTempFolderPath);
                 settings.CachePath = cefsharpTempFolderPath;
 
-                if (!Directory.Exists(Commun.Settings.working_folder))
+                if (!Directory.Exists(Settings.working_folder))
                 {
                     try
                     {
-                        Directory.CreateDirectory(Commun.Settings.working_folder);
+                        Directory.CreateDirectory(Settings.working_folder);
                     }
                     catch (Exception)
                     {
-                        Commun.Settings.working_folder = Commun.Settings.temp_folder;
+                        Settings.working_folder = Settings.temp_folder;
                     }
 
-                    if (!HasWritePermission(Commun.Settings.working_folder))
+                    if (!HasWritePermission(Settings.working_folder))
                     {
-                        Commun.Settings.working_folder = Commun.Settings.temp_folder;
+                        Settings.working_folder = Settings.temp_folder;
                     }
 
                     try
                     {
-                        Directory.CreateDirectory(Commun.Settings.working_folder);
+                        Directory.CreateDirectory(Settings.working_folder);
                     }
                     catch (Exception)
                     {
-                        DebugMode.WriteLine("Erreur creation du dossier working_folder : " + Commun.Settings.working_folder);
+                        DebugMode.WriteLine("Erreur creation du dossier working_folder : " + Settings.working_folder);
                     }
                 }
 
@@ -122,7 +121,7 @@ namespace MapsInMyFolder
                     SchemeName = "localfolder",
                     DomainName = "cefsharp",
                     SchemeHandlerFactory = new FolderSchemeHandlerFactory(
-              rootFolder: Commun.Settings.working_folder,
+              rootFolder: Settings.working_folder,
               hostName: "cefsharp",
               defaultPage: "index.html" // will default to index.html
           )
@@ -159,7 +158,7 @@ namespace MapsInMyFolder
             {
                 Debug.WriteLine(e.Exception.ToString());
                 e.Handled = true;
-                System.IO.File.WriteAllText(Path.Combine(Commun.Settings.working_folder, "crash.log"), e.Exception.Message + Environment.NewLine + e.Exception.StackTrace + Environment.NewLine + Environment.NewLine + "Error string \n" + e.Exception.ToString(), System.Text.Encoding.UTF8);
+                File.WriteAllText(Path.Combine(Settings.working_folder, "crash.log"), e.Exception.Message + Environment.NewLine + e.Exception.StackTrace + Environment.NewLine + Environment.NewLine + "Error string \n" + e.Exception.ToString(), System.Text.Encoding.UTF8);
                 MessageBox.Show("Une erreur innatendu s'est produite, l'application va peut-être devoir se fermer ! \n" + e.Exception.ToString(), "Erreur fatale");
                 //Message.NoReturnBoxAsync("Une erreur innatendu s'est produite, l'application va devoir se fermer", "Erreur");
             }
@@ -177,7 +176,7 @@ namespace MapsInMyFolder
         {
             Exception ex = e.ExceptionObject as Exception;
             Debug.WriteLine(ex.ToString());
-            System.IO.File.WriteAllText(ex.Message + Environment.NewLine + ex.StackTrace, "log.txt");
+            File.WriteAllText(ex.Message + Environment.NewLine + ex.StackTrace, "log.txt");
             //En cas d'erreur CEFSHARP.CORE.RUNTIME introuvable alors intaller vc_redist.x64 (https://aka.ms/vs/17/release/vc_redist.x64.exe)
         }
     }

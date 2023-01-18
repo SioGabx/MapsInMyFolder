@@ -51,10 +51,6 @@ namespace MapsInMyFolder.MapControl
 
             if (UriFormat != null)
             {
-                //var uriString = UriFormat
-                //    .Replace("{x}", x.ToString())
-                //    .Replace("{y}", y.ToString())
-                //    .Replace("{z}", zoomLevel.ToString());
                 var uriString = Collectif.GetUrl.FromTileXYZ(UriFormat, x, y, zoomLevel, LayerID, Collectif.GetUrl.InvokeFunction.getTile);
 
                 if (Subdomains != null && Subdomains.Length > 0)
@@ -74,7 +70,15 @@ namespace MapsInMyFolder.MapControl
         public virtual Task<ImageSource> LoadImageAsync(int x, int y, int zoomLevel, TileSource tileSource)
         {
             var uri = GetUri(x, y, zoomLevel);
-            return uri != null ? ImageLoader.LoadImageAsync(uri, x,y, zoomLevel, tileSource) : Task.FromResult((ImageSource)null);
+            if (uri is null)
+            {
+                return Task.FromResult((ImageSource)null);
+            }
+            else
+            {
+                return ImageLoader.LoadImageAsync(uri, x, y, zoomLevel, tileSource);
+            }
+            //return uri != null ? ImageLoader.LoadImageAsync(uri, x,y, zoomLevel, tileSource) : Task.FromResult((ImageSource)null);
         }
     }
 

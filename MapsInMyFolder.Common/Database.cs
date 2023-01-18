@@ -1,12 +1,8 @@
 ﻿using ModernWpf.Controls;
 using System;
-using System.Collections.Generic;
 using System.Data.SQLite;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MapsInMyFolder.Commun
 {
@@ -49,9 +45,9 @@ namespace MapsInMyFolder.Commun
                 }
 
 
-                if (!Directory.Exists(Commun.Settings.working_folder))
+                if (!Directory.Exists(Settings.working_folder))
                 {
-                    Directory.CreateDirectory(Commun.Settings.working_folder);
+                    Directory.CreateDirectory(Settings.working_folder);
                 }
 
                 //Ask if we want to download remote database or create empty
@@ -144,7 +140,7 @@ namespace MapsInMyFolder.Commun
 
         static public void ExecuteNonQuerySQLCommand(string querry)
         {
-            SQLiteConnection conn = Database.DB_Connection();
+            SQLiteConnection conn = DB_Connection();
             if (conn is null)
             {
                 Debug.WriteLine("La connection à la base de donnée est null");
@@ -157,7 +153,7 @@ namespace MapsInMyFolder.Commun
 
         static public int ExecuteScalarSQLCommand(string querry)
         {
-            SQLiteConnection conn = Database.DB_Connection();
+            SQLiteConnection conn = DB_Connection();
             if (conn is null)
             {
                 Debug.WriteLine("La connection à la base de donnée est null");
@@ -174,7 +170,7 @@ namespace MapsInMyFolder.Commun
         {
             // Create a new database connection:
             string dbFile = Path.Combine(Settings.working_folder, Settings.database_pathname);
-            if (System.IO.File.Exists(dbFile))
+            if (File.Exists(dbFile))
             {
                 FileInfo filinfo = new FileInfo(dbFile);
                 if (filinfo.Length == 0)
@@ -224,7 +220,7 @@ namespace MapsInMyFolder.Commun
             {
                 SQLiteCommand sqlite_cmd = conn?.CreateCommand();
                 if (conn is null) { return; }
-                sqlite_cmd.CommandText = "CREATE TABLE IF NOT EXISTS 'DOWNLOADS' ('ID' INTEGER NOT NULL UNIQUE,'STATE' TEXT,'INFOS' TEXT,'FILE_NAME' TEXT,'NBR_TILES' INTEGER,'ZOOM' INTEGER,'NO_LAT' REAL,'NO_LONG' REAL,'SE_LAT' REAL,'SE_LONG' REAL,'LAYER_ID' INTEGER,'TEMP_DIRECTORY' TEXT,'SAVE_DIRECTORY' TEXT,'TIMESTAMP' TEXT,'QUALITY' INTEGER,'REDIMWIDTH' INTEGER,'REDIMHEIGHT' INTEGER,'SPECIALSOPTIONS' TEXT,PRIMARY KEY('ID' AUTOINCREMENT));";
+                sqlite_cmd.CommandText = "CREATE TABLE IF NOT EXISTS 'DOWNLOADS' ('ID' INTEGER NOT NULL UNIQUE,'STATE' TEXT,'INFOS' TEXT,'FILE_NAME' TEXT,'NBR_TILES' INTEGER,'ZOOM' INTEGER,'NO_LAT' REAL,'NO_LONG' REAL,'SE_LAT' REAL,'SE_LONG' REAL,'LAYER_ID' INTEGER,'TEMP_DIRECTORY' TEXT,'SAVE_DIRECTORY' TEXT,'TIMESTAMP' TEXT,'QUALITY' INTEGER,'REDIMWIDTH' INTEGER,'REDIMHEIGHT' INTEGER,'COLORINTERPRETATION' TEXT,PRIMARY KEY('ID' AUTOINCREMENT));";
                 sqlite_cmd.ExecuteNonQuery();
             }
             catch (Exception e)
@@ -234,7 +230,7 @@ namespace MapsInMyFolder.Commun
             }
         }
 
-        public static int DB_Download_Write(Status STATE, string FILE_NAME, int NBR_TILES, int ZOOM, double NO_LAT, double NO_LONG, double SE_LAT, double SE_LONG, int LAYER_ID, string TEMP_DIRECTORY, string SAVE_DIRECTORY, string TIMESTAMP, int QUALITY, int REDIMWIDTH, int REDIMHEIGHT)
+        public static int DB_Download_Write(Status STATE, string FILE_NAME, int NBR_TILES, int ZOOM, double NO_LAT, double NO_LONG, double SE_LAT, double SE_LONG, int LAYER_ID, string TEMP_DIRECTORY, string SAVE_DIRECTORY, string TIMESTAMP, int QUALITY, int REDIMWIDTH, int REDIMHEIGHT, string COLORINTERPRETATION)
         {
             //staticc
             //CREATE TABLE IF NOT EXISTS some_table (id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -248,7 +244,7 @@ namespace MapsInMyFolder.Commun
                 if (conn is null) { return 0; }
                 SQLiteCommand sqlite_cmd = conn.CreateCommand();
                 DB_Download_Init(conn);
-                sqlite_cmd.CommandText = "INSERT INTO 'DOWNLOADS'('STATE','INFOS', 'FILE_NAME', 'NBR_TILES', 'ZOOM', 'NO_LAT', 'NO_LONG', 'SE_LAT', 'SE_LONG', 'LAYER_ID', 'TEMP_DIRECTORY', 'SAVE_DIRECTORY','TIMESTAMP','QUALITY','REDIMWIDTH','REDIMHEIGHT') VALUES('" + STATE + "','','" + FILE_NAME + "','" + NBR_TILES + "','" + ZOOM + "','" + NO_LAT + "','" + NO_LONG + "','" + SE_LAT + "','" + SE_LONG + "','" + LAYER_ID + "','" + TEMP_DIRECTORY + "','" + SAVE_DIRECTORY + "','" + TIMESTAMP + "','" + QUALITY + "','" + REDIMWIDTH + "','" + REDIMHEIGHT + "');";
+                sqlite_cmd.CommandText = "INSERT INTO 'DOWNLOADS'('STATE','INFOS', 'FILE_NAME', 'NBR_TILES', 'ZOOM', 'NO_LAT', 'NO_LONG', 'SE_LAT', 'SE_LONG', 'LAYER_ID', 'TEMP_DIRECTORY', 'SAVE_DIRECTORY','TIMESTAMP','QUALITY','REDIMWIDTH','REDIMHEIGHT', 'COLORINTERPRETATION') VALUES('" + STATE + "','','" + FILE_NAME + "','" + NBR_TILES + "','" + ZOOM + "','" + NO_LAT + "','" + NO_LONG + "','" + SE_LAT + "','" + SE_LONG + "','" + LAYER_ID + "','" + TEMP_DIRECTORY + "','" + SAVE_DIRECTORY + "','" + TIMESTAMP + "','" + QUALITY + "','" + REDIMWIDTH + "','" + REDIMHEIGHT + "','" + COLORINTERPRETATION + "');";
                 sqlite_cmd.ExecuteNonQuery();
 
                 //sqlite_cmd.

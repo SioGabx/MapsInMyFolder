@@ -135,15 +135,15 @@
                             <RowDefinition/>
                         </Grid.RowDefinitions>
                         <Label Content="Format :" Foreground="#888989" Grid.Row="0"></Label>
-                        <ComboBox x:Name="TextboxLayerFormat" Grid.Row="1" Width="Auto" HorizontalAlignment="Stretch" VerticalContentAlignment="Stretch" Height="21" Cursor="Arrow" IsEditable="False"  Padding="5,0,0,1" SelectedIndex="0" >
+                        <ComboBox x:Name="TextboxLayerFormat" Grid.Row="1" Width="Auto" HorizontalAlignment="Stretch" VerticalContentAlignment="Stretch" Height="21" Cursor="Arrow" IsEditable="False"  Padding="5,0,0,1" SelectedIndex="0" SelectionChanged="TextboxLayerFormat_SelectionChanged" >
                             <ComboBox.Resources>
                                 <Style TargetType="ScrollBar" BasedOn="{StaticResource {x:Type ScrollBar}}">
                                     <Setter Property="Margin" Value="0,0,-5,0"></Setter>
                                 </Style>
                             </ComboBox.Resources>
-                            <ComboBoxItem >JPEG</ComboBoxItem>
-                            <ComboBoxItem >PNG</ComboBoxItem>
-                            <ComboBoxItem >PBF</ComboBoxItem>
+                            <ComboBoxItem>JPEG</ComboBoxItem>
+                            <ComboBoxItem>PNG</ComboBoxItem>
+                            <ComboBoxItem>PBF</ComboBoxItem>
                         </ComboBox>
                     </Grid>
                     
@@ -200,7 +200,7 @@
                     </Grid>
 
 
-                    <Grid Margin="0,10,0,0">
+                    <Grid Margin="0,10,0,0" x:Name="SpecialOptionPBFJsonStyle">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="20"/>
                             <RowDefinition Height="*" />

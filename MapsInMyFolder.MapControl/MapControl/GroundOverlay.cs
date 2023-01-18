@@ -112,7 +112,7 @@ namespace MapsInMyFolder.MapControl
                 }
 
                 SetBoundingBox(overlay, imageOverlay.LatLonBox);
-                Canvas.SetZIndex(overlay, imageOverlay.ZIndex);
+                SetZIndex(overlay, imageOverlay.ZIndex);
                 Children.Add(overlay);
             }
         }

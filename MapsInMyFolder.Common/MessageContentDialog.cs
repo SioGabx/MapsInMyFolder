@@ -1,15 +1,9 @@
-﻿using MapsInMyFolder.Commun;
-using ModernWpf.Controls;
+﻿using ModernWpf.Controls;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Threading;
 
 namespace MapsInMyFolder.Commun
 {
@@ -180,7 +174,7 @@ namespace MapsInMyFolder.Commun
         {
             try
             {
-                await Message.SetContentDialog(text, caption, MessageDialogButton.OK).ShowAsync().ConfigureAwait(false);
+                await SetContentDialog(text, caption, MessageDialogButton.OK).ShowAsync().ConfigureAwait(false);
             }
             catch (Exception ex)
             {

@@ -1,27 +1,16 @@
-﻿using CefSharp;
-using MapsInMyFolder.MapControl;
-using ModernWpf;
+﻿using MapsInMyFolder.MapControl;
 using ModernWpf.Controls;
 using System;
 using System.Collections.Generic;
 using System.Data.SQLite;
 using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 using System.Windows.Threading;
 using MapsInMyFolder.Commun;
-using System.Timers;
 using System.Text.Json;
 
 namespace MapsInMyFolder
@@ -34,7 +23,7 @@ namespace MapsInMyFolder
         public CustomOrEditLayersPage()
         {
             InitializeComponent();
-            LayerId = Commun.Settings.layer_startup_id;
+            LayerId = Settings.layer_startup_id;
         }
 
         public int LayerId { get; set; }
@@ -47,7 +36,7 @@ namespace MapsInMyFolder
             GenerateTempLayerInDicList();
             SQLiteConnection conn = Database.DB_Connection();
             //DB_Download_Init(conn);
-            System.Windows.Media.SolidColorBrush brush = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(255, (byte)Commun.Settings.background_layer_color_R, (byte)Commun.Settings.background_layer_color_G, (byte)Commun.Settings.background_layer_color_B));
+            System.Windows.Media.SolidColorBrush brush = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(255, (byte)Settings.background_layer_color_R, (byte)Settings.background_layer_color_G, (byte)Settings.background_layer_color_B));
             mapviewerappercu.Background = brush;
             Init_LayerEditableTextbox();
             SetAppercuLayers();
@@ -91,7 +80,7 @@ namespace MapsInMyFolder
             List<string> Categories = new List<string>();
             List<string> Site = new List<string>();
             List<string> SiteUrl = new List<string>();
-            foreach (MapsInMyFolder.Commun.Layers layer in MapsInMyFolder.Commun.Layers.GetLayersList())
+            foreach (MapsInMyFolder.Commun.Layers layer in Layers.GetLayersList())
             {
                 if (layer.class_id < 0)
                 {
@@ -168,6 +157,7 @@ namespace MapsInMyFolder
             {
                 TextboxLayerFormat.SelectedIndex = TextboxLayerFormat.Items.Add(LayerInEditMode.class_format.ToUpperInvariant());
             }
+            DoShowSpecialOptionPBFJsonStyle();
 
             string tileSize = LayerInEditMode.class_tiles_size.ToString();
             if (string.IsNullOrEmpty(tileSize.Trim()))
@@ -186,7 +176,7 @@ namespace MapsInMyFolder
             TextBoxSetValueAndLock(TextboxSpecialOptionBackgroundColor, LayerInEditMode.class_specialsoptions.BackgroundColor);
             TextBoxSetValueAndLock(TextboxSpecialOptionPBFJsonStyle, LayerInEditMode.class_specialsoptions.PBFJsonStyle);
 
-            DefaultValuesHachCode = Commun.Collectif.CheckIfInputValueHaveChange(EditeurStackPanel);
+            DefaultValuesHachCode = Collectif.CheckIfInputValueHaveChange(EditeurStackPanel);
         }
 
         static void TextBoxSetValueAndLock(TextBox textBox, string value)
@@ -250,7 +240,7 @@ namespace MapsInMyFolder
                 {
                     if (BackgroundSwitch.IsOn)
                     {
-                        Layers Layer = Layers.GetLayerById(Commun.Settings.layer_startup_id) ?? Layers.Empty();
+                        Layers Layer = Layers.GetLayerById(Settings.layer_startup_id) ?? Layers.Empty();
                         basemap = new MapTileLayer
                         {
                             TileSource = new TileSource { UriFormat = Layer.class_tile_url, LayerID = Layer.class_id },
@@ -301,7 +291,7 @@ namespace MapsInMyFolder
 
         private void TextboxLayerTileUrl_TextChanged(object sender, TextChangedEventArgs e)
         {
-            App.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
+            Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
             {
                 SetAppercuLayers(TextboxLayerTileUrl.Text);
             }, null);
@@ -563,7 +553,7 @@ namespace MapsInMyFolder
         async void AutoDetectZoom()
         {
             string label_base_content = ClickableLabel.Content.ToString();
-            await App.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)async delegate
+            await Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)async delegate
             {
                 if (string.IsNullOrEmpty(TextboxLayerTileUrl.Text))
                 {
@@ -580,7 +570,7 @@ namespace MapsInMyFolder
                 for (int i = 0; i < 30; i++)
                 {
                     string infotext = String.Concat("Analyse.... (niveau de zoom ", i.ToString(), ")");
-                    await App.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
+                    await Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
                     {
                         ClickableLabel.Content = infotext;
                     }, null);
@@ -598,7 +588,7 @@ namespace MapsInMyFolder
                                 if (ZoomMinimum == -1)
                                 {
                                     ZoomMinimum = i;
-                                    App.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
+                                    Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
                                     {
                                         Javascript.Print("Zoom minimum détecté (" + ZoomMinimum + ") !", -2);
                                         TextBoxLayerMinZoom.Text = ZoomMinimum.ToString();
@@ -614,7 +604,7 @@ namespace MapsInMyFolder
                                 if (ZoomMaximum == -1)
                                 {
                                     ZoomMaximum = i - 1;
-                                    App.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
+                                    Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
                                     {
                                         Javascript.Print("Zoom maximal détecté (" + ZoomMaximum + ") !", -2);
                                         TextBoxLayerMaxZoom.Text = ZoomMaximum.ToString();
@@ -632,7 +622,7 @@ namespace MapsInMyFolder
                 }
                 if (ZoomMaximum == -1)
                 {
-                    await App.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
+                    await Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
                     {
                         ClickableLabel.Content = "Le zoom maximal n'as pas pu être trouvé, veuillez réessayer...";
                         ClickableLabel.IsEnabled = true;
@@ -643,7 +633,7 @@ namespace MapsInMyFolder
 
         void DisposeElementOnLeave()
         {
-            Commun.TileGeneratorSettings.AcceptJavascriptPrint = false;
+            TileGeneratorSettings.AcceptJavascriptPrint = false;
             Javascript.EngineStopAll();
             if (UpdateTimer is not null)
             {
@@ -710,7 +700,7 @@ namespace MapsInMyFolder
 
         private async void ClosePage_button_Click(object sender, RoutedEventArgs e)
         {
-            int ValuesHachCode = Commun.Collectif.CheckIfInputValueHaveChange(EditeurStackPanel);
+            int ValuesHachCode = Collectif.CheckIfInputValueHaveChange(EditeurStackPanel);
             ContentDialogResult result = ContentDialogResult.Primary;
             if (DefaultValuesHachCode != ValuesHachCode)
             {
@@ -817,7 +807,30 @@ namespace MapsInMyFolder
         {
             DoWeNeedToUpdateMoinsUnLayer();
         }
+
         #endregion
+
+        private void TextboxLayerFormat_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            DoShowSpecialOptionPBFJsonStyle();
+        }
+
+        void DoShowSpecialOptionPBFJsonStyle()
+        {
+            if (SpecialOptionPBFJsonStyle is null || !IsInitialized)
+            {
+                return;
+            }
+            ComboBoxItem comboBoxItem = TextboxLayerFormat.SelectedItem as ComboBoxItem;
+            if (comboBoxItem.Content.ToString() == "PBF")
+            {
+                SpecialOptionPBFJsonStyle.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                SpecialOptionPBFJsonStyle.Visibility = Visibility.Collapsed;
+            }
+        }
 
 
     }

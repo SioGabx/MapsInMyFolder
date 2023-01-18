@@ -3,12 +3,9 @@ using SkiaSharp;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -317,7 +314,7 @@ namespace MapsInMyFolder.VectorTileRenderer
                     if (style.GlyphsDirectory != null)
                     {
                         // check file system for ttf
-                        var newType = SKTypeface.FromFile(System.IO.Path.Combine(style.GlyphsDirectory, name + ".ttf"));
+                        var newType = SKTypeface.FromFile(Path.Combine(style.GlyphsDirectory, name + ".ttf"));
                         if (newType != null)
                         {
                             fontPairs[name] = newType;
@@ -325,7 +322,7 @@ namespace MapsInMyFolder.VectorTileRenderer
                         }
 
                         // check file system for otf
-                        newType = SKTypeface.FromFile(System.IO.Path.Combine(style.GlyphsDirectory, name + ".otf"));
+                        newType = SKTypeface.FromFile(Path.Combine(style.GlyphsDirectory, name + ".otf"));
                         if (newType != null)
                         {
                             fontPairs[name] = newType;

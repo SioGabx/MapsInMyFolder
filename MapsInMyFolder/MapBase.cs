@@ -17,23 +17,23 @@ namespace MapsInMyFolder
         {
             UIElement EmptyMapTileLayer = new MapTileLayer();
             mapviewer.MapLayer = EmptyMapTileLayer;
-            NO_PIN.Visibility = Commun.Settings.visibility_pins;
-            SE_PIN.Visibility = Commun.Settings.visibility_pins;
+            NO_PIN.Visibility = Settings.visibility_pins;
+            SE_PIN.Visibility = Settings.visibility_pins;
 
-            Location NO_PIN_starting_location = new Location(Commun.Settings.NO_PIN_starting_location_latitude, Commun.Settings.NO_PIN_starting_location_longitude);
-            Location SE_PIN_starting_location = new Location(Commun.Settings.SE_PIN_starting_location_latitude, Commun.Settings.SE_PIN_starting_location_longitude);
+            Location NO_PIN_starting_location = new Location(Settings.NO_PIN_starting_location_latitude, Settings.NO_PIN_starting_location_longitude);
+            Location SE_PIN_starting_location = new Location(Settings.SE_PIN_starting_location_latitude, Settings.SE_PIN_starting_location_longitude);
 
             MapPanel.SetLocation(NO_PIN, NO_PIN_starting_location);
             MapPanel.SetLocation(SE_PIN, SE_PIN_starting_location);
             Draw_rectangle_selection_arround_pushpin();
 
             mapviewer.Center = new Location(NO_PIN_starting_location.Latitude - ((NO_PIN_starting_location.Latitude - SE_PIN_starting_location.Latitude) / 2), NO_PIN_starting_location.Longitude - ((NO_PIN_starting_location.Longitude - SE_PIN_starting_location.Longitude) / 2));
-            mapviewer.ZoomLevel = Commun.Settings.map_defaut_zoom_level;
+            mapviewer.ZoomLevel = Settings.map_defaut_zoom_level;
             System.Windows.Media.SolidColorBrush brush = new System.Windows.Media.SolidColorBrush(
                 System.Windows.Media.Color.FromArgb(255,
-                (byte)Commun.Settings.background_layer_color_R,
-                (byte)Commun.Settings.background_layer_color_G,
-                (byte)Commun.Settings.background_layer_color_B)
+                (byte)Settings.background_layer_color_R,
+                (byte)Settings.background_layer_color_G,
+                (byte)Settings.background_layer_color_B)
                 );
             mapviewer.Background = brush;
         }
@@ -42,12 +42,12 @@ namespace MapsInMyFolder
         {
             //    Javascript JavascriptLocationInstance = Javascript.JavascriptInstance;
             //    JavascriptLocationInstance.LocationChanged += (o, e) => MapViewerSetSelection(e.Location);
-            App.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
+            Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
             {
                 try
                 {
-                    Location ActualNO_PINLocation = MainPage._instance.NO_PIN.Location;
-                    Location ActualSE_PINLocation = MainPage._instance.SE_PIN.Location;
+                    Location ActualNO_PINLocation = _instance.NO_PIN.Location;
+                    Location ActualSE_PINLocation = _instance.SE_PIN.Location;
                     if (ActualNO_PINLocation.Latitude == locations["NO_Latitude"] ||
                         ActualNO_PINLocation.Longitude == locations["NO_Longitude"] ||
                         ActualSE_PINLocation.Latitude == locations["SE_Latitude"] ||
@@ -65,16 +65,16 @@ namespace MapsInMyFolder
                 {
                     Location SE_Loc = new Location(locations["SE_Latitude"], locations["SE_Longitude"]);
                     Location NO_Loc = new Location(locations["NO_Latitude"], locations["NO_Longitude"]);
-                    MainPage._instance.NO_PIN.Location = NO_Loc;
-                    MainPage._instance.SE_PIN.Location = SE_Loc;
-                    MainPage._instance.Draw_rectangle_selection_arround_pushpin();
+                    _instance.NO_PIN.Location = NO_Loc;
+                    _instance.SE_PIN.Location = SE_Loc;
+                    _instance.Draw_rectangle_selection_arround_pushpin();
                     if (ZoomToNewLocation)
                     {
-                        Point NO_Point_Bounds = MainPage._instance.mapviewer.LocationToView(NO_Loc);
-                        Point SE_Point_Bounds = MainPage._instance.mapviewer.LocationToView(SE_Loc);
-                        Location NO_Location_Bounds = MainPage._instance.mapviewer.ViewToLocation(new Point(NO_Point_Bounds.X - Commun.Settings.maps_margin_ZoomToBounds, NO_Point_Bounds.Y - Commun.Settings.maps_margin_ZoomToBounds));
-                        Location SE_Location_Bounds = MainPage._instance.mapviewer.ViewToLocation(new Point(SE_Point_Bounds.X + Commun.Settings.maps_margin_ZoomToBounds, SE_Point_Bounds.Y + Commun.Settings.maps_margin_ZoomToBounds));
-                        MainPage._instance.mapviewer.ZoomToBounds(new BoundingBox(NO_Location_Bounds.Latitude, NO_Location_Bounds.Longitude, SE_Location_Bounds.Latitude, SE_Location_Bounds.Longitude));
+                        Point NO_Point_Bounds = _instance.mapviewer.LocationToView(NO_Loc);
+                        Point SE_Point_Bounds = _instance.mapviewer.LocationToView(SE_Loc);
+                        Location NO_Location_Bounds = _instance.mapviewer.ViewToLocation(new Point(NO_Point_Bounds.X - Settings.maps_margin_ZoomToBounds, NO_Point_Bounds.Y - Settings.maps_margin_ZoomToBounds));
+                        Location SE_Location_Bounds = _instance.mapviewer.ViewToLocation(new Point(SE_Point_Bounds.X + Settings.maps_margin_ZoomToBounds, SE_Point_Bounds.Y + Settings.maps_margin_ZoomToBounds));
+                        _instance.mapviewer.ZoomToBounds(new BoundingBox(NO_Location_Bounds.Latitude, NO_Location_Bounds.Longitude, SE_Location_Bounds.Latitude, SE_Location_Bounds.Longitude));
                     }
                 }
                 catch (Exception ex)
@@ -91,7 +91,7 @@ namespace MapsInMyFolder
 
         public void RightClickUp(Point p)
         {
-            if (Commun.Settings.disable_selection_rectangle_moving)
+            if (Settings.disable_selection_rectangle_moving)
             {
                 return;
             }
@@ -135,7 +135,7 @@ namespace MapsInMyFolder
 
         void StartRightClick(MouseButtonEventArgs e)
         {
-            if (Commun.Settings.disable_selection_rectangle_moving)
+            if (Settings.disable_selection_rectangle_moving)
             {
                 return;
             }
@@ -199,7 +199,7 @@ namespace MapsInMyFolder
         private void Mapviewer_MouseMove(object sender, System.Windows.Input.MouseEventArgs e)
         {
             e.Handled = true;
-            if (Commun.Settings.disable_selection_rectangle_moving)
+            if (Settings.disable_selection_rectangle_moving)
             {
                 return;
             }
@@ -250,9 +250,9 @@ namespace MapsInMyFolder
                 }
                 else
                 {
-                    Cursor grab = new Cursor(Commun.Collectif.ReadResourceStream("cursors/closedhand.cur"));
+                    Cursor grab = new Cursor(Collectif.ReadResourceStream("cursors/closedhand.cur"));
                     mapviewer.Cursor = grab;
-                    if (!Commun.Settings.disable_selection_rectangle_moving)
+                    if (!Settings.disable_selection_rectangle_moving)
                     {
                         is_left_mouse_down = true;
                         saved_left_click_mouse_position = e.GetPosition(mapviewer);
@@ -263,7 +263,7 @@ namespace MapsInMyFolder
             if (e.MiddleButton == MouseButtonState.Pressed)
             {
                 e.Handled = true;
-                Cursor grab = new Cursor(Commun.Collectif.ReadResourceStream("cursors/closedhand.cur"));
+                Cursor grab = new Cursor(Collectif.ReadResourceStream("cursors/closedhand.cur"));
                 mapviewer.Cursor = grab;
             }
 
@@ -275,7 +275,7 @@ namespace MapsInMyFolder
                 }
                 else
                 {
-                    if (!Commun.Settings.disable_selection_rectangle_moving)
+                    if (!Settings.disable_selection_rectangle_moving)
                     {
                         if (e.MiddleButton == MouseButtonState.Released)
                         {
@@ -351,7 +351,7 @@ namespace MapsInMyFolder
         {
             Selection_Rectangle.Locations = new List<Location>() { NO_PIN.Location, new Location(SE_PIN.Location.Latitude, NO_PIN.Location.Longitude), SE_PIN.Location, new Location(NO_PIN.Location.Latitude, SE_PIN.Location.Longitude) };
 
-            if (Commun.Settings.visibility_pins == Visibility.Visible)
+            if (Settings.visibility_pins == Visibility.Visible)
             {
                 NO_PIN.Content = "Latitude = " + Math.Round(NO_PIN.Location.Latitude, 6).ToString() + "\nLongitude = " + Math.Round(NO_PIN.Location.Longitude, 6).ToString();
                 SE_PIN.Content = "Latitude = " + Math.Round(SE_PIN.Location.Latitude, 6).ToString() + "\nLongitude = " + Math.Round(SE_PIN.Location.Longitude, 6).ToString();
@@ -498,8 +498,8 @@ namespace MapsInMyFolder
         HitType MouseHitType = HitType.None;
         private HitType SetHitType(Point point)
         {
-            double tblr_GAP = Commun.Settings.selection_rectangle_resize_tblr_gap;
-            double angle_GAP = Commun.Settings.selection_rectangle_resize_angle_gap;
+            double tblr_GAP = Settings.selection_rectangle_resize_tblr_gap;
+            double angle_GAP = Settings.selection_rectangle_resize_angle_gap;
             double left = NO_PIN.TranslatePoint(new Point(0, 0), mapviewer).X;
             double top = NO_PIN.TranslatePoint(new Point(0, 0), mapviewer).Y + selection_map_rectange_y_decalage + 5;
             double right = SE_PIN.TranslatePoint(new Point(0, 0), mapviewer).X;
@@ -510,7 +510,7 @@ namespace MapsInMyFolder
             if (point.Y < top) return HitType.None;
             if (point.Y > bottom) return HitType.None;
 
-            if (Commun.Settings.disable_selection_rectangle_moving)
+            if (Settings.disable_selection_rectangle_moving)
             {
                 return HitType.No;
             }
@@ -597,7 +597,7 @@ namespace MapsInMyFolder
 
         private void Selection_Rectangle_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            if (!Commun.Settings.disable_selection_rectangle_moving)
+            if (!Settings.disable_selection_rectangle_moving)
             {
                 if (e.LeftButton == MouseButtonState.Pressed)
                 {

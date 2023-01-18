@@ -63,31 +63,43 @@ namespace MapsInMyFolder.MapControl
 
             if (cacheItem == null || cacheItem.Item2 < DateTime.UtcNow)
             {
-                //TileGeneratorSettings.TileLoaderGenerator.Layer = Layers.Convert.CurentLayerToLayer();
                 Layers layers = Layers.GetLayerById(LayerId) ?? Layers.Empty();
-                //var response = await TileGeneratorSettings.TileLoaderGenerator.GetImageAsync(TileGeneratorSettings.TileLoaderGenerator.Layer.class_tile_url, tile.XIndex, tile.Y, tile.ZoomLevel).ConfigureAwait(false);
-                var response = await TileGeneratorSettings.TileLoaderGenerator.GetImageAsync(uri, tile.XIndex, tile.Y, tile.ZoomLevel, LayerId, null, Collectif.GetSaveTempDirectory(layers.class_name,layers.class_identifiant, tile.ZoomLevel), Commun.Settings.tiles_cache_expire_after_x_days).ConfigureAwait(false);
-                if (!(response?.Buffer is null) && response.ResponseMessage.IsSuccessStatusCode) // download succeeded
+                Debug.WriteLine("Call here");
+                try
                 {
-                    buffer = response.Buffer;
-                    cacheItem = Tuple.Create(buffer, GetExpiration(response.ResponseMessage.Headers.CacheControl?.MaxAge));
-                    Cache.Set(cacheKey, cacheItem, new CacheItemPolicy { AbsoluteExpiration = cacheItem.Item2 });
+                    var response = await TileGeneratorSettings.TileLoaderGenerator.GetImageAsync(uri, tile.XIndex, tile.Y, tile.ZoomLevel, LayerId, null, Collectif.GetSaveTempDirectory(layers.class_name, layers.class_identifiant, tile.ZoomLevel)).ConfigureAwait(false);
+                    if (!((response is null) || (response.Buffer is null) || (response.ResponseMessage is null)) && response.ResponseMessage.IsSuccessStatusCode) // download succeeded
+                    {
+                        buffer = response.Buffer;
+                        cacheItem = Tuple.Create(buffer, GetExpiration(response.ResponseMessage.Headers.CacheControl?.MaxAge));
+                        Cache.Set(cacheKey, cacheItem, new CacheItemPolicy { AbsoluteExpiration = cacheItem.Item2 });
+                    }
+                    else if (Settings.map_view_error_tile)
+                    {
+                        buffer = Collectif.GetEmptyImageBufferFromText(response);
+                    }
                 }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine("on top " + ex.Message);
+                }
+
+                
             }
 
             if (buffer?.Length > 0)
             {
                 DebugMode.WriteLine("Loading LoadCachedTile image LayerId=" + LayerId);
                 var image = await ImageLoader.LoadImageAsync(buffer).ConfigureAwait(false);
-
                 await tile.Image.Dispatcher.InvokeAsync(() => tile.SetImage(image));
             }
         }
 
         private static async Task LoadTile(Tile tile, TileSource tileSource)
         {
+            Debug.WriteLine("Loading tiile");
             var image = await tileSource.LoadImageAsync(tile.XIndex, tile.Y, tile.ZoomLevel, tileSource).ConfigureAwait(false);
-            //Debug.WriteLine("Loading tiile");
+            
             await tile.Image.Dispatcher.InvokeAsync(() => tile.SetImage(image));
         }
     }

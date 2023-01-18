@@ -1,11 +1,6 @@
 ﻿using Microsoft.Win32;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 
 namespace MapsInMyFolder.Commun
@@ -50,6 +45,7 @@ namespace MapsInMyFolder.Commun
         public static int waiting_before_start_another_tile_download = 0;                        //Nombre de milisecondes entre chaque téléchargement d'une tuile (seulement si max_download_tiles_in_parralele = 1 de préférence)
         public static bool generate_transparent_tiles_on_404 = true;                            //Genere une tuile en cas d'erreur no data | Default=true
         public static bool generate_transparent_tiles_on_error = true;                            //Genere une tuile en cas d'erreur  | Default=true
+        public static bool map_view_error_tile = true;                            
 
         public static bool is_in_debug_mode = false;                                                  //Debug : affiche les devtool des deux navigateur       
         public static bool show_layer_devtool = false;                                                  //Debug : affiche les devtool des deux navigateur       
@@ -105,7 +101,7 @@ namespace MapsInMyFolder.Commun
 
             if (save)
             {
-                string value = System.IO.Path.Combine(Settings.working_folder, "Settings.xml");
+                string value = System.IO.Path.Combine(working_folder, "Settings.xml");
                 RegistryKey ckey = Registry.CurrentUser.CreateSubKey(regPath);
                 ckey.SetValue(regKey, value);
                 ckey.Close();

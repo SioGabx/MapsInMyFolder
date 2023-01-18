@@ -2,21 +2,15 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Windows;
 using CefSharp;
 using MapsInMyFolder.MapControl;
 using System.Diagnostics;
-using System.Reflection;
 using System.Windows.Threading;
 using System.Data.SQLite;
-using System.Timers;
-using System.Windows.Input;
 using System.Threading.Tasks;
 using MapsInMyFolder.Commun;
-using System.Windows.Controls;
-using ModernWpf.Controls;
 using System.Text.Json;
 
 namespace MapsInMyFolder
@@ -26,7 +20,7 @@ namespace MapsInMyFolder
         string last_input = "";
         public async void SearchLayerStart(bool IsIgnoringLastInput = false)
         {
-            await App.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)async delegate
+            await Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)async delegate
             {
                 if ((last_input != layer_searchbar.Text.Trim() || IsIgnoringLastInput) && layer_searchbar.Text != "Rechercher un calque, un site...")
                 {
@@ -179,7 +173,7 @@ namespace MapsInMyFolder
                     }
                     if (string.IsNullOrEmpty(DB_Layer_TILECOMPUTATIONSCRIPT))
                     {
-                        DB_Layer_TILECOMPUTATIONSCRIPT = Commun.Settings.tileloader_default_script;
+                        DB_Layer_TILECOMPUTATIONSCRIPT = Settings.tileloader_default_script;
                     }
                     DB_Layer_TILECOMPUTATIONSCRIPT = Collectif.HTMLEntities(DB_Layer_TILECOMPUTATIONSCRIPT, true);
                     Debug.WriteLine("Layer " + DB_Layer_NOM + " : Tilesize = " + DB_Layer_TILE_SIZE + " id = " + DB_Layer_ID);
@@ -205,8 +199,8 @@ namespace MapsInMyFolder
 
         string DB_Layer_Load()
         {
-            string query = "SELECT *,'LAYERS' AS TYPE FROM LAYERS UNION SELECT *,'CUSTOMSLAYERS' FROM CUSTOMSLAYERS ORDER BY " + Commun.Settings.layers_Sort.ToString() + " " + Commun.Settings.Layers_Order.ToString() + " NULLS LAST";
-            string query2 = "SELECT * FROM EDITEDLAYERS ORDER BY " + Commun.Settings.layers_Sort.ToString() + " " + Commun.Settings.Layers_Order.ToString() + " NULLS LAST";
+            string query = "SELECT *,'LAYERS' AS TYPE FROM LAYERS UNION SELECT *,'CUSTOMSLAYERS' FROM CUSTOMSLAYERS ORDER BY " + Settings.layers_Sort.ToString() + " " + Settings.Layers_Order.ToString() + " NULLS LAST";
+            string query2 = "SELECT * FROM EDITEDLAYERS ORDER BY " + Settings.layers_Sort.ToString() + " " + Settings.Layers_Order.ToString() + " NULLS LAST";
             SQLiteConnection conn = Database.DB_Connection();
             if (conn is null)
             {
@@ -217,16 +211,16 @@ namespace MapsInMyFolder
 
             conn.Close();
             string finalHTML = baseHTML;
-            if (Commun.Settings.show_layer_devtool)
+            if (Settings.show_layer_devtool)
             {
                 layer_browser.ShowDevTools();
             }
 
             string injection = @"<script>
-                document.body.style.setProperty(""--opacity_preview_background"", " + (1 - Commun.Settings.background_layer_opacity) + @");
-                document.body.style.setProperty(""--background_layer_color_R"", " + Commun.Settings.background_layer_color_R + @");
-                document.body.style.setProperty(""--background_layer_color_G"", " + Commun.Settings.background_layer_color_G + @");
-                document.body.style.setProperty(""--background_layer_color_B"", " + Commun.Settings.background_layer_color_B + @");
+                document.body.style.setProperty(""--opacity_preview_background"", " + (1 - Settings.background_layer_opacity) + @");
+                document.body.style.setProperty(""--background_layer_color_R"", " + Settings.background_layer_color_R + @");
+                document.body.style.setProperty(""--background_layer_color_G"", " + Settings.background_layer_color_G + @");
+                document.body.style.setProperty(""--background_layer_color_B"", " + Settings.background_layer_color_B + @");
                </script>";
 
             finalHTML += injection;
@@ -237,7 +231,7 @@ namespace MapsInMyFolder
         {
             Layers.Layers_Dictionary_List.Clear();
             string generated_layers = String.Empty;
-            generated_layers += "<ul class=\"" + Commun.Settings.layerpanel_displaystyle.ToString().ToLower() + "\">";
+            generated_layers += "<ul class=\"" + Settings.layerpanel_displaystyle.ToString().ToLower() + "\">";
             Dictionary<int, Layers> EditedLayersDictionnary = new Dictionary<int, Layers>();
             foreach (Layers individual_editedlayer in editedlayers)
             {
@@ -259,7 +253,7 @@ namespace MapsInMyFolder
                         individual_layer_with_replacement = individual_layer;
                     }
 
-                    if (Commun.Settings.layerpanel_put_non_letter_layername_at_the_end)
+                    if (Settings.layerpanel_put_non_letter_layername_at_the_end)
                     {
                         if (DoRejectLayer && (string.IsNullOrEmpty(individual_layer_with_replacement.class_name) || !Char.IsLetter(individual_layer_with_replacement.class_name.Trim()[0])))
                         {
@@ -284,7 +278,7 @@ namespace MapsInMyFolder
                     const string imgbase64 = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"; //1 pixel gif transparent -> disable base 
 
                     string supplement_class = "";
-                    if (!Commun.Settings.layerpanel_website_IsVisible)
+                    if (!Settings.layerpanel_website_IsVisible)
                     {
                         supplement_class += " displaynone";
                     }
@@ -317,7 +311,7 @@ namespace MapsInMyFolder
 
         public void Set_current_layer(int id)
         {
-            int layer_startup_id = Commun.Settings.layer_startup_id;
+            int layer_startup_id = Settings.layer_startup_id;
             DebugMode.WriteLine("Set layer");
             string last_format = "";
             if (Curent.Layer.class_format is not null && Curent.Layer.class_format.Trim() != "")
@@ -336,7 +330,7 @@ namespace MapsInMyFolder
             if (layer is null || layer_startup_id == 0)
             {
                 layer = Layers.GetLayerById(Layers.Layers_Dictionary_List[0].Keys.First());
-                Commun.Settings.layer_startup_id = layer.class_id;
+                Settings.layer_startup_id = layer.class_id;
                 if (layer_startup_id == 0)
                 {
                     layer_startup_id = layer.class_id;
@@ -368,7 +362,7 @@ namespace MapsInMyFolder
                                     Description = "© [OpenStreetMap contributors](http://www.openstreetmap.org/copyright)"
                                 };
 
-                                basemap.Opacity = Commun.Settings.background_layer_opacity;
+                                basemap.Opacity = Settings.background_layer_opacity;
                                 mapviewer.MapLayer = basemap;
                             }
                             catch (Exception ex)
@@ -395,7 +389,7 @@ namespace MapsInMyFolder
                         mapviewer.MapLayer = layer_uielement;
                     }
 
-                    if (Commun.Settings.zoom_limite_taille_carte)
+                    if (Settings.zoom_limite_taille_carte)
                     {
                         if (layer.class_min_zoom < 3)
                         {
@@ -498,7 +492,7 @@ namespace MapsInMyFolder
 
             try
             {
-                int layer_startup_id = Commun.Settings.layer_startup_id;
+                int layer_startup_id = Settings.layer_startup_id;
                 Layers StartingLayer = Layers.GetLayerById(layer_startup_id);
 
                 int min_zoom = layer.class_min_zoom;
@@ -565,7 +559,7 @@ namespace MapsInMyFolder
         public void Layer_favorite_add(double id = 0)
         {
             int id_int = Convert.ToInt32(id);
-            App.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
+            Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
             {
                 MainPage.DBLayerFavorite(id_int, 1);
             }, null);
@@ -575,7 +569,7 @@ namespace MapsInMyFolder
         public void Clear_cache(double id = 0)
         {
             int id_int = Convert.ToInt32(id);
-            App.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
+            Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
             {
                 MainPage.ClearCache(id_int);
             }, null);
@@ -585,7 +579,7 @@ namespace MapsInMyFolder
         public void Layer_favorite_remove(double id = 0)
         {
             int id_int = Convert.ToInt32(id);
-            App.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
+            Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
             {
                 MainPage.DBLayerFavorite(id_int, 0);
             }, null);
@@ -595,7 +589,7 @@ namespace MapsInMyFolder
         public void Layer_edit(double id = 0)
         {
             int id_int = Convert.ToInt32(id);
-            App.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
+            Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
             {
                 MainPage.LayerEditOpenWindow(id_int);
             }, null);
@@ -605,14 +599,14 @@ namespace MapsInMyFolder
         public void Layer_set_current(double id = 0)
         {
             int id_int = Convert.ToInt32(id);
-            App.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
+            Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
             {
                 MainWindow._instance.MainPage.Set_current_layer(id_int);
             }, null);
         }
         public void Request_search_update()
         {
-            App.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
+            Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
             {
                 MainWindow._instance.MainPage.SearchLayerStart(true);
             }, null);
@@ -620,7 +614,7 @@ namespace MapsInMyFolder
 
         public void Refresh_panel()
         {
-            App.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
+            Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
             {
                 MainWindow._instance.MainPage.ReloadPage();
                 MainWindow._instance.MainPage.SearchLayerStart();
@@ -629,14 +623,14 @@ namespace MapsInMyFolder
 
         public string Gettilepreviewurlfromid(double id = 0)
         {
-            if (!Commun.Settings.layerpanel_livepreview)
+            if (!Settings.layerpanel_livepreview)
             {
                 return "";
             }
             async Task<string> Gettilepreviewurlfromid_interne(double id)
             {
                 int id_int = Convert.ToInt32(id);
-                DispatcherOperation op = App.Current.Dispatcher.BeginInvoke(new Func<string>(() => MainWindow._instance.MainPage.LayerTilePreview_ReturnUrl(id_int)));
+                DispatcherOperation op = Application.Current.Dispatcher.BeginInvoke(new Func<string>(() => MainWindow._instance.MainPage.LayerTilePreview_ReturnUrl(id_int)));
                 await op;
                 return op.Result.ToString();
             }

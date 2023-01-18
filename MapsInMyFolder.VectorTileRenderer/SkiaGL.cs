@@ -1,5 +1,4 @@
 ﻿using SkiaSharp;
-using System;
 using System.Runtime.InteropServices;
 
 namespace MapsInMyFolder.VectorTileRenderer

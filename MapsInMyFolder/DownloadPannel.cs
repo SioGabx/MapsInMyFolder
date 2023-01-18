@@ -1,15 +1,12 @@
 ﻿using CefSharp;
-using MapsInMyFolder.MapControl;
 using ModernWpf.Controls;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
 using MapsInMyFolder.Commun;
-
 using System.Data.SQLite;
 using System.Windows.Input;
 using System.Windows.Media.Animation;
@@ -18,8 +15,6 @@ namespace MapsInMyFolder
 {
     public partial class MainPage : System.Windows.Controls.Page
     {
-        // int settings_max_download_simult;
-
         void DB_Download_Load()
         {
             DebugMode.WriteLine("Loading downloads");
@@ -49,6 +44,7 @@ namespace MapsInMyFolder
                     string DB_Download_TIMESTAMP = sqlite_datareader.GetString(sqlite_datareader.GetOrdinal("TIMESTAMP"));
                     string DB_Download_TEMP_DIRECTORY = sqlite_datareader.GetString(sqlite_datareader.GetOrdinal("TEMP_DIRECTORY"));
                     string DB_Download_SAVE_DIRECTORY = sqlite_datareader.GetString(sqlite_datareader.GetOrdinal("SAVE_DIRECTORY"));
+                    string DB_Download_COLORINTERPRETATION = sqlite_datareader.GetString(sqlite_datareader.GetOrdinal("COLORINTERPRETATION"));
                     string DB_Download_FILE_NAME = sqlite_datareader.GetString(sqlite_datareader.GetOrdinal("FILE_NAME"));
                     string DB_Download_STATE = sqlite_datareader.GetString(sqlite_datareader.GetOrdinal("STATE"));
                     string DB_Download_INFOS = sqlite_datareader.GetString(sqlite_datareader.GetOrdinal("INFOS")).Trim();
@@ -67,6 +63,8 @@ namespace MapsInMyFolder
                         { "SE_Latitude", DB_Download_SE_LAT },
                         { "SE_Longitude", DB_Download_SE_LONG }
                     };
+
+                    NetVips.Enums.Interpretation COLORINTERPRETATION = (NetVips.Enums.Interpretation)Enum.Parse(typeof(NetVips.Enums.Interpretation), DB_Download_COLORINTERPRETATION);
 
                     //List<Url_class> urls = Collectif.GetUrl.GetListOfUrlFromLocation(location, DB_Download_ZOOM, layers.class_tile_url, DB_Download_LAYER_ID, downloadid);
                     List<Url_class> urls = null;
@@ -89,6 +87,7 @@ namespace MapsInMyFolder
                             engine_status = Status.cancel;
                             break;
                         case "success":
+                        case "cleanup":
                             engine_status = Status.success;
                             Download_INFOS = "Téléchargé.";
                             break;
@@ -120,7 +119,7 @@ namespace MapsInMyFolder
                             Download_INFOS = "Introuvable.";
                         }
                     }
-                    DownloadClass engine = new DownloadClass(downloadid, DB_Download_ID, DB_Download_LAYER_ID, urls, tokenSource2, ct, format, final_saveformat, DB_Download_ZOOM, DB_Download_TEMP_DIRECTORY, DB_Download_SAVE_DIRECTORY, DB_Download_FILE_NAME, filetempname, location, REDIMWIDTH, REDIMHEIGHT, new TileGenerator(), DB_Download_NBR_TILES, layers.class_tile_url, layers.class_identifiant, engine_status, layers.class_tiles_size, quality: DB_Download_QUALITY);
+                    DownloadClass engine = new DownloadClass(downloadid, DB_Download_ID, DB_Download_LAYER_ID, urls, tokenSource2, ct, format, final_saveformat, DB_Download_ZOOM, DB_Download_TEMP_DIRECTORY, DB_Download_SAVE_DIRECTORY, DB_Download_FILE_NAME, filetempname, location, REDIMWIDTH, REDIMHEIGHT, new TileGenerator(), COLORINTERPRETATION, DB_Download_NBR_TILES, layers.class_tile_url, layers.class_identifiant, engine_status, layers.class_tiles_size, quality: DB_Download_QUALITY);
                     DownloadClass.Add(engine, downloadid);
                     string commande_add = "add_download(" + downloadid + @",""" + engine_status.ToString() + @""",""" + DB_Download_FILE_NAME + @""",0," + DB_Download_NBR_TILES + @",""" + Download_INFOS + @""",""" + DB_Download_TIMESTAMP + @""");";
                     if (engine_status == Status.error)
@@ -163,7 +162,7 @@ namespace MapsInMyFolder
                 Debug.WriteLine("CefSharp.BindObjectAsync(\"download_Csharp_call_from_js\");" + ex.Message);
             }
             DB_Download_Load();
-            if (Commun.Settings.show_download_devtool)
+            if (Settings.show_download_devtool)
             {
                 download_panel_browser.ShowDevTools();
             }
@@ -178,12 +177,12 @@ namespace MapsInMyFolder
         {
             MainWindow._instance.open_download_panel_titlebar_button.Opacity = 1;
             MainWindow._instance.open_download_panel_titlebar_button.IsHitTestVisible = true;
-            DoubleAnimation hide_anim = new DoubleAnimation(0d, Commun.Settings.animations_duration / 1.5)
+            DoubleAnimation hide_anim = new DoubleAnimation(0d, Settings.animations_duration / 1.5)
             {
                 EasingFunction = new PowerEase { EasingMode = EasingMode.EaseInOut }
             };
             hide_anim.Completed += (s, e) => download_panel.Visibility = Visibility.Hidden;
-            download_panel.BeginAnimation(UIElement.OpacityProperty, hide_anim);
+            download_panel.BeginAnimation(OpacityProperty, hide_anim);
         }
 
         public void Download_panel_open()
@@ -192,11 +191,11 @@ namespace MapsInMyFolder
             MainWindow._instance.open_download_panel_titlebar_button.Opacity = 0.5;
             MainWindow._instance.open_download_panel_titlebar_button.IsHitTestVisible = false;
             download_panel.Visibility = Visibility.Visible;
-            DoubleAnimation show_anim = new DoubleAnimation(1, Commun.Settings.animations_duration / 1.5)
+            DoubleAnimation show_anim = new DoubleAnimation(1, Settings.animations_duration / 1.5)
             {
                 EasingFunction = new PowerEase { EasingMode = EasingMode.EaseInOut }
             };
-            download_panel.BeginAnimation(UIElement.OpacityProperty, show_anim);
+            download_panel.BeginAnimation(OpacityProperty, show_anim);
             download_panel_browser.Focus();
         }
     }
@@ -234,7 +233,7 @@ namespace MapsInMyFolder
             int id_int = Convert.ToInt32(id);
             if (id_int != 0)
             {
-                App.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
+                Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
                 {
                     try
                     {
@@ -254,7 +253,7 @@ namespace MapsInMyFolder
             int id_int = Convert.ToInt32(id);
             if (id_int != 0)
             {
-                App.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
+                Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
                 {
                     try
                     {
@@ -274,7 +273,7 @@ namespace MapsInMyFolder
             int id_int = Convert.ToInt32(id);
             if (id_int != 0)
             {
-                App.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
+                Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
                 {
                     try
                     {
@@ -294,7 +293,7 @@ namespace MapsInMyFolder
             int id_int = Convert.ToInt32(id);
             if (id_int != 0)
             {
-                App.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
+                Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
                 {
                     try
                     {
@@ -315,7 +314,7 @@ namespace MapsInMyFolder
             {
                 var engine = DownloadClass.GetEngineById(id_int);
                 if (engine is null) return;
-                App.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
+                Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
                {
                    try
                    {
@@ -373,7 +372,7 @@ namespace MapsInMyFolder
                 if (engine is null) return;
                 System.IO.File.Delete(engine.save_directory + engine.file_name);
 
-                App.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
+                Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
                 {
                     try
                     {
@@ -408,7 +407,7 @@ namespace MapsInMyFolder
             }
             else
             {
-                App.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
+                Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
                 {
                     Message.NoReturnBoxAsync("Le dossier temporaire n'existe plus. \n\nChemin du dossier : \n" + engine.save_temp_directory, "Erreur");
                 }, null);
@@ -420,7 +419,7 @@ namespace MapsInMyFolder
             int id_int = Convert.ToInt32(id);
             var engine = DownloadClass.GetEngineById(id_int);
             if (engine is null) return;
-            App.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
+            Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
             {
                 try
                 {
@@ -439,7 +438,7 @@ namespace MapsInMyFolder
             int id_int = Convert.ToInt32(id);
             var engine = DownloadClass.GetEngineById(id_int);
             if (engine is null) return;
-            App.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
+            Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
             {
                 try
                 {
@@ -463,7 +462,7 @@ namespace MapsInMyFolder
             int id_int = Convert.ToInt32(id);
             var engine = DownloadClass.GetEngineById(id_int);
             if (engine is null) return;
-            App.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
+            Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
             {
                 try
                 {
@@ -482,7 +481,7 @@ namespace MapsInMyFolder
             int id_int = Convert.ToInt32(id);
             var engine = DownloadClass.GetEngineById(id_int);
             if (engine is null) return;
-            App.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
+            Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
             {
                 try
                 {
@@ -507,7 +506,7 @@ namespace MapsInMyFolder
 
             if (RunningState.Contains(engine.state) || engine.state == Status.pause)
             {
-                App.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)async delegate
+                Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)async delegate
                 {
                     Download_stop(id_int);
                     //var result = await dialog.ShowAsync();

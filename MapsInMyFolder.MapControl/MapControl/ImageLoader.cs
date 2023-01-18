@@ -24,16 +24,18 @@ namespace MapsInMyFolder.MapControl
 
         public static async Task<ImageSource> LoadImageAsync(Uri uri, int x = 0, int y = 0, int z = -1, TileSource tileSource = null)
         {
+            Debug.WriteLine("2222222222");
             ImageSource image = null;
-
             try
             {
                 if (!uri.IsAbsoluteUri || uri.IsFile)
                 {
+                    Debug.WriteLine("333333");
                     image = await LoadImageAsync(uri.IsAbsoluteUri ? uri.LocalPath : uri.OriginalString);
                 }
                 else if (uri.Scheme == "http" || uri.Scheme == "https")
                 {
+                    Debug.WriteLine("444444");
                     Commun.HttpResponse response;
                     if (z != -1)
                     {
@@ -41,20 +43,19 @@ namespace MapsInMyFolder.MapControl
                         string fileformat = string.Empty;
                         if (!(tileSource is null) && tileSource.LayerID != 0)
                         {
-                            Layers layers = Commun.Layers.GetLayerById(tileSource.LayerID);
+                            Layers layers = Layers.GetLayerById(tileSource.LayerID);
                             if (layers is null)
                             {
                                 return null;
                             }
-                            SaveTempDir = Commun.Collectif.GetSaveTempDirectory(layers.class_name, layers.class_identifiant, z);
+                            SaveTempDir = Collectif.GetSaveTempDirectory(layers.class_name, layers.class_identifiant, z);
                             fileformat = layers.class_format;
                         }
-
-                        //Debug.WriteLine(String.Concat(uri.ToString(), "\n", x, "/", y, "/", z, "\n", tileSource.LayerID, "\n", fileformat, "\n", SaveTempDir, "\n", Commun.Settings.tiles_cache_expire_after_x_days));
-                        response = await Commun.TileGeneratorSettings.TileLoaderGenerator.GetImageAsync(uri.ToString(), x, y, z, tileSource.LayerID, fileformat, SaveTempDir, Commun.Settings.tiles_cache_expire_after_x_days);
+                        response = await TileGeneratorSettings.TileLoaderGenerator.GetImageAsync(uri.ToString(), x, y, z, tileSource.LayerID, fileformat, SaveTempDir);
                     }
                     else
                     {
+                        Debug.WriteLine("555555");
                         var resp = await GetHttpResponseAsync(uri);
                         response = new Commun.HttpResponse(resp.Buffer, resp.Reponse);
                         resp = null;
@@ -63,6 +64,10 @@ namespace MapsInMyFolder.MapControl
                     if (response?.Buffer != null && response.ResponseMessage.IsSuccessStatusCode)
                     {
                         image = await LoadImageAsync(response.Buffer).ConfigureAwait(false);
+                    }
+                    else if (Settings.map_view_error_tile)
+                    {
+                        image = await LoadImageAsync(Collectif.GetEmptyImageBufferFromText(response)).ConfigureAwait(false);
                     }
                 }
                 else
@@ -74,7 +79,6 @@ namespace MapsInMyFolder.MapControl
             {
                 Debug.WriteLine($"ImageLoader: {uri}: {ex.Message}");
             }
-
             return image;
         }
 

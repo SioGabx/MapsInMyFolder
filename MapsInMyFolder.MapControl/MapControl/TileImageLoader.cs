@@ -81,7 +81,6 @@ namespace MapsInMyFolder.MapControl
             while (pendingTiles.TryPop(out var tile))
             {
                 tile.Pending = false;
-
                 try
                 {
                     await LoadTile(tile, tileSource, cacheName).ConfigureAwait(false);
@@ -97,10 +96,8 @@ namespace MapsInMyFolder.MapControl
         {
             if (string.IsNullOrEmpty(cacheName))
             {
-                //Debug.WriteLine("Cache Name is null");
                 return LoadTile(tile, tileSource);
             }
-            //Debug.WriteLine("Loading tiile from cache 1");
             var uri = tileSource.GetUri(tile.XIndex, tile.Y, tile.ZoomLevel);
 
             if (uri != null)

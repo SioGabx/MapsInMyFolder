@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Data.SQLite;
 using System.IO;
 using System.Threading.Tasks;
@@ -111,7 +110,7 @@ namespace MapsInMyFolder.VectorTileRenderer.Sources
         public void ExtractTile(int x, int y, int zoom, string path)
         {
             if (File.Exists(path))
-                System.IO.File.Delete(path);
+                File.Delete(path);
 
             using (var fileStream = File.Create(path))
             using (Stream tileStream = GetRawTile(x, y, zoom))

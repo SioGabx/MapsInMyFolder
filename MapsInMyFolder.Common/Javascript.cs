@@ -1,14 +1,10 @@
 ﻿using Jint;
 using Jint.Native;
-using Jint.Runtime.Interop;
-using ModernWpf.Controls;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Reflection;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
@@ -36,7 +32,7 @@ namespace MapsInMyFolder.Commun
             get { return _logs; }
             set
             {
-                if (Commun.TileGeneratorSettings.AcceptJavascriptPrint)
+                if (TileGeneratorSettings.AcceptJavascriptPrint)
                 {
                     _logs = value;
                     OnLogsChanged();
@@ -99,7 +95,7 @@ namespace MapsInMyFolder.Commun
             add.SetValue("cls", PrintClearAction);
             Action<object> helpAction = _ => Help(LayerId);
             add.SetValue("help", helpAction);
-            Action<object, object> setVarAction = (variable, value) => Javascript.SetVar(variable, value, LayerId);
+            Action<object, object> setVarAction = (variable, value) => SetVar(variable, value, LayerId);
             add.SetValue("setVar", setVarAction); //setVar("variable1","valeur1")
             Func<object, object> getVarFunction = (variablename) => GetVar(variablename, LayerId);
             add.SetValue("getVar", getVarFunction); //getVar("variable1")
@@ -207,13 +203,13 @@ namespace MapsInMyFolder.Commun
         {
             if (Curent.Layer.class_id == LayerId)
             {
-                Javascript.JavascriptInstance.Location = new Dictionary<string, double>(){
+                JavascriptInstance.Location = new Dictionary<string, double>(){
                     {"SE_Latitude",SE_Latitude },
                     {"SE_Longitude",SE_Longitude },
                     {"NO_Latitude",NO_Latitude },
                     {"NO_Longitude",NO_Longitude }
                 };
-                Javascript.JavascriptInstance.ZoomToNewLocation = ZoomToNewLocation;
+                JavascriptInstance.ZoomToNewLocation = ZoomToNewLocation;
             }
         }
 
@@ -286,18 +282,18 @@ namespace MapsInMyFolder.Commun
             string printString = ConvertJSObjectToString(print);
             if (!string.IsNullOrEmpty(printString))
             {
-                if (LayerId == -2 && Commun.TileGeneratorSettings.AcceptJavascriptPrint)
+                if (LayerId == -2 && TileGeneratorSettings.AcceptJavascriptPrint)
                 {
-                    Javascript.JavascriptInstance.Logs = String.Concat(Javascript.JavascriptInstance.Logs, "\n", printString);
+                    JavascriptInstance.Logs = String.Concat(JavascriptInstance.Logs, "\n", printString);
                 }
             }
         }
 
         static public void PrintClear()
         {
-            if (Commun.TileGeneratorSettings.AcceptJavascriptPrint)
+            if (TileGeneratorSettings.AcceptJavascriptPrint)
             {
-                Javascript.JavascriptInstance.Logs = String.Empty;
+                JavascriptInstance.Logs = String.Empty;
             }
         }
 

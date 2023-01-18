@@ -2,19 +2,12 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Windows;
-using CefSharp;
 using MapsInMyFolder.MapControl;
-using System.Diagnostics;
-using System.Reflection;
 using System.Windows.Threading;
-using System.Data.SQLite;
-using System.Timers;
 using System.Windows.Input;
 using System.Threading.Tasks;
-using MapsInMyFolder.Commun;
 using System.Windows.Controls;
 using System.Net.Http;
 
@@ -117,7 +110,7 @@ namespace MapsInMyFolder
         async void SearchStart(Boolean selectfirst = false)
         {
             string text = "";
-            await App.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)async delegate
+            await Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)async delegate
             {
                 text = map_searchbar.Text.Trim();
                 if (text != "" && text != last_search)

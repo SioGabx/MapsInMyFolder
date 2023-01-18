@@ -1,27 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Data;
-using System.Diagnostics;
-using System.IO;
-using System.Windows.Documents;
-using System.Text;
-using System.Threading.Tasks;
-using System.Net.Http;
-using System.Net;
-using System.Windows.Threading;
-using System.Threading;
-using ModernWpf.Controls;
-using System.Data.SQLite;
-using System.Xml;
-using System.Xml.Linq;
-using System.Linq;
-using MapsInMyFolder.Commun;
-using System.Reflection;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 
 namespace MapsInMyFolder
 {

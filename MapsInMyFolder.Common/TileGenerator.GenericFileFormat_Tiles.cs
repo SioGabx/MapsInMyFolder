@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace MapsInMyFolder.Commun
 {
-   public partial class TileGenerator
+    public partial class TileGenerator
     {
         public async Task<HttpResponse> GetTile(int layerID, string urlBase, int TileX, int TileY, int zoom)
         {
@@ -23,16 +20,16 @@ namespace MapsInMyFolder.Commun
                 Debug.WriteLine("Le format peut ne pas être supporté actuellement : " + Layer.class_format);
             }
 
-                try
-                {
-                    Uri uri = new Uri(Collectif.GetUrl.FromTileXYZ(urlBase, TileX, TileY, zoom, layerID, Collectif.GetUrl.InvokeFunction.getTile));
-                    return await Collectif.ByteDownloadUri(uri, layerID, true);
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine("Erreur GetTile : " + ex.Message);
-                    return HttpResponse.HttpResponseError;
-                }
+            try
+            {
+                Uri uri = new Uri(Collectif.GetUrl.FromTileXYZ(urlBase, TileX, TileY, zoom, layerID, Collectif.GetUrl.InvokeFunction.getTile));
+                return await Collectif.ByteDownloadUri(uri, layerID, true);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("Erreur GetTile : " + ex.Message);
+                return HttpResponse.HttpResponseError;
+            }
         }
     }
 }

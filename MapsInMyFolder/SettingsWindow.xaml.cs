@@ -1,25 +1,12 @@
 ﻿using MapsInMyFolder.Commun;
 using ModernWpf.Controls;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Threading;
 
 namespace MapsInMyFolder
 {
-    //    public static class Extension
-    //    {
-    //        public static void ScrollToElement(this System.Windows.Controls.ScrollViewer scrollViewer, System.Windows.UIElement uIElement)
-    //        {
-    //            GeneralTransform groupBoxTransform = uIElement.TransformToAncestor(scrollViewer);
-    //            Rect rectangle = groupBoxTransform.TransformBounds(new Rect(new Point(0, 0), uIElement.RenderSize));
-    //            scrollViewer.ScrollToVerticalOffset(rectangle.Top + scrollViewer.VerticalOffset);
-    //        }
-    //    }
     /// <summary>
     /// Logique d'interaction pour SettingsWindow.xaml
     /// </summary>
@@ -244,7 +231,7 @@ namespace MapsInMyFolder
             //nettoyer_cache_browser_au_demarrage
             nettoyer_cache_layers_au_demarrage.IsChecked = Settings.nettoyer_cache_layers_au_demarrage;
 
-            DefaultValuesHachCode = Commun.Collectif.CheckIfInputValueHaveChange(SettingsScrollViewer);
+            DefaultValuesHachCode = Collectif.CheckIfInputValueHaveChange(SettingsScrollViewer);
         }
 
 
@@ -267,7 +254,7 @@ namespace MapsInMyFolder
                     await dialog.ShowAsync();
                     return;
                 }
-                DefaultValuesHachCode = Commun.Collectif.CheckIfInputValueHaveChange(SettingsScrollViewer);
+                DefaultValuesHachCode = Collectif.CheckIfInputValueHaveChange(SettingsScrollViewer);
                 dialog = Message.SetContentDialog("MapsInMyFolder nécessite de redémarrer...\n Fermeture de l'application.", "Information", MessageDialogButton.OK);
                 await dialog.ShowAsync();
 
@@ -447,7 +434,7 @@ namespace MapsInMyFolder
 
         private async void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            int ValuesHachCode = Commun.Collectif.CheckIfInputValueHaveChange(SettingsScrollViewer);
+            int ValuesHachCode = Collectif.CheckIfInputValueHaveChange(SettingsScrollViewer);
             ContentDialogResult result = ContentDialogResult.None;
             if (DefaultValuesHachCode != ValuesHachCode)
             {
@@ -517,7 +504,7 @@ namespace MapsInMyFolder
                 //CTRL + S
                 SaveSettings();
                 MainWindow.RefreshAllPanels();
-                DefaultValuesHachCode = Commun.Collectif.CheckIfInputValueHaveChange(SettingsScrollViewer);
+                DefaultValuesHachCode = Collectif.CheckIfInputValueHaveChange(SettingsScrollViewer);
             }
         }
     }

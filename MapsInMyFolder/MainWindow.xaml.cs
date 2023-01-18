@@ -1,24 +1,11 @@
 ﻿using System;
-using System.IO;
 using System.Windows;
 using CefSharp;
 using MapsInMyFolder.MapControl;
 using System.Diagnostics;
 using ModernWpf;
-using System.Data.SQLite;
-using CefSharp.Wpf;
-using System.Collections.Generic;
-using System.Timers;
 using System.Windows.Input;
 using System.Windows.Media.Animation;
-using System.Threading.Tasks;
-using ModernWpf.Controls;
-//using Windows.Foundation.Metadata;
-using System.Globalization;
-using System.Windows.Data;
-using System.Windows.Threading;
-using System.Threading;
-using System.Reflection;
 using MapsInMyFolder.Commun;
 using ModernWpf.Media.Animation;
 
@@ -50,6 +37,7 @@ namespace MapsInMyFolder
             {
                 CustomOrEditLayersPage = null;
             }
+            if (!MainContentFrame.CanGoBack) { return; }
             if (NoTransition)
             {
                 MainContentFrame.GoBack(new SuppressNavigationTransitionInfo());
@@ -82,7 +70,7 @@ namespace MapsInMyFolder
             CustomOrEditLayersPage.Init_CustomOrEditLayersWindow();
 
                 MainContentFrame.Navigate(CustomOrEditLayersPage);
-            Commun.TileGeneratorSettings.AcceptJavascriptPrint = true;
+            TileGeneratorSettings.AcceptJavascriptPrint = true;
         }
 
         //SQLiteConnection global_conn;
@@ -94,8 +82,8 @@ namespace MapsInMyFolder
             //Settings.LoadSettingsAsync();
             Database.DB_Download();
             ThemeManager.Current.ApplicationTheme = ApplicationTheme.Dark;
-            ImageLoader.HttpClient.DefaultRequestHeaders.Add("User-Agent", Commun.Settings.user_agent);
-            TileGeneratorSettings.HttpClient.DefaultRequestHeaders.Add("User-Agent", Commun.Settings.user_agent);
+            ImageLoader.HttpClient.DefaultRequestHeaders.Add("User-Agent", Settings.user_agent);
+            TileGeneratorSettings.HttpClient.DefaultRequestHeaders.Add("User-Agent", Settings.user_agent);
             MainPage.mapviewer.AnimationDuration = Settings.animations_duration;
             Debug.WriteLine("Version dotnet :" + Environment.Version.ToString());
             Javascript JavascriptLocationInstance = Javascript.JavascriptInstance;
@@ -115,13 +103,13 @@ namespace MapsInMyFolder
             _instance.MainPage.ReloadPage();
             _instance.MainPage.SearchLayerStart();
             _instance.MainPage.Init_download_panel();
-            _instance.MainPage.Set_current_layer(Commun.Settings.layer_startup_id);
+            _instance.MainPage.Set_current_layer(Settings.layer_startup_id);
         }
 
 
         private void Window_ContentRendered(object sender, EventArgs e)
         {
-            MainPage.Set_current_layer(Commun.Settings.layer_startup_id);
+            MainPage.Set_current_layer(Settings.layer_startup_id);
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -141,12 +129,12 @@ namespace MapsInMyFolder
         public void Popup_closing()
         {
             AppTitleBar.Opacity = 1;
-            DoubleAnimation hide_anim = new DoubleAnimation(0d, Commun.Settings.animations_duration / 1.3)
+            DoubleAnimation hide_anim = new DoubleAnimation(0d, Settings.animations_duration / 1.3)
             {
                 EasingFunction = new PowerEase { EasingMode = EasingMode.EaseInOut }
             };
             hide_anim.Completed += (s, e) => MainPage.popup_background.Visibility = Visibility.Hidden;
-            MainPage.popup_background.BeginAnimation(UIElement.OpacityProperty, hide_anim);
+            MainPage.popup_background.BeginAnimation(OpacityProperty, hide_anim);
         }
 
         public void Popup_opening(bool ReduceOpacity = true)
@@ -156,11 +144,11 @@ namespace MapsInMyFolder
             if (ReduceOpacity)
             {
                 MainPage.popup_background.Visibility = Visibility.Visible;
-                DoubleAnimation show_anim = new DoubleAnimation(1, Commun.Settings.animations_duration * 1)
+                DoubleAnimation show_anim = new DoubleAnimation(1, Settings.animations_duration * 1)
                 {
                     EasingFunction = new PowerEase { EasingMode = EasingMode.EaseInOut }
                 };
-                MainPage.popup_background.BeginAnimation(UIElement.OpacityProperty, show_anim);
+                MainPage.popup_background.BeginAnimation(OpacityProperty, show_anim);
             }
         }
 

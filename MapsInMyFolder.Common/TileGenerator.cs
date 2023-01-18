@@ -9,12 +9,14 @@ namespace MapsInMyFolder.Commun
     {
         public byte[] Buffer { get; }
         public HttpResponseMessage ResponseMessage { get; }
+        public string CustomMessage { get; }
         public static HttpResponse HttpResponseError { get; } = new HttpResponse(null, new System.Net.Http.HttpResponseMessage(System.Net.HttpStatusCode.BadRequest));
 
-        public HttpResponse(byte[] buffer, HttpResponseMessage responseMessage)
+        public HttpResponse(byte[] buffer, HttpResponseMessage responseMessage, string customMessage = "")
         {
             Buffer = buffer;
             ResponseMessage = responseMessage;
+            CustomMessage = customMessage;
         }
     }
 
@@ -40,7 +42,7 @@ namespace MapsInMyFolder.Commun
 
     public enum Status
     {
-        waitfordownloading, error, cancel, success, pause, progress, no_data, assemblage, rognage, enregistrement, deleted, noconnection
+        waitfordownloading, error, cancel, success, pause, progress, no_data, assemblage, rognage, enregistrement, deleted, noconnection, cleanup
     }
 
     public static class TileGeneratorSettings
@@ -74,8 +76,7 @@ namespace MapsInMyFolder.Commun
 
     public partial class TileGenerator
     {
-        //public Layers Layer { get; set; } = Layers.Empty();
-         public async Task<HttpResponse> GetImageAsync(string urlBase, int TileX, int TileY, int TileZoom, int layerID, string fileformat = null, string save_temp_directory = "", int settings_max_tiles_cache_days = 0, bool pbfdisableadjacent = false)
+        public async Task<HttpResponse> GetImageAsync(string urlBase, int TileX, int TileY, int TileZoom, int layerID, string fileformat = null, string save_temp_directory = "", bool pbfdisableadjacent = false)
         {
             Layers Layer = Layers.GetLayerById(layerID);
             string SwitchFormat;
@@ -92,7 +93,7 @@ namespace MapsInMyFolder.Commun
             {
                 case "pbf":
                     const int TileSize = 1;
-                    return await GetTilePBF(layerID, urlBase, TileX, TileY, TileZoom, save_temp_directory, settings_max_tiles_cache_days, Layer.class_tiles_size * TileSize, TileSize, 0.5, pbfdisableadjacent).ConfigureAwait(false);
+                    return await GetTilePBF(layerID, urlBase, TileX, TileY, TileZoom, save_temp_directory, Layer.class_tiles_size * TileSize, TileSize, 0.5, pbfdisableadjacent).ConfigureAwait(false);
 
                 default:
                     //Debug.WriteLine("Classic format start Converting");

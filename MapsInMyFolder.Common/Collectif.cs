@@ -13,10 +13,12 @@ using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Media.Imaging;
 using System.Reflection;
-using System.Net.NetworkInformation;
 using System.Windows;
 using System.Windows.Media;
 using System.Text.RegularExpressions;
+using System.Windows.Media.Animation;
+using MapsInMyFolder.Commun;
+using NetVips;
 
 namespace MapsInMyFolder.Commun
 {
@@ -30,9 +32,6 @@ namespace MapsInMyFolder.Commun
             }
         }
     }
-
-
-
 
 
     public class NameHiddenIdValue
@@ -52,11 +51,8 @@ namespace MapsInMyFolder.Commun
         }
     }
 
-
-
     public static class Collectif
     {
-
         public static class GetUrl
         {
             public enum InvokeFunction { getTile, getPreview, getPreviewFallback }
@@ -81,9 +77,9 @@ namespace MapsInMyFolder.Commun
                 {
                     finalurl = urlbase;
                 }
-                List<double> location_topleft = Commun.Collectif.TileToCoordonnees(Tilex, Tiley, z);
-                List<double> location_bottomright = Commun.Collectif.TileToCoordonnees(Tilex + 1, Tiley + 1, z);
-                List<double> location = Commun.Collectif.GetCenterBetweenTwoPoints(location_topleft, location_bottomright);
+                List<double> location_topleft = TileToCoordonnees(Tilex, Tiley, z);
+                List<double> location_bottomright = TileToCoordonnees(Tilex + 1, Tiley + 1, z);
+                List<double> location = GetCenterBetweenTwoPoints(location_topleft, location_bottomright);
 
                 Dictionary<string, object> argument = new Dictionary<string, object>()
                 {
@@ -111,7 +107,7 @@ namespace MapsInMyFolder.Commun
                     Jint.Native.JsValue JavascriptMainResult = null;
                     try
                     {
-                        JavascriptMainResult = Commun.Javascript.ExecuteScript(TileComputationScript, argument, LayerID, InvokeFunction);
+                        JavascriptMainResult = Javascript.ExecuteScript(TileComputationScript, argument, LayerID, InvokeFunction);
                     }
                     catch (Exception ex)
                     {
@@ -184,8 +180,8 @@ namespace MapsInMyFolder.Commun
 
             public static List<Url_class> GetListOfUrlFromLocation(Dictionary<string, double> location, int z, string urlbase, int LayerID, int downloadid = 0)
             {
-                List<int> NO_tile = Collectif.CoordonneesToTile(location["NO_Latitude"], location["NO_Longitude"], z);
-                List<int> SE_tile = Collectif.CoordonneesToTile(location["SE_Latitude"], location["SE_Longitude"], z);
+                List<int> NO_tile = CoordonneesToTile(location["NO_Latitude"], location["NO_Longitude"], z);
+                List<int> SE_tile = CoordonneesToTile(location["SE_Latitude"], location["SE_Longitude"], z);
                 int NO_x = NO_tile[0];
                 int NO_y = NO_tile[1];
                 int SE_x = SE_tile[0];
@@ -214,6 +210,13 @@ namespace MapsInMyFolder.Commun
             }
         }
 
+        public static DoubleAnimation GetOpacityAnimation(int toValue, double durationMultiplicator = 1)
+        {
+            return new DoubleAnimation(toValue, TimeSpan.FromTicks((long)(Settings.animations_duration.Ticks * durationMultiplicator)))
+            {
+                EasingFunction = new PowerEase { EasingMode = EasingMode.EaseOut }
+            };
+        }
 
         //private static void GetAllManifestResourceNames()
         //{
@@ -267,8 +270,6 @@ namespace MapsInMyFolder.Commun
             Application.Current.Shutdown();
         }
 
-
-
         public static SolidColorBrush HexValueToSolidColorBrush(string hexvalue)
         {
             //"#BCBCBC"
@@ -284,7 +285,7 @@ namespace MapsInMyFolder.Commun
             string settings_temp_folder;
             if (string.IsNullOrEmpty(temp_folder))
             {
-                settings_temp_folder = Commun.Settings.temp_folder;
+                settings_temp_folder = Settings.temp_folder;
             }
             else
             {
@@ -292,7 +293,7 @@ namespace MapsInMyFolder.Commun
             }
             //Debug.WriteLine(settings_temp_folder);
             string nom_charclean = string.Concat(nom.Split(Path.GetInvalidFileNameChars()));
-            string chemin = System.IO.Path.Combine(settings_temp_folder, "layers", nom_charclean + "_" + identifiant + "\\");
+            string chemin = Path.Combine(settings_temp_folder, "layers", nom_charclean + "_" + identifiant + "\\");
             if (zoom != -1)
             {
                 chemin += zoom + "\\";
@@ -310,9 +311,6 @@ namespace MapsInMyFolder.Commun
         public static byte[] GetBytesFromBitmapSource(BitmapSource bmp)
         {
             PngBitmapEncoder encoder = new PngBitmapEncoder();
-            //encoder.Frames.Add(BitmapFrame.Create(bitmapSource));
-
-            // byte[] bit = new byte[0];
             using (MemoryStream stream = new MemoryStream())
             {
                 encoder.Frames.Add(BitmapFrame.Create(bmp));
@@ -323,9 +321,120 @@ namespace MapsInMyFolder.Commun
             }
         }
 
-        public static byte[] GetBytesFromBitmapSource2(BitmapSource bmp)
+        static readonly object Locker = new object();
+        public static byte[] GetEmptyImageBufferFromText(HttpResponse httpResponse)
         {
-            return GetBytesFromBitmapSource(bmp);
+            string BitmapErrorsMessage;
+            if (httpResponse is null || httpResponse.ResponseMessage is null)
+            {
+                if (!string.IsNullOrEmpty(httpResponse.CustomMessage))
+                {
+                    BitmapErrorsMessage = httpResponse.CustomMessage;
+                }
+                else
+                {
+                    BitmapErrorsMessage = "Null response";
+                }
+
+            }
+            else
+            {
+                BitmapErrorsMessage = (((int)httpResponse?.ResponseMessage?.StatusCode).ToString() + " - " + httpResponse?.ResponseMessage?.ReasonPhrase);
+            }
+
+            return GetEmptyImageBufferFromText(BitmapErrorsMessage);
+        }
+
+
+        public static byte[] GetEmptyImageBufferFromText(string BitmapErrorsMessage)
+        {
+            const int tile_size = 300;
+            const int border_size = 1;
+            if (string.IsNullOrEmpty(BitmapErrorsMessage))
+            {
+                return null;
+            }
+            lock (Locker)
+            {
+                
+                using (NetVips.Image text = NetVips.Image.Text(WordWrap(BitmapErrorsMessage,20), null, null, null, NetVips.Enums.Align.Centre, null, 100, true, 5, null))
+                {
+                    const int border_tile_size = tile_size - (border_size * 2);
+                    int offsetX = (int)Math.Floor((double)(border_tile_size - text.Width) / 2);
+                    int offsetY = (int)Math.Floor((double)(border_tile_size - text.Height) / 2);
+                    int[] graycolor = new int[] { 100, 100, 100 };
+                    const string format = "jpeg";
+                    NetVips.VOption saveVOption = getSaveVOption(format, 100, tile_size);
+                    var color = new double[] { Settings.background_layer_color_R, Settings.background_layer_color_G, Settings.background_layer_color_B };
+                    using (NetVips.Image image = NetVips.Image.Black(border_tile_size, border_tile_size).Linear(color, color).Composite2(text, NetVips.Enums.BlendMode.Atop, offsetX, offsetY))
+                    using (NetVips.Image border = NetVips.Image.Black(tile_size, tile_size))
+                    {
+                        try
+                        {
+                            return border.Insert(image, border_size, border_size).WriteToBuffer("." + format, saveVOption);
+                        }
+                        catch (Exception ex)
+                        {
+                            Debug.WriteLine(ex.ToString());
+                        }
+                    }
+                }
+            }
+            return null;
+        }
+
+
+        public static VOption getSaveVOption(string final_saveformat, int quality, int tile_size)
+        {
+            if (quality <= 0)
+            {
+                quality = 1;
+            }
+
+            VOption saving_options;
+            if (final_saveformat == "png")
+            {
+                saving_options = new VOption
+                    {
+                        { "Q", quality },
+                        { "compression", 100 },
+                        { "interlace", true },
+                        { "strip", true },
+                    };
+                Debug.WriteLine("Format is png" + quality);
+            }
+            else if (final_saveformat == "jpeg")
+            {
+                saving_options = new VOption
+                    {
+                        { "Q", quality },
+                        { "interlace", true },
+                        { "optimize_coding", true },
+                        { "strip", true },
+
+                    };
+                Debug.WriteLine("Format is jpeg" + quality);
+            }
+            else if (final_saveformat == "tiff")
+            {
+                saving_options = new VOption
+                    {
+                        { "Q", quality },
+                        { "tileWidth", tile_size },
+                        { "tileHeight", tile_size },
+                        { "compression", "jpeg" },
+                        { "interlace", true },
+                        { "tile", true },
+                        { "pyramid", true },
+                        { "bigtif", true }
+                    };
+                Debug.WriteLine("Format is tiff");
+            }
+            else
+            {
+                saving_options = new VOption();
+            }
+            return saving_options;
         }
 
         public static async Task<Stream> StreamDownloadUri(Uri url)
@@ -356,7 +465,7 @@ namespace MapsInMyFolder.Commun
         {
             HttpResponse response = HttpResponse.HttpResponseError;
 
-            int max_retry = Commun.Settings.max_redirection_download_tile;
+            int max_retry = Settings.max_redirection_download_tile;
             int retry = 0;
 
             bool do_need_retry;
@@ -410,7 +519,7 @@ namespace MapsInMyFolder.Commun
                                 }
                                 else
                                 {
-                                    return new HttpResponse(null, new System.Net.Http.HttpResponseMessage(System.Net.HttpStatusCode.NotFound));
+                                    return new HttpResponse(null, new System.Net.Http.HttpResponseMessage(HttpStatusCode.NotFound));
                                 }
                             }
                         }
@@ -428,13 +537,12 @@ namespace MapsInMyFolder.Commun
                     {
                         Javascript.PrintError($"DownloadUrl - Error {ex.Message}. Url : {url}");
                     }
+                    response = new HttpResponse(null, null, ex.Message);
                 }
             } while (do_need_retry && (retry < max_retry));
 
             return response;
         }
-
-
 
         public static string ByteArrayToString(byte[] data)
         {
@@ -456,7 +564,7 @@ namespace MapsInMyFolder.Commun
                 date_du_telechargement = date_du_telechargement.AddDays(-Math.Abs(settings_max_tiles_cache_days));
                 if ((size == 0) || (DateTime.Compare(date_du_telechargement, filinfo.LastWriteTime) >= 0))
                 {
-                    System.IO.File.Delete(save_temp_directory + filename);
+                    File.Delete(save_temp_directory + filename);
                     return true;
                 }
                 else
@@ -484,8 +592,6 @@ namespace MapsInMyFolder.Commun
             uIElement.UndoLimit = undo_limit;
         }
 
-
-
         public static List<UIElement> FindVisualChildren(UIElement obj, List<System.Type> BlackListNoSearchChildren = null)
         {
             List<UIElement> children = new List<UIElement>();
@@ -508,7 +614,6 @@ namespace MapsInMyFolder.Commun
             return children;
         }
 
-
         public static int CheckIfInputValueHaveChange(UIElement SourcePanel)
         {
 
@@ -520,7 +625,7 @@ namespace MapsInMyFolder.Commun
                 typeof(RadioButton)
             };
 
-            var ListOfisualChildren = Commun.Collectif.FindVisualChildren(SourcePanel, TypeOfSearchElement);
+            var ListOfisualChildren = FindVisualChildren(SourcePanel, TypeOfSearchElement);
 
             string strHachCode = String.Empty;
             ListOfisualChildren.ForEach(element =>
@@ -571,7 +676,6 @@ namespace MapsInMyFolder.Commun
             });
             return strHachCode.GetHashCode();
         }
-
 
         public static string HTMLEntities(string texte, bool decode = false)
         {
@@ -645,7 +749,7 @@ namespace MapsInMyFolder.Commun
         {
             Stream SM = new MemoryStream(Encoding.UTF8.GetBytes(text));
             TextRange range = new TextRange(textBox.Document.ContentStart, textBox.Document.ContentEnd);
-            range.Load(SM, System.Windows.DataFormats.Text);
+            range.Load(SM, DataFormats.Text);
             SM.Close();
         }
 
@@ -678,7 +782,7 @@ namespace MapsInMyFolder.Commun
         {
             bool TextHasBeenFilteredAndChanged = false;
             textbElement.TextChanged -= action;
-            if (Collectif.FilterDigitOnlyWhileWritingInTextBox(textbElement))
+            if (FilterDigitOnlyWhileWritingInTextBox(textbElement))
             {
                 if (MaxInt != -1 && Convert.ToUInt32(textbElement.Text) > MaxInt)
                 {
@@ -695,6 +799,7 @@ namespace MapsInMyFolder.Commun
 
             return TextHasBeenFilteredAndChanged;
         }
+
         public static string FilterDigitOnly(string origin, List<char> char_supplementaire)
         {
             //string str = new string((from c in origin where char.IsDigit(c) select c).ToArray());
@@ -728,23 +833,17 @@ namespace MapsInMyFolder.Commun
 
         public static string Replacements(string tileBaseUrl, string x, string y, string z, int LayerID, Collectif.GetUrl.InvokeFunction invokeFunction)
         {
-            //string origin_result = origin;
-            //origin_result = origin_result.Replace("{x}", x);
-            //origin_result = origin_result.Replace("{y}", y);
-            //origin_result = origin_result.Replace("{z}", z);
             if (string.IsNullOrEmpty(tileBaseUrl)) { return String.Empty; }
-            return Collectif.GetUrl.FromTileXYZ(tileBaseUrl, Convert.ToInt32(x), Convert.ToInt32(y), Convert.ToInt32(z), LayerID, invokeFunction).Replace(" ", "%20");
+            return GetUrl.FromTileXYZ(tileBaseUrl, Convert.ToInt32(x), Convert.ToInt32(y), Convert.ToInt32(z), LayerID, invokeFunction).Replace(" ", "%20");
         }
 
         public static int CheckIfDownloadSuccess(string url)
         {
             async Task<HttpStatusCode> InternalCheckIfDownloadSuccess(string internalurl)
             {
-                //var httpClient = new HttpClient();
-                //httpClient.DefaultRequestHeaders.Add("User-Agent", Settings.user_agent);
                 try
                 {
-                    HttpResponse reponseHttpResponse = await Collectif.ByteDownloadUri(new Uri(internalurl), 0, true);
+                    HttpResponse reponseHttpResponse = await ByteDownloadUri(new Uri(internalurl), 0, true);
                     if (reponseHttpResponse is null || reponseHttpResponse.ResponseMessage is null)
                     {
                         return HttpStatusCode.SeeOther;
@@ -766,7 +865,6 @@ namespace MapsInMyFolder.Commun
                 return HttpStatusCode.SeeOther;
             }
 
-            //MessageBox.Show(url);
             HttpStatusCode code = InternalCheckIfDownloadSuccess(url).Result;
             switch (code)
             {
@@ -867,5 +965,51 @@ namespace MapsInMyFolder.Commun
             double y = Math.Atan(Math.Sinh(Math.PI * (1 - (2 * TileY / Math.Pow(2, zoom))))) * 180 / Math.PI;
             return new List<double>() { x, y };
         }
+
+        public static string WordWrap(string text, int width)
+        {
+            if (string.IsNullOrEmpty(text) || 0 == width || width >= text.Length)
+            {
+                return text;
+            }
+            var sb = new StringBuilder();
+            var sr = new StringReader(text);
+            string line;
+            var first = true;
+            while (null != (line = sr.ReadLine()))
+            {
+                var col = 0;
+                if (!first)
+                {
+                    sb.AppendLine();
+                    col = 0;
+                }
+                else
+                {
+                    first = false;
+                }
+                char[] wordBreakChars = new char[] { ' ', '_', '\n', '\r', '\v', '\f', '\0' };
+                var words = line.Split(wordBreakChars, StringSplitOptions.RemoveEmptyEntries);
+
+                for (var i = 0; i < words.Length; i++)
+                {
+                    var word = words[i];
+                    if (0 != i)
+                    {
+                        sb.Append(" ");
+                        ++col;
+                    }
+                    if (col + word.Length > width)
+                    {
+                        sb.AppendLine();
+                        col = 0;
+                    }
+                    sb.Append(word);
+                    col += word.Length;
+                }
+            }
+            return sb.ToString();
+        }
+
     }
 }

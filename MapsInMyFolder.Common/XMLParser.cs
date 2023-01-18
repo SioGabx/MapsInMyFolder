@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
 using System.Xml;
 using System.Xml.Linq;
 
@@ -38,7 +34,7 @@ namespace MapsInMyFolder.Commun
             string strSettingsXmlFilePath = Settings.SettingsPath();
             if (!File.Exists(strSettingsXmlFilePath))
             {
-                System.IO.Directory.CreateDirectory(Path.GetDirectoryName(strSettingsXmlFilePath));
+                Directory.CreateDirectory(Path.GetDirectoryName(strSettingsXmlFilePath));
                 var sts = new XmlWriterSettings()
                 {
                     Indent = true,

@@ -174,10 +174,12 @@
 
                             <Label Grid.Column="0" Content="Convertir les couleurs de l&#39;image vers :" HorizontalAlignment="Left" Margin="0,0,0,5" VerticalAlignment="Top" Width="Auto" FontSize="11.8" FontFamily="Segoe UI" Foreground="#888989" Padding="0"/>
 
-                            <ComboBox Grid.Column="2" Opacity="1" x:Name="TextBox_color_conversion" Width="Auto" HorizontalAlignment="Stretch" Height="21" SelectedIndex="0" Cursor="Arrow" IsEnabled="True" FontSize="11.8" FontFamily="Segoe UI" >
-                                <ComboBoxItem >Original</ComboBoxItem>
-                                <ComboBoxItem >Noir &amp; Blanc (non disponible)</ComboBoxItem>
-                                <ComboBoxItem >Niveau de gris (non disponible)</ComboBoxItem>
+                            <ComboBox Grid.Column="2" Opacity="1" x:Name="Combobox_color_conversion" Width="Auto" HorizontalAlignment="Stretch" Height="21" SelectedIndex="0" Cursor="Arrow" IsEnabled="True" FontSize="11.8" FontFamily="Segoe UI" SelectionChanged="Combobox_color_conversion_SelectionChanged" >
+                                <ComboBoxItem Tag="Srgb">Original</ComboBoxItem>
+                                <!--<ComboBoxItem Tag="Rgb">RGB</ComboBoxItem>-->
+                                <!--<ComboBoxItem Tag="Rgb">RGB 16 bit</ComboBoxItem>-->
+                                <ComboBoxItem Tag="Bw">Noir &amp; Blanc</ComboBoxItem>
+                                <!--<ComboBoxItem Tag="Grey16">Noir &amp; Blanc (16bit)</ComboBoxItem>-->
                             </ComboBox>
                         </Grid>
 
