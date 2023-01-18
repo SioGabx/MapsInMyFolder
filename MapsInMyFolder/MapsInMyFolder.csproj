@@ -70,7 +70,7 @@
     <PackageReference Include="NetVips.Native" Version="8.13.2" />
     <PackageReference Include="NetVips.Native.win-x64" Version="8.13.2" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
-    <PackageReference Include="System.Data.SQLite" Version="1.0.116" />
+    <PackageReference Include="System.Data.SQLite" Version="1.0.117" />
     <PackageReference Include="wix" Version="3.11.2" />
   </ItemGroup>
 
