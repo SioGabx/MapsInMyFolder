@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Media;
 
@@ -30,6 +31,19 @@ namespace MapsInMyFolder.Commun
             char[] theChars = theString.ToCharArray();
             theChars[0] = char.ToUpper(theChars[0]);
             return new string(theChars);
+        }    
+        
+        public static string RemoveNewLineChar(this string theString)
+        {
+            var sb = new System.Text.StringBuilder(theString.Length);
+            foreach (char i in theString)
+            {
+                if (i != '\n' && i != '\r' && i != '\t')
+                {
+                    sb.Append(i);
+                }
+            }
+            return sb.ToString();
         }
 
 
@@ -67,13 +81,19 @@ namespace MapsInMyFolder.Commun
             }
         }
 
-        public static void ExecOnUiThread(this Application app, Action action)
+        public static int IndexOf<T>(this IEnumerable<T> enumerable, T element, IEqualityComparer<T> comparer = null)
         {
-            var dispatcher = app.Dispatcher;
-            if (dispatcher.CheckAccess())
-                action();
-            else
-                dispatcher.BeginInvoke(action);
+            int i = 0;
+            comparer = comparer ?? EqualityComparer<T>.Default;
+            foreach (var currentElement in enumerable)
+            {
+                if (comparer.Equals(currentElement, element))
+                {
+                    return i;
+                }
+                i++;
+            }
+            return -1;
         }
 
     }

@@ -60,16 +60,16 @@ namespace MapsInMyFolder
             PrepareDownloadPage.Init();
             MainContentFrame.Navigate(PrepareDownloadPage);
         }
-        public void FrameLoad_CustomOrEditLayers(int Layerid)
+        public void FrameLoad_CustomOrEditLayers(int Layerid, int prefilLayerId = -1)
         {
             Popup_opening(false);
             CustomOrEditLayersPage CustomOrEditLayersPage = new CustomOrEditLayersPage
             {
                 LayerId = Layerid
             };
-            CustomOrEditLayersPage.Init_CustomOrEditLayersWindow();
+            CustomOrEditLayersPage.Init_CustomOrEditLayersWindow(prefilLayerId);
 
-                MainContentFrame.Navigate(CustomOrEditLayersPage);
+            MainContentFrame.Navigate(CustomOrEditLayersPage);
             TileGeneratorSettings.AcceptJavascriptPrint = true;
         }
 

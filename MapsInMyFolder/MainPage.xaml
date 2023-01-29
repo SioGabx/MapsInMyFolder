@@ -49,7 +49,7 @@
                 </Grid.RowDefinitions>
 
                 <Label Grid.Row="0" Content="Carte" HorizontalAlignment="Left" Margin="28,10,0,0" VerticalAlignment="Top" Width="192" Height="50" FontSize="30" FontFamily="Segoe UI Light" Foreground="#FFE2E2E1"/>
-                <Grid x:Name="MapGrid" Grid.Row="1" Margin="0,0,0,0" MouseLeave="MapGrid_MouseLeave">
+                <Grid x:Name="MapGrid" Grid.Row="1" Margin="0,0,0,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="45" />
@@ -105,14 +105,13 @@
 
                     <map:Map Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Grid.RowSpan="2" x:Name="mapviewer" ZoomLevel="18" Margin="10,0,0,0" MinHeight="30" MinWidth="30"
                  MouseMove="Mapviewer_MouseMove" MouseLeftButtonUp="Mapviewer_MouseLeftButtonUp" MouseDown="Mapviewer_MouseDown" 
-                 Background="White" MouseRightButtonUp="Mapviewer_MouseRightButtonUp" MouseRightButtonDown="Mapviewer_MouseRightButtonDown" MouseLeave="Mapviewer_MouseLeave" MouseWheel="Mapviewer_MouseWheel" 
-                            >
+                 Background="White" MouseRightButtonUp="Mapviewer_MouseRightButtonUp" MouseWheel="Mapviewer_MouseWheel">
 
                         <map:Map.Center>
                             <map:Location Longitude="6.429381" Latitude="48.198846"/>
                         </map:Map.Center>
-                        <map:Pushpin Panel.ZIndex="999" x:Name="SE_PIN"  Background="#303031" Foreground="#FFE2E2E1" map:MapPanel.Location="48.198846,6.4" Content="Coin_Superieur" MouseMove="SE_PIN_MouseMove" MouseLeftButtonDown="SE_PIN_MouseLeftButtonDown" MouseRightButtonUp="SE_PIN_MouseRightButtonUp" MouseRightButtonDown="SE_PIN_MouseLeftButtonDown" Cursor="Hand" />
-                        <map:Pushpin Panel.ZIndex="999" x:Name="NO_PIN" Background="#303031" Foreground="#FFE2E2E1" map:MapPanel.Location="48.16,6.5" Content="Coin_Inferieur" MouseMove="NO_PIN_MouseMove" MouseLeftButtonDown="NO_PIN_MouseLeftButtonDown" MouseLeftButtonUp="NO_PIN_MouseLeftButtonUp" MouseRightButtonDown="NO_PIN_MouseLeftButtonDown" Cursor="Hand" />
+                        <map:Pushpin Panel.ZIndex="999" x:Name="SE_PIN"  Background="#303031" Foreground="#FFE2E2E1" map:MapPanel.Location="48.198846,6.4" Content="Coin_Superieur" />
+                        <map:Pushpin Panel.ZIndex="999" x:Name="NO_PIN" Background="#303031" Foreground="#FFE2E2E1" map:MapPanel.Location="48.16,6.5" Content="Coin_Inferieur" />
                         <map:Pushpin Panel.ZIndex="999" x:Name="search_result" Style="{DynamicResource PushpinStyleOrange}"  map:MapPanel.Location="48.16,6.5" Visibility="Hidden" MouseDoubleClick="Search_result_MouseDoubleClick"/>
 
                         <map:MapTileLayer x:Name="MapTileLayer_Transparent"/>

@@ -8,8 +8,8 @@
   <?define MapsInMyFolderFilesfr=Microsoft.VisualBasic.Forms.resources.dll;PresentationCore.resources.dll;PresentationFramework.resources.dll;PresentationUI.resources.dll;ReachFramework.resources.dll;System.Windows.Controls.Ribbon.resources.dll;System.Windows.Forms.Design.resources.dll;System.Windows.Forms.Primitives.resources.dll;System.Windows.Forms.resources.dll;System.Windows.Input.Manipulations.resources.dll;System.Xaml.resources.dll;UIAutomationClient.resources.dll;UIAutomationClientSideProviders.resources.dll;UIAutomationProvider.resources.dll;UIAutomationTypes.resources.dll;WindowsBase.resources.dll;WindowsFormsIntegration.resources.dll?>
   <?define MapsInMyFolderFilesx64=libSkiaSharp.dll?>
 
-
-  <Product Id="*" Name="MapsInMyFolder" Language="1033" Version="0.2.0" Manufacturer="SioGabx" UpgradeCode="091b4d98-0e03-441f-8e40-acb9706db235">
+<!--DONT FORGET TO CHANGE THE VERSION NUMER HERE AND IN MAPSINMYFOLDER.CSPROJ-->
+  <Product Id="*" Name="MapsInMyFolder" Language="1033" Version="0.3.0" Manufacturer="SioGabx" UpgradeCode="091b4d98-0e03-441f-8e40-acb9706db235">
     <Package InstallerVersion="200" Compressed="yes"  InstallPrivileges="elevated" AdminImage="yes" Manufacturer="SioGabx"/><!--InstallScope="perUser"-->
     <Media Id="1" Cabinet="MyCabFile.cab" EmbedCab="yes" />
     
@@ -24,12 +24,6 @@
     <Property Id="VC_REDIST_X64_EXISTS" Secure="yes">
       <RegistrySearch Id="VC_REDIST_X64_REGSEARCH" Root="HKLM" Key="SOFTWARE\Microsoft\VisualStudio\14.0\VC\Runtimes\x64" Name="Version" Type="raw" />
     </Property>
-
-    <!--<InstallExecuteSequence>
-      <Custom Action="InstallVCRedist" Before="InstallFinalize">
-        VCRedistInstalled
-      </Custom>
-    </InstallExecuteSequence>-->
 
     <InstallExecuteSequence>
       <!--<Custom Action="LaunchExe2" Before="InstallFinalize"></Custom>-->

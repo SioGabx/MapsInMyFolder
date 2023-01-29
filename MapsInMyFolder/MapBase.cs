@@ -8,6 +8,7 @@ using System.Windows.Controls;
 using MapsInMyFolder.Commun;
 using System.Windows.Threading;
 using System.Threading;
+using System.Linq;
 
 namespace MapsInMyFolder
 {
@@ -25,7 +26,7 @@ namespace MapsInMyFolder
 
             MapPanel.SetLocation(NO_PIN, NO_PIN_starting_location);
             MapPanel.SetLocation(SE_PIN, SE_PIN_starting_location);
-            Draw_rectangle_selection_arround_pushpin();
+            DrawRectangleCelectionArroundPushpin();
 
             mapviewer.Center = new Location(NO_PIN_starting_location.Latitude - ((NO_PIN_starting_location.Latitude - SE_PIN_starting_location.Latitude) / 2), NO_PIN_starting_location.Longitude - ((NO_PIN_starting_location.Longitude - SE_PIN_starting_location.Longitude) / 2));
             mapviewer.ZoomLevel = Settings.map_defaut_zoom_level;
@@ -34,14 +35,138 @@ namespace MapsInMyFolder
                 (byte)Settings.background_layer_color_R,
                 (byte)Settings.background_layer_color_G,
                 (byte)Settings.background_layer_color_B)
-                );
+            );
             mapviewer.Background = brush;
         }
 
+        public Point MakeSquareIfShift(Point targetPoint, int OpositeCorner = 0, string overrideWidthValue = null)
+        {
+            if ((Keyboard.Modifiers & ModifierKeys.Shift) != ModifierKeys.Shift)
+            {
+                return targetPoint;
+            }
+
+            Point SelectionRectanglePoint = mapviewer.LocationToView(Selection_Rectangle.Locations.ElementAt(OpositeCorner));
+            double width = Math.Abs(targetPoint.X - SelectionRectanglePoint.X);
+            double height = Math.Abs(targetPoint.Y - SelectionRectanglePoint.Y);
+            if (string.IsNullOrEmpty(overrideWidthValue))
+            {
+                if (Math.Abs(width) < Math.Abs(height))
+                {
+                    height = width;
+                }
+                else
+                {
+                    width = height;
+                }
+            }
+            else if (overrideWidthValue == "width")
+            {
+                height = width;
+            }
+            else if (overrideWidthValue == "height")
+            {
+                width = height;
+            }
+            Point returnNewTargetPoint = new Point(SelectionRectanglePoint.X, SelectionRectanglePoint.Y);
+            bool XtargetPointIsSuperiorAsSelectionRectanglePoint = targetPoint.X > SelectionRectanglePoint.X;
+            bool YtargetPointIsSuperiorAsSelectionRectanglePoint = targetPoint.Y > SelectionRectanglePoint.Y;
+            //BAS GAUCHE
+            //targetPoint.X > SelectionRectanglePoint.X = False
+            //targetPoint.Y > SelectionRectanglePoint.Y = True
+            if (XtargetPointIsSuperiorAsSelectionRectanglePoint == false && YtargetPointIsSuperiorAsSelectionRectanglePoint == true)
+            {
+                width *= -1;
+                height *= 1;
+            }
+
+
+            //BAS DROITE
+            //targetPoint.X > SelectionRectanglePoint.X = True
+            //targetPoint.Y > SelectionRectanglePoint.Y = True
+            if (XtargetPointIsSuperiorAsSelectionRectanglePoint == true && YtargetPointIsSuperiorAsSelectionRectanglePoint == true)
+            {
+                width *= 1;
+                height *= 1;
+            }
+
+            //HAUT GAUCHE
+            //targetPoint.X > SelectionRectanglePoint.X = False
+            //targetPoint.Y > SelectionRectanglePoint.Y = False
+            if (XtargetPointIsSuperiorAsSelectionRectanglePoint == false && YtargetPointIsSuperiorAsSelectionRectanglePoint == false)
+            {
+                width *= -1;
+                height *= -1;
+            }
+
+            //HAUT DROITE
+            //targetPoint.X > SelectionRectanglePoint.X = True
+            //targetPoint.Y > SelectionRectanglePoint.Y = False
+            if (XtargetPointIsSuperiorAsSelectionRectanglePoint == true && YtargetPointIsSuperiorAsSelectionRectanglePoint == false)
+            {
+                width *= 1;
+                height *= -1;
+            }
+
+            returnNewTargetPoint.X += width;
+            returnNewTargetPoint.Y += height;
+            return returnNewTargetPoint;
+        }
+
+        static Point ExtandPositionByXUnit(Point positionToExtand, int XUnit, HitType MouseHitType)
+        {
+            Point returnPoint = positionToExtand;
+            switch (MouseHitType)
+            {
+                case HitType.Body:
+                    return returnPoint;
+                case HitType.UL:
+                    //top left
+                    returnPoint.X -= XUnit;
+                    returnPoint.Y -= XUnit;
+                    return returnPoint;
+                case HitType.UR:
+                    //top right
+                    returnPoint.X += XUnit;
+                    returnPoint.Y -= XUnit;
+                    return returnPoint;
+                case HitType.LR:
+                    //Bottom right
+                    returnPoint.X += XUnit;
+                    returnPoint.Y += XUnit;
+                    return returnPoint;
+                case HitType.LL:
+                    //Bottom left
+                    returnPoint.X -= XUnit;
+                    returnPoint.Y += XUnit;
+                    return returnPoint;
+                case HitType.L:
+                    //left
+                    returnPoint.X -= XUnit;
+                    returnPoint.Y += 0;
+                    return returnPoint;
+                case HitType.R:
+                    //right
+                    returnPoint.X += XUnit;
+                    returnPoint.Y += 0;
+                    return returnPoint;
+                case HitType.B:
+                    //bottom
+                    returnPoint.X += 0;
+                    returnPoint.Y += XUnit;
+                    return returnPoint;
+                case HitType.T:
+                    //top
+                    returnPoint.X += 0;
+                    returnPoint.Y -= XUnit;
+                    return returnPoint;
+            }
+            return returnPoint;
+        }
+
+
         public static void MapViewerSetSelection(Dictionary<string, double> locations, bool ZoomToNewLocation = true)
         {
-            //    Javascript JavascriptLocationInstance = Javascript.JavascriptInstance;
-            //    JavascriptLocationInstance.LocationChanged += (o, e) => MapViewerSetSelection(e.Location);
             Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
             {
                 try
@@ -67,7 +192,7 @@ namespace MapsInMyFolder
                     Location NO_Loc = new Location(locations["NO_Latitude"], locations["NO_Longitude"]);
                     _instance.NO_PIN.Location = NO_Loc;
                     _instance.SE_PIN.Location = SE_Loc;
-                    _instance.Draw_rectangle_selection_arround_pushpin();
+                    _instance.DrawRectangleCelectionArroundPushpin();
                     if (ZoomToNewLocation)
                     {
                         Point NO_Point_Bounds = _instance.mapviewer.LocationToView(NO_Loc);
@@ -86,11 +211,26 @@ namespace MapsInMyFolder
 
         private void Mapviewer_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
         {
-            RightClickUp(e.GetPosition(mapviewer));
+            RightClickUp(MakeSquareIfShift(e.GetPosition(mapviewer)));
         }
+
+
+        public void MiddleClickUp(object sender, MouseButtonEventArgs e)
+        {
+            if (e.MiddleButton != MouseButtonState.Pressed)
+            {
+                is_middle_mouse_down = false;
+                MapviewerMouseDownEvent(sender, e, false);
+            }
+        }
+
 
         public void RightClickUp(Point p)
         {
+            if (Mouse.RightButton == MouseButtonState.Pressed)
+            {
+                return;
+            }
             if (Settings.disable_selection_rectangle_moving)
             {
                 return;
@@ -98,6 +238,7 @@ namespace MapsInMyFolder
 
             if (is_right_mouse_down)
             {
+
                 Point NewLocation = p;
                 double No_X = mapviewer.LocationToView(NO_PIN.Location).X;
                 double No_Y = mapviewer.LocationToView(NO_PIN.Location).Y;
@@ -126,8 +267,8 @@ namespace MapsInMyFolder
                     }
                 }
                 SE_PIN.Location = mapviewer.ViewToLocation(NewLocation);
-                Draw_rectangle_selection_arround_pushpin();
-                Pushpin_stop_mooving();
+                DrawRectangleCelectionArroundPushpin();
+                UpdatePushpinPositionAndDrawRectangle();
                 is_right_mouse_down = false;
                 //Selection_Rectangle.IsHitTestVisible = true;
             }
@@ -150,56 +291,15 @@ namespace MapsInMyFolder
             StartDownloadButton.Focus();
         }
 
-        private void Mapviewer_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            if (is_left_mouse_down) { e.Handled = true; return; }
-            StartRightClick(e);
-            //Selection_Rectangle.IsHitTestVisible = false;
-        }
-
-        private void Mapviewer_MouseLeave(object sender, MouseEventArgs e)
-        {
-            //RightClickUp(e.GetPosition(mapviewer));
-        }
-
-        private void MapGrid_MouseLeave(object sender, MouseEventArgs e)
-        {
-        }
-
-        private void NO_PIN_MouseMove(object sender, System.Windows.Input.MouseEventArgs e)
-        {
-        }
-
-        private void NO_PIN_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
-        {
-            e.Handled = true;
-        }
-
-        private void NO_PIN_MouseLeftButtonUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
-        {
-            Pushpin_stop_mooving();
-            UpdateSelectionRectangle(e);
-        }
-
-        private void SE_PIN_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
-        {
-            Pushpin_stop_mooving();
-            UpdateSelectionRectangle(e);
-        }
-
-        private void SE_PIN_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            e.Handled = true;
-        }
-
-        private void SE_PIN_MouseMove(object sender, MouseEventArgs e)
-        {
-        }
 
         private void Mapviewer_MouseMove(object sender, System.Windows.Input.MouseEventArgs e)
         {
             e.Handled = true;
             if (Settings.disable_selection_rectangle_moving)
+            {
+                return;
+            }
+            if (Mouse.MiddleButton == MouseButtonState.Pressed)
             {
                 return;
             }
@@ -210,7 +310,6 @@ namespace MapsInMyFolder
             else
             {
                 is_right_mouse_down = false;
-                //Selection_Rectangle.IsHitTestVisible = true;
             }
 
             if (e.LeftButton == MouseButtonState.Pressed)
@@ -234,60 +333,68 @@ namespace MapsInMyFolder
                 is_right_mouse_down = false;
                 //Selection_Rectangle.IsHitTestVisible = true;
             }
-            Pushpin_stop_mooving();
+            UpdatePushpinPositionAndDrawRectangle();
             UpdateSelectionRectangle(e);
             LayerTilePreview_RequestUpdate();
         }
         private void Mapviewer_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
+            MapviewerMouseDownEvent(sender, e, true);
+        }
+
+        public void MapviewerMouseDownEvent(object sender, System.Windows.Input.MouseButtonEventArgs e, bool UpdateHitType = true)
+        {
             e.Handled = true;
+            if (e.MiddleButton == MouseButtonState.Pressed)
+            {
+                e.Handled = true;
+                is_middle_mouse_down = true;
+                is_left_mouse_down = false;
+                is_right_mouse_down = false;
+                mapviewer.Cursor = new Cursor(Collectif.ReadResourceStream("cursors/closedhand.cur"));
+                return;
+            }
 
             if (e.LeftButton == MouseButtonState.Pressed)
             {
                 if (is_right_mouse_down)
                 {
-                    e.Handled = true; return;
+                    return;
+                }
+                if (!Settings.disable_selection_rectangle_moving && Mouse.MiddleButton != MouseButtonState.Pressed)
+                {
+                    is_left_mouse_down = true;
+                    origin_saved_left_click_mouse_position = saved_left_click_mouse_position = e.GetPosition(mapviewer);
+                    if (UpdateHitType)
+                    {
+                        MouseHitType = SetHitType(e.GetPosition(mapviewer));
+
+                    }
+                    SetMouseCursor();
                 }
                 else
                 {
-                    Cursor grab = new Cursor(Collectif.ReadResourceStream("cursors/closedhand.cur"));
-                    mapviewer.Cursor = grab;
-                    if (!Settings.disable_selection_rectangle_moving)
-                    {
-                        is_left_mouse_down = true;
-                        saved_left_click_mouse_position = e.GetPosition(mapviewer);
-                    }
+                    mapviewer.Cursor = new Cursor(Collectif.ReadResourceStream("cursors/closedhand.cur"));
                 }
-            }
-
-            if (e.MiddleButton == MouseButtonState.Pressed)
-            {
-                e.Handled = true;
-                Cursor grab = new Cursor(Collectif.ReadResourceStream("cursors/closedhand.cur"));
-                mapviewer.Cursor = grab;
             }
 
             if (e.RightButton == MouseButtonState.Pressed)
             {
                 if (is_left_mouse_down)
                 {
-                    e.Handled = true; return;
+                    return;
                 }
-                else
+                else if (!Settings.disable_selection_rectangle_moving)
                 {
-                    if (!Settings.disable_selection_rectangle_moving)
-                    {
-                        if (e.MiddleButton == MouseButtonState.Released)
-                        {
-                            e.Handled = true;
-                            is_right_mouse_down = true;
-                            //Selection_Rectangle.IsHitTestVisible = false;
-                            saved_left_click_mouse_position = e.GetPosition(mapviewer);
-                        }
-                    }
+                    e.Handled = true;
+                    is_right_mouse_down = true;
+                    origin_saved_left_click_mouse_position = saved_left_click_mouse_position = e.GetPosition(mapviewer);
+                    StartRightClick(e);
                 }
             }
         }
+
+
         public List<double> Map_location_to_mouse_location(System.Windows.Input.MouseEventArgs mouse_position)
         {
             System.Windows.Point LocationXY = new System.Windows.Point(mouse_position.GetPosition(mapviewer).X, mouse_position.GetPosition(mapviewer).Y);
@@ -300,7 +407,7 @@ namespace MapsInMyFolder
             Message.NoReturnBoxAsync("Cette fonctionnalité fait l'objet d'une prochaine mise à jour, elle n'as pas encore été ajoutée à cette version !", "Erreur");
         }
 
-        public void Pushpin_stop_mooving()
+        public void UpdatePushpinPositionAndDrawRectangle()
         {
             void CheckPositionOutOfBound(Pushpin pushpin)
             {
@@ -325,7 +432,7 @@ namespace MapsInMyFolder
                 }
             }
 
-           CheckPositionOutOfBound(NO_PIN);
+            CheckPositionOutOfBound(NO_PIN);
             CheckPositionOutOfBound(SE_PIN);
 
             Location NO_PIN_Temp_Loc = NO_PIN.Location;
@@ -343,11 +450,11 @@ namespace MapsInMyFolder
                 NO_PIN.Location = new Location(NO_PIN.Location.Latitude, SE_PIN_Temp_Loc.Longitude);
                 SE_PIN.Location = new Location(SE_PIN.Location.Latitude, NO_PIN_Temp_Loc.Longitude);
             }
-            Draw_rectangle_selection_arround_pushpin();
+            DrawRectangleCelectionArroundPushpin();
         }
 
         int selection_map_rectange_y_decalage = 45; //Decalage des pins (read only)
-        public void Draw_rectangle_selection_arround_pushpin()
+        public void DrawRectangleCelectionArroundPushpin()
         {
             Selection_Rectangle.Locations = new List<Location>() { NO_PIN.Location, new Location(SE_PIN.Location.Latitude, NO_PIN.Location.Longitude), SE_PIN.Location, new Location(NO_PIN.Location.Latitude, SE_PIN.Location.Longitude) };
 
@@ -372,120 +479,161 @@ namespace MapsInMyFolder
 
         public Boolean is_left_mouse_down;
         public Boolean is_right_mouse_down;
+        public Boolean is_middle_mouse_down;
         Point saved_left_click_mouse_position;
-        Point saved_no_pin_location;
-        Point saved_se_pin_location;
+        Point origin_saved_left_click_mouse_position;
+        Point SavedNo_Placement = new Point();
+        Point SavedSe_Placement = new Point();
+
 
         public void UpdateSelectionRectangle(MouseEventArgs e)
         {
-            //todo : add square selection on shift key
-            //todo : corect position on wheel move
             e.Handled = true;
             Point mouse_location = e.GetPosition(mapviewer);
+            if (Mouse.MiddleButton == MouseButtonState.Pressed)
+            {
+                return;
+            }
             if (is_left_mouse_down && MouseHitType != HitType.None && e.LeftButton == MouseButtonState.Pressed)
             {
-                Location PositionSouris;// = new Location(mouse_map_location[0], mouse_map_location[1]);
-                Location get_fixed_location(string NOorSE)
-                {
-                    List<double> mouse_map_location = Map_location_to_mouse_location(e);
-                    double X_correctif;
-                    double Y_correctif;
-                    if (NOorSE == "NO")
-                    {
-                        X_correctif = saved_left_click_mouse_position.X - saved_no_pin_location.X;
-                        Y_correctif = saved_left_click_mouse_position.Y - saved_no_pin_location.Y;
-                        X_correctif = Math.Abs(X_correctif) * -1;
-                        Y_correctif = Math.Abs(Y_correctif) * -1;
-                    }
-                    else
-                    {
-                        X_correctif = saved_left_click_mouse_position.X - saved_se_pin_location.X;
-                        Y_correctif = saved_left_click_mouse_position.Y - saved_se_pin_location.Y;
-                        X_correctif = Math.Abs(X_correctif);
-                        Y_correctif = Math.Abs(Y_correctif);
-                    }
-
-                    if (!(Y_correctif > 1 || Y_correctif < 0))
-                    {
-                        Y_correctif = 0;
-                    }
-                    if (!(X_correctif > 1 || X_correctif < 0))
-                    {
-                        X_correctif = 0;
-                    }
-
-                    Location temp_location_from_mouse = new Location(mouse_map_location[0], mouse_map_location[1]);
-                    double location_x_fixed = mapviewer.LocationToView(temp_location_from_mouse).X + X_correctif;
-                    double location_y_fixed = mapviewer.LocationToView(temp_location_from_mouse).Y + Y_correctif;
-                    Location final_edited_location = mapviewer.ViewToLocation(new Point(location_x_fixed, location_y_fixed));
-                    return new Location(final_edited_location.Latitude, final_edited_location.Longitude);
-                }
-
+                mouse_location = ExtandPositionByXUnit(e.GetPosition(mapviewer), 4, MouseHitType);
+                Location PositionSouris;
+                Location PositionToMakeSquareIfShift;
                 switch (MouseHitType)
                 {
                     case HitType.Body:
-                        double deplacement_X = mouse_location.X - saved_left_click_mouse_position.X;
-                        double deplacement_Y = mouse_location.Y - saved_left_click_mouse_position.Y;
-                        Point No_Placement = mapviewer.LocationToView(NO_PIN.Location);
-                        Point Se_Placement = mapviewer.LocationToView(SE_PIN.Location);
-                        NO_PIN.Location = mapviewer.ViewToLocation(new Point(No_Placement.X + deplacement_X, No_Placement.Y + deplacement_Y));
-                        SE_PIN.Location = mapviewer.ViewToLocation(new Point(Se_Placement.X + deplacement_X, Se_Placement.Y + deplacement_Y));
+                        double deplacement_X;
+                        double deplacement_Y;
+                        if ((Keyboard.Modifiers & ModifierKeys.Shift) == ModifierKeys.Shift)
+                        {
+                            deplacement_X = mouse_location.X - origin_saved_left_click_mouse_position.X;
+                            deplacement_Y = mouse_location.Y - origin_saved_left_click_mouse_position.Y;
+                            if (origin_saved_left_click_mouse_position == saved_left_click_mouse_position)
+                            {
+                                SavedNo_Placement = mapviewer.LocationToView(NO_PIN.Location);
+                                SavedSe_Placement = mapviewer.LocationToView(SE_PIN.Location);
+                            }
+                            if (Math.Abs(deplacement_X) > Math.Abs(deplacement_Y))
+                            {
+                                deplacement_Y = 0;
+                            }
+                            else
+                            {
+                                deplacement_X = 0;
+
+                            }
+                        }
+                        else
+                        {
+                            origin_saved_left_click_mouse_position = e.GetPosition(mapviewer);
+                            SavedNo_Placement = mapviewer.LocationToView(NO_PIN.Location);
+                            SavedSe_Placement = mapviewer.LocationToView(SE_PIN.Location);
+                            deplacement_X = mouse_location.X - saved_left_click_mouse_position.X;
+                            deplacement_Y = mouse_location.Y - saved_left_click_mouse_position.Y;
+                        }
+
+                        NO_PIN.Location = mapviewer.ViewToLocation(new Point(SavedNo_Placement.X + deplacement_X, SavedNo_Placement.Y + deplacement_Y));
+                        SE_PIN.Location = mapviewer.ViewToLocation(new Point(SavedSe_Placement.X + deplacement_X, SavedSe_Placement.Y + deplacement_Y));
                         saved_left_click_mouse_position = e.GetPosition(mapviewer);
                         break;
                     case HitType.UL:
-
-                        PositionSouris = new Location(get_fixed_location("NO").Latitude, get_fixed_location("NO").Longitude);
-                        MapPanel.SetLocation(NO_PIN, PositionSouris);
+                        //top left
+                        //PositionSouris = new Location(get_fixed_location("NO").Latitude, get_fixed_location("NO").Longitude);
+                        PositionToMakeSquareIfShift = mapviewer.ViewToLocation(MakeSquareIfShift(mouse_location, 2));
+                        MapPanel.SetLocation(NO_PIN, PositionToMakeSquareIfShift);
                         break;
                     case HitType.UR:
-                        PositionSouris = new Location(SE_PIN.Location.Latitude, get_fixed_location("SE").Longitude);
+                        //top right
+                        PositionToMakeSquareIfShift = mapviewer.ViewToLocation(MakeSquareIfShift(mouse_location, 1));
+                        PositionSouris = new Location(SE_PIN.Location.Latitude, PositionToMakeSquareIfShift.Longitude);
                         MapPanel.SetLocation(SE_PIN, PositionSouris);
-                        PositionSouris = new Location(get_fixed_location("NO").Latitude, NO_PIN.Location.Longitude);
+                        PositionSouris = new Location(PositionToMakeSquareIfShift.Latitude, NO_PIN.Location.Longitude);
                         MapPanel.SetLocation(NO_PIN, PositionSouris);
                         break;
                     case HitType.LR:
-                        PositionSouris = new Location(get_fixed_location("SE").Latitude, get_fixed_location("SE").Longitude);
-                        MapPanel.SetLocation(SE_PIN, PositionSouris);
+                        //Bottom right
+                        PositionToMakeSquareIfShift = mapviewer.ViewToLocation(MakeSquareIfShift(mouse_location, 0));
+                        MapPanel.SetLocation(SE_PIN, PositionToMakeSquareIfShift);
                         break;
                     case HitType.LL:
-                        PositionSouris = new Location(NO_PIN.Location.Latitude, get_fixed_location("NO").Longitude);
+                        //Bottom left
+                        PositionToMakeSquareIfShift = mapviewer.ViewToLocation(MakeSquareIfShift(mouse_location, 3));
+                        PositionSouris = new Location(NO_PIN.Location.Latitude, PositionToMakeSquareIfShift.Longitude);
                         MapPanel.SetLocation(NO_PIN, PositionSouris);
-                        PositionSouris = new Location(get_fixed_location("SE").Latitude, SE_PIN.Location.Longitude);
+                        PositionSouris = new Location(PositionToMakeSquareIfShift.Latitude, SE_PIN.Location.Longitude);
                         MapPanel.SetLocation(SE_PIN, PositionSouris);
                         break;
                     case HitType.L:
-                        PositionSouris = new Location(NO_PIN.Location.Latitude, get_fixed_location("NO").Longitude);
+                        //left
+                        PositionToMakeSquareIfShift = mapviewer.ViewToLocation(MakeSquareIfShift(mouse_location, 2, "width"));
+                        if ((Keyboard.Modifiers & ModifierKeys.Shift) == ModifierKeys.Shift)
+                        {
+                            PositionSouris = new Location(PositionToMakeSquareIfShift.Latitude, PositionToMakeSquareIfShift.Longitude);
+                        }
+                        else
+                        {
+                            PositionSouris = new Location(NO_PIN.Location.Latitude, PositionToMakeSquareIfShift.Longitude);
+                        }
                         MapPanel.SetLocation(NO_PIN, PositionSouris);
                         break;
                     case HitType.R:
-                        PositionSouris = new Location(SE_PIN.Location.Latitude, get_fixed_location("SE").Longitude);
+                        //right
+                        PositionToMakeSquareIfShift = mapviewer.ViewToLocation(MakeSquareIfShift(mouse_location, 0, "width"));
+                        if ((Keyboard.Modifiers & ModifierKeys.Shift) == ModifierKeys.Shift)
+                        {
+                            PositionSouris = new Location(PositionToMakeSquareIfShift.Latitude, PositionToMakeSquareIfShift.Longitude);
+                        }
+                        else
+                        {
+                            PositionSouris = new Location(SE_PIN.Location.Latitude, PositionToMakeSquareIfShift.Longitude);
+                        }
                         MapPanel.SetLocation(SE_PIN, PositionSouris);
                         break;
                     case HitType.B:
-                        PositionSouris = new Location(get_fixed_location("SE").Latitude, SE_PIN.Location.Longitude);
+                        //bottom
+                        PositionToMakeSquareIfShift = mapviewer.ViewToLocation(MakeSquareIfShift(mouse_location, 0, "height"));
+                        if ((Keyboard.Modifiers & ModifierKeys.Shift) == ModifierKeys.Shift)
+                        {
+                            PositionSouris = new Location(PositionToMakeSquareIfShift.Latitude, PositionToMakeSquareIfShift.Longitude);
+                        }
+                        else
+                        {
+                            PositionSouris = new Location(PositionToMakeSquareIfShift.Latitude, SE_PIN.Location.Longitude);
+                        }
                         MapPanel.SetLocation(SE_PIN, PositionSouris);
                         break;
                     case HitType.T:
-                        PositionSouris = new Location(get_fixed_location("NO").Latitude, NO_PIN.Location.Longitude);
+                        //top
+                        PositionToMakeSquareIfShift = mapviewer.ViewToLocation(MakeSquareIfShift(mouse_location, 2, "height"));
+                        if ((Keyboard.Modifiers & ModifierKeys.Shift) == ModifierKeys.Shift)
+                        {
+                            PositionSouris = new Location(PositionToMakeSquareIfShift.Latitude, PositionToMakeSquareIfShift.Longitude);
+                        }
+                        else
+                        {
+                            PositionSouris = new Location(PositionToMakeSquareIfShift.Latitude, NO_PIN.Location.Longitude);
+                        }
                         MapPanel.SetLocation(NO_PIN, PositionSouris);
                         break;
                 }
-                Draw_rectangle_selection_arround_pushpin();
+                DrawRectangleCelectionArroundPushpin();
             }
             else if (is_right_mouse_down)
             {
-                //Selection_Rectangle.IsHitTestVisible = false;
                 if (mapviewer.Cursor != Cursors.Cross)
                 {
-                    Debug.WriteLine("set cursor");
                     mapviewer.Cursor = Cursors.Cross;
                 }
-                SE_PIN.Location = mapviewer.ViewToLocation(e.GetPosition(mapviewer));
-                Draw_rectangle_selection_arround_pushpin();
+
+                SE_PIN.Location = mapviewer.ViewToLocation(MakeSquareIfShift(e.GetPosition(mapviewer)));
+                DrawRectangleCelectionArroundPushpin();
             }
             else
             {
-                MouseHitType = SetHitType(mouse_location);
+                if (Mouse.LeftButton != MouseButtonState.Pressed && Mouse.RightButton != MouseButtonState.Pressed)
+                {
+                    MouseHitType = SetHitType(mouse_location);
+                }
                 SetMouseCursor();
             }
         }
@@ -585,8 +733,7 @@ namespace MapsInMyFolder
         }
         private void Selection_Rectangle_MouseLeave(object sender, MouseEventArgs e)
         {
-            if (is_left_mouse_down) { return; }
-            if (is_right_mouse_down) { return; }
+            if (is_left_mouse_down || is_right_mouse_down) { return; }
             mapviewer.Cursor = Cursors.Arrow;
         }
         private void Selection_Rectangle_MouseMove(object sender, MouseEventArgs e)
@@ -597,6 +744,12 @@ namespace MapsInMyFolder
 
         private void Selection_Rectangle_MouseDown(object sender, MouseButtonEventArgs e)
         {
+            if (Mouse.MiddleButton == MouseButtonState.Pressed)
+            {
+                is_left_mouse_down = false;
+                is_right_mouse_down = false;
+                return;
+            }
             if (!Settings.disable_selection_rectangle_moving)
             {
                 if (e.LeftButton == MouseButtonState.Pressed)
@@ -604,22 +757,27 @@ namespace MapsInMyFolder
                     if (is_right_mouse_down) { e.Handled = true; return; }
                     e.Handled = true;
                     is_left_mouse_down = true;
-                    saved_left_click_mouse_position = e.GetPosition(mapviewer);
-                    saved_no_pin_location = mapviewer.LocationToView(NO_PIN.Location);
-                    saved_se_pin_location = mapviewer.LocationToView(SE_PIN.Location);
+                    if (Mouse.MiddleButton != MouseButtonState.Pressed)
+                    {
+                        origin_saved_left_click_mouse_position = saved_left_click_mouse_position = e.GetPosition(mapviewer);
+                    }
+
                 }
 
                 if (e.RightButton == MouseButtonState.Pressed)
                 {
+                    e.Handled = true;
                     if (is_left_mouse_down)
                     {
-                        e.Handled = true; return;
+                        return;
                     }
                     else
                     {
-                        e.Handled = true;
-                        StartRightClick(e);
-                        saved_left_click_mouse_position = e.GetPosition(mapviewer);
+                        if (Mouse.MiddleButton != MouseButtonState.Pressed)
+                        {
+                            StartRightClick(e);
+                            origin_saved_left_click_mouse_position = saved_left_click_mouse_position = e.GetPosition(mapviewer);
+                        }
                         //Debug.WriteLine(saved_left_click_mouse_position.X + " " + saved_left_click_mouse_position.Y);
                     }
                 }
@@ -628,10 +786,18 @@ namespace MapsInMyFolder
 
         private void Selection_Rectangle_MouseUp(object sender, MouseButtonEventArgs e)
         {
-            if (is_left_mouse_down)
+            if (Mouse.MiddleButton == MouseButtonState.Pressed) { e.Handled = true; return; }
+
+            if (is_left_mouse_down && Mouse.LeftButton == MouseButtonState.Released)
             {
                 is_left_mouse_down = false;
                 RightClickUp(e.GetPosition(mapviewer));
+            }
+            else if (Mouse.LeftButton != MouseButtonState.Pressed && Mouse.RightButton != MouseButtonState.Pressed)
+            {
+                Point mouse_location = e.GetPosition(mapviewer);
+                MouseHitType = SetHitType(mouse_location);
+                SetMouseCursor();
             }
         }
 
@@ -650,26 +816,28 @@ namespace MapsInMyFolder
 
         private void Window_MouseUp(object sender, MouseButtonEventArgs e)
         {
-            MainPage.RightClickUp(e.GetPosition(MainPage.mapviewer));
-            MainPage.UpdateSelectionRectangle(e);
+            if (Mouse.MiddleButton != MouseButtonState.Pressed)
+            {
+                MainPage.MiddleClickUp(sender, e);
+                MainPage.RightClickUp(e.GetPosition(MainPage.mapviewer));
+                MainPage.UpdateSelectionRectangle(e);
+            }
         }
 
         private void Window_MouseMove(object sender, MouseEventArgs e)
         {
             //e.Handled = true;
-
+            if (Mouse.MiddleButton == MouseButtonState.Pressed)
+            {
+                return;
+            }
             if (e.RightButton == MouseButtonState.Pressed)
             {
                 MainPage.UpdateSelectionRectangle(e);
             }
             else
             {
-                if (e.MiddleButton == MouseButtonState.Released)
-                {
-                    MainPage.is_right_mouse_down = false;
-                }
-
-                //Selection_Rectangle.IsHitTestVisible = true;
+                MainPage.is_right_mouse_down = false;
             }
 
             if (e.LeftButton == MouseButtonState.Pressed)

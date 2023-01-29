@@ -22,7 +22,7 @@ namespace MapsInMyFolder.Commun
             public string Logs { get; set; }
         }
         public delegate void LogsChangedHandler(object source, LogsEventArgs e);
-        public event EventHandler<LogsEventArgs> LogsChanged;
+        public static event EventHandler<LogsEventArgs> LogsChanged;
         protected virtual void OnLogsChanged()
         {
             LogsChanged?.Invoke(this, new LogsEventArgs { Logs = _logs });

@@ -134,17 +134,17 @@ namespace MapsInMyFolder
                     }
 
                     int DB_Layer_ID = GetIntFromOrdinal("ID");
-                    string DB_Layer_NOM = GetStringFromOrdinal("NOM");
+                    string DB_Layer_NOM = GetStringFromOrdinal("NOM").RemoveNewLineChar();
                     bool DB_Layer_FAVORITE = Convert.ToBoolean(GetIntFromOrdinal("FAVORITE"));
                     string DB_Layer_DESCRIPTION = GetStringFromOrdinal("DESCRIPTION");
-                    string DB_Layer_CATEGORIE = GetStringFromOrdinal("CATEGORIE");
-                    string DB_Layer_IDENTIFIANT = GetStringFromOrdinal("IDENTIFIANT");
-                    string DB_Layer_TILE_URL = GetStringFromOrdinal("TILE_URL");
+                    string DB_Layer_CATEGORIE = GetStringFromOrdinal("CATEGORIE").RemoveNewLineChar();
+                    string DB_Layer_IDENTIFIANT = GetStringFromOrdinal("IDENTIFIANT").RemoveNewLineChar();
+                    string DB_Layer_TILE_URL = GetStringFromOrdinal("TILE_URL").RemoveNewLineChar();
                     int DB_Layer_MIN_ZOOM = GetIntFromOrdinal("MIN_ZOOM");
                     int DB_Layer_MAX_ZOOM = GetIntFromOrdinal("MAX_ZOOM");
                     string DB_Layer_FORMAT = GetStringFromOrdinal("FORMAT");
-                    string DB_Layer_SITE = GetStringFromOrdinal("SITE");
-                    string DB_Layer_SITE_URL = GetStringFromOrdinal("SITE_URL");
+                    string DB_Layer_SITE = GetStringFromOrdinal("SITE").RemoveNewLineChar();
+                    string DB_Layer_SITE_URL = GetStringFromOrdinal("SITE_URL").RemoveNewLineChar();
                     string DB_Layer_STYLE = GetStringFromOrdinal("STYLE");
                     int DB_Layer_TILE_SIZE = GetIntFromOrdinal("TILE_SIZE");
                     string DB_Layer_TILECOMPUTATIONSCRIPT = GetStringFromOrdinal("TILECOMPUTATIONSCRIPT");
@@ -476,11 +476,7 @@ namespace MapsInMyFolder
             return;
         }
 
-        public static void LayerEditOpenWindow(int id = -1)
-        {
-            MainWindow._instance.FrameLoad_CustomOrEditLayers(id);
-        }
-
+        
         public string LayerTilePreview_ReturnUrl(int id)
         {
             Layers layer = Layers.GetLayerById(id);
@@ -586,14 +582,14 @@ namespace MapsInMyFolder
             DebugMode.WriteLine("Removing layer" + id_int + " to favorite");
         }
 
-        public void Layer_edit(double id = 0)
+        public void Layer_edit(double id = 0, double prefilid = -1)
         {
             int id_int = Convert.ToInt32(id);
+            int prefilid_int = Convert.ToInt32(prefilid);
             Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
             {
-                MainPage.LayerEditOpenWindow(id_int);
+                MainWindow._instance.FrameLoad_CustomOrEditLayers(id_int, prefilid_int);
             }, null);
-            DebugMode.WriteLine("Editing layer" + id_int + " to favorite");
         }
 
         public void Layer_set_current(double id = 0)

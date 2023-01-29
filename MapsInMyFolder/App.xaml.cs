@@ -121,11 +121,13 @@ namespace MapsInMyFolder
                     SchemeName = "localfolder",
                     DomainName = "cefsharp",
                     SchemeHandlerFactory = new FolderSchemeHandlerFactory(
-              rootFolder: Settings.working_folder,
-              hostName: "cefsharp",
-              defaultPage: "index.html" // will default to index.html
-          )
+                        rootFolder: Settings.working_folder,
+                        hostName: "cefsharp",
+                        defaultPage: "index.html" // will default to index.html
+                    )
                 });
+                settings.CefCommandLineArgs.Add("ignore-certificate-errors"); //cf https://stackoverflow.com/a/35564187/9947331
+
 
                 if (!Cef.IsInitialized)
                 {

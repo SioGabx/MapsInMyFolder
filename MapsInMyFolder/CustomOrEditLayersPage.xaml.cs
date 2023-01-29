@@ -29,27 +29,30 @@ namespace MapsInMyFolder
         public int LayerId { get; set; }
         private const int InternalEditorId = -2;
         private int DefaultValuesHachCode = 0;
-        public void Init_CustomOrEditLayersWindow()
+        public void Init_CustomOrEditLayersWindow(int prefilLayerId)
         {
+            if (prefilLayerId == -1)
+            {
+                prefilLayerId = LayerId;
+            }
             Javascript.JavascriptInstance.Logs = String.Empty;
             TextboxLayerScriptConsole.Text = String.Empty;
             GenerateTempLayerInDicList();
-            SQLiteConnection conn = Database.DB_Connection();
-            //DB_Download_Init(conn);
-            System.Windows.Media.SolidColorBrush brush = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(255, (byte)Settings.background_layer_color_R, (byte)Settings.background_layer_color_G, (byte)Settings.background_layer_color_B));
-            mapviewerappercu.Background = brush;
-            Init_LayerEditableTextbox();
-            SetAppercuLayers();
+            mapviewerappercu.Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(255, (byte)Settings.background_layer_color_R, (byte)Settings.background_layer_color_G, (byte)Settings.background_layer_color_B));
             mapviewerappercu.Center = MainPage._instance.mapviewer.Center;
             mapviewerappercu.ZoomLevel = MainPage._instance.mapviewer.ZoomLevel;
+
+            Init_LayerEditableTextbox(prefilLayerId);
+            SetAppercuLayers();
+
             if (Database.ExecuteScalarSQLCommand("SELECT COUNT(*) FROM 'main'.'EDITEDLAYERS' WHERE ID = " + LayerId) == 0)
             {
                 ResetInfoLayerClikableLabel.IsEnabled = false;
                 ResetInfoLayerClikableLabel.Opacity = 0.6;
             }
 
-            Javascript JavascriptLogInstance = Javascript.JavascriptInstance;
-            JavascriptLogInstance.LogsChanged += (o, e) => SetTextboxLayerScriptConsoleText(e.Logs);
+            //Javascript JavascriptLogInstance = Javascript.JavascriptInstance;
+            Javascript.LogsChanged += (o, e) => SetTextboxLayerScriptConsoleText(e.Logs);
             var keyeventHandler = new KeyEventHandler(TextboxLayerScriptConsoleSender_KeyDown);
             TextboxLayerScriptConsoleSender.AddHandler(PreviewKeyDownEvent, keyeventHandler, handledEventsToo: true);
         }
@@ -75,7 +78,7 @@ namespace MapsInMyFolder
             Layers.Layers_Dictionary_List.Add(DicLayers);
         }
 
-        void Init_LayerEditableTextbox()
+        void Init_LayerEditableTextbox(int prefilLayerId)
         {
             List<string> Categories = new List<string>();
             List<string> Site = new List<string>();
@@ -119,7 +122,7 @@ namespace MapsInMyFolder
             TextboxLayerCategories.Items.SortDescriptions.Add(new System.ComponentModel.SortDescription("", listSortDirection));
             TextboxLayerSite.Items.SortDescriptions.Add(new System.ComponentModel.SortDescription("", listSortDirection));
             TextboxLayerSiteUrl.Items.SortDescriptions.Add(new System.ComponentModel.SortDescription("", listSortDirection));
-            Layers LayerInEditMode = Layers.GetLayerById(LayerId);
+            Layers LayerInEditMode = Layers.GetLayerById(prefilLayerId);
             TextboxLayerCategories.IsEditable = true;
             TextboxLayerSite.IsEditable = true;
             TextboxLayerSiteUrl.IsEditable = true;
@@ -131,12 +134,13 @@ namespace MapsInMyFolder
                 return;
             }
             TextboxLayerName.Text = LayerInEditMode.class_name;
-            if (!string.IsNullOrEmpty(LayerInEditMode.class_name.Trim()))
+            if (LayerId > 0 && !string.IsNullOrEmpty(LayerInEditMode.class_name.Trim()))
             {
-                if (LayerInEditMode.class_id > 0)
-                {
-                    CalqueType.Content = String.Concat("Calque - ", LayerInEditMode.class_name);
-                }
+                CalqueType.Content = String.Concat("Calque - ", LayerInEditMode.class_name);
+            }
+            else if (LayerId != prefilLayerId)
+            {
+                CalqueType.Content = "Nouveau calque (basé sur le calque N°" + prefilLayerId + ")";
             }
             TextboxLayerCategories.Text = LayerInEditMode.class_categorie;
             TextboxLayerSiteUrl.Text = LayerInEditMode.class_site_url;
@@ -462,25 +466,22 @@ namespace MapsInMyFolder
                 "VALUES('" + ID + "', '" + NOM + "', '" + DESCRIPTION + "', '" + CATEGORIE + "', '" + IDENTIFIANT + "', '" + TILE_URL + "', '" + MIN_ZOOM + "', '" +
                 MAX_ZOOM + "', '" + FORMAT + "', '" + SITE + "', '" + SITE_URL + "', '" + TILE_SIZE + "', '0' , '" + TILECOMPUTATIONSCRIPT + "',  '" + SPECIALSOPTIONS + "')");
             }
+            else if (Database.ExecuteScalarSQLCommand("SELECT COUNT(*) FROM 'main'.'EDITEDLAYERS' WHERE ID = " + LayerId) == 0)
+            {
+                Debug.WriteLine("Adding to EDITEDLAYERS");
+                int FAVORITE = Layers.GetLayerById(LayerId).class_favorite ? 1 : 0;
+                Database.ExecuteNonQuerySQLCommand("INSERT INTO 'main'.'EDITEDLAYERS'('ID', 'NOM', 'DESCRIPTION', 'CATEGORIE', 'IDENTIFIANT', " +
+                "'TILE_URL', 'MIN_ZOOM', 'MAX_ZOOM', 'FORMAT', 'SITE', 'SITE_URL', 'TILE_SIZE', 'FAVORITE', 'TILECOMPUTATIONSCRIPT', 'SPECIALSOPTIONS') " +
+                "VALUES('" + LayerId + "', '" + NOM + "', '" + DESCRIPTION + "', '" + CATEGORIE + "', '" + IDENTIFIANT + "', '" + TILE_URL + "', '" + MIN_ZOOM + "', '" +
+                MAX_ZOOM + "', '" + FORMAT + "', '" + SITE + "', '" + SITE_URL + "', '" + TILE_SIZE + "', '" + FAVORITE + "',  '" + TILECOMPUTATIONSCRIPT + "',  '" + SPECIALSOPTIONS + "')");
+            }
             else
             {
-                if (Database.ExecuteScalarSQLCommand("SELECT COUNT(*) FROM 'main'.'EDITEDLAYERS' WHERE ID = " + LayerId) == 0)
-                {
-                    Debug.WriteLine("Adding to EDITEDLAYERS");
-                    int FAVORITE = Layers.GetLayerById(LayerId).class_favorite ? 1 : 0;
-                    Database.ExecuteNonQuerySQLCommand("INSERT INTO 'main'.'EDITEDLAYERS'('ID', 'NOM', 'DESCRIPTION', 'CATEGORIE', 'IDENTIFIANT', " +
-                    "'TILE_URL', 'MIN_ZOOM', 'MAX_ZOOM', 'FORMAT', 'SITE', 'SITE_URL', 'TILE_SIZE', 'FAVORITE', 'TILECOMPUTATIONSCRIPT', 'SPECIALSOPTIONS') " +
-                    "VALUES('" + LayerId + "', '" + NOM + "', '" + DESCRIPTION + "', '" + CATEGORIE + "', '" + IDENTIFIANT + "', '" + TILE_URL + "', '" + MIN_ZOOM + "', '" +
-                    MAX_ZOOM + "', '" + FORMAT + "', '" + SITE + "', '" + SITE_URL + "', '" + TILE_SIZE + "', '" + FAVORITE + "',  '" + TILECOMPUTATIONSCRIPT + "',  '" + SPECIALSOPTIONS + "')");
-                }
-                else
-                {
-                    Debug.WriteLine("Update to EDITEDLAYERS");
-                    Database.ExecuteNonQuerySQLCommand("UPDATE 'main'.'EDITEDLAYERS' SET 'NOM'='" + NOM + "','DESCRIPTION'='" + DESCRIPTION +
-                    "','CATEGORIE'='" + CATEGORIE + "','IDENTIFIANT'='" + IDENTIFIANT + "','TILE_URL'='" + TILE_URL + "','MIN_ZOOM'='" + MIN_ZOOM + "'," +
-                    "'MAX_ZOOM'='" + MAX_ZOOM + "','FORMAT'='" + FORMAT + "','SITE'='" + SITE + "','SITE_URL'='" + SITE_URL + "','TILE_SIZE'='" + TILE_SIZE +
-                    "','TILECOMPUTATIONSCRIPT'='" + TILECOMPUTATIONSCRIPT + "','SPECIALSOPTIONS'='" + SPECIALSOPTIONS + "' WHERE ID = " + LayerId);
-                }
+                Debug.WriteLine("Update to EDITEDLAYERS");
+                Database.ExecuteNonQuerySQLCommand("UPDATE 'main'.'EDITEDLAYERS' SET 'NOM'='" + NOM + "','DESCRIPTION'='" + DESCRIPTION +
+                "','CATEGORIE'='" + CATEGORIE + "','IDENTIFIANT'='" + IDENTIFIANT + "','TILE_URL'='" + TILE_URL + "','MIN_ZOOM'='" + MIN_ZOOM + "'," +
+                "'MAX_ZOOM'='" + MAX_ZOOM + "','FORMAT'='" + FORMAT + "','SITE'='" + SITE + "','SITE_URL'='" + SITE_URL + "','TILE_SIZE'='" + TILE_SIZE +
+                "','TILECOMPUTATIONSCRIPT'='" + TILECOMPUTATIONSCRIPT + "','SPECIALSOPTIONS'='" + SPECIALSOPTIONS + "' WHERE ID = " + LayerId);
             }
             MainPage.ClearCache(LayerId, false);
 
@@ -639,7 +640,7 @@ namespace MapsInMyFolder
             {
                 UpdateTimer.Elapsed -= UpdateTimerElapsed_StartUpdateMoinsUnLayer;
             }
-            Javascript.JavascriptInstance.LogsChanged -= (o, e) => SetTextboxLayerScriptConsoleText(e.Logs);
+            Javascript.LogsChanged -= (o, e) => SetTextboxLayerScriptConsoleText(e.Logs);
         }
 
         System.Timers.Timer UpdateTimer;
@@ -753,7 +754,7 @@ namespace MapsInMyFolder
                     Database.ExecuteNonQuerySQLCommand("DELETE FROM EDITEDLAYERS WHERE ID=" + LayerId);
                     MainPage._instance.ReloadPage();
                     MainWindow._instance.FrameBack(true);
-                    MainPage.LayerEditOpenWindow(LayerId);
+                    MainWindow._instance.FrameLoad_CustomOrEditLayers(LayerId);
                 }
                 result = ContentDialogResult.None;
             }

@@ -7,7 +7,6 @@
     <TargetFrameworks>net6.0-windows</TargetFrameworks>
     <TargetFramework>net6.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
-    <NeutralLanguage>en-US</NeutralLanguage>
     <Platforms>x64</Platforms>
    <PlatformTarget>x64</PlatformTarget>
   <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
@@ -29,12 +28,11 @@
   <PropertyGroup>
     <NoWarn>CS8002,NU1701</NoWarn>
     <ApplicationIcon>icone\icone_v2.ico</ApplicationIcon>
+    <RepositoryUrl>https://github.com/SioGabx/MapsInMyFolder</RepositoryUrl>
+    <Copyright>SioGabx</Copyright>
+    <Version>0.3.0-alpha</Version>
   </PropertyGroup>
 
-  
-  
-  
-  
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <DefineConstants>TRACE</DefineConstants>
     <Optimize>False</Optimize>

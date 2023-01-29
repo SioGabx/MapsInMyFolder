@@ -32,8 +32,8 @@ namespace MapsInMyFolder
         {
             ReloadPage();
             MapLoad();
-            Draw_rectangle_selection_arround_pushpin();
-            Pushpin_stop_mooving();
+            DrawRectangleCelectionArroundPushpin();
+            UpdatePushpinPositionAndDrawRectangle();
         }
         void Init()
         {
@@ -96,5 +96,6 @@ namespace MapsInMyFolder
             SearchLayerStart();
         }
 
+       
     }
 }

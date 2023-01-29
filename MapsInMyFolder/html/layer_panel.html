@@ -733,7 +733,7 @@
                 })
             }, {
                 threshold: [0],
-                rootMargin: '0px',
+                rootMargin: '100px',
             });
 
             // On observe nos éléments
@@ -1220,6 +1220,9 @@
                         break;
                     case "ajouter_calque":
                         layer_Csharp_call_from_js.layer_edit(-1);
+                        break;
+                    case "ajouter_calque_template":
+                        layer_Csharp_call_from_js.layer_edit(-1, parseInt(id));
                         break;
                     case "actualiser_panel":
                         layer_Csharp_call_from_js.refresh_panel();

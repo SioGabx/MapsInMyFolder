@@ -10,7 +10,7 @@
     <Page.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="RessourcesDictionnary.xaml"/>             
+                <ResourceDictionary Source="RessourcesDictionnary.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
         </ResourceDictionary>
@@ -34,6 +34,23 @@
                 <ColumnDefinition Width="0"/>
             </Grid.ColumnDefinitions>
             <Label Grid.Row="0" x:Name="CalqueType" Content="Nouveau calque" HorizontalAlignment="Left" Margin="28,10,0,0" VerticalAlignment="Top" Width="Auto" Height="50" FontSize="30" FontFamily="Segoe UI Light" Foreground="#FFE2E2E1"/>
+            <Rectangle Grid.Row="0" Width="80" HorizontalAlignment="Right">
+                <Rectangle.Fill>
+                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0" SpreadMethod="Pad">
+                        <LinearGradientBrush.RelativeTransform>
+                            <TransformGroup>
+                                <ScaleTransform CenterY="0.5" CenterX="0.5"/>
+                                <SkewTransform CenterY="0.5" CenterX="0.5"/>
+                                <RotateTransform Angle="-90" CenterY="0.5" CenterX="0.5"/>
+                                <TranslateTransform/>
+                            </TransformGroup>
+                        </LinearGradientBrush.RelativeTransform>
+                        <GradientStop Color="#FF171719" Offset="1"/>
+                        <GradientStop Color="#FF171719" Offset="0.8"/>
+                        <GradientStop Color="#00171719" Offset="0"/>
+                    </LinearGradientBrush>
+                </Rectangle.Fill>
+            </Rectangle>
             <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.Row="1" Grid.Column="0">
                 <StackPanel Margin="17,0,32,0" x:Name="EditeurStackPanel">
                     <Label x:Name="EditeurType" Content="Editeur : " HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" Width="Auto" Height="25" FontSize="16.5" FontFamily="Segoe UI Semilight" Foreground="#FFE2E2E1"/>
@@ -127,7 +144,7 @@
                         <TextBox x:Name="TextBoxLayerMaxZoom" HorizontalAlignment="Stretch" Grid.Row="1" Grid.Column="2" Style="{DynamicResource TextBoxCleanStyle_13}" TextChanged="TextBoxLayerMaxZoom_TextChanged" LostFocus="TextBoxLayerMaxZoom_LostFocus"></TextBox>
                         <Label x:Name="ClickableLabel" IsTabStop="True" VerticalAlignment="Center" Content="Cliquez ici pour detecter automatiquement l'interval de zooms" Foreground="#888989" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" MouseEnter="ClickableLabel_MouseEnter" MouseLeave="ClickableLabel_MouseLeave" MouseUp="ClickableLabel_MouseUp"></Label>
                     </Grid>
-                    
+
                     <Grid Margin="0,10,0,0">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="20"/>
@@ -146,7 +163,7 @@
                             <ComboBoxItem>PBF</ComboBoxItem>
                         </ComboBox>
                     </Grid>
-                    
+
                     <Grid Margin="0,10,0,0">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="20"/>
@@ -188,7 +205,7 @@
                         <Label Content="Taille des tuiles :" Foreground="#888989" Grid.Row="0"></Label>
                         <TextBox x:Name="TextboxLayerTileWidth" HorizontalAlignment="Stretch" Grid.Row="1" Style="{DynamicResource TextBoxCleanStyle_13}" IsEnabled="True" Cursor="IBeam" TextChanged="TextboxLayerTileWidth_TextChanged"></TextBox>
                     </Grid>
-                    
+
                     <Grid Margin="0,10,0,0">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="20"/>
@@ -265,12 +282,18 @@
             </Button>
             <Grid Margin="10,0,0,0" Grid.Row="1" Grid.Column="0">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="25" /><!--0-->
-                    <RowDefinition Height="*"/><!--2-->
-                    <RowDefinition Height="*"/><!--3-->
-                    <RowDefinition Height="15" /><!--5-->
-                    <RowDefinition Height="25" /><!--6-->
-                    <RowDefinition Height="*" /><!--7-->
+                    <RowDefinition Height="25" />
+                    <!--0-->
+                    <RowDefinition Height="*"/>
+                    <!--2-->
+                    <RowDefinition Height="*"/>
+                    <!--3-->
+                    <RowDefinition Height="15" />
+                    <!--5-->
+                    <RowDefinition Height="25" />
+                    <!--6-->
+                    <RowDefinition Height="*" />
+                    <!--7-->
                     <RowDefinition Height="*" MaxHeight="60" />
                     <RowDefinition Height="30" />
                 </Grid.RowDefinitions>
@@ -284,7 +307,7 @@
                 </map:Map>
                 <Label Grid.Row="4" Grid.Column="0" Content="Console : " HorizontalAlignment="Left" Margin="0,-4,0,0" VerticalAlignment="Top" Width="Auto" FontSize="16.5" FontFamily="Segoe UI Semilight" Foreground="#FFE2E2E1"/>
 
-                
+
                 <TextBox x:Name="TextboxLayerScriptConsole" IsReadOnly="True"  VerticalAlignment="Stretch" Height="Auto" HorizontalAlignment="Stretch" Grid.Row="5" Style="{DynamicResource TextBoxCleanStyleNoBorder}" Padding="0,5,13,15"
                          ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" Cursor="IBeam" MinHeight="20" ScrollViewer.CanContentScroll="True" SpellCheck.IsEnabled="False" TextWrapping="NoWrap" VerticalContentAlignment="Bottom">
                     <TextBox.Resources>
@@ -311,7 +334,7 @@
                 <RichTextBox x:Name="TextboxLayerScriptConsole" HorizontalAlignment="Stretch" Grid.Row="4" Style="{DynamicResource RichTextBoxCleanStyle}" VerticalScrollBarVisibility="Visible" Cursor="IBeam" MinHeight="80" Margin="10,0,0,0"></RichTextBox>-->
 
             </Grid>
-            
+
             <Label Grid.Row="2" Margin="10,-10,0,0" Grid.Column="0" Content="Affichage de la carte de fond :" HorizontalAlignment="Left" VerticalAlignment="Top" Width="Auto" Height="25" FontSize="10.5" FontFamily="Segoe UI" Foreground="#888989" Padding="0"/>
 
             <ui:ToggleSwitch Foreground="#FFE2E2E1" Margin="10,0,0,0" x:Name="BackgroundSwitch"  Grid.Row="2"  Grid.RowSpan="3" Grid.Column="0" AutomationProperties.Name="simple ToggleSwitch"  IsOn="True" OffContent="Désactivé" OnContent="Activé" Toggled="BackgroundSwitch_Toggled">

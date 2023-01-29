@@ -108,7 +108,7 @@ namespace MapsInMyFolder.Commun
                     else
                     {
                         //print network not available
-                        var dialog = Message.SetContentDialog("Impossible de télécharger la dernière base de données en ligne car vous n'êtes pas connecter à internet. Voullez-vous reessayer ?", "Confirmer", MessageDialogButton.YesNo);
+                        var dialog = Message.SetContentDialog("Impossible de télécharger la dernière base de données en ligne car vous n'êtes pas connecté à internet. Voullez-vous reessayer ?", "Confirmer", MessageDialogButton.YesNo);
                         ContentDialogResult result2 = ContentDialogResult.None;
                         try
                         {
