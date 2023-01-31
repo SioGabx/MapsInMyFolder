@@ -6,5 +6,6 @@
 - Add context menu on textbox click
 - Add settings for layers topmost
 - Add script template for new layers
+- Add a way to convert location to another using epsg code (PROJ.4) => https://epsg.io/
 
 - Add more layers
