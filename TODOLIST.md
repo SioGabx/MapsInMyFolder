@@ -1,7 +1,6 @@
 - Add application update system
 - Add database update system (with change compare)
 - Add export database buttton (clear downloads, merge edited layers and customs layers)
-- Layer list visibility (toggle in the context menu) -> set settings [in progress]
 - Add fallback url textbox
 - Add context menu on textbox click
 - Add settings for layers topmost
