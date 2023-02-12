@@ -339,15 +339,14 @@ namespace MapsInMyFolder
         }
         private void Mapviewer_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
+            e.Handled = true;
             MapviewerMouseDownEvent(sender, e, true);
         }
 
         public void MapviewerMouseDownEvent(object sender, System.Windows.Input.MouseButtonEventArgs e, bool UpdateHitType = true)
         {
-            e.Handled = true;
             if (e.MiddleButton == MouseButtonState.Pressed)
             {
-                e.Handled = true;
                 is_middle_mouse_down = true;
                 is_left_mouse_down = false;
                 is_right_mouse_down = false;
@@ -386,7 +385,6 @@ namespace MapsInMyFolder
                 }
                 else if (!Settings.disable_selection_rectangle_moving)
                 {
-                    e.Handled = true;
                     is_right_mouse_down = true;
                     origin_saved_left_click_mouse_position = saved_left_click_mouse_position = e.GetPosition(mapviewer);
                     StartRightClick(e);
@@ -488,7 +486,7 @@ namespace MapsInMyFolder
 
         public void UpdateSelectionRectangle(MouseEventArgs e)
         {
-            e.Handled = true;
+            //e.Handled = true;
             Point mouse_location = e.GetPosition(mapviewer);
             if (Mouse.MiddleButton == MouseButtonState.Pressed)
             {

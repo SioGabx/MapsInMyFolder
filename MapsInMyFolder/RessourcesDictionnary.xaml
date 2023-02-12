@@ -10,6 +10,23 @@
     xmlns:map="clr-namespace:MapsInMyFolder.MapControl;assembly=MapsInMyFolder.MapControl" xmlns:sys="clr-namespace:System;assembly=netstandard"
 >
 
+    <ContextMenu x:Key="CopyPasteContextMenu" Foreground="#E2E2E1" Background="#171719">
+        <MenuItem Header="Copier" InputGestureText="Ctrl+C" Command="{x:Static ApplicationCommands.Copy}">
+            <MenuItem.Icon>
+                <ui:FontIcon Glyph="&#xE16F;" Foreground="#888989" />
+            </MenuItem.Icon>
+        </MenuItem>
+        <MenuItem Header="Couper" InputGestureText="Ctrl+X"  Command="{x:Static ApplicationCommands.Cut}">
+            <MenuItem.Icon>
+                <ui:FontIcon Glyph="&#xE16B;" Foreground="#888989" />
+            </MenuItem.Icon>
+        </MenuItem>
+        <MenuItem Header="Coller" InputGestureText="Ctrl+V"  Command="{x:Static ApplicationCommands.Paste}">
+            <MenuItem.Icon>
+                <ui:FontIcon Glyph="&#xE16D;" Foreground="#888989" />
+            </MenuItem.Icon>
+        </MenuItem>
+    </ContextMenu>
 
     <Style x:Key="TextBoxCleanStyleDefault" TargetType="{x:Type TextBox}">
         <Setter Property="Foreground" Value="#5A5A5A"></Setter>
@@ -69,6 +86,8 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
+        <Setter Property="ContextMenu" Value="{StaticResource CopyPasteContextMenu}"/>
+
     </Style>
 
     <Style x:Key="TextBoxCleanStyleNoBorder" TargetType="{x:Type TextBox}">
@@ -95,6 +114,7 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
+        <Setter Property="ContextMenu" Value="{StaticResource CopyPasteContextMenu}"/>
     </Style>
 
 
@@ -107,7 +127,7 @@
         <Setter Property="Height" Value="20"/>
     </Style>
 
-    
+
     <Style TargetType="{x:Type ListBoxItem}">
         <Setter Property="Template">
             <Setter.Value>
@@ -140,7 +160,7 @@
             </Setter.Value>
         </Setter>
     </Style>
-    
+
     <Style x:Key="PushpinStyleRouge" TargetType="{x:Type map:Pushpin}">
         <Setter Property="HorizontalAlignment" Value="Center" />
         <Setter Property="VerticalAlignment" Value="Bottom" />
@@ -174,7 +194,7 @@
             </Setter.Value>
         </Setter>
     </Style>
-    
+
     <Style x:Key="PushpinStyleOrange" TargetType="{x:Type map:Pushpin}">
         <Setter Property="HorizontalAlignment" Value="Center" />
         <Setter Property="VerticalAlignment" Value="Bottom" />
@@ -208,7 +228,7 @@
             </Setter.Value>
         </Setter>
     </Style>
-    
+
     <Style x:Key="PushpinStyleBleu" TargetType="{x:Type map:Pushpin}">
         <Setter Property="HorizontalAlignment" Value="Center" />
         <Setter Property="VerticalAlignment" Value="Bottom" />
@@ -242,7 +262,7 @@
             </Setter.Value>
         </Setter>
     </Style>
-    
+
     <Style  x:Key="RoundedButton" TargetType="Button">
         <Setter Property="Background" Value="#F18712" />
         <Setter Property="Template">
@@ -276,12 +296,12 @@
             </EventTrigger>
         </Style.Triggers>
     </Style>
-    
+
     <Geometry x:Key="CloseButton">m 53.682675 110.04927 7.234018 7.23404 -7.234018 7.23402 14.468034 -14.46806 -7.234016 7.23404 7.234016 7.23402</Geometry>
     <Geometry x:Key="DownloadButton">m50.1 0v86l-29.8-29.9-0.7 0.7 30.6 30.6v1l30.8-30.8-0.7-0.7-29 29v-86c-0.5 0.1-0.9 0.1-1.2 0.1zm-50.1 98.2v1h100v-1z</Geometry>
     <Geometry x:Key="LocationButton">m50.1 8.3008c-8.1776 0-15.836 4.3761-19.436 10.955-6.85e-4 0.0013-0.001253 0.002707-0.001953 0.003907-4.4829 7.5522-4.2878 16.546-0.085937 23.207l0.001953 0.001953 2.4531 3.832h0.66797v1h-0.029297l16.529 25.826 16.529-25.826h-0.5293v-1h1.1699l2.4531-3.832v-0.001953c4.2054-6.6672 4.2968-15.567-0.087891-23.215l-0.003906-0.007812c-3.8952-6.5605-11.452-10.943-19.631-10.943zm17.27 38-0.64062 1h18.012l14.564 43.398h-98.609l14.564-43.398h18.41l-0.63867-1h-18.49l-15.236 45.398h101.39l-15.236-45.398h-18.09zm-17.27-37c7.8208 0 15.065 4.2156 18.77 10.455 4.2107 7.3499 4.1013 15.845 0.10938 22.176l-18.779 29.34-18.775-29.338-0.001953-0.001953v-0.001953c-3.993-6.3335-4.1993-14.931 0.10742-22.174l0.005859-0.007812 0.003906-0.007813c3.4009-6.2189 10.74-10.439 18.561-10.439zm-0.19922 12.699c-4.9094 0-8.9004 3.991-8.9004 8.9004 0 4.9094 3.991 8.9004 8.9004 8.9004 4.9094 0 8.9004-3.991 8.9004-8.9004 0-4.9094-3.991-8.9004-8.9004-8.9004zm0 1c4.369 0 7.9004 3.5314 7.9004 7.9004 0 4.369-3.5314 7.9004-7.9004 7.9004-4.369 0-7.9004-3.5314-7.9004-7.9004 0-4.369 3.5314-7.9004 7.9004-7.9004z</Geometry>
     <Geometry x:Key="SettingsButton">m37.6-0.5v13.17c-1.7978 0.57122-3.5633 1.3423-5.1816 2.1406l-9.3184-9.3184-17.607 17.607 9.3184 9.3184c-0.86984 1.6935-1.5823 3.4036-2.1406 5.1816h-13.17v24.801h13.166c0.55792 1.7884 1.274 3.5676 2.1484 5.2793l-9.3223 9.3203 17.508 17.508 9.3184-9.3203c1.6945 0.87035 3.4025 1.586 5.1816 2.1445v13.168h24.801v-13.17c1.7978-0.57122 3.5633-1.3423 5.1816-2.1406l9.3184 9.3184 17.506-17.508-9.3184-9.3184c0.87021-1.6943 1.5861-3.4027 2.1445-5.1816h13.168v-24.9h-12.971c-0.57122-1.7978-1.3423-3.5633-2.1406-5.1816l9.3184-9.3184-17.607-17.607-9.3184 9.3184c-1.6935-0.86984-3.4036-1.5823-5.1816-2.1406v-13.17h-24.801zm1 1h22.801v12.871l0.35547 0.10742c1.9663 0.58989 3.8353 1.3761 5.7109 2.3633l0.32617 0.17188 9.1074-9.1074 16.193 16.193-9.1016 9.1016 0.16016 0.32227c0.89337 1.7867 1.7823 3.7646 2.3691 5.7207l0.10742 0.35547h12.672v22.9h-12.873l-0.10742 0.35547c-0.58989 1.9663-1.3761 3.8353-2.3633 5.7109l-0.17188 0.32617 9.1074 9.1074-16.092 16.094-9.1016-9.1016-0.32227 0.16016c-1.7867 0.89337-3.7646 1.7823-5.7207 2.3691l-0.35547 0.10742v12.871h-22.801v-12.871l-0.35547-0.10742c-1.9663-0.58989-3.8353-1.3761-5.7109-2.3633l-0.32617-0.17188-9.1074 9.1074-16.094-16.094 9.1074-9.1074-0.17188-0.32617c-0.98383-1.8693-1.7721-3.8398-2.3633-5.8105l-0.10742-0.35547h-12.871v-22.801h12.871l0.10742-0.35547c0.58989-1.9663 1.3761-3.8353 2.3633-5.7109l0.17188-0.32617-9.1074-9.1074 16.193-16.193 9.1016 9.1016 0.32227-0.16016c1.7867-0.89337 3.7646-1.7823 5.7207-2.3691l0.35547-0.10742v-12.871zm11.4 30.9c-10.267 0-18.6 8.333-18.6 18.6s8.333 18.6 18.6 18.6 18.6-8.333 18.6-18.6-8.333-18.6-18.6-18.6zm0 1c9.7261 0 17.6 7.8735 17.6 17.6s-7.8735 17.6-17.6 17.6-17.6-7.8735-17.6-17.6 7.8735-17.6 17.6-17.6z</Geometry>
-    
+
     <Style x:Key="IconButton" TargetType="Button">
         <Setter Property="Cursor" Value="Hand"></Setter>
         <Setter Property="Path.StrokeThickness" Value="3"></Setter>
@@ -310,7 +330,7 @@
     <Style x:Key="AppTitleBarStyle" TargetType="ui:TitleBarControl">
         <Setter Property="ui:ThemeManager.RequestedTheme" Value="Dark" />
     </Style>
-    
+
     <Style x:Key="AppTitleBarButtonStyle" TargetType="ui:TitleBarButton">
     </Style>
 
@@ -544,6 +564,7 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
+        <Setter Property="ContextMenu" Value="{StaticResource CopyPasteContextMenu}"/>
     </Style>
 
     <Style x:Key="RichTextBoxCleanStyleNoBorder" TargetType="{x:Type RichTextBox}">
@@ -583,7 +604,7 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
-
+        <Setter Property="ContextMenu" Value="{StaticResource CopyPasteContextMenu}"/>
     </Style>
 
 
@@ -683,7 +704,7 @@
     <SolidColorBrush x:Key="CheckBoxForegroundUncheckedPointerOver" Color="#888989" />
     <SolidColorBrush x:Key="CheckBoxForegroundUncheckedPressed" Color="#888989" />
     <SolidColorBrush x:Key="CheckBoxForegroundUncheckedDisabled" Color="#888989" />
-    
+
     <SolidColorBrush x:Key="CheckBoxForegroundChecked" Color="#888989" />
     <SolidColorBrush x:Key="CheckBoxForegroundCheckedPointerOver" Color="#888989" />
     <SolidColorBrush x:Key="CheckBoxForegroundCheckedPressed" Color="#888989" />
@@ -700,9 +721,32 @@
         <Setter Property="Margin" Value="10,-5,0,0" />
     </Style>
 
-    
+
     <Style TargetType="{x:Type ui:HyperlinkButton}" BasedOn="{StaticResource {x:Type ui:HyperlinkButton}}">
         <Setter Property="Padding" Value="0" />
     </Style>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 </ResourceDictionary>
