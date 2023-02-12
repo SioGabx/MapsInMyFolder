@@ -114,6 +114,9 @@ namespace MapsInMyFolder
             //layerpanel_put_non_letter_layername_at_the_end
             layerpanel_put_non_letter_layername_at_the_end.IsChecked = Settings.layerpanel_put_non_letter_layername_at_the_end;
 
+            //layerpanel_favorite_at_top
+            layerpanel_favorite_at_top.IsChecked = Settings.layerpanel_favorite_at_top;
+
             //layerpanel_displaystyle
             var ListDisplayTypeValues = (ListDisplayType[])Enum.GetValues(typeof(ListDisplayType));
             for (int ListDisplayTypeValuesIndex = 0; ListDisplayTypeValuesIndex < ListDisplayTypeValues.Length; ListDisplayTypeValuesIndex++)
@@ -339,6 +342,9 @@ namespace MapsInMyFolder
 
             //layerpanel_put_non_letter_layername_at_the_end = ;
             Settings.layerpanel_put_non_letter_layername_at_the_end = layerpanel_put_non_letter_layername_at_the_end.IsChecked ?? false;
+
+            //layerpanel_favorite_at_top = ;
+            Settings.layerpanel_favorite_at_top = layerpanel_favorite_at_top.IsChecked ?? false;
 
             //layerpanel_displaystyle = ;
             string layerpanel_displaystylevalue = layerpanel_displaystyle.SelectedValue.ToString().ToUpperInvariant();

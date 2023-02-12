@@ -5,7 +5,7 @@ using System.Windows;
 
 namespace MapsInMyFolder.Commun
 {
-    public enum ListDisplayType { BIG, CONDENSED, LIST, LIST_ALTERNAT }
+    public enum ListDisplayType { BIG, CONDENSED, SMALL, LIST, LIST_ALTERNAT }
     public enum LayersSort { ID, NOM, DESCRIPTION, CATEGORIE, IDENTIFIANT, FORMAT, SITE }
     public enum LayersOrder { ASC, DESC }
 
@@ -53,6 +53,7 @@ namespace MapsInMyFolder.Commun
         public static bool layerpanel_website_IsVisible = false;                                //Affiche les sites web dans le nom des layers
         public static bool layerpanel_livepreview = true;                                      //Charge dans les migniatures des claques une tuile.                   
         public static bool layerpanel_put_non_letter_layername_at_the_end = true;
+        public static bool layerpanel_favorite_at_top = true;
         public static ListDisplayType layerpanel_displaystyle = ListDisplayType.CONDENSED;                                      //Charge dans les migniatures des claques une tuile.                   
         public static double NO_PIN_starting_location_latitude = 48.175224;
         public static double NO_PIN_starting_location_longitude = 6.449794;

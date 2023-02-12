@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Windows;
 using System.Windows.Media;
 
@@ -80,6 +81,7 @@ namespace MapsInMyFolder.Commun
                 }
             }
         }
+
 
         public static int IndexOf<T>(this IEnumerable<T> enumerable, T element, IEqualityComparer<T> comparer = null)
         {

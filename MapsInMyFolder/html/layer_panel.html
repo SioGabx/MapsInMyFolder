@@ -10,17 +10,62 @@
     <meta charset="UTF-8">
     <meta name="language" content="fr-FR">
     <style>
-        .layer_main_div:hover:not(.select) {
+        li:not(.select) .layer_main_div:hover {
             border-left: 4px solid #62626B;
         }
 
         .displaynone,
         .hidden {
+            display: none!important;
+        }
+
+        .layerHiddenStateProgress {
+            transition: opacity 100ms;
+            opacity: 0;
+        }
+        
+        .showHiddenLayer .layerHiddenStateProgress {
+            transition: opacity 100ms, filter 100ms;
+            opacity: 0.8;
+            filter: brightness(0.6) grayscale(0.5)
+        }
+
+        .layerHidden {
             display: none;
         }
 
-        .layer_main_div.select {
+        .showHiddenLayer .layerHidden {
+            display: inherit;
+            opacity: 0.8;
+            filter: brightness(0.6) grayscale(0.5)
+        }
+
+        .select .layer_main_div {
             border-left: 4px solid #F18712;
+        }
+
+        .inSelectionHighlight .layer_main_div {
+            border-top: 1px solid #794915;
+            border-right: 1px solid #794915;
+            border-bottom: 1px solid #794915;
+        }
+
+        .inSelectionHighlight .layer_main_div::before {
+            position: absolute;
+            content: "";
+            width: 100%;
+            height: 100%;
+            background-color: rgb(160, 100, 30);
+            mix-blend-mode: color;
+        }
+        
+        .layerHidden.inSelectionHighlight .layer_main_div::before{
+            background-color: rgb(212 162 103);
+            mix-blend-mode: darken;
+        }
+        
+        .layerHidden.inSelectionHighlight{
+            filter: brightness(0.8) grayscale(0.2)
         }
 
         .layer_main_div {
@@ -84,9 +129,9 @@
             border-radius: 10px;
         }
 
-            ::-webkit-scrollbar-thumb:hover {
-                background: #62626B;
-            }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #62626B;
+        }
 
         ul,
         li,
@@ -101,10 +146,10 @@
             font-size: 16.5px;
         }
 
-            p + p {
-                margin-top: 0px;
-                font-size: 12px;
-            }
+        p+p {
+            margin-top: 0px;
+            font-size: 12px;
+        }
 
         .layer_texte {
             color: #E2E2E1;
@@ -121,6 +166,7 @@
             margin-bottom: 15px;
             user-select: none;
             cursor: pointer;
+            opacity: 1;
         }
 
         ul {
@@ -132,17 +178,17 @@
         }
 
         .star {
-            width: 35px;
-            height: 35px;
+            width: 25px;
+            height: 25px;
             position: absolute;
             right: 0;
         }
 
-            .star.orange {
-                opacity: 0.9;
-                background-image: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIj8+CjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iMTUwIiBoZWlnaHQ9IjE1MCI+CjxwYXRoIGZpbGw9IiNGMTg3MTIiIHN0cm9rZT0iIzc0NzQ3NyIgc3Ryb2tlLXdpZHRoPSIyIiBkPSJtNzUsMTMKMTUsNDcgaDUwbC00MCwyOSAxNSw0Ny00MC0yOS00MCwyOSAxNS00Ny00MC0yOSBoNTB6Ii8+IAo8L3N2Zz4=");
-                background-size: contain;
-            }
+        .star.orange {
+            opacity: 0.8;
+            background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNDEuNzMiIGhlaWdodD0iMTQxLjczIiB2aWV3Qm94PSIwIDAgMTQxLjczIDE0MS43MyI+PHRpdGxlPnBpY3RvZ3JhbW1lczwvdGl0bGU+PHBhdGggZD0iTTcwLjg3LDU5Ljk0QTEwLjkzLDEwLjkzLDAsMSwwLDgxLjc5LDcwLjg3LDEwLjk0LDEwLjk0LDAsMCwwLDcwLjg3LDU5Ljk0WiIgc3R5bGU9ImZpbGw6IzAxMDEwMSIvPjxwYXRoIGQ9Ik03MC44Nyw5LjM3bDE1LDQ3aDUwbC00MCwyOSwxNSw0Ny00MC0yOS00MCwyOSwxNS00Ny00MC0yOWg1MFoiIHN0eWxlPSJmaWxsOiNmMTg3MTM7c3Ryb2tlOiMwMDA7c3Ryb2tlLXdpZHRoOjJweCIvPjwvc3ZnPg==");
+            background-size: contain;
+        }
 
         .star {
             opacity: 0.6;
@@ -150,14 +196,50 @@
             background-size: contain;
         }
 
-            .star:not(.orange):hover {
-                opacity: 0.7;
-            }
+        .star:not(.orange):hover {
+            opacity: 0.7;
+        }
 
-            .star:hover {
-                opacity: 1;
-                filter: brightness(1.1)
-            }
+        .star:hover {
+            opacity: 1;
+            filter: brightness(1.1)
+        }
+
+
+
+        .eye {
+            width: 25px;
+            height: 25px;
+            position: absolute;
+            right: 0px;
+            top: 26px;
+            opacity: 0.6;
+            transition: opacity 150ms;
+        }
+
+        .eye.orange {
+            opacity: 0;
+            /*            background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNDEuNzMiIGhlaWdodD0iMTQxLjczIiB2aWV3Qm94PSIwIDAgMTQxLjczIDE0MS43MyI+PHRpdGxlPnBpY3RvZ3JhbW1lczwvdGl0bGU+PHBhdGggZD0iTTcwLjg3LDU5Ljk0QTEwLjkzLDEwLjkzLDAsMSwwLDgxLjc5LDcwLjg3LDEwLjk0LDEwLjk0LDAsMCwwLDcwLjg3LDU5Ljk0WiIgc3R5bGU9ImZpbGw6I2YxODcxMztzdHJva2U6IzAwMDtzdHJva2Utd2lkdGg6MnB4Ii8+PHBhdGggZD0iTTEzNy42LDY3LjhhMTIxLjIsMTIxLjIsMCwwLDAtMTkuMzQtMTcuNjljLTE1Ljc3LTExLjY0LTMyLjE1LTE3LjgtNDcuMzktMTcuOHMtMzEuNjMsNi4xNi00Ny40LDE3LjhBMTIxLjc0LDEyMS43NCwwLDAsMCw0LjEzLDY3LjhhNC44MSw0LjgxLDAsMCwwLDAsNi4xM0ExMjEuMiwxMjEuMiwwLDAsMCwyMy40Nyw5MS42MmMxNS43NywxMS42NSwzMi4xNiwxNy44LDQ3LjQsMTcuOHMzMS42Mi02LjE1LDQ3LjM5LTE3LjhBMTIwLjY3LDEyMC42NywwLDAsMCwxMzcuNiw3My45Myw0LjgxLDQuODEsMCwwLDAsMTM3LjYsNjcuOFpNNzAuODcsOTUuODdhMjUsMjUsMCwxLDEsMjUtMjVBMjUsMjUsMCwwLDEsNzAuODcsOTUuODdaIiBzdHlsZT0iZmlsbDojZjE4NzEzO3N0cm9rZTojMDAwO3N0cm9rZS13aWR0aDoycHgiLz48L3N2Zz4=");  */
+            /*            background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNDEuNzMiIGhlaWdodD0iMTQxLjczIiB2aWV3Qm94PSIwIDAgMTQxLjczIDE0MS43MyI+PGRlZnM+PHN0eWxlPi5he2ZpbGw6bm9uZTtzdHJva2U6IzAxMDEwMTtzdHJva2UtbWl0ZXJsaW1pdDoxMDtzdHJva2Utd2lkdGg6NHB4O308L3N0eWxlPjwvZGVmcz48dGl0bGU+cGljdG9ncmFtbWVzPC90aXRsZT48cGF0aCBjbGFzcz0iYSIgZD0iTTcwLjg3LDU5Ljk0QTEwLjkzLDEwLjkzLDAsMSwwLDgxLjc5LDcwLjg3LDEwLjk0LDEwLjk0LDAsMCwwLDcwLjg3LDU5Ljk0WiIvPjxwYXRoIGNsYXNzPSJhIiBkPSJNMTM3LjYsNjcuOGExMjEuMiwxMjEuMiwwLDAsMC0xOS4zNC0xNy42OWMtMTUuNzctMTEuNjQtMzIuMTUtMTcuOC00Ny4zOS0xNy44cy0zMS42Myw2LjE2LTQ3LjQsMTcuOEExMjEuNzQsMTIxLjc0LDAsMCwwLDQuMTMsNjcuOGE0LjgxLDQuODEsMCwwLDAsMCw2LjEzQTEyMS4yLDEyMS4yLDAsMCwwLDIzLjQ3LDkxLjYyYzE1Ljc3LDExLjY1LDMyLjE2LDE3LjgsNDcuNCwxNy44czMxLjYyLTYuMTUsNDcuMzktMTcuOEExMjAuNjcsMTIwLjY3LDAsMCwwLDEzNy42LDczLjkzLDQuODEsNC44MSwwLDAsMCwxMzcuNiw2Ny44Wk03MC44Nyw5NS44N2EyNSwyNSwwLDEsMSwyNS0yNUEyNSwyNSwwLDAsMSw3MC44Nyw5NS44N1oiLz48cGF0aCBjbGFzcz0iYSIgZD0iTTgsMTMwLjg0LDEzMy43OCwxMC44OSIvPjwvc3ZnPg==");    */
+                        background-image: url("data:image/svg+xml;base64,PHN2ZyBpZD0iQ2FscXVlXzIiIGRhdGEtbmFtZT0iQ2FscXVlIDIiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjE0MS43MyIgaGVpZ2h0PSIxNDEuNzMiIHZpZXdCb3g9IjAgMCAxNDEuNzMgMTQxLjczIj48ZGVmcz48c3R5bGU+LmNscy0xe2ZpbGw6IzAxMDEwMTtzdHJva2U6Izc1NzU3ODtzdHJva2Utd2lkdGg6MnB4O308L3N0eWxlPjwvZGVmcz48dGl0bGU+cGljdG9ncmFtbWVzPC90aXRsZT48cGF0aCBjbGFzcz0iY2xzLTEiIGQ9Ik03MC44Nyw1OS45NEExMC45MywxMC45MywwLDEsMCw4MS43OSw3MC44NywxMC45NCwxMC45NCwwLDAsMCw3MC44Nyw1OS45NFoiLz48cGF0aCBjbGFzcz0iY2xzLTEiIGQ9Ik0xMzcuNiw2Ny44YTEyMS4yLDEyMS4yLDAsMCwwLTE5LjM0LTE3LjY5Yy0xNS43Ny0xMS42NC0zMi4xNS0xNy44LTQ3LjM5LTE3LjhzLTMxLjYzLDYuMTYtNDcuNCwxNy44QTEyMS43NCwxMjEuNzQsMCwwLDAsNC4xMyw2Ny44YTQuODEsNC44MSwwLDAsMCwwLDYuMTNBMTIxLjIsMTIxLjIsMCwwLDAsMjMuNDcsOTEuNjJjMTUuNzcsMTEuNjUsMzIuMTYsMTcuOCw0Ny40LDE3LjhzMzEuNjItNi4xNSw0Ny4zOS0xNy44QTEyMC42NywxMjAuNjcsMCwwLDAsMTM3LjYsNzMuOTMsNC44MSw0LjgxLDAsMCwwLDEzNy42LDY3LjhaTTcwLjg3LDk1Ljg3YTI1LDI1LDAsMSwxLDI1LTI1QTI1LDI1LDAsMCwxLDcwLjg3LDk1Ljg3WiIvPjwvc3ZnPg==");
+/*            background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNDEuNzMiIGhlaWdodD0iMTQxLjczIiB2aWV3Qm94PSIwIDAgMTQxLjczIDE0MS43MyI+PGRlZnM+PHN0eWxlPi5he2ZpbGw6I2YxODcxMztzdHJva2U6IzAwMDtzdHJva2Utd2lkdGg6MnB4O308L3N0eWxlPjwvZGVmcz48dGl0bGU+cGljdG9ncmFtbWVzPC90aXRsZT48cGF0aCBjbGFzcz0iYSIgZD0iTTcwLjg3LDU5Ljk0QTEwLjkzLDEwLjkzLDAsMSwwLDgxLjc5LDcwLjg3LDEwLjk0LDEwLjk0LDAsMCwwLDcwLjg3LDU5Ljk0WiIvPjxwYXRoIGNsYXNzPSJhIiBkPSJNMTM3LjYsNjcuOGExMjEuMiwxMjEuMiwwLDAsMC0xOS4zNC0xNy42OWMtMTUuNzctMTEuNjQtMzIuMTUtMTcuOC00Ny4zOS0xNy44cy0zMS42Myw2LjE2LTQ3LjQsMTcuOEExMjEuNzQsMTIxLjc0LDAsMCwwLDQuMTMsNjcuOGE0LjgxLDQuODEsMCwwLDAsMCw2LjEzQTEyMS4yLDEyMS4yLDAsMCwwLDIzLjQ3LDkxLjYyYzE1Ljc3LDExLjY1LDMyLjE2LDE3LjgsNDcuNCwxNy44czMxLjYyLTYuMTUsNDcuMzktMTcuOEExMjAuNjcsMTIwLjY3LDAsMCwwLDEzNy42LDczLjkzLDQuODEsNC44MSwwLDAsMCwxMzcuNiw2Ny44Wk03MC44Nyw5NS44N2EyNSwyNSwwLDEsMSwyNS0yNUEyNSwyNSwwLDAsMSw3MC44Nyw5NS44N1oiLz48L3N2Zz4=");*/
+            background-size: contain;
+        }
+
+        .eye {
+            background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNDEuNzMiIGhlaWdodD0iMTQxLjczIiB2aWV3Qm94PSIwIDAgMTQxLjczIDE0MS43MyI+PGRlZnM+PHN0eWxlPi5he2ZpbGw6IzAxMDEwMTt9LmJ7ZmlsbDpub25lO3N0cm9rZTojMDEwMTAxO3N0cm9rZS1taXRlcmxpbWl0OjEwO3N0cm9rZS13aWR0aDoxNnB4O308L3N0eWxlPjwvZGVmcz48dGl0bGU+cGljdG9ncmFtbWVzPC90aXRsZT48cGF0aCBjbGFzcz0iYSIgZD0iTTcwLjg3LDU5Ljk0QTEwLjkzLDEwLjkzLDAsMSwwLDgxLjc5LDcwLjg3LDEwLjk0LDEwLjk0LDAsMCwwLDcwLjg3LDU5Ljk0WiIvPjxwYXRoIGQ9Ik0xMzcuNiw2Ny44YTEyMS4yLDEyMS4yLDAsMCwwLTE5LjM0LTE3LjY5Yy0xNS43Ny0xMS42NC0zMi4xNS0xNy44LTQ3LjM5LTE3LjhzLTMxLjYzLDYuMTYtNDcuNCwxNy44QTEyMS43NCwxMjEuNzQsMCwwLDAsNC4xMyw2Ny44YTQuODEsNC44MSwwLDAsMCwwLDYuMTNBMTIxLjIsMTIxLjIsMCwwLDAsMjMuNDcsOTEuNjJjMTUuNzcsMTEuNjUsMzIuMTYsMTcuOCw0Ny40LDE3LjhzMzEuNjItNi4xNSw0Ny4zOS0xNy44QTEyMC42NywxMjAuNjcsMCwwLDAsMTM3LjYsNzMuOTMsNC44MSw0LjgxLDAsMCwwLDEzNy42LDY3LjhaTTcwLjg3LDk1Ljg3YTI1LDI1LDAsMSwxLDI1LTI1QTI1LDI1LDAsMCwxLDcwLjg3LDk1Ljg3WiIvPjxwYXRoIGNsYXNzPSJiIiBkPSJNMTYsMTIzLjE0LDEyNS43MSwxOC41OSIvPjwvc3ZnPg==");
+            background-size: contain;
+        }
+
+        li:hover .eye {
+            opacity: 0.6;
+        }
+
+        li .eye:hover {
+            opacity: 0.8;
+            filter: brightness(1.1)
+        }
+
 
         /*  ------------------ CONTEXT MENU ------------------ */
 
@@ -227,13 +309,13 @@
             z-index: 9999;
         }
 
-            .context_menu .context_menu {
-                transform: scale(1);
-                position: absolute;
-                left: 100%;
-                top: -6px;
-                box-shadow: rgb(0 0 0 / 8%) 5px 2px 20px 0, rgb(0 0 0 / 10%) 0px 5px 11px;
-            }
+        .context_menu .context_menu {
+            transform: scale(1);
+            position: absolute;
+            left: 100%;
+            top: -6px;
+            box-shadow: rgb(0 0 0 / 8%) 5px 2px 20px 0, rgb(0 0 0 / 10%) 0px 5px 11px;
+        }
 
         .item {
             padding: 7px 48px;
@@ -242,24 +324,24 @@
             transition: background-color ease 125ms;
         }
 
-            /*  [data-navtype="keyboard"] [data-navtype="mouse"] */
-            .context_menu[data-navtype="mouse"] .item:hover,
-            .item:focus-within,
-            .context_menu[data-navtype="keyboard"] .item.selected {
-                background-color: #303031;
-                --background-menu-color: #303031;
-            }
+        /*  [data-navtype="keyboard"] [data-navtype="mouse"] */
+        .context_menu[data-navtype="mouse"] .item:hover,
+        .item:focus-within,
+        .context_menu[data-navtype="keyboard"] .item.selected {
+            background-color: #303031;
+            --background-menu-color: #303031;
+        }
 
-            .item .sous-menu {
-                display: none;
-                width: 100%;
-            }
+        .item .sous-menu {
+            display: none;
+            width: 100%;
+        }
 
-            .context_menu[data-navtype="mouse"] .item:hover .sous-menu,
-            .item:focus-within .sous-menu,
-            .context_menu[data-navtype="keyboard"] .item.selected .sous-menu {
-                display: block;
-            }
+        .context_menu[data-navtype="mouse"] .item:hover .sous-menu,
+        .item:focus-within .sous-menu,
+        .context_menu[data-navtype="keyboard"] .item.selected .sous-menu {
+            display: block;
+        }
 
         .item-content {
             align-items: center;
@@ -380,11 +462,11 @@
             display: none;
         }
 
-            .nolayermessage p {
-                font-size: 14px;
-                font-family: "Segoe UI";
-                color: #888989;
-            }
+        .nolayermessage p {
+            font-size: 14px;
+            font-family: "Segoe UI";
+            color: #888989;
+        }
 
         body:has(ul:empty) .nolayermessage {
             display: block;
@@ -394,12 +476,20 @@
         /*  ------------------ CONTEXT MENU ------------------ */
 
         ul.condensed .layer_main_div {
-            height: 110px;
+            height: 109px;
         }
 
-        ul.condensed .layer_content {
+        ul.small .layer_main_div {
+            height: 60px;
+        }
+
+
+        ul.condensed .layer_content,
+        ul.small .layer_content {
             background: linear-gradient(0deg, rgba(50, 50, 50, 0.8) 0%, rgba(30, 30, 30, 0) 120%);
         }
+
+
 
 
         ul.list div,
@@ -429,9 +519,9 @@
             margin-left: 15px;
         }
 
-            ul.list_alternat li:nth-child(even) {
-                background-color: #313131;
-            }
+        ul.list_alternat li:nth-child(even) {
+            background-color: #313131;
+        }
 
         ul.list .zoom,
         ul.list_alternat .zoom {
@@ -450,19 +540,22 @@
         .context_menu.shiftkeydown:not([data-layer_binding="0"]) .menu.item.shiftkeydownrequired {
             display: block;
         }
+
     </style>
 </head>
 
 <body>
-    <div class="nolayermessage"><p>La base de donnée des calques est vide.</p><br /><p>Pour commencer à ajouter des calques, faites clic-droit, puis cliquez sur "ajouter un calque"</p></div>
+    <div class="nolayermessage">
+        <p>La base de donnée des calques est vide.</p><br />
+        <p>Pour commencer à ajouter des calques, faites clic-droit, puis cliquez sur "ajouter un calque"</p>
+    </div>
     <!--  ------------------ CONTENT ------------------ -->
     <!--htmllayerplaceholder-->
     <!--  ------------------ CONTENT ------------------ -->
     <!--  ------------------ CONTEXT MENU ------------------ -->
 
     <div class="context_menu" data-navtype="mouse">
-
-
+        <!--
         <div class="menu item" id="rendre_courant">
             <div class="item-content">
                 <div class="icon">
@@ -474,8 +567,7 @@
                 <a href="#">Rendre le calque courant</a>
             </div>
         </div>
-
-
+-->
         <div class="menu item" id="ajouter_favori">
             <div class="item-content">
                 <div class="icon">
@@ -487,12 +579,10 @@
                 <a href="#">Ajouter aux favoris</a>
             </div>
         </div>
-
         <div class="menu item" id="retirer_favori">
             <div class="item-content">
                 <div class="icon">
                     <svg width="141.73" height="141.73" version="1.1" viewBox="0 0 141.73 141.73" xmlns="http://www.w3.org/2000/svg">
-
                         <polygon points="70.87 11.26 90.23 50.5 133.54 56.8 102.2 87.34 109.6 130.47 70.87 110.11 32.13 130.47 39.53 87.34 8.19 56.8 51.5 50.5" />
                         <path d="m9.6791 133.61 125.83-119.95"></path>
                     </svg>
@@ -501,27 +591,42 @@
             </div>
         </div>
 
-
+        <div class="menu item" id="afficher_calque">
+            <div class="item-content">
+                <div class="icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="141.73" height="141.73" viewBox="0 0 141.73 141.73">
+                        <path d="M70.87,59.94A10.93,10.93,0,1,0,81.79,70.87,10.94,10.94,0,0,0,70.87,59.94Z" />
+                        <path d="M137.6,67.8a121.2,121.2,0,0,0-19.34-17.69c-15.77-11.64-32.15-17.8-47.39-17.8s-31.63,6.16-47.4,17.8A121.74,121.74,0,0,0,4.13,67.8a4.81,4.81,0,0,0,0,6.13A121.2,121.2,0,0,0,23.47,91.62c15.77,11.65,32.16,17.8,47.4,17.8s31.62-6.15,47.39-17.8A120.67,120.67,0,0,0,137.6,73.93,4.81,4.81,0,0,0,137.6,67.8ZM70.87,95.87a25,25,0,1,1,25-25A25,25,0,0,1,70.87,95.87Z" />
+                    </svg>
+                </div>
+                <a href="#">Afficher le calque</a>
+            </div>
+        </div>
+        <div class="menu item" id="masquer_calque">
+            <div class="item-content">
+                <div class="icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="141.73" height="141.73" viewBox="0 0 141.73 141.73">
+                        <path d="M70.87,59.94A10.93,10.93,0,1,0,81.79,70.87,10.94,10.94,0,0,0,70.87,59.94Z" />
+                        <path d="M137.6,67.8a121.2,121.2,0,0,0-19.34-17.69c-15.77-11.64-32.15-17.8-47.39-17.8s-31.63,6.16-47.4,17.8A121.74,121.74,0,0,0,4.13,67.8a4.81,4.81,0,0,0,0,6.13A121.2,121.2,0,0,0,23.47,91.62c15.77,11.65,32.16,17.8,47.4,17.8s31.62-6.15,47.39-17.8A120.67,120.67,0,0,0,137.6,73.93,4.81,4.81,0,0,0,137.6,67.8ZM70.87,95.87a25,25,0,1,1,25-25A25,25,0,0,1,70.87,95.87Z" />
+                        <path d="M8,130.84,133.78,10.89" />
+                    </svg>
+                </div>
+                <a href="#">Masquer le calque</a>
+            </div>
+        </div>
         <div class="item_hr"></div>
-
         <div class="menu item" id="modifier_calque">
             <div class="item-content">
                 <div class="icon">
-
-
-
                     <svg width="141.73" height="141.73" version="1.1" viewBox="0 0 141.73 141.73" xmlns="http://www.w3.org/2000/svg">
                         <path d="M5.81,135.14Q12,120.2,18.22,105.26L87.51,35l17.83,18.07L35.58,122.85Z" />
                         <path d="m87.51 35 29.64-30.23 18.68 18.07-30.49 30.24z" />
                         <path d="m18.22 105.26 17.36 17.59" />
                     </svg>
-
-
                 </div>
                 <a href="#">Modifier le calque</a>
             </div>
         </div>
-
         <div class="menu item" id="supprimer_cache_calque">
             <div class="item-content">
                 <div class="icon">
@@ -537,21 +642,14 @@
                 <a href="#">Vider le cache du calque</a>
             </div>
         </div>
-
         <div class="item_hr"></div>
-
         <div class="menu item" id="ajouter_calque">
             <div class="item-content">
                 <div class="icon">
-
-
-
                     <svg width="141.73" height="141.73" version="1.1" viewBox="0 0 141.73 141.73" xmlns="http://www.w3.org/2000/svg">
                         <line x1="71" y1="134" x2="71" y2="8" />
                         <line x1="8" y1="71" x2="134" y2="71" />
                     </svg>
-
-
                 </div>
                 <a href="#">Ajouter un calque</a>
             </div>
@@ -568,83 +666,320 @@
             </div>
         </div>
         <!--        <div class="item_hr"></div>-->
+        <div class="menu item" id="basculer_affichage_showmasque">
+            <div class="item-content">
+                <div class="icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="141.73" height="141.73" viewBox="0 0 141.73 141.73">
+                        <path d="M70.87,59.94A10.93,10.93,0,1,0,81.79,70.87,10.94,10.94,0,0,0,70.87,59.94Z" />
+                        <path d="M137.6,67.8a121.2,121.2,0,0,0-19.34-17.69c-15.77-11.64-32.15-17.8-47.39-17.8s-31.63,6.16-47.4,17.8A121.74,121.74,0,0,0,4.13,67.8a4.81,4.81,0,0,0,0,6.13A121.2,121.2,0,0,0,23.47,91.62c15.77,11.65,32.16,17.8,47.4,17.8s31.62-6.15,47.39-17.8A120.67,120.67,0,0,0,137.6,73.93,4.81,4.81,0,0,0,137.6,67.8ZM70.87,95.87a25,25,0,1,1,25-25A25,25,0,0,1,70.87,95.87Z" />
+                        <path d="M8,130.84,133.78,10.89" />
+                    </svg>
+                </div>
+                <a href="#">Afficher les calques masqué</a>
+            </div>
+        </div>
+        <div class="menu item" id="basculer_affichage_hidemasque">
+            <div class="item-content">
+                <div class="icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="141.73" height="141.73" viewBox="0 0 141.73 141.73">
+                        <path d="M70.87,59.94A10.93,10.93,0,1,0,81.79,70.87,10.94,10.94,0,0,0,70.87,59.94Z" />
+                        <path d="M137.6,67.8a121.2,121.2,0,0,0-19.34-17.69c-15.77-11.64-32.15-17.8-47.39-17.8s-31.63,6.16-47.4,17.8A121.74,121.74,0,0,0,4.13,67.8a4.81,4.81,0,0,0,0,6.13A121.2,121.2,0,0,0,23.47,91.62c15.77,11.65,32.16,17.8,47.4,17.8s31.62-6.15,47.39-17.8A120.67,120.67,0,0,0,137.6,73.93,4.81,4.81,0,0,0,137.6,67.8ZM70.87,95.87a25,25,0,1,1,25-25A25,25,0,0,1,70.87,95.87Z" />
+                    </svg>
+                </div>
+                <a href="#">Masquer les calques masqué</a>
+            </div>
+        </div>
         <div class="menu item" id="actualiser_panel">
             <div class="item-content">
                 <div class="icon">
-
                     <svg version="1.2" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 141.7 141.7" overflow="visible" xml:space="preserve">
-
-                    <g id="Calque_2">
-                    <path d="
+                        <g id="Calque_2">
+                            <path d="
 		M135.5,61.9c5.2,36.9-20.5,71-57.4,76.2c-0.4,0-0.7,0.1-1.1,0.1C39.9,140.5,7.9,112.2,5.7,75c-0.1-1.8-0.1-3.5-0.1-5.3
 		C6.9,33.8,35.5,5,71.3,3.4c21.2,0.6,41,10.8,53.8,27.8l2.9,4.4H95.9" />
                         </g>
                     </svg>
-
-
                 </div>
                 <a href="#">Actualiser</a>
             </div>
         </div>
-
-
     </div>
     <!--  ------------------ CONTEXT MENU ------------------ -->
 
+    <script>
+        //https://codepen.io/SioGabx/pen/wvxNaxg
+
+        const selectedItemClass = "inSelection";
+        const selectedHighlightItemClass = "inSelectionHighlight";
+        const referenceItemClass = "isReference";
+
+        //Add click event on all items
+        document.querySelectorAll("li").forEach((element) => {
+            element.addEventListener("click", select);
+        });
+
+
+        var lastelement;
+        //on click
+        function select(event) {
+            if (event != null) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+
+            hide_context_menu(null);
+            let eventTarget = event.target.closest("li");
+            if (eventTarget.tagName.toLowerCase() != "li") {
+                return;
+            }
+
+
+            //is selection additive or not
+            let dataSelectIsAdditiveAttribute = eventTarget.parentElement.getAttribute(
+                "data-select-isAdditive"
+            );
+            let isAdditive =
+                dataSelectIsAdditiveAttribute == "true" ||
+                dataSelectIsAdditiveAttribute == null;
+            //get all li element inside parent element
+            let ulQuerySelectorItems = eventTarget.parentElement.querySelectorAll("li");
+            //get Array from querySelector to get element with a index.
+            let NodeArray = Array.prototype.slice.call(ulQuerySelectorItems);
+            //get Index of the current target element.
+            let Index = NodeArray.indexOf(eventTarget);
+            //get LastIndexClick from html
+            let lastIndexClick = NodeArray.indexOf(
+                eventTarget.parentElement.querySelector("li." + referenceItemClass)
+            );
+            //if no element is found with reference class
+            if (lastIndexClick == undefined) {
+                lastIndexClick = -1;
+            }
+            //remove each element with class reference
+            NodeArray.forEach((element) => {
+                element.classList.remove(referenceItemClass);
+                element.classList.remove(selectedHighlightItemClass);
+            });
+            //if CTRL key is not down then we remove all selected class.
+            if (!event.ctrlKey) {
+                NodeArray.forEach((element) => {
+                    element.classList.remove(selectedItemClass);
+                });
+            }
+
+            //if shiftKey is down, then we are doing multiple selection at once.
+
+            if (!event.shiftKey && eventTarget.classList.contains(selectedItemClass)) {
+                //if element has arealdy the selected class, then that mean we want to remove it. Set for the next shift that we want to remove tag and not add
+                eventTarget.classList.remove(selectedItemClass);
+                //save to the dom :
+                NodeArray[Index].classList.add(referenceItemClass);
+                eventTarget.parentElement.setAttribute("data-select-isAdditive", false);
+            } else {
+                if (!event.shiftKey) {
+                    //this mean that the element havent the selected classList = we want to add elements
+                    isAdditive = true;
+                }
+                let from = 0;
+                let to = 0;
+
+                if (event.shiftKey) {
+                    //get the range of elements between old click and new one if shift key is down
+                    from = Math.min(lastIndexClick, Index);
+                    to = Math.max(lastIndexClick, Index);
+                } else {
+                    console.log("simple click");
+                    from = Index;
+                    to = Index;
+                    lastIndexClick = Index;
+
+                    if (!event.ctrlKey || eventTarget.parentElement.querySelectorAll("." + selectedItemClass).length == 0)
+                        //Add select class to the click if it is simple (no CTRL + no SHIFT key press)
+                        try {
+                            document.querySelectorAll('.select').forEach(function(layer) {
+                                layer.classList.remove("select");
+                                lastelement = layer;
+                            });
+                            NodeArray[Index].classList.add("select");
+                            if (lastelement != NodeArray[Index]) {
+                                //Execute c#
+                                layer_Csharp_call_from_js.layer_set_current(parseInt(eventTarget.id))
+                            }
+                        } catch (error) {
+                            console.error(error);
+                        }
+
+
+                }
+
+                //save to the dom
+                eventTarget.parentElement.setAttribute("data-select-isAdditive", isAdditive);
+                if (lastIndexClick > -1) {
+                    NodeArray[lastIndexClick].classList.add(referenceItemClass);
+                }
+
+
+                //update class from range
+                for (let i = from; i <= to; i++) {
+                    if (!isAdditive && event.shiftKey && event.ctrlKey) {
+                        ulQuerySelectorItems[i].classList.remove(selectedItemClass);
+                    } else {
+                        ulQuerySelectorItems[i].classList.add(selectedItemClass);
+                    }
+                }
+            }
+            if (eventTarget.parentElement.querySelectorAll("." + selectedItemClass).length <= 1) {
+                return;
+            } else {
+                eventTarget.parentElement.querySelectorAll("." + selectedItemClass).forEach(function(element) {
+                    element.classList.add(selectedHighlightItemClass);
+                });
+            }
+        }
+
+
+        function getSelectedElements() {
+            let listOfSelectedElements = [];
+            document.querySelectorAll('.' + selectedItemClass).forEach(function(element) {
+                if (element.clientHeight > 0) {
+                    listOfSelectedElements.push(element);
+                }
+            });
+            return listOfSelectedElements;
+        }
+
+    </script>
+
 
     <script>
+        function change_visibility(event, eye, id) {
+            if (event != null) {
+                event.stopPropagation();
+                event.preventDefault();
+            }
+            
+            
+            
+            let isAddingAction;
+            if (eye.classList.contains("orange")) {
+                isAddingAction = false;
+            } else {
+                isAddingAction = true;
+            }
+
+            if (getSelectedElements().length > 1 && eye.closest("li").classList.contains(selectedItemClass)) {
+                getSelectedElements().forEach(function(element) {
+                    internal_change_visibility(element.querySelector(".eye"), element.id, isAddingAction);
+                });
+            } else {
+                internal_change_visibility(eye, id, isAddingAction);
+            }
+        }
+
+        function internal_change_visibility(eye, id, isAddingAction) {
+            let liElement = document.getElementById(id);
+            if (isAddingAction) {
+                //C# ajouter au favoris
+                if (!eye.classList.contains("orange")) {
+                    eye.classList.add("orange")
+                }
+                if (!liElement.classList.contains("layerVisible")) {
+                    liElement.classList.add("layerVisible");
+                    liElement.classList.remove("layerHidden");
+                    liElement.classList.remove("layerHiddenStateProgress");
+                }
+
+                layer_Csharp_call_from_js.layer_visibility(parseInt(id), true)
+                eye.title = "Masquer le calque";
+            } else {
+                //C# supprimer des favoris
+                if (eye.classList.contains("orange")) {
+                    eye.classList.remove("orange")
+                }
+                if (!liElement.classList.contains("layerHidden")) {
+                    liElement.classList.add("layerHiddenStateProgress");
+                    liElement.classList.remove("layerVisible");
+                }
+                layer_Csharp_call_from_js.layer_visibility(parseInt(id), false)
+                eye.title = "Afficher le calque";
+
+                if (liElement.classList.contains("layerHiddenStateProgress")) {
+                    setTimeout(function() {
+                        liElement.classList.add("layerHidden");
+                        liElement.classList.remove("layerHiddenStateProgress");
+                    }, 150);
+                }
+
+
+            }
+        }
+
+
         function ajouter_aux_favoris(event, star, id) {
             if (event != null) {
                 event.stopPropagation();
                 event.preventDefault();
             }
-            star.classList.toggle("orange");
-
+            let isAddingAction;
             if (star.classList.contains("orange")) {
+                isAddingAction = false;
+            } else {
+                isAddingAction = true;
+            }
+
+            if (getSelectedElements().length > 1) {
+                getSelectedElements().forEach(function(element) {
+                    internal_ajouter_aux_favoris(element.querySelector(".star"), element.id, isAddingAction);
+                });
+            } else {
+                internal_ajouter_aux_favoris(star, id, isAddingAction);
+            }
+        }
+
+        function internal_ajouter_aux_favoris(star, id, isAddingAction) {
+            if (isAddingAction) {
                 //C# ajouter au favoris
-                layer_Csharp_call_from_js.layer_favorite_add(parseInt(id))
+                if (!star.classList.contains("orange")) {
+                    star.classList.add("orange")
+                }
+                layer_Csharp_call_from_js.layer_favorite(parseInt(id), true)
                 star.title = "Supprimer le calque des favoris";
             } else {
                 //C# supprimer des favoris
-                layer_Csharp_call_from_js.layer_favorite_remove(parseInt(id))
+                if (star.classList.contains("orange")) {
+                    star.classList.remove("orange")
+                }
+                layer_Csharp_call_from_js.layer_favorite(parseInt(id), false)
                 star.title = "Ajouter le calque aux favoris";
             }
-            return true;
         }
 
-        var lastelement;
-
-        function selectionner_ce_calque(event, calque, id) {
-            try {
-                if (event != null) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                }
-                document.querySelectorAll('.select').forEach(function (layer) {
-                    layer.classList.remove("select");
-                    lastelement = layer;
-                });
-                calque.parentElement.classList.add("select");
-                if (lastelement != calque.parentElement) {
-                    //Execute c#
-                    layer_Csharp_call_from_js.layer_set_current(parseInt(id))
-                    return true;
-                } else {
-                    //Cancel : l'�l�ment � deja �t� s�l�ctionn�
-
-                    return false;
-                }
-                return false;
-            } catch (error) {
-                console.error(error);
-            }
-        }
-
-        function selectionner_calque_by_id(id) {
+        function selectionner_calque_by_id(id, scroll = true) {
             console.log("selectionner_calque_by_id" + id);
-            let element = document.getElementById(id).querySelector(".layer_main_div");
+            document.querySelectorAll('.select').forEach(function(layer) {
+                layer.classList.remove("select");
+            });
+            document.querySelectorAll('.inSelection').forEach(function(layer) {
+                layer.classList.remove(selectedItemClass);
+                layer.classList.remove(referenceItemClass);
+                layer.classList.remove(selectedHighlightItemClass);
+            });
+            let element = document.getElementById(id);
             element.classList.add("select");
-            lastelement = element;
+            element.classList.add(selectedItemClass);
+            element.classList.add(referenceItemClass);
+
+            if (scroll && document.body.getBoundingClientRect().y == 0) {
+                element.scrollIntoView({
+                    block: 'start',
+                    behavior: 'smooth'
+                });
+            }
+            if (lastelement != element) {
+                layer_Csharp_call_from_js.layer_set_current(parseInt(id));
+                lastelement = element;
+            }
+
         }
 
         function cleantxt(source) {
@@ -706,8 +1041,8 @@
 
         function StartObserving() {
             isObserving = true;
-            let observer = new IntersectionObserver(function (observables) {
-                observables.forEach(function (observable) {
+            let observer = new IntersectionObserver(function(observables) {
+                observables.forEach(function(observable) {
                     try {
                         // L'élément devient visible
                         if (observable.intersectionRatio > 0) {
@@ -738,7 +1073,7 @@
 
             // On observe nos éléments
             let items = document.querySelectorAll("li")
-            items.forEach(function (item) {
+            items.forEach(function(item) {
                 item.classList.remove('inview')
                 observer.observe(item)
             });
@@ -751,8 +1086,8 @@
             }
             if (element_fiup !== null) {
                 let mainDiv = element_fiup.querySelector(".layer_main_div");
-                let id = parseInt(mainDiv.id);
-                layer_Csharp_call_from_js.gettilepreviewurlfromid(id).then(function (urlResult) {
+                let id = parseInt(element_fiup.id);
+                layer_Csharp_call_from_js.gettilepreviewurlfromid(id).then(function(urlResult) {
                     let urlResultSplit = urlResult.split(" ");
                     let css = "url(\"" + urlResultSplit[0] + "\")";
                     let css_opti = "url(\"" + urlResultSplit[0] + "\")";
@@ -764,7 +1099,7 @@
                         }
                         const img = new Image(); // width, height
                         img.src = urlResultSplit[0];
-                        img.addEventListener('load', function () {
+                        img.addEventListener('load', function() {
                             //console.log("Preview : " + id + "loaded");
                             mainDiv.style.backgroundImage = "url(" + img.src + ")";
                             if (element_fiup.classList.contains("inview")) {
@@ -772,13 +1107,13 @@
                             }
 
                         });
-                        img.addEventListener('error', function () {
+                        img.addEventListener('error', function() {
                             if (fallbackurl === undefined) {
                                 emptyPreview();
                             } else {
                                 const fallbackimg = new Image();
                                 fallbackimg.src = fallbackurl;
-                                fallbackimg.addEventListener('load', function () {
+                                fallbackimg.addEventListener('load', function() {
                                     //console.log("Preview : " + id + "loaded");
                                     mainDiv.style.backgroundImage = "url(" + fallbackimg.src + ")";
                                     if (element_fiup.classList.contains("inview")) {
@@ -786,7 +1121,7 @@
                                     }
                                 });
 
-                                fallbackimg.addEventListener('error', function () {
+                                fallbackimg.addEventListener('error', function() {
                                     console.log("Failed to load fallback image");
                                     emptyPreview();
                                 });
@@ -815,7 +1150,7 @@
         function UpdatePreview() {
             try {
                 let inviewelements = document.querySelectorAll(".inview");
-                inviewelements.forEach(function (element_up) {
+                inviewelements.forEach(function(element_up) {
                     InternalUpdatePreview(element_up);
                 });
             } catch (error) {
@@ -844,7 +1179,7 @@
         var all_item_element = document.querySelectorAll(".context_menu .item .item-content:not(.have-sous-menu) a");
         //init fonction
         //si la souris bouge sur l'un des item du context menu, alors on passe en mode souris et on enregistre sa position
-        document.querySelectorAll(".context_menu .item").forEach(element_qsaci => element_qsaci.addEventListener("mousemove", function (event) {
+        document.querySelectorAll(".context_menu .item").forEach(element_qsaci => element_qsaci.addEventListener("mousemove", function(event) {
             get_context_menu_element().setAttribute("data-navtype", "mouse");
 
             var temp_tab_index = parseInt(event.target.closest(".item").getAttribute("data-selectable-id"));
@@ -864,10 +1199,10 @@
         }));
 
         //on enregistre l'event de click sur chaque items et on leur ajoute un index
-        all_item_element.forEach(function (item, index) {
+        all_item_element.forEach(function(item, index) {
             var parent_item = item.parentElement.parentElement;
 
-            parent_item.addEventListener("click", function (event) {
+            parent_item.addEventListener("click", function(event) {
                 event.preventDefault();
                 item_context_menu_clicked(event.target);
             });
@@ -888,7 +1223,7 @@
         }
 
         function unclicked() {
-            document.querySelectorAll(".clickfocus").forEach(function (selected_items) {
+            document.querySelectorAll(".clickfocus").forEach(function(selected_items) {
                 selected_items.classList.remove("clickfocus");
             });
         }
@@ -970,7 +1305,7 @@
 
         function unselect_all() {
             //on retire à tout les items le tag séléctionné
-            document.querySelectorAll(".selected").forEach(function (selected_items) {
+            document.querySelectorAll(".selected").forEach(function(selected_items) {
                 selected_items.classList.remove("selected");
             });
         }
@@ -1011,19 +1346,19 @@
             }
             /**/
             if (e.which === 46) { //Supp
-                if (document.querySelector(".clickfocus") != null) {
-                    let dataState = document.querySelector(".clickfocus .download_main_div").getAttribute("data-state");
-                    download_Csharp_call_from_js.download_cancel_deleted_db(parseInt(document.querySelector(".clickfocus").getAttribute("id")));
-                    /*if (dataState == "success" || dataState == "cancel" || dataState == "error") {
-                        e.preventDefault();
-                        console.log(document.querySelector(".clickfocus"));
-                        download_js_delete_db(document.querySelector(".clickfocus").getAttribute("id"));
-                        hide_context_menu(e);
-                    } else {
-                        download_Csharp_call_from_js.download_cancel_deleted_db(parseInt(document.querySelector(".clickfocus").getAttribute("id")));
-                        hide_context_menu(e);
-                    }*/
-                }
+                //                if (document.querySelector(".clickfocus") != null) {
+                //                    let dataState = document.querySelector(".clickfocus .download_main_div").getAttribute("data-state");
+                //                    download_Csharp_call_from_js.download_cancel_deleted_db(parseInt(document.querySelector(".clickfocus").getAttribute("id")));
+                //                    /*if (dataState == "success" || dataState == "cancel" || dataState == "error") {
+                //                        e.preventDefault();
+                //                        console.log(document.querySelector(".clickfocus"));
+                //                        download_js_delete_db(document.querySelector(".clickfocus").getAttribute("id"));
+                //                        hide_context_menu(e);
+                //                    } else {
+                //                        download_Csharp_call_from_js.download_cancel_deleted_db(parseInt(document.querySelector(".clickfocus").getAttribute("id")));
+                //                        hide_context_menu(e);
+                //                    }*/
+                //                }
             }
             /**/
 
@@ -1038,12 +1373,10 @@
             }
             //toute les exceptions on été traité, si la fonction est toujours ok alors on masque
             get_context_menu_element().style.display = "none";
-
             if (get_context_menu_element().classList.contains("shiftkeydown")) {
                 get_context_menu_element().classList.remove("shiftkeydown");
             }
-
-            document.querySelectorAll(".hover").forEach(function (selected_items) {
+            document.querySelectorAll(".hover").forEach(function(selected_items) {
                 selected_items.classList.remove("hover");
             });
             unclicked();
@@ -1052,7 +1385,7 @@
 
         function update_lock_state(id, lock) {
             if (id == "*") {
-                all_item_element.forEach(function (item, index) {
+                all_item_element.forEach(function(item, index) {
                     var parent_item = item.parentElement.parentElement;
                     if (lock) {
                         parent_item.classList.add("lock");
@@ -1060,7 +1393,6 @@
                         parent_item.classList.remove("lock");
                     }
                 });
-
             } else {
                 let element_uls = document.getElementById(id);
                 if (element_uls === null) {
@@ -1072,13 +1404,8 @@
                 } else {
                     element_uls.classList.remove("lock");
                 }
-
             }
         }
-
-
-
-        //var x;
 
         function show_context_menu(e) {
             try {
@@ -1098,20 +1425,34 @@
 
                     if (e.target) {
                         element_sctm = e.target.closest("li");
+
                         if (element_sctm != null && element_sctm !== null) {
-                            get_context_menu_element().setAttribute("data-layer_binding", element_sctm.getAttribute("id"))
+                            if (!element_sctm.classList.contains(selectedItemClass) && getSelectedElements().length > 1) {
+                                lastelement = null;
+                                selectionner_calque_by_id(element_sctm.getAttribute("id"), false);
+                            }
+                            get_context_menu_element().setAttribute("data-layer_binding", element_sctm.getAttribute("id"));
+
                             element_sctm.classList.add("hover")
                             update_lock_state("*", false);
-                            let state = element_sctm.querySelector(".star").classList.contains("orange");
+                            let favState = element_sctm.querySelector(".star").classList.contains("orange");
                             //console.log(state);
                             get_context_menu_element().querySelector("#ajouter_favori").style.display = "inherit";
                             get_context_menu_element().querySelector("#retirer_favori").style.display = "inherit";
-                            if (state) {
-
+                            if (favState) {
                                 get_context_menu_element().querySelector("#ajouter_favori").style.display = "none";
-
                             } else {
                                 get_context_menu_element().querySelector("#retirer_favori").style.display = "none";
+                            }
+
+                            let eyeState = element_sctm.querySelector(".eye").classList.contains("orange");
+                            //console.log(state);
+                            get_context_menu_element().querySelector("#afficher_calque").style.display = "inherit";
+                            get_context_menu_element().querySelector("#masquer_calque").style.display = "inherit";
+                            if (eyeState) {
+                                get_context_menu_element().querySelector("#afficher_calque").style.display = "none";
+                            } else {
+                                get_context_menu_element().querySelector("#masquer_calque").style.display = "none";
                             }
                         } else {
                             get_context_menu_element().setAttribute("data-layer_binding", "0")
@@ -1119,6 +1460,32 @@
                             update_lock_state("ajouter_calque", false);
                             update_lock_state("actualiser_panel", false);
                         }
+
+                        //if multiple element, then change text :
+                        if (getSelectedElements().length <= 1) {
+                            document.querySelector("#supprimer_cache_calque a").innerText = "Vider le cache du calque";
+                            document.querySelector("#afficher_calque a").innerText = "Afficher le calque";
+                            document.querySelector("#masquer_calque a").innerText = "Masquer le calque";
+                        } else {
+                            update_lock_state("modifier_calque", true);
+                            update_lock_state("supprimer_cache_calque", false);
+                            update_lock_state("retirer_favori", false);
+                            update_lock_state("ajouter_favori", false);
+                            update_lock_state("afficher_calque", false);
+                            update_lock_state("masquer_calque", false);
+                            document.querySelector("#supprimer_cache_calque a").innerText = "Vider le cache des calque";
+                            document.querySelector("#afficher_calque a").innerText = "Afficher les calques";
+                            document.querySelector("#masquer_calque a").innerText = "Masquer les calques";
+                        }
+
+                        if (document.querySelector("ul").classList.contains("showHiddenLayer")) {
+                            get_context_menu_element().querySelector("#basculer_affichage_showmasque").style.display = "none";
+                            get_context_menu_element().querySelector("#basculer_affichage_hidemasque").style.display = "inherit";
+                        } else {
+                            get_context_menu_element().querySelector("#basculer_affichage_showmasque").style.display = "inherit";
+                            get_context_menu_element().querySelector("#basculer_affichage_hidemasque").style.display = "none";
+                        }
+
 
                     }
                 }
@@ -1204,19 +1571,61 @@
                 //                }
                 switch (action) {
                     case "rendre_courant":
-                        selectionner_ce_calque(null, element_icmc.querySelector(".layer_content"), id);
+                        selectionner_calque_by_id(id, false);
                         break;
                     case "ajouter_favori":
-                        ajouter_aux_favoris(null, element_icmc.querySelector(".star"), id);
+                        if (getSelectedElements().length > 1) {
+                            getSelectedElements().forEach(function(element) {
+                                internal_ajouter_aux_favoris(element.querySelector(".star"), element.id, true);
+                            });
+                        } else {
+                            internal_ajouter_aux_favoris(element_icmc.querySelector(".star"), id, true);
+                        }
+
                         break;
                     case "retirer_favori":
-                        ajouter_aux_favoris(null, element_icmc.querySelector(".star"), id);
+                        if (getSelectedElements().length > 1) {
+                            getSelectedElements().forEach(function(element) {
+                                internal_ajouter_aux_favoris(element.querySelector(".star"), element.id, false);
+                            });
+                        } else {
+                            internal_ajouter_aux_favoris(element_icmc.querySelector(".star"), id, false);
+                        }
+                        break;
+                        
+                    case "afficher_calque":
+                        if (getSelectedElements().length > 1) {
+                            getSelectedElements().forEach(function(element) {
+                                internal_change_visibility(element.querySelector(".eye"), element.id, true);
+                            });
+                        } else {
+                            internal_change_visibility(element_icmc.querySelector(".eye"), id, true);
+                        }
+
+                        break;
+                    case "masquer_calque":
+                        if (getSelectedElements().length > 1) {
+                            getSelectedElements().forEach(function(element) {
+                                internal_change_visibility(element.querySelector(".eye"), element.id, false);
+                            });
+                        } else {
+                            internal_change_visibility(element_icmc.querySelector(".eye"), id, false);
+                        }
                         break;
                     case "modifier_calque":
                         layer_Csharp_call_from_js.layer_edit(parseInt(id));
                         break;
                     case "supprimer_cache_calque":
-                        layer_Csharp_call_from_js.clear_cache(parseInt(id));
+
+                        if (getSelectedElements().length > 1) {
+                            let listOfId = "";
+                            getSelectedElements().forEach(function(element) {
+                                listOfId += element.id + ",";
+                            });
+                            layer_Csharp_call_from_js.clear_cache(listOfId);
+                        } else {
+                            layer_Csharp_call_from_js.clear_cache(id.toString());
+                        }
                         break;
                     case "ajouter_calque":
                         layer_Csharp_call_from_js.layer_edit(-1);
@@ -1224,10 +1633,15 @@
                     case "ajouter_calque_template":
                         layer_Csharp_call_from_js.layer_edit(-1, parseInt(id));
                         break;
+                    case "basculer_affichage_showmasque":
+                        document.querySelector("ul").classList.add("showHiddenLayer"); //showHiddenLayer
+                        break;
+                    case "basculer_affichage_hidemasque":
+                        document.querySelector("ul").classList.remove("showHiddenLayer"); //showHiddenLayer
+                        break;
                     case "actualiser_panel":
                         layer_Csharp_call_from_js.refresh_panel();
                         break;
-
                     default:
                         break;
                 }

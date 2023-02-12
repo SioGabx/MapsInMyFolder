@@ -12,6 +12,7 @@ using System.Data.SQLite;
 using System.Threading.Tasks;
 using MapsInMyFolder.Commun;
 using System.Text.Json;
+using System.Reflection;
 
 namespace MapsInMyFolder
 {
@@ -72,7 +73,7 @@ namespace MapsInMyFolder
             }
         }
 
-        static List<Layers> DB_Layer_Read(SQLiteConnection conn, string query_command)
+        public static List<Layers> DB_Layer_Read(SQLiteConnection conn, string query_command)
         {
             List<Layers> layersFavorite = new List<Layers>();
             List<Layers> layersClassicSort = new List<Layers>();
@@ -140,6 +141,7 @@ namespace MapsInMyFolder
                     string DB_Layer_CATEGORIE = GetStringFromOrdinal("CATEGORIE").RemoveNewLineChar();
                     string DB_Layer_IDENTIFIANT = GetStringFromOrdinal("IDENTIFIANT").RemoveNewLineChar();
                     string DB_Layer_TILE_URL = GetStringFromOrdinal("TILE_URL").RemoveNewLineChar();
+                    string DB_Layer_TILE_FALLBACK_URL = GetStringFromOrdinal("TILE_FALLBACK_URL").RemoveNewLineChar();
                     int DB_Layer_MIN_ZOOM = GetIntFromOrdinal("MIN_ZOOM");
                     int DB_Layer_MAX_ZOOM = GetIntFromOrdinal("MAX_ZOOM");
                     string DB_Layer_FORMAT = GetStringFromOrdinal("FORMAT");
@@ -148,7 +150,9 @@ namespace MapsInMyFolder
                     string DB_Layer_STYLE = GetStringFromOrdinal("STYLE");
                     int DB_Layer_TILE_SIZE = GetIntFromOrdinal("TILE_SIZE");
                     string DB_Layer_TILECOMPUTATIONSCRIPT = GetStringFromOrdinal("TILECOMPUTATIONSCRIPT");
+                    string DB_Layer_VISIBILITY = GetStringFromOrdinal("VISIBILITY");
                     string DB_Layer_SPECIALSOPTIONS = GetStringFromOrdinal("SPECIALSOPTIONS");
+                    int DB_Layer_VERSION = GetIntFromOrdinal("VERSION");
 
                     bool doCreateSpecialsOptionsClass = true;
                     Layers.SpecialsOptions DeserializeSpecialsOptions = null;
@@ -175,11 +179,14 @@ namespace MapsInMyFolder
                     {
                         DB_Layer_TILECOMPUTATIONSCRIPT = Settings.tileloader_default_script;
                     }
+                    if (string.IsNullOrEmpty(DB_Layer_VISIBILITY))
+                    {
+                        DB_Layer_VISIBILITY = "Visible";
+                    }
+
                     DB_Layer_TILECOMPUTATIONSCRIPT = Collectif.HTMLEntities(DB_Layer_TILECOMPUTATIONSCRIPT, true);
-                    Debug.WriteLine("Layer " + DB_Layer_NOM + " : Tilesize = " + DB_Layer_TILE_SIZE + " id = " + DB_Layer_ID);
-                    Layers calque = new Layers(DB_Layer_ID, DB_Layer_FAVORITE, DB_Layer_NOM, DB_Layer_DESCRIPTION, DB_Layer_CATEGORIE, DB_Layer_IDENTIFIANT, DB_Layer_TILE_URL, DB_Layer_SITE, DB_Layer_SITE_URL, DB_Layer_MIN_ZOOM, DB_Layer_MAX_ZOOM, DB_Layer_FORMAT, DB_Layer_TILE_SIZE, DB_Layer_TILECOMPUTATIONSCRIPT, DeserializeSpecialsOptions);
-                    Debug.WriteLine("Layer " + DB_Layer_NOM + " : Tilesize = " + DB_Layer_TILE_SIZE);
-                    if (DB_Layer_FAVORITE)
+                    Layers calque = new Layers(DB_Layer_ID, DB_Layer_FAVORITE, DB_Layer_NOM, DB_Layer_DESCRIPTION, DB_Layer_CATEGORIE, DB_Layer_IDENTIFIANT, DB_Layer_TILE_URL, DB_Layer_TILE_FALLBACK_URL, DB_Layer_SITE, DB_Layer_SITE_URL, DB_Layer_MIN_ZOOM, DB_Layer_MAX_ZOOM, DB_Layer_FORMAT, DB_Layer_TILE_SIZE, DB_Layer_TILECOMPUTATIONSCRIPT, DB_Layer_VISIBILITY, DeserializeSpecialsOptions, DB_Layer_VERSION);
+                    if (DB_Layer_FAVORITE && Settings.layerpanel_favorite_at_top)
                     {
                         layersFavorite.Add(calque);
                     }
@@ -193,8 +200,7 @@ namespace MapsInMyFolder
                     Debug.WriteLine("fonction DB_Layer_Read : " + ex.Message);
                 }
             }
-            List<Layers> layers = layersFavorite.Concat(layersClassicSort).ToList();
-            return layers;
+            return layersFavorite.Concat(layersClassicSort).ToList();
         }
 
         string DB_Layer_Load()
@@ -240,39 +246,69 @@ namespace MapsInMyFolder
             List<Layers> GenerateHTMLFromLayerList(List<Layers> ListOfLayers, bool DoRejectLayer = true)
             {
                 List<Layers> layersRejected = new List<Layers>();
-                foreach (Layers individual_layer in ListOfLayers)
+                foreach (Layers InitialLayerFromList in ListOfLayers)
                 {
-                    Layers individual_layer_with_replacement;
-                    bool hasValue = EditedLayersDictionnary.TryGetValue(individual_layer.class_id, out Layers value);
-                    if (hasValue)
+                    Layers LayerWithReplacement = InitialLayerFromList;
+                    bool layerHasReplacement = EditedLayersDictionnary.TryGetValue(InitialLayerFromList.class_id, out Layers replacementLayer);
+                    if (layerHasReplacement)
                     {
-                        individual_layer_with_replacement = value;
-                    }
-                    else
-                    {
-                        individual_layer_with_replacement = individual_layer;
+                        //if layer has replacement :
+                        BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static;
+
+                        foreach (FieldInfo field in typeof(Layers).GetFields(bindingFlags))
+                        {
+                            object replacementValue = field.GetValue(replacementLayer);
+                            Type replacementValueType = replacementValue.GetType();
+
+                            if (replacementValueType == typeof(string))
+                            {
+                                string replacementValueTypeToString = replacementValue as string;
+                                if (!string.IsNullOrEmpty(replacementValueTypeToString))
+                                {
+                                    field.SetValue(LayerWithReplacement, replacementValueTypeToString);
+                                }
+                                Debug.WriteLine("string");
+                            }
+                            //else if (replacementValueType == typeof(int))
+                            //{
+                            //    int replacementValueTypeToInt = (int)replacementValue;
+                            //}
+                        }
                     }
 
                     if (Settings.layerpanel_put_non_letter_layername_at_the_end)
                     {
-                        if (DoRejectLayer && (string.IsNullOrEmpty(individual_layer_with_replacement.class_name) || !Char.IsLetter(individual_layer_with_replacement.class_name.Trim()[0])))
+                        if (DoRejectLayer && (string.IsNullOrEmpty(LayerWithReplacement.class_name) || !Char.IsLetter(LayerWithReplacement.class_name.Trim()[0])))
                         {
-                            layersRejected.Add(individual_layer);
+                            layersRejected.Add(InitialLayerFromList);
                             continue;
                         }
                     }
-                    Dictionary<int, Layers> temp_Layers_dictionnary = new Dictionary<int, Layers> { { Convert.ToInt32(individual_layer_with_replacement.class_id), individual_layer_with_replacement } };
+                    Dictionary<int, Layers> temp_Layers_dictionnary = new Dictionary<int, Layers> { { Convert.ToInt32(LayerWithReplacement.class_id), LayerWithReplacement } };
 
                     Layers.Layers_Dictionary_List.Add(temp_Layers_dictionnary);
 
                     string orangestar = "";
-                    if (individual_layer_with_replacement.class_favorite)
+                    if (LayerWithReplacement.class_favorite)
                     {
                         orangestar = @"class=""star orange"" title=""Supprimer le calque des favoris""";
                     }
                     else
                     {
                         orangestar = @"class=""star"" title=""Ajouter le calque aux favoris""";
+                    }
+
+                    string orangelayervisibility;
+                    string visibility;
+                    if (LayerWithReplacement.class_visibility == "Hidden")
+                    {
+                        orangelayervisibility = @"class=""eye"" title=""Afficher le calque""";
+                        visibility = "Hidden";
+                    }
+                    else
+                    {
+                        orangelayervisibility = @"class=""eye orange"" title=""Masquer le calque"""; ;
+                        visibility = "Visible";
                     }
 
                     const string imgbase64 = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"; //1 pixel gif transparent -> disable base 
@@ -282,17 +318,18 @@ namespace MapsInMyFolder
                     {
                         supplement_class += " displaynone";
                     }
-                    generated_layers = generated_layers + @"<li class=""inview"" id=""" + individual_layer_with_replacement.class_id + @""">
-          <div class=""layer_main_div"" style=""background-image:url(" + imgbase64.Trim() + @")"" id=""" + individual_layer_with_replacement.class_id + @""">
+                    generated_layers = generated_layers + @"<li class=""inview layer" + visibility + @""" id=""" + LayerWithReplacement.class_id + @""">
+          <div class=""layer_main_div"" style=""background-image:url(" + imgbase64.Trim() + @")"">
              <div class=""layer_main_div_background_image""></div>
-            <div class=""layer_content"" data-layer=""" + individual_layer_with_replacement.class_identifiant + @""" title=""Sélectionner ce calque"" onclick=""selectionner_ce_calque(event, this," + individual_layer.class_id + @")"">
-                  <div class=""layer_texte"" title=""" + Collectif.HTMLEntities(individual_layer_with_replacement.class_description) + @""">
-                      <p class=""display_name"">" + Collectif.HTMLEntities(individual_layer_with_replacement.class_name) + @"</p>
-                      <p class=""zoom"">[" + individual_layer_with_replacement.class_min_zoom + "-" + individual_layer_with_replacement.class_max_zoom + @"]</p>
-                      <p class=""layer_website" + supplement_class + @""">" + individual_layer_with_replacement.class_site + @"</p>
-                      <p class=""layer_categorie" + supplement_class + @""">" + individual_layer_with_replacement.class_categorie + @"</p>
+            <div class=""layer_content"" data-layer=""" + LayerWithReplacement.class_identifiant + @""" title=""Sélectionner ce calque"">
+                  <div class=""layer_texte"" title=""" + Collectif.HTMLEntities(LayerWithReplacement.class_description) + @""">
+                      <p class=""display_name"">" + Collectif.HTMLEntities(LayerWithReplacement.class_name) + @"</p>
+                      <p class=""zoom"">[" + LayerWithReplacement.class_min_zoom + "-" + LayerWithReplacement.class_max_zoom + @"] - " + LayerWithReplacement.class_site + @"</p>
+                      <p class=""layer_website" + supplement_class + @""">" + LayerWithReplacement.class_site + @"</p>
+                      <p class=""layer_categorie" + supplement_class + @""">" + LayerWithReplacement.class_categorie + @"</p>
                   </div>
-                  <div " + orangestar + @" onclick=""ajouter_aux_favoris(event, this," + individual_layer_with_replacement.class_id + @")""></div>
+                  <div " + orangestar + @" onclick=""ajouter_aux_favoris(event, this," + LayerWithReplacement.class_id + @")""></div>
+                  <div " + orangelayervisibility + @" onclick=""change_visibility(event, this," + LayerWithReplacement.class_id + @")""></div>
               </div>
           </div>
       </li>";
@@ -305,8 +342,7 @@ namespace MapsInMyFolder
 
             generated_layers += "</ul>";
             string resource_data = Collectif.ReadResourceString("html/layer_panel.html");
-            string final_generated_layers = resource_data.Replace("<!--htmllayerplaceholder-->", generated_layers);
-            return final_generated_layers;
+            return resource_data.Replace("<!--htmllayerplaceholder-->", generated_layers);
         }
 
         public void Set_current_layer(int id)
@@ -404,7 +440,7 @@ namespace MapsInMyFolder
                     else
                     {
                         mapviewer.MinZoomLevel = 2;
-                        mapviewer.MaxZoomLevel = 22;
+                        mapviewer.MaxZoomLevel = 25;
                     }
                 }
                 catch (Exception ex)
@@ -414,12 +450,13 @@ namespace MapsInMyFolder
             }
         }
 
-        public static void ClearCache(int id, bool ShowMessageBox = true)
+        public static long ClearCache(int id, bool ShowMessageBox = true)
         {
-            if (id == 0) { return; }
+            if (id == 0) { return 0; }
 
             Layers layers = Layers.GetLayerById(id);
-            if (layers is null) { return; }
+            if (layers is null) { return 0; }
+            long DirectorySize = 0;
             try
             {
                 Javascript.EngineDeleteById(id);
@@ -427,22 +464,25 @@ namespace MapsInMyFolder
                 Debug.WriteLine("Cache path : " + temp_dir);
                 if (Directory.Exists(temp_dir))
                 {
+                    DirectorySize = Collectif.GetDirectorySize(temp_dir);
                     Directory.Delete(temp_dir, true);
                 }
                 if (ShowMessageBox)
                 {
-                    Message.NoReturnBoxAsync("Le cache du calque \"" + layers.class_name + "\" à été vidé", "Opération réussie");
+                    Message.NoReturnBoxAsync("Le cache du calque \"" + layers.class_name + "\" à été vidé. " + Collectif.FormatBytes(DirectorySize) + " libéré.", "Opération réussie");
                 }
             }
             catch (Exception ex)
             {
                 Debug.WriteLine("Erreur lors du nettoyage du cache : " + ex.Message);
             }
+            return DirectorySize;
         }
 
-        public static void DBLayerFavorite(int id, int fav_state)
+        public static void DBLayerFavorite(int id, bool favBooleanState)
         {
             if (id == 0) { return; }
+            int fav_state = favBooleanState ? 1 : 0;
             try
             {
                 SQLiteConnection conn = Database.DB_Connection();
@@ -470,13 +510,43 @@ namespace MapsInMyFolder
             }
         }
 
+        public static void DBLayerVisibility(int id, string visibility_state)
+        {
+            if (id == 0) { return; }
+            try
+            {
+                SQLiteConnection conn = Database.DB_Connection();
+                if (conn is null)
+                {
+                    DebugMode.WriteLine("Connection to bdd is null");
+                    return;
+                }
+                SQLiteCommand sqlite_cmd = conn.CreateCommand();
+                sqlite_cmd.CommandText = "UPDATE LAYERS SET VISIBILITY = '" + visibility_state + "' WHERE ID=" + id;
+                sqlite_cmd.ExecuteNonQuery();
+
+                sqlite_cmd.CommandText = "UPDATE EDITEDLAYERS SET VISIBILITY = '" + visibility_state + "' WHERE ID=" + id;
+                sqlite_cmd.ExecuteNonQuery();
+
+                sqlite_cmd.CommandText = "UPDATE CUSTOMSLAYERS SET VISIBILITY = '" + visibility_state + "' WHERE ID=" + id;
+                sqlite_cmd.ExecuteNonQuery();
+                conn.Close();
+
+                Layers.GetLayerById(id).class_visibility = visibility_state;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("fonction DBLayerVisibility : " + ex.Message);
+            }
+        }
+
         public void LayerTilePreview_RequestUpdate()
         {
             layer_browser.ExecuteScriptAsyncWhenPageLoaded("UpdatePreview();");
             return;
         }
 
-        
+
         public string LayerTilePreview_ReturnUrl(int id)
         {
             Layers layer = Layers.GetLayerById(id);
@@ -520,7 +590,7 @@ namespace MapsInMyFolder
                     invokeFunction = Collectif.GetUrl.InvokeFunction.getPreview;
                 }
                 string previewLayerImageUrl = Collectif.Replacements(layer.class_tile_url, TileNumber[0].ToString(), TileNumber[1].ToString(), Zoom.ToString(), id, invokeFunction);
-                
+
                 if (string.IsNullOrEmpty(previewLayerImageUrl) && invokeFunction == Collectif.GetUrl.InvokeFunction.getPreview)
                 {
                     Debug.WriteLine("Trahison" + previewLayerImageUrl);
@@ -532,7 +602,7 @@ namespace MapsInMyFolder
                 string previewFallbackLayerImageUrl = String.Empty;
                 if (Javascript.CheckIfFunctionExist(id, Collectif.GetUrl.InvokeFunction.getPreviewFallback.ToString(), null))
                 {
-                    previewFallbackLayerImageUrl = Collectif.Replacements(layer.class_tile_url, TileNumber[0].ToString(), TileNumber[1].ToString(), Zoom.ToString(), id, Collectif.GetUrl.InvokeFunction.getPreviewFallback); 
+                    previewFallbackLayerImageUrl = Collectif.Replacements(layer.class_tile_url, TileNumber[0].ToString(), TileNumber[1].ToString(), Zoom.ToString(), id, Collectif.GetUrl.InvokeFunction.getPreviewFallback);
                     if (!string.IsNullOrEmpty(previewFallbackLayerImageUrl))
                     {
                         previewFallbackLayerImageUrl = " " + previewFallbackLayerImageUrl;
@@ -552,35 +622,56 @@ namespace MapsInMyFolder
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Marquer les membres comme étant static", Justification = "Used by CEFSHARP, static isnt a option here")]
     public class Layer_Csharp_call_from_js
     {
-        public void Layer_favorite_add(double id = 0)
+
+        public void Clear_cache(string listOfId = "0")
         {
-            int id_int = Convert.ToInt32(id);
+            long DirectorySize = 0;
+            string[] splittedListOfId = listOfId.Split(',', StringSplitOptions.RemoveEmptyEntries);
+            foreach (string str in splittedListOfId)
+            {
+                int id_int = int.Parse(str.Trim());
+                Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
+                {
+                    DirectorySize += MainPage.ClearCache(id_int, false);
+
+                }, null);
+                DebugMode.WriteLine("Clear_cache layer " + id_int);
+            }
+            string layerName = "";
+            if (splittedListOfId.Count() == 1)
+            {
+                layerName = "Le cache du calque \"" + Layers.GetLayerById(int.Parse(splittedListOfId[0])).class_name + "\" à été vidé";
+            }
+            else
+            {
+                layerName = "Le cache des calques séléctionné ont été vidés";
+            }
             Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
             {
-                MainPage.DBLayerFavorite(id_int, 1);
+                Message.NoReturnBoxAsync(layerName + " (" + Collectif.FormatBytes(DirectorySize) + " libéré).", "Opération réussie");
             }, null);
-            DebugMode.WriteLine("Adding layer" + id_int + " to favorite");
         }
 
-        public void Clear_cache(double id = 0)
+
+        public void Layer_favorite(double id = 0, bool isAdding = true)
         {
             int id_int = Convert.ToInt32(id);
             Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
             {
-                MainPage.ClearCache(id_int);
+                MainPage.DBLayerFavorite(id_int, isAdding);
             }, null);
-            DebugMode.WriteLine("Clear_cache layer " + id_int);
         }
 
-        public void Layer_favorite_remove(double id = 0)
+        public void Layer_visibility(double id = 0, bool isVisible = true)
         {
+            //Debug.WriteLine($"Layer_visibility : id={id} & isVisible={isVisible}");
             int id_int = Convert.ToInt32(id);
             Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
             {
-                MainPage.DBLayerFavorite(id_int, 0);
+                MainPage.DBLayerVisibility(id_int, (isVisible ? "Visible" : "Hidden"));
             }, null);
-            DebugMode.WriteLine("Removing layer" + id_int + " to favorite");
         }
+
 
         public void Layer_edit(double id = 0, double prefilid = -1)
         {

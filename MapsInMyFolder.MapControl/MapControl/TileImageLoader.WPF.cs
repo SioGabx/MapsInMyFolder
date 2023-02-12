@@ -64,7 +64,6 @@ namespace MapsInMyFolder.MapControl
             if (cacheItem == null || cacheItem.Item2 < DateTime.UtcNow)
             {
                 Layers layers = Layers.GetLayerById(LayerId) ?? Layers.Empty();
-                Debug.WriteLine("Call here");
                 try
                 {
                     var response = await TileGeneratorSettings.TileLoaderGenerator.GetImageAsync(uri, tile.XIndex, tile.Y, tile.ZoomLevel, LayerId, null, Collectif.GetSaveTempDirectory(layers.class_name, layers.class_identifiant, tile.ZoomLevel)).ConfigureAwait(false);
@@ -97,7 +96,6 @@ namespace MapsInMyFolder.MapControl
 
         private static async Task LoadTile(Tile tile, TileSource tileSource)
         {
-            Debug.WriteLine("Loading tiile");
             var image = await tileSource.LoadImageAsync(tile.XIndex, tile.Y, tile.ZoomLevel, tileSource).ConfigureAwait(false);
             
             await tile.Image.Dispatcher.InvokeAsync(() => tile.SetImage(image));

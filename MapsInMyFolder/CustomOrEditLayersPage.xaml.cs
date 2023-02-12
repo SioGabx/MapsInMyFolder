@@ -37,6 +37,8 @@ namespace MapsInMyFolder
             }
             Javascript.JavascriptInstance.Logs = String.Empty;
             TextboxLayerScriptConsole.Text = String.Empty;
+            Javascript.ClearVar(-1);
+            Javascript.ClearVar(-2);
             GenerateTempLayerInDicList();
             mapviewerappercu.Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(255, (byte)Settings.background_layer_color_R, (byte)Settings.background_layer_color_G, (byte)Settings.background_layer_color_B));
             mapviewerappercu.Center = MainPage._instance.mapviewer.Center;
@@ -447,8 +449,61 @@ namespace MapsInMyFolder
             int TILE_SIZE = layers.class_tiles_size;
             string TILECOMPUTATIONSCRIPT = Collectif.HTMLEntities(layers.class_tilecomputationscript);
             string SPECIALSOPTIONS = JsonSerializer.Serialize<Layers.SpecialsOptions>(layers.class_specialsoptions);
-
+            string TILE_FALLBACK_URL = "TILE_FALLBACK_URL";
             SQLiteConnection conn = Database.DB_Connection();
+
+            string getSavingStringOptimalValue(string formValue, string layerValue)
+            {
+                if (formValue == layerValue || formValue == Collectif.HTMLEntities(layerValue))
+                {
+                    return null;
+                }
+                else
+                {
+                    return formValue;
+                }
+            }
+
+
+            try
+            {
+                //check both : with HTMLEntities and not -> set a function
+                //set int ? 
+
+                Layers DB_Layer = MainPage.DB_Layer_Read(conn, $"SELECT * FROM LAYERS WHERE ID='{LayerId}'")[0];
+                //NOM = (NOM == DB_Layer.class_name) ? null : NOM;
+                //DESCRIPTION = (DESCRIPTION == DB_Layer.class_description) ? null : DESCRIPTION;
+                //CATEGORIE = (CATEGORIE == DB_Layer.class_categorie) ? null : CATEGORIE;
+                //IDENTIFIANT = (IDENTIFIANT == DB_Layer.class_identifiant) ? null : IDENTIFIANT;
+                //TILE_URL = (TILE_URL == DB_Layer.class_tile_url) ? null : TILE_URL;
+                ////MIN_ZOOM = (MIN_ZOOM == DB_Layer.class_min_zoom) ? null : MIN_ZOOM;
+                ////MAX_ZOOM = (MAX_ZOOM == DB_Layer.class_max_zoom) ? null : MAX_ZOOM;
+                //FORMAT = (FORMAT == DB_Layer.class_format) ? null : FORMAT;
+                //SITE = (SITE == DB_Layer.class_site) ? null : SITE;
+                //Debug.WriteLine($"SITE_URL : {SITE_URL} & DB_Layer.class_site_url : {DB_Layer.class_site_url}");
+                //SITE_URL = (SITE_URL == DB_Layer.class_site_url) ? null : SITE_URL;
+                //TILECOMPUTATIONSCRIPT = (TILECOMPUTATIONSCRIPT == Collectif.HTMLEntities(layers.class_tilecomputationscript)) ? null : TILECOMPUTATIONSCRIPT;
+                //SPECIALSOPTIONS = (SPECIALSOPTIONS == JsonSerializer.Serialize<Layers.SpecialsOptions>(DB_Layer.class_specialsoptions)) ? null : SPECIALSOPTIONS;
+                //TILE_FALLBACK_URL = (TILE_FALLBACK_URL == DB_Layer.class_tile_fallback_url) ? null : TILE_FALLBACK_URL;
+                NOM = getSavingStringOptimalValue(NOM, DB_Layer.class_name);
+                DESCRIPTION = getSavingStringOptimalValue(DESCRIPTION, DB_Layer.class_description);
+                CATEGORIE = getSavingStringOptimalValue(CATEGORIE, DB_Layer.class_categorie);
+                IDENTIFIANT = getSavingStringOptimalValue(IDENTIFIANT, DB_Layer.class_identifiant);
+                TILE_URL = getSavingStringOptimalValue(TILE_URL, DB_Layer.class_tile_url);
+                //MIN_ZOOM = (MIN_ZOOM == DB_Layer.class_min_zoom) ? null : MIN_ZOOM;
+                //MAX_ZOOM = (MAX_ZOOM == DB_Layer.class_max_zoom) ? null : MAX_ZOOM;
+                FORMAT = getSavingStringOptimalValue(FORMAT, DB_Layer.class_format);
+                SITE = getSavingStringOptimalValue(SITE, DB_Layer.class_site);
+                SITE_URL = getSavingStringOptimalValue(SITE_URL, DB_Layer.class_site_url);
+                TILECOMPUTATIONSCRIPT = getSavingStringOptimalValue(TILECOMPUTATIONSCRIPT, DB_Layer.class_tilecomputationscript);
+                SPECIALSOPTIONS = (SPECIALSOPTIONS == JsonSerializer.Serialize<Layers.SpecialsOptions>(DB_Layer.class_specialsoptions)) ? null : SPECIALSOPTIONS;
+                TILE_FALLBACK_URL = getSavingStringOptimalValue(TILE_FALLBACK_URL, DB_Layer.class_tile_fallback_url);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error comparaison des layers à partir du N°{LayerId} : {ex.Message}");
+            }
+
             if (conn is null)
             {
                 Debug.WriteLine("La connection à la base de donnée est null");
@@ -461,27 +516,20 @@ namespace MapsInMyFolder
                 int RowCount = Database.ExecuteScalarSQLCommand("SELECT COUNT(*) FROM 'main'.'CUSTOMSLAYERS'");
                 int ID = 1000000 + RowCount;
                 Debug.WriteLine(RowCount);
-                Database.ExecuteNonQuerySQLCommand("INSERT INTO 'main'.'CUSTOMSLAYERS'('ID','NOM', 'DESCRIPTION', 'CATEGORIE', 'IDENTIFIANT', " +
-                "'TILE_URL', 'MIN_ZOOM', 'MAX_ZOOM', 'FORMAT', 'SITE', 'SITE_URL', 'TILE_SIZE', 'FAVORITE', 'TILECOMPUTATIONSCRIPT', 'SPECIALSOPTIONS') " +
-                "VALUES('" + ID + "', '" + NOM + "', '" + DESCRIPTION + "', '" + CATEGORIE + "', '" + IDENTIFIANT + "', '" + TILE_URL + "', '" + MIN_ZOOM + "', '" +
-                MAX_ZOOM + "', '" + FORMAT + "', '" + SITE + "', '" + SITE_URL + "', '" + TILE_SIZE + "', '0' , '" + TILECOMPUTATIONSCRIPT + "',  '" + SPECIALSOPTIONS + "')");
+                Database.ExecuteNonQuerySQLCommand("INSERT INTO 'main'.'CUSTOMSLAYERS'('ID','NOM', 'DESCRIPTION', 'CATEGORIE', 'IDENTIFIANT', 'TILE_URL', 'TILE_FALLBACK_URL', 'MIN_ZOOM', 'MAX_ZOOM', 'FORMAT', 'SITE', 'SITE_URL', 'TILE_SIZE', 'FAVORITE', 'TILECOMPUTATIONSCRIPT', 'VISIBILITY', 'SPECIALSOPTIONS', 'VERSION') " +
+                $"VALUES('{ID}', '{NOM}', '{DESCRIPTION}', '{CATEGORIE}', '{IDENTIFIANT}', '{TILE_URL}', '{TILE_FALLBACK_URL}', '{MIN_ZOOM}', '{MAX_ZOOM}', '{FORMAT}', '{SITE}', '{SITE_URL}', '{TILE_SIZE}', '{0}' , '{TILECOMPUTATIONSCRIPT}',  '{Visibility.Visible.ToString()}',  '{SPECIALSOPTIONS}',  '{1}')");
             }
             else if (Database.ExecuteScalarSQLCommand("SELECT COUNT(*) FROM 'main'.'EDITEDLAYERS' WHERE ID = " + LayerId) == 0)
             {
                 Debug.WriteLine("Adding to EDITEDLAYERS");
                 int FAVORITE = Layers.GetLayerById(LayerId).class_favorite ? 1 : 0;
-                Database.ExecuteNonQuerySQLCommand("INSERT INTO 'main'.'EDITEDLAYERS'('ID', 'NOM', 'DESCRIPTION', 'CATEGORIE', 'IDENTIFIANT', " +
-                "'TILE_URL', 'MIN_ZOOM', 'MAX_ZOOM', 'FORMAT', 'SITE', 'SITE_URL', 'TILE_SIZE', 'FAVORITE', 'TILECOMPUTATIONSCRIPT', 'SPECIALSOPTIONS') " +
-                "VALUES('" + LayerId + "', '" + NOM + "', '" + DESCRIPTION + "', '" + CATEGORIE + "', '" + IDENTIFIANT + "', '" + TILE_URL + "', '" + MIN_ZOOM + "', '" +
-                MAX_ZOOM + "', '" + FORMAT + "', '" + SITE + "', '" + SITE_URL + "', '" + TILE_SIZE + "', '" + FAVORITE + "',  '" + TILECOMPUTATIONSCRIPT + "',  '" + SPECIALSOPTIONS + "')");
+                Database.ExecuteNonQuerySQLCommand("INSERT INTO 'main'.'EDITEDLAYERS'('ID', 'NOM', 'DESCRIPTION', 'CATEGORIE', 'IDENTIFIANT', 'TILE_URL', 'TILE_FALLBACK_URL', 'MIN_ZOOM', 'MAX_ZOOM', 'FORMAT', 'SITE', 'SITE_URL', 'TILE_SIZE', 'FAVORITE', 'TILECOMPUTATIONSCRIPT', 'VISIBILITY', 'SPECIALSOPTIONS', 'VERSION') " +
+                $"VALUES('{LayerId}', '{NOM}', '{DESCRIPTION}', '{CATEGORIE}', '{IDENTIFIANT}', '{TILE_URL}', '{TILE_FALLBACK_URL}', '{MIN_ZOOM}', '{MAX_ZOOM}', '{FORMAT}', '{SITE}', '{SITE_URL}', '{TILE_SIZE}', '{FAVORITE}',  '{TILECOMPUTATIONSCRIPT}',  '{Visibility.Visible.ToString()}',  '{SPECIALSOPTIONS}',  '{1}')");
             }
             else
             {
                 Debug.WriteLine("Update to EDITEDLAYERS");
-                Database.ExecuteNonQuerySQLCommand("UPDATE 'main'.'EDITEDLAYERS' SET 'NOM'='" + NOM + "','DESCRIPTION'='" + DESCRIPTION +
-                "','CATEGORIE'='" + CATEGORIE + "','IDENTIFIANT'='" + IDENTIFIANT + "','TILE_URL'='" + TILE_URL + "','MIN_ZOOM'='" + MIN_ZOOM + "'," +
-                "'MAX_ZOOM'='" + MAX_ZOOM + "','FORMAT'='" + FORMAT + "','SITE'='" + SITE + "','SITE_URL'='" + SITE_URL + "','TILE_SIZE'='" + TILE_SIZE +
-                "','TILECOMPUTATIONSCRIPT'='" + TILECOMPUTATIONSCRIPT + "','SPECIALSOPTIONS'='" + SPECIALSOPTIONS + "' WHERE ID = " + LayerId);
+                Database.ExecuteNonQuerySQLCommand($"UPDATE 'main'.'EDITEDLAYERS' SET 'NOM'='{NOM}','DESCRIPTION'='{DESCRIPTION}','CATEGORIE'='{CATEGORIE}','IDENTIFIANT'='{IDENTIFIANT}','TILE_URL'='{TILE_URL}','TILE_FALLBACK_URL'='{TILE_FALLBACK_URL}','MIN_ZOOM'='{MIN_ZOOM}','MAX_ZOOM'='{MAX_ZOOM}','FORMAT'='{FORMAT}','SITE'='{SITE}','SITE_URL'='{SITE_URL}','TILE_SIZE'='{TILE_SIZE}','TILECOMPUTATIONSCRIPT'='{TILECOMPUTATIONSCRIPT}','VISIBILITY'='{Visibility.Visible.ToString()}','SPECIALSOPTIONS'='{SPECIALSOPTIONS}','VERSION'='{1}' WHERE ID = {LayerId}");
             }
             MainPage.ClearCache(LayerId, false);
 
@@ -823,6 +871,11 @@ namespace MapsInMyFolder
                 return;
             }
             ComboBoxItem comboBoxItem = TextboxLayerFormat.SelectedItem as ComboBoxItem;
+            if (comboBoxItem is null)
+            {
+                TextboxLayerFormat.SelectedItem = TextboxLayerFormat.Items[0];
+                return;
+            }
             if (comboBoxItem.Content.ToString() == "PBF")
             {
                 SpecialOptionPBFJsonStyle.Visibility = Visibility.Visible;

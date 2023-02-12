@@ -95,10 +95,12 @@ namespace MapsInMyFolder.Commun
             add.SetValue("cls", PrintClearAction);
             Action<object> helpAction = _ => Help(LayerId);
             add.SetValue("help", helpAction);
-            Action<object, object> setVarAction = (variable, value) => SetVar(variable, value, LayerId);
+            Func<object, object, bool, object> setVarAction = (variable, value, isglobalvar) => SetVar(variable, value, isglobalvar, LayerId);
             add.SetValue("setVar", setVarAction); //setVar("variable1","valeur1")
             Func<object, object> getVarFunction = (variablename) => GetVar(variablename, LayerId);
             add.SetValue("getVar", getVarFunction); //getVar("variable1")
+            Func<object, bool> clearVarFunction = (variablename) => ClearVar(LayerId, variablename);
+            add.SetValue("clearVar", clearVarFunction);
 
             Func<object, object, object, object> getTileNumberAction = (latitude, longitude, zoom) => CoordonneesToTile(latitude, longitude, zoom);
             add.SetValue("getTileNumber", getTileNumberAction); //setVar("variable1","valeur1")
@@ -122,35 +124,33 @@ namespace MapsInMyFolder.Commun
 
         #region StoreVariable
         private static readonly Dictionary<int, Dictionary<string, object>> DictionnaryOfVariablesKeyLayerId = new Dictionary<int, Dictionary<string, object>>();
-        static public void SetVar(object variablename, object value, int LayerId = 0)
+        static public object SetVar(object variablename, object value, bool isglobalvar = false, int LayerId = 0)
         {
             string variablenameString;
             if (variablename is null)
             {
                 PrintError("Le nom de la variable n'est pas défini !");
-                return;
+                return null;
             }
             else
             {
                 variablenameString = variablename.ToString();
             }
 
+            if (isglobalvar)
+            {
+                LayerId = 0;
+            }
+
             if (DictionnaryOfVariablesKeyLayerId.TryGetValue(LayerId, out Dictionary<string, object> VariableKeyAndValue))
             {
-                //if (VariableKeyAndValue.ContainsKey(variablenameString))
-                //{
-                //    VariableKeyAndValue[variablenameString] = value;
-                //}
-                //else
-                //{
-                //    VariableKeyAndValue.Add(variablenameString, value);
-                //} 
                 VariableKeyAndValue[variablenameString] = value;
             }
             else
             {
                 DictionnaryOfVariablesKeyLayerId.Add(LayerId, new Dictionary<string, object>() { { variablenameString, value } });
             }
+            return value;
         }
 
         static public object GetVar(object variablename, int LayerId = 0)
@@ -165,15 +165,44 @@ namespace MapsInMyFolder.Commun
             {
                 variablenameString = variablename.ToString();
             }
-            if (DictionnaryOfVariablesKeyLayerId.TryGetValue(LayerId, out Dictionary<string, object> VariableKeyAndValue))
+
+            //ID 0 is global scope
+            foreach (int ID in new int[] { LayerId, 0 })
             {
-                if (VariableKeyAndValue.ContainsKey(variablenameString))
+                if (DictionnaryOfVariablesKeyLayerId.TryGetValue(ID, out Dictionary<string, object> VariableKeyAndValue))
                 {
-                    return VariableKeyAndValue[variablenameString];
+                    if (VariableKeyAndValue.ContainsKey(variablenameString))
+                    {
+                        return VariableKeyAndValue[variablenameString];
+                    }
                 }
             }
             PrintError("La variable " + variablenameString + " n'est pas défini", LayerId);
             return null;
+        }
+
+        static public bool ClearVar(int LayerId, object variablename = null)
+        {
+            if (object.ReferenceEquals(null, variablename))
+            {
+                if (DictionnaryOfVariablesKeyLayerId.ContainsKey(LayerId))
+                {
+                    DictionnaryOfVariablesKeyLayerId.Remove(LayerId);
+                    return true;
+                }
+            }
+            else
+            {
+                if (DictionnaryOfVariablesKeyLayerId.TryGetValue(LayerId, out Dictionary<string, object> VariableKeyAndValue))
+                {
+                    if (VariableKeyAndValue.ContainsKey(variablename.ToString()))
+                    {
+                        VariableKeyAndValue.Remove(variablename.ToString());
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
 
         public static void DisposeVariablesOfLayer(int LayerId)
@@ -194,10 +223,6 @@ namespace MapsInMyFolder.Commun
             }
         }
         #endregion
-
-
-
-
 
         public static void SetSelection(double NO_Latitude, double NO_Longitude, double SE_Latitude, double SE_Longitude, bool ZoomToNewLocation, int LayerId)
         {
@@ -266,8 +291,8 @@ namespace MapsInMyFolder.Commun
         private static string ConvertJSObjectToString(object supposedString)
         {
 
-            string returnString = supposedString.ToString();
-            if ((supposedString.GetType() == typeof(System.Object) || supposedString.GetType() == typeof(System.Object[]) || supposedString.GetType() == typeof(System.Dynamic.ExpandoObject) || supposedString.GetType() == typeof(Dictionary<string, string>) || supposedString.GetType() == typeof(Dictionary<string, object>))
+            string returnString = supposedString?.ToString();
+            if (returnString != null && (supposedString.GetType() == typeof(System.Object) || supposedString.GetType() == typeof(System.Object[]) || supposedString.GetType() == typeof(System.Dynamic.ExpandoObject) || supposedString.GetType() == typeof(Dictionary<string, string>) || supposedString.GetType() == typeof(Dictionary<string, object>))
                 && (supposedString.GetType().FullName != "Jint.Runtime.Interop.DelegateWrapper"))
             {
                 Debug.WriteLine(supposedString.GetType().FullName);
@@ -275,8 +300,6 @@ namespace MapsInMyFolder.Commun
             }
             return returnString;
         }
-
-
         public static void Print(object print, int LayerId = 0)
         {
             string printString = ConvertJSObjectToString(print);
@@ -315,7 +338,7 @@ namespace MapsInMyFolder.Commun
                     dialog.Closed += (_, __) =>
                     {
                         // stops the frame
-                        frame.Continue = false; 
+                        frame.Continue = false;
                     };
                     dialog.ShowAsync();
                     return textBox;

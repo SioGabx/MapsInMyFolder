@@ -24,18 +24,15 @@ namespace MapsInMyFolder.MapControl
 
         public static async Task<ImageSource> LoadImageAsync(Uri uri, int x = 0, int y = 0, int z = -1, TileSource tileSource = null)
         {
-            Debug.WriteLine("2222222222");
             ImageSource image = null;
             try
             {
                 if (!uri.IsAbsoluteUri || uri.IsFile)
                 {
-                    Debug.WriteLine("333333");
                     image = await LoadImageAsync(uri.IsAbsoluteUri ? uri.LocalPath : uri.OriginalString);
                 }
                 else if (uri.Scheme == "http" || uri.Scheme == "https")
                 {
-                    Debug.WriteLine("444444");
                     Commun.HttpResponse response;
                     if (z != -1)
                     {
@@ -55,7 +52,6 @@ namespace MapsInMyFolder.MapControl
                     }
                     else
                     {
-                        Debug.WriteLine("555555");
                         var resp = await GetHttpResponseAsync(uri);
                         response = new Commun.HttpResponse(resp.Buffer, resp.Reponse);
                         resp = null;

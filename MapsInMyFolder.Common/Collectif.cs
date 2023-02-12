@@ -384,6 +384,24 @@ namespace MapsInMyFolder.Commun
         }
 
 
+        public static long GetDirectorySize(string folderPath)
+        {
+            DirectoryInfo di = new DirectoryInfo(folderPath);
+            return di.EnumerateFiles("*.*", SearchOption.AllDirectories).Sum(fi => fi.Length);
+        }
+        public static string FormatBytes(long bytes)
+        {
+            string[] Suffix = { "octets", "Ko", "Mo", "Go", "To" };
+            int i;
+            double dblSByte = bytes;
+            for (i = 0; i < Suffix.Length && bytes >= 1024; i++, bytes /= 1024)
+            {
+                dblSByte = bytes / 1024.0;
+            }
+
+            return String.Format("{0:0} {1}", dblSByte, Suffix[i]);
+        }
+
         public static VOption getSaveVOption(string final_saveformat, int quality, int tile_size)
         {
             if (quality <= 0)

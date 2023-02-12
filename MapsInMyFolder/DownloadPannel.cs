@@ -485,7 +485,8 @@ namespace MapsInMyFolder
             {
                 try
                 {
-                    MainPage._instance.Set_current_layer(engine.layerid);
+                    //MainPage._instance.Set_current_layer(engine.layerid);
+                    MainPage._instance.layer_browser.GetMainFrame().EvaluateScriptAsync("selectionner_calque_by_id(" + engine.layerid + ")");
                 }
                 catch (Exception ex)
                 {
