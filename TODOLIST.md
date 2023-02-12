@@ -6,6 +6,5 @@
 - Add settings for http client timeout.
 - Add script template for new layers
 - Add a way to convert location to another using epsg code (PROJ.4) => https://epsg.io/
-- On layer edit, update value exclusivly if changed. (In progress)
 
 - Add more layers 😝
