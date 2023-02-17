@@ -1,4 +1,6 @@
-- Add application update system
+- Add application update system (in progress)
+- Add change log + update banner
+- Add decouvrir les nouveautés -> lien vers github
 - Add database update system (with change compare)
 - Add export database buttton (clear downloads, merge edited layers and customs layers)
 - Add fallback url textbox
