@@ -267,7 +267,10 @@ namespace MapsInMyFolder
                                 {
                                     field.SetValue(LayerWithReplacement, replacementValueTypeToString);
                                 }
-                                Debug.WriteLine("string");
+                            }
+                            else
+                            {
+                                field.SetValue(LayerWithReplacement, replacementValue);
                             }
                             //else if (replacementValueType == typeof(int))
                             //{
@@ -313,13 +316,18 @@ namespace MapsInMyFolder
 
                     const string imgbase64 = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"; //1 pixel gif transparent -> disable base 
 
+                    string overideBackgroundColor = string.Empty;
+                    if (!string.IsNullOrEmpty(LayerWithReplacement?.class_specialsoptions?.BackgroundColor?.Trim()))
+                    {
+                        overideBackgroundColor = "background-color:" + LayerWithReplacement.class_specialsoptions.BackgroundColor;
+                    }
                     string supplement_class = "";
                     if (!Settings.layerpanel_website_IsVisible)
                     {
                         supplement_class += " displaynone";
                     }
                     generated_layers = generated_layers + @"<li class=""inview layer" + visibility + @""" id=""" + LayerWithReplacement.class_id + @""">
-          <div class=""layer_main_div"" style=""background-image:url(" + imgbase64.Trim() + @")"">
+          <div class=""layer_main_div"" style=""background-image:url(" + imgbase64.Trim() + @");" + overideBackgroundColor + @""">
              <div class=""layer_main_div_background_image""></div>
             <div class=""layer_content"" data-layer=""" + LayerWithReplacement.class_identifiant + @""" title=""Sélectionner ce calque"">
                   <div class=""layer_texte"" title=""" + Collectif.HTMLEntities(LayerWithReplacement.class_description) + @""">
@@ -378,7 +386,7 @@ namespace MapsInMyFolder
                 {
                     Layers.Convert.ToCurentLayer(layer);
                     Debug.WriteLine("Set curent layer " + layer.class_name + " = " + layer.class_tiles_size);
-                    List<string> listoftransparentformat = new List<string> { "png", "pbf2" };
+                    List<string> listoftransparentformat = new List<string> { "png" };
 
                     if (listoftransparentformat.Contains(layer.class_format))
                     {
@@ -442,6 +450,17 @@ namespace MapsInMyFolder
                         mapviewer.MinZoomLevel = 2;
                         mapviewer.MaxZoomLevel = 25;
                     }
+
+                    if (string.IsNullOrEmpty(layer?.class_specialsoptions?.BackgroundColor?.Trim()))
+                    {
+                        mapviewer.Background = Collectif.RgbValueToSolidColorBrush(Settings.background_layer_color_R, Settings.background_layer_color_G, Settings.background_layer_color_B); ;
+                    }
+                    else
+                    {
+                        mapviewer.Background = Collectif.HexValueToSolidColorBrush(layer.class_specialsoptions.BackgroundColor);
+                    }
+                    Collectif.setBackgroundOnUIElement(mapviewer, layer?.class_specialsoptions?.BackgroundColor);
+
                 }
                 catch (Exception ex)
                 {

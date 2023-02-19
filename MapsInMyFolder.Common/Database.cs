@@ -9,10 +9,6 @@ namespace MapsInMyFolder.Commun
     public static class Database
     {
         public static event EventHandler RefreshPanels;
-        //public static string selected_database_pathname = "";
-        // public static string database_default_path_url = "";
-        // public static string default_database_pathname = "";
-        //public static string working_folder = "";
         public static async void DB_Download(bool force_download = false)
         {
             //https://api.github.com/repos/SioGabx/MapsInMyFolder/releases
@@ -125,9 +121,6 @@ namespace MapsInMyFolder.Commun
                         }
                     }
                 }
-
-
-
                 SQLiteConnection.CreateFile(database_pathname);
                 DB_CreateTables(database_pathname);
                 RefreshPanels.Invoke(null, EventArgs.Empty);
@@ -203,7 +196,6 @@ namespace MapsInMyFolder.Commun
                 return null;
             }
             SQLiteCommand sqlite_cmd = sqlite_conn.CreateCommand();
-            //
             const string commande_arg = "('ID' INTEGER UNIQUE, 'NOM' TEXT, 'DESCRIPTION' TEXT, 'CATEGORIE' TEXT, 'IDENTIFIANT' TEXT, 'TILE_URL' TEXT,'TILE_FALLBACK_URL' TEXT, 'MIN_ZOOM' INTEGER DEFAULT 0, 'MAX_ZOOM' INTEGER DEFAULT 0, 'FORMAT' TEXT, 'SITE' TEXT, 'SITE_URL' TEXT, 'TILE_SIZE' INTEGER DEFAULT 256, 'FAVORITE' INTEGER DEFAULT 0, 'TILECOMPUTATIONSCRIPT' TEXT DEFAULT '','VISIBILITY' TEXT DEFAULT 'Visible' ,'SPECIALSOPTIONS' TEXT DEFAULT '', 'VERSION' INTEGER DEFAULT 1 ";
             sqlite_cmd.CommandText = "CREATE TABLE IF NOT EXISTS 'CUSTOMSLAYERS' " + commande_arg + ");";
             sqlite_cmd.ExecuteNonQuery();
@@ -226,7 +218,6 @@ namespace MapsInMyFolder.Commun
             }
             catch (Exception e)
             {
-                //MessageBox.Show("Une erreur s'est produite au niveau de la base de donnée.\n" + e.Message);  
                 Debug.WriteLine("Une erreur s'est produite au niveau de la base de donnée.\n" + e.Message);
             }
         }
@@ -247,9 +238,6 @@ namespace MapsInMyFolder.Commun
                 DB_Download_Init(conn);
                 sqlite_cmd.CommandText = "INSERT INTO 'DOWNLOADS'('STATE','INFOS', 'FILE_NAME', 'NBR_TILES', 'ZOOM', 'NO_LAT', 'NO_LONG', 'SE_LAT', 'SE_LONG', 'LAYER_ID', 'TEMP_DIRECTORY', 'SAVE_DIRECTORY','TIMESTAMP','QUALITY','REDIMWIDTH','REDIMHEIGHT', 'COLORINTERPRETATION') VALUES('" + STATE + "','','" + FILE_NAME + "','" + NBR_TILES + "','" + ZOOM + "','" + NO_LAT + "','" + NO_LONG + "','" + SE_LAT + "','" + SE_LONG + "','" + LAYER_ID + "','" + TEMP_DIRECTORY + "','" + SAVE_DIRECTORY + "','" + TIMESTAMP + "','" + QUALITY + "','" + REDIMWIDTH + "','" + REDIMHEIGHT + "','" + COLORINTERPRETATION + "');";
                 sqlite_cmd.ExecuteNonQuery();
-
-                //sqlite_cmd.
-
                 sqlite_cmd.CommandText = "select last_insert_rowid()";
                 Int64 LastRowID64 = (Int64)sqlite_cmd.ExecuteScalar();
                 int LastRowID = (int)LastRowID64;

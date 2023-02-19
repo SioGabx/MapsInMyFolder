@@ -272,12 +272,44 @@ namespace MapsInMyFolder.Commun
 
         public static SolidColorBrush HexValueToSolidColorBrush(string hexvalue)
         {
-            //"#BCBCBC"
-            if (!hexvalue.StartsWith("#"))
+            if (!string.IsNullOrEmpty(hexvalue))
             {
-                hexvalue = "#" + hexvalue;
+                hexvalue = hexvalue.Trim('#');
             }
-            return (SolidColorBrush)new BrushConverter().ConvertFrom(hexvalue);
+            if (!string.IsNullOrEmpty(hexvalue) && (Int32.TryParse(hexvalue, System.Globalization.NumberStyles.HexNumber, null, out _)))
+            {
+                if (hexvalue.Length == 3)
+                {
+                    return (SolidColorBrush)new BrushConverter().ConvertFrom('#' + string.Concat(hexvalue[0], hexvalue[0],hexvalue[1], hexvalue[1],hexvalue[2], hexvalue[2]));
+                }
+                else if (hexvalue.Length == 6)
+                {
+                    return (SolidColorBrush)new BrushConverter().ConvertFrom('#' + hexvalue);
+                }
+            }
+            return RgbValueToSolidColorBrush(Settings.background_layer_color_R, Settings.background_layer_color_G, Settings.background_layer_color_B);
+        }
+
+        public static SolidColorBrush RgbValueToSolidColorBrush(int R, int G, int B)
+        {
+            return new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(255, (byte)R, (byte)G, (byte)B));
+        }
+
+        public static void setBackgroundOnUIElement(UIElement element, string hexcolor)
+        {
+            SolidColorBrush brush;
+            if (string.IsNullOrEmpty(hexcolor?.Trim()))
+            {
+                brush = Collectif.RgbValueToSolidColorBrush(Settings.background_layer_color_R, Settings.background_layer_color_G, Settings.background_layer_color_B); ;
+            }
+            else
+            {
+                brush = Collectif.HexValueToSolidColorBrush(hexcolor);
+            }
+
+            //element.GetType().GetProperty("Background").GetValue(element);
+            element.GetType().GetProperty("Background").SetValue(element, brush);
+
         }
 
         public static string GetSaveTempDirectory(string nom, string identifiant, int zoom = -1, string temp_folder = "")
@@ -345,7 +377,6 @@ namespace MapsInMyFolder.Commun
             return GetEmptyImageBufferFromText(BitmapErrorsMessage);
         }
 
-
         public static byte[] GetEmptyImageBufferFromText(string BitmapErrorsMessage)
         {
             const int tile_size = 300;
@@ -356,8 +387,8 @@ namespace MapsInMyFolder.Commun
             }
             lock (Locker)
             {
-                
-                using (NetVips.Image text = NetVips.Image.Text(WordWrap(BitmapErrorsMessage,20), null, null, null, NetVips.Enums.Align.Centre, null, 100, true, 5, null))
+
+                using (NetVips.Image text = NetVips.Image.Text(WordWrap(BitmapErrorsMessage, 20), null, null, null, NetVips.Enums.Align.Centre, null, 100, true, 5, null))
                 {
                     const int border_tile_size = tile_size - (border_size * 2);
                     int offsetX = (int)Math.Floor((double)(border_tile_size - text.Width) / 2);
@@ -382,7 +413,6 @@ namespace MapsInMyFolder.Commun
             }
             return null;
         }
-
 
         public static long GetDirectorySize(string folderPath)
         {
@@ -419,7 +449,6 @@ namespace MapsInMyFolder.Commun
                         { "interlace", true },
                         { "strip", true },
                     };
-                Debug.WriteLine("Format is png" + quality);
             }
             else if (final_saveformat == "jpeg")
             {
@@ -431,7 +460,6 @@ namespace MapsInMyFolder.Commun
                         { "strip", true },
 
                     };
-                Debug.WriteLine("Format is jpeg" + quality);
             }
             else if (final_saveformat == "tiff")
             {
@@ -446,7 +474,6 @@ namespace MapsInMyFolder.Commun
                         { "pyramid", true },
                         { "bigtif", true }
                     };
-                Debug.WriteLine("Format is tiff");
             }
             else
             {
@@ -609,6 +636,24 @@ namespace MapsInMyFolder.Commun
             uIElement.UndoLimit = 0;
             uIElement.UndoLimit = undo_limit;
         }
+        public static void InsertTextAtCaretPosition(TextBox TextBox, string text)
+        {
+            if (TextBox.SelectionLength == 0)
+            {
+                int CaretIndex = TextBox.CaretIndex;
+                TextBox.Text = TextBox.Text.Insert(CaretIndex, text);
+                TextBox.CaretIndex = CaretIndex + text.Length;
+            }
+            else
+            {
+                TextBox.SelectedText = text;
+                TextBox.CaretIndex += TextBox.SelectedText.Length;
+                TextBox.SelectionLength = 0; 
+            }
+            int lineIndex = TextBox.GetLineIndexFromCharacterIndex(TextBox.CaretIndex);
+            TextBox.ScrollToLine(lineIndex);
+        }
+
 
         public static List<UIElement> FindVisualChildren(UIElement obj, List<System.Type> BlackListNoSearchChildren = null)
         {
@@ -631,6 +676,61 @@ namespace MapsInMyFolder.Commun
             }
             return children;
         }
+
+        /// <summary>
+        /// Finds a Child of a given item in the visual tree. 
+        /// https://stackoverflow.com/questions/636383/how-can-i-find-wpf-controls-by-name-or-type
+        /// </summary>
+        /// <param name="parent">A direct parent of the queried item.</param>
+        /// <typeparam name="T">The type of the queried item.</typeparam>
+        /// <param name="childName">x:Name or Name of child. </param>
+        /// <returns>The first parent item that matches the submitted type parameter. 
+        /// If not matching item can be found, 
+        /// a null parent is being returned.</returns>
+        public static T FindChild<T>(DependencyObject parent, string childName)
+           where T : DependencyObject
+        {
+            // Confirm parent and childName are valid. 
+            if (parent == null) return null;
+
+            T foundChild = null;
+
+            int childrenCount = VisualTreeHelper.GetChildrenCount(parent);
+            for (int i = 0; i < childrenCount; i++)
+            {
+                var child = VisualTreeHelper.GetChild(parent, i);
+                // If the child is not of the request child type child
+                T childType = child as T;
+                if (childType == null)
+                {
+                    // recursively drill down the tree
+                    foundChild = FindChild<T>(child, childName);
+
+                    // If the child is found, break so we do not overwrite the found child. 
+                    if (foundChild != null) break;
+                }
+                else if (!string.IsNullOrEmpty(childName))
+                {
+                    var frameworkElement = child as FrameworkElement;
+                    // If the child's name is set for search
+                    if (frameworkElement != null && frameworkElement.Name == childName)
+                    {
+                        // if the child's name is of the request name
+                        foundChild = (T)child;
+                        break;
+                    }
+                }
+                else
+                {
+                    // child element found.
+                    foundChild = (T)child;
+                    break;
+                }
+            }
+
+            return foundChild;
+        }
+
 
         public static int CheckIfInputValueHaveChange(UIElement SourcePanel)
         {
@@ -798,6 +898,10 @@ namespace MapsInMyFolder.Commun
 
         public static bool FilterDigitOnlyWhileWritingInTextBox(TextBox textbElement, System.Windows.Controls.TextChangedEventHandler action, int MaxInt = -1)
         {
+            if (textbElement is null)
+            {
+                return false;
+            }
             bool TextHasBeenFilteredAndChanged = false;
             textbElement.TextChanged -= action;
             if (FilterDigitOnlyWhileWritingInTextBox(textbElement))
@@ -818,15 +922,14 @@ namespace MapsInMyFolder.Commun
             return TextHasBeenFilteredAndChanged;
         }
 
-        public static string FilterDigitOnly(string origin, List<char> char_supplementaire)
+        public static string FilterDigitOnly(string origin, List<char> char_supplementaire, bool onlyOnePoint = true, bool limitLenght = true)
         {
             //string str = new string((from c in origin where char.IsDigit(c) select c).ToArray());
-            if (string.IsNullOrEmpty(origin.Trim())) { return origin; }
+            if (string.IsNullOrEmpty(origin)) { return String.Empty; }
             string str = "";
-            char[] split_origin = origin.ToCharArray();
-            foreach (char caractere in split_origin)
+            foreach (char caractere in origin.ToCharArray())
             {
-                if (str.Length > 10)
+                if (str.Length > 10 && limitLenght)
                 {
                     return str;
                 }
@@ -837,7 +940,7 @@ namespace MapsInMyFolder.Commun
                 }
                 if (!(char_supplementaire is null))
                 {
-                    if (!(car == '.' && str.Contains(car)))
+                    if (!(car == '.' && str.Contains(car) && onlyOnePoint))
                     {
                         if (char_supplementaire.Contains(car))
                         {

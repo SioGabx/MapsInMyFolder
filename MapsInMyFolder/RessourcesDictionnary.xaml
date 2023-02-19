@@ -9,24 +9,34 @@
     xmlns:cef="clr-namespace:CefSharp;assembly=CefSharp.Core"
     xmlns:map="clr-namespace:MapsInMyFolder.MapControl;assembly=MapsInMyFolder.MapControl" xmlns:sys="clr-namespace:System;assembly=netstandard"
 >
+    <MenuItem x:Key="ContextMenu_Copier" x:Shared="false" Header="Copier" InputGestureText="Ctrl+C" Command="{x:Static ApplicationCommands.Copy}">
+        <MenuItem.Icon>
+            <ui:FontIcon Glyph="&#xE16F;" Foreground="#888989" />
+        </MenuItem.Icon>
+    </MenuItem>
+    <MenuItem x:Key="ContextMenu_Couper" x:Shared="false"  Header="Couper" InputGestureText="Ctrl+X"  Command="{x:Static ApplicationCommands.Cut}">
+        <MenuItem.Icon>
+            <ui:FontIcon Glyph="&#xE16B;" Foreground="#888989" />
+        </MenuItem.Icon>
+    </MenuItem>
+    <MenuItem x:Key="ContextMenu_Coller" x:Shared="false"  Header="Coller" InputGestureText="Ctrl+V" Command="{x:Static ApplicationCommands.Paste}">
+        <MenuItem.Icon>
+            <ui:FontIcon Glyph="&#xE16D;" Foreground="#888989" />
+        </MenuItem.Icon>
+    </MenuItem>
+    <MenuItem x:Key="ContextMenu_ScriptTemplate" x:Name="ContextMenu_ScriptTemplate" x:Shared="false"  Header="Script template">
+        <MenuItem.Icon>
+            <ui:FontIcon Glyph="&#xE16D;" Foreground="#888989" />
+        </MenuItem.Icon>
+    </MenuItem>
 
-    <ContextMenu x:Key="CopyPasteContextMenu" Foreground="#E2E2E1" Background="#171719">
-        <MenuItem Header="Copier" InputGestureText="Ctrl+C" Command="{x:Static ApplicationCommands.Copy}">
-            <MenuItem.Icon>
-                <ui:FontIcon Glyph="&#xE16F;" Foreground="#888989" />
-            </MenuItem.Icon>
-        </MenuItem>
-        <MenuItem Header="Couper" InputGestureText="Ctrl+X"  Command="{x:Static ApplicationCommands.Cut}">
-            <MenuItem.Icon>
-                <ui:FontIcon Glyph="&#xE16B;" Foreground="#888989" />
-            </MenuItem.Icon>
-        </MenuItem>
-        <MenuItem Header="Coller" InputGestureText="Ctrl+V"  Command="{x:Static ApplicationCommands.Paste}">
-            <MenuItem.Icon>
-                <ui:FontIcon Glyph="&#xE16D;" Foreground="#888989" />
-            </MenuItem.Icon>
-        </MenuItem>
+    <ContextMenu x:Key="CopyPasteContextMenu" x:Name="CopyPasteContextMenu" Foreground="#E2E2E1" Background="#171719">
+        <StaticResourceExtension ResourceKey="ContextMenu_Copier" />
+        <StaticResourceExtension ResourceKey="ContextMenu_Couper" />
+        <StaticResourceExtension ResourceKey="ContextMenu_Coller" />
     </ContextMenu>
+
+    
 
     <Style x:Key="TextBoxCleanStyleDefault" TargetType="{x:Type TextBox}">
         <Setter Property="Foreground" Value="#5A5A5A"></Setter>

@@ -74,7 +74,7 @@ namespace MapsInMyFolder
         }
 
         //SQLiteConnection global_conn;
-        public void Init()
+        public async void Init()
         {
             this.Title = "MapsInMyFolder";
             TitleTextBox.Text = "MapsInMyFolder";
@@ -90,9 +90,20 @@ namespace MapsInMyFolder
             JavascriptLocationInstance.LocationChanged += (o, e) => MainPage.MapViewerSetSelection(Javascript.JavascriptInstance.Location, Javascript.JavascriptInstance.ZoomToNewLocation);
             Network.IsNetworkNowAvailable += (o, e) => CheckIfReadyToStartDownloadAfterNetworkChange();
             Database.RefreshPanels += (o, e) => RefreshAllPanels();
+            Update.NewUpdateFoundEvent += (o, e) => Application.Current.Dispatcher.Invoke(NewUpdateFoundEvent);
 
+
+            if (await Update.CheckIfNewerVersionAvailableOnGithub())
+            {
+                Debug.WriteLine("Une nouvelle mise à jour est disponible : Version " + Update.UpdateRelease.Tag_name);
+            }
         }
 
+        public void NewUpdateFoundEvent()
+        {
+            Action Callback = () => Update.StartUpdating();
+            MainPage.CreateNotification("MapsInMyFolder", $"Une nouvelle version de l'application ({Update.UpdateRelease.Tag_name}) est disponible. Cliquez ici pour mettre à jour.", Callback);
+        }
 
 
         public static void RefreshAllPanels()

@@ -1079,6 +1079,39 @@
             });
         }
 
+        var visibleY = function (el) {
+            var rect = el.getBoundingClientRect(), top = rect.top, height = rect.height,
+                el = el.parentNode
+            // Check if bottom of the element is off the page
+            if (rect.bottom < 0) return false
+            // Check its within the document viewport
+            if (top > document.documentElement.clientHeight) return false
+            do {
+                rect = el.getBoundingClientRect()
+                if (top <= rect.bottom === false) return false
+                // Check if the element is out of view due to a container scrolling
+                if ((top + height) <= rect.top) return false
+                el = el.parentNode
+            } while (el != document.body)
+            return true
+        };
+
+
+        window.addEventListener("scroll", CheckIfIntersectionObserverHasDetectedEachElements);
+        function CheckIfIntersectionObserverHasDetectedEachElements() {
+            // On observe nos éléments
+            let items = document.querySelectorAll("li")
+            items.forEach(function (item) {
+                if (visibleY(item)) {
+                    if (!item.classList.contains("inview")) {
+
+                        item.classList.add("inview");
+                        UpdatePreview();
+                        //console.log("Elmenet was not update" + item.id);
+                    }
+                }
+            });
+        }
 
         function InternalUpdatePreview(element_fiup) {
             if (document.querySelector("ul").classList.value == "list" || document.querySelector("ul").classList.value == "list_alternat") {
@@ -1459,6 +1492,8 @@
                             update_lock_state("*", true);
                             update_lock_state("ajouter_calque", false);
                             update_lock_state("actualiser_panel", false);
+                            update_lock_state("basculer_affichage_showmasque", false);
+                            update_lock_state("basculer_affichage_hidemasque", false);
                         }
 
                         //if multiple element, then change text :

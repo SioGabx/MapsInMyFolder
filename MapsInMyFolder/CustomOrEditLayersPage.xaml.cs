@@ -40,7 +40,7 @@ namespace MapsInMyFolder
             Javascript.ClearVar(-1);
             Javascript.ClearVar(-2);
             GenerateTempLayerInDicList();
-            mapviewerappercu.Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(255, (byte)Settings.background_layer_color_R, (byte)Settings.background_layer_color_G, (byte)Settings.background_layer_color_B));
+            mapviewerappercu.Background = Collectif.RgbValueToSolidColorBrush(Settings.background_layer_color_R, Settings.background_layer_color_G, Settings.background_layer_color_B);
             mapviewerappercu.Center = MainPage._instance.mapviewer.Center;
             mapviewerappercu.ZoomLevel = MainPage._instance.mapviewer.ZoomLevel;
 
@@ -96,7 +96,7 @@ namespace MapsInMyFolder
                 {
                     Categories.Add(class_categorie);
                     TextboxLayerCategories.Items.Add(class_categorie);
-                    Debug.WriteLine("Adding " + class_categorie + " From " + layer.class_id);
+                   //Debug.WriteLine("Adding " + class_categorie + " From " + layer.class_id);
                 }
                 string class_site = layer.class_site.Trim();
                 if (!Site.Contains(class_site))
@@ -181,9 +181,22 @@ namespace MapsInMyFolder
             TextBoxSetValueAndLock(TextboxLayerTileWidth, tileSize);
             TextBoxSetValueAndLock(TextboxSpecialOptionBackgroundColor, LayerInEditMode.class_specialsoptions.BackgroundColor);
             TextBoxSetValueAndLock(TextboxSpecialOptionPBFJsonStyle, LayerInEditMode.class_specialsoptions.PBFJsonStyle);
-
             DefaultValuesHachCode = Collectif.CheckIfInputValueHaveChange(EditeurStackPanel);
+
+            Collectif.setBackgroundOnUIElement(mapviewerappercu, LayerInEditMode?.class_specialsoptions?.BackgroundColor);
+            MenuItem menuItem = new MenuItem();
+            menuItem.Header = "Script template";
+            menuItem.Icon = new ModernWpf.Controls.FontIcon() { Glyph = "\uE15C", Foreground = Collectif.HexValueToSolidColorBrush("#888989") };
+            menuItem.Click += (sender, e) => putScriptTemplate(sender, e, TextboxLayerScript);
+            TextboxLayerScript.ContextMenu.Items.Add(menuItem);
         }
+
+        void putScriptTemplate(object sender, EventArgs e, TextBox textBox)
+        {
+            Collectif.InsertTextAtCaretPosition(textBox, Settings.tileloader_template_script); 
+            DoWeNeedToUpdateMoinsUnLayer();
+        }
+
 
         static void TextBoxSetValueAndLock(TextBox textBox, string value)
         {
@@ -854,7 +867,9 @@ namespace MapsInMyFolder
 
         private void TextboxSpecialOptionBackgroundColor_KeyUp(object sender, KeyEventArgs e)
         {
+            
             DoWeNeedToUpdateMoinsUnLayer();
+            Collectif.setBackgroundOnUIElement(mapviewerappercu, TextboxSpecialOptionBackgroundColor.Text);
         }
 
         #endregion
@@ -886,6 +901,9 @@ namespace MapsInMyFolder
             }
         }
 
-
+        private void TextboxSpecialOptionBackgroundColor_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            Collectif.FilterDigitOnlyWhileWritingInTextBox((TextBox)sender, new List<char>() { 'A', 'a', 'B', 'b', 'C', 'c', 'D', 'd', 'E', 'e', 'F', 'f', '#' });
+        }
     }
 }

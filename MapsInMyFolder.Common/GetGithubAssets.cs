@@ -67,6 +67,11 @@ namespace MapsInMyFolder.Commun
         public DateTime Created_at { get; set; }
         public DateTime Updated_at { get; set; }
         public string Browser_download_url { get; set; }
+
+        public override string ToString()
+        {
+            return $"Url {Url},Id {Id},Node_id {Node_id},Name {Name},Label {Label},Uploader {Uploader},Content_type {Content_type},State {State},Size {Size},Download_count {Download_count},Created_at {Created_at},Updated_at {Updated_at},Browser_download_url {Browser_download_url},";
+        }
     }
 
     public class RootObject
@@ -115,11 +120,12 @@ namespace MapsInMyFolder.Commun
 
     public static class GetGithubAssets
     {
-        public static Asset GetReleaseAssetsFromGithub(string githubUrl, string filename)
+        public static (RootObject Release, Asset FileAsset) GetReleaseAssetsFromGithub(string githubUrl, string filename)
         {
+            //get releases
             string url = "https://api.github.com/repos" + githubUrl + "/releases";
             string responseBody = GetAssetsFromGithub(url, filename);
-            if (string.IsNullOrEmpty(responseBody))
+            if (!string.IsNullOrEmpty(responseBody))
             {
                 var token = JToken.Parse(responseBody);
                 List<RootObject> releases;
@@ -143,24 +149,25 @@ namespace MapsInMyFolder.Commun
                 {
                     foreach (var asset in release.Assets)
                     {
+                        Debug.WriteLine("asset.Name : " + asset.Name);
                         if (asset.Name == filename)
                         {
-                            string AssetSerializeObject = JsonConvert.SerializeObject(asset);
-                            XMLParser.Write("GithubAsset_" + filename, AssetSerializeObject);
-                            return asset;
+                            //string AssetSerializeObject = JsonConvert.SerializeObject(asset);
+                            //XMLParser.Write("GithubAsset_" + filename, AssetSerializeObject);
+                            return (release, asset);
                         }
 
                     }
                 }
-                return new Asset { Created_at = new DateTime(0), Browser_download_url = "File not found in assets :" + filename };
+                return (new RootObject(), new Asset { Created_at = new DateTime(0), Browser_download_url = "File not found in assets :" + filename });
             }
-            return new Asset { Created_at = new DateTime(0), Browser_download_url = "Error" + filename };
+            return (new RootObject(), new Asset { Created_at = new DateTime(0), Browser_download_url = "Error" + filename });
         }
 
 
         public static GitHubFile GetContentAssetsFromGithub(string githubUrl, string githubPath, string filename)
         {
-            //$"https://api.github.com/repos/SioGabx/MapsInMyFolder/contents/MapsInMyFolder/cursors/
+            //get files inside repos
             string url = "https://api.github.com/repos" + githubUrl + "/contents/" + githubPath;
             string responseBody = GetAssetsFromGithub(url, filename);
             if (!string.IsNullOrEmpty(responseBody))
@@ -183,15 +190,13 @@ namespace MapsInMyFolder.Commun
                     files = new List<GitHubFile>();
                 }
 
-
-
                 foreach (var file in files)
                 {
                     Debug.WriteLine(file.Name);
                     if (file.Name == filename)
                     {
-                        string AssetSerializeObject = JsonConvert.SerializeObject(file);
-                        XMLParser.Write("GithubAsset_" + filename, AssetSerializeObject);
+                        //string AssetSerializeObject = JsonConvert.SerializeObject(file);
+                        //XMLParser.Write("GithubAsset_" + filename, AssetSerializeObject);
                         return file;
                     }
                 }
@@ -202,7 +207,7 @@ namespace MapsInMyFolder.Commun
 
 
 
-        public static string GetAssetsFromGithub(string url, string filename)
+        private static string GetAssetsFromGithub(string url, string filename)
         {
             //$"https://api.github.com/repos/SioGabx/MapsInMyFolder/releases/latest"
             //$"https://api.github.com/repos/SioGabx/MapsInMyFolder/contents/MapsInMyFolder/cursors/
@@ -227,16 +232,13 @@ namespace MapsInMyFolder.Commun
             else
             {
                 Debug.WriteLine(HttpResponse.ResponseMessage.StatusCode);
-                if (HttpResponse.ResponseMessage.StatusCode == HttpStatusCode.NotModified)
-                {
-                    return XMLParser.Read("GithubAsset_" + filename);
-                }
-                else
-                {
-                    return string.Empty;
-                }
+                //if 301 not modified, then we have a cache version inside Settings.xml, else we try to fetch and give back null if not
+                return XMLParser.Read("GithubAsset_" + filename);
+
             }
-            return Collectif.ByteArrayToString(HttpResponse.Buffer);
+            string ResponseMsg = Collectif.ByteArrayToString(HttpResponse.Buffer);
+            XMLParser.Write("GithubAsset_" + filename, ResponseMsg);
+            return ResponseMsg;
         }
     }
 }

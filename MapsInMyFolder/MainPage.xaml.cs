@@ -1,7 +1,9 @@
-﻿using System;
+﻿using MapsInMyFolder.Commun;
+using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media.Animation;
 
 namespace MapsInMyFolder
 {
@@ -28,7 +30,7 @@ namespace MapsInMyFolder
         }
 
         bool isInitialised = false;
-       public void Preload()
+        public void Preload()
         {
             ReloadPage();
             MapLoad();
@@ -57,7 +59,6 @@ namespace MapsInMyFolder
             {
                 layer_searchbar.Text = "";
             }
-            //SearchStart();
         }
 
         private void Layer_searchbar_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
@@ -96,6 +97,145 @@ namespace MapsInMyFolder
             SearchLayerStart();
         }
 
-       
+        public Grid CreateNotification(string Title, string Information, Action callback = null, string NotificationInternalName = null)
+        {
+            //<Grid Background="#303031" MaxHeight="400">
+            //    <Border BorderThickness="3" BorderBrush="Transparent" Margin="5,2,25,5" Grid.Column="0">
+            //        <TextBlock TextWrapping="WrapWithOverflow" Foreground="#FFE2E2E1"  TextAlignment="Justify">
+            //                    <Span>MapsInMyFolder</Span>
+            //                    <Span>&#160;:&#160;</Span>
+            //                    <!--<Span FontWeight="Light">Une nouvelle version est disponible. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</Span>-->
+            //                    <Span FontWeight="Light">Une nouvelle version est disponible. </Span>
+            //        </TextBlock>
+            //    </Border>
+            //    <Button  Style="{DynamicResource IconButton}" HorizontalAlignment="Right" Height="10" Width="10" Foreground="#FFE2E2E1" Cursor="Hand" ToolTip="Fermer cette notification" Margin="5,10,5,0" VerticalAlignment="Top">
+            //        <Path StrokeStartLineCap="round" StrokeEndLineCap="round" StrokeLineJoin="round" StrokeThickness="0.8" Data="{StaticResource CloseButton}" Stroke="{Binding Foreground, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Button}}" Stretch="Uniform" Height="10" Width="10"/>
+            //    </Button>
+            //    <Rectangle Fill="#62626b" Height="1" VerticalAlignment="Bottom"></Rectangle>
+            //</Grid>
+
+
+            Grid ContentGrid = new Grid()
+            {
+                Background = Collectif.HexValueToSolidColorBrush("#303031"),
+                MaxHeight = 400
+            };
+            ContentGrid.RowDefinitions.Add(new RowDefinition());
+            ContentGrid.ColumnDefinitions.Add(new ColumnDefinition());
+            if (!string.IsNullOrEmpty(NotificationInternalName))
+            {
+                ContentGrid.Name = NotificationInternalName;
+            }
+
+
+            Border ContentBorder = new Border()
+            {
+                BorderThickness = new Thickness(3),
+                BorderBrush = System.Windows.Media.Brushes.Transparent,
+                Margin = new Thickness(5, 2, 20, 5),
+            };
+            ContentBorder.SetValue(Grid.RowProperty, 0);
+
+            TextBlock ContentTextBlock = new TextBlock()
+            {
+                TextWrapping = TextWrapping.WrapWithOverflow,
+                Foreground = Collectif.HexValueToSolidColorBrush("#FFE2E2E1"),
+                TextAlignment = TextAlignment.Justify
+
+
+            };
+            if (callback != null)
+            {
+                ContentTextBlock.Cursor = Cursors.Hand;
+                ContentGrid.MouseLeftButtonUp += (_, _) =>
+                {
+                    CloseNotification(ContentGrid, null);
+                    callback();
+                };
+            }
+
+            ContentTextBlock.Inlines.Add(new System.Windows.Documents.Run()
+            {
+                Text = Title
+            });
+            ContentTextBlock.Inlines.Add(new System.Windows.Documents.Run()
+            {
+                Text = "\u00A0:\u00A0"
+            });
+            ContentTextBlock.Inlines.Add(new System.Windows.Documents.Run()
+            {
+                Text = Information,
+                FontWeight = FontWeights.Light,
+            });
+            ContentBorder.Child = ContentTextBlock;
+
+            Button CloseButton = new Button()
+            {
+                Style = (Style)Application.Current.Resources["IconButton"],
+                Height = 26,
+                Width = 25,
+                Foreground = Collectif.HexValueToSolidColorBrush("#FFE2E2E1"),
+                Cursor = Cursors.Hand,
+                ToolTip = "Fermer cette notification",
+                Margin = new Thickness(0, 0, 0, 0),
+                VerticalAlignment = VerticalAlignment.Top,
+                HorizontalAlignment = HorizontalAlignment.Right
+            };
+
+            CloseButton.Content = new System.Windows.Shapes.Path()
+            {
+                Margin = new Thickness(0, 4, 0, 0),
+                StrokeStartLineCap = System.Windows.Media.PenLineCap.Round,
+                StrokeEndLineCap = System.Windows.Media.PenLineCap.Round,
+                StrokeLineJoin = System.Windows.Media.PenLineJoin.Round,
+                StrokeThickness = 0.8,
+                Data = (System.Windows.Media.Geometry)Application.Current.Resources["CloseButton"],
+                Stroke = Collectif.HexValueToSolidColorBrush("#FFE2E2E1"),
+                Stretch = System.Windows.Media.Stretch.Uniform,
+                Height = 10,
+                Width = 10
+            };
+            CloseButton.Click += (_, e) =>
+            {
+                CloseNotification(ContentGrid, e);
+                CloseButton.IsEnabled = false;
+            };
+
+            System.Windows.Shapes.Rectangle BorderBottom = new System.Windows.Shapes.Rectangle()
+            {
+                Fill = Collectif.HexValueToSolidColorBrush("#62626b"),
+                Height = 1,
+                VerticalAlignment = VerticalAlignment.Bottom
+            };
+            BorderBottom.PreviewMouseUp += (_, e) => e.Handled = true;
+
+            ContentGrid.Children.Add(ContentBorder);
+            ContentGrid.Children.Add(CloseButton);
+            ContentGrid.Children.Add(BorderBottom);
+
+            ContentGrid.Opacity = 0;
+            var doubleAnimation = new DoubleAnimation(0, 1, Settings.animations_duration);
+            ContentGrid.BeginAnimation(UIElement.OpacityProperty, doubleAnimation);
+
+            if (Collectif.FindChild<Grid>(NotificationZone, NotificationInternalName) != null)
+            {
+                NotificationZone.Children.Remove(Collectif.FindChild<Grid>(NotificationZone, NotificationInternalName));
+            }
+            NotificationZone.Children.Add(ContentGrid);
+
+            return ContentGrid;
+        }
+
+        public void CloseNotification(object sender, RoutedEventArgs e)
+        {
+            if (e is not null)
+            {
+                e.Handled = true;
+            }
+            Grid ContentGrid = (Grid)sender;
+            var doubleAnimation = new DoubleAnimation(ContentGrid.ActualHeight, 0, new Duration(TimeSpan.FromSeconds(0.1)));
+            ContentGrid.BeginAnimation(Grid.MaxHeightProperty, doubleAnimation);
+        }
+
     }
 }

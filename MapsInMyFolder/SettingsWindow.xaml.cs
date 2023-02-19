@@ -2,6 +2,8 @@
 using ModernWpf.Controls;
 using System;
 using System.Diagnostics;
+using System.Globalization;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -131,6 +133,9 @@ namespace MapsInMyFolder
             //tileloader_default_script
             tileloader_default_script.Text = Settings.tileloader_default_script;
 
+            //tileloader_template_script
+            tileloader_template_script.Text = Settings.tileloader_template_script;
+
             //working_folder
             working_folder.Text = Settings.working_folder;
 
@@ -145,6 +150,9 @@ namespace MapsInMyFolder
 
             //tiles_cache_expire_after_x_days
             tiles_cache_expire_after_x_days.Text = Settings.tiles_cache_expire_after_x_days.ToString();
+
+            //http_client_timeout_in_seconds
+            http_client_timeout_in_seconds.Text = Settings.http_client_timeout_in_seconds.ToString();
 
             //max_download_project_in_parralele
             max_download_project_in_parralele.Text = Settings.max_download_project_in_parralele.ToString();
@@ -235,8 +243,21 @@ namespace MapsInMyFolder
             nettoyer_cache_layers_au_demarrage.IsChecked = Settings.nettoyer_cache_layers_au_demarrage;
 
             DefaultValuesHachCode = Collectif.CheckIfInputValueHaveChange(SettingsScrollViewer);
+            SettingsVersionInformation.Content = Update.GetActualProductVersionFormatedString();
+            UpdateLastUpdateSearch();
         }
 
+        public void UpdateLastUpdateSearch()
+        {
+            string LastUpdateCheckDateTimeTick = Collectif.FilterDigitOnly(XMLParser.Read("LastUpdateCheck"), null, false, false);
+            string LastUpdateCheckDate = "/";
+            if (!string.IsNullOrEmpty(LastUpdateCheckDateTimeTick))
+            {
+                LastUpdateCheckDate = new DateTime(Convert.ToInt64(LastUpdateCheckDateTimeTick)).ToString("dd MMMM yyyy à H:mm:ss", CultureInfo.InstalledUICulture);
+            }
+            Debug.WriteLine(LastUpdateCheckDateTimeTick);
+            searchForUpdatesLastUpdateCheck.Content = LastUpdateCheckDate;
+        }
 
         private async void ResetSettings_Click(object sender, RoutedEventArgs e)
         {
@@ -307,6 +328,9 @@ namespace MapsInMyFolder
             //tiles_cache_expire_after_x_days = ;
             Settings.tiles_cache_expire_after_x_days = Convert.ToInt32(tiles_cache_expire_after_x_days.Text);
 
+            //http_client_timeout_in_seconds = ;
+            Settings.http_client_timeout_in_seconds = Convert.ToInt32(http_client_timeout_in_seconds.Text);
+
             //max_download_project_in_parralele = ;
             Settings.max_download_project_in_parralele = Convert.ToInt32(max_download_project_in_parralele.Text);
 
@@ -370,6 +394,9 @@ namespace MapsInMyFolder
 
             //tileloader_default_script = ;
             Settings.tileloader_default_script = tileloader_default_script.Text;
+
+            //tileloader_template_script = ;
+            Settings.tileloader_template_script = tileloader_template_script.Text;
 
             //user_agent = ;
             Settings.user_agent = user_agent.Text;
@@ -512,6 +539,15 @@ namespace MapsInMyFolder
                 MainWindow.RefreshAllPanels();
                 DefaultValuesHachCode = Collectif.CheckIfInputValueHaveChange(SettingsScrollViewer);
             }
+        }
+
+        private async void searchForUpdates_Click(object sender, RoutedEventArgs e)
+        {
+            searchForUpdates.IsEnabled = false;
+            searchForUpdatesLastUpdateCheck.Content = "Recherche en cours...";
+            Debug.WriteLine("Nouvelle mise à jour disponible ? : "  + await Commun.Update.CheckIfNewerVersionAvailableOnGithub());
+            searchForUpdates.IsEnabled = true;
+            UpdateLastUpdateSearch();
         }
     }
 }

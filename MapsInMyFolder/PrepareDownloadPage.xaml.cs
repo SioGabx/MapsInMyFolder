@@ -67,12 +67,7 @@ namespace MapsInMyFolder
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
             //Init();
-            System.Windows.Media.SolidColorBrush brush = new System.Windows.Media.SolidColorBrush(
-                Color.FromArgb(255,
-                (byte)Settings.background_layer_color_R,
-                (byte)Settings.background_layer_color_G,
-                (byte)Settings.background_layer_color_B)
-                );
+            System.Windows.Media.SolidColorBrush brush = Collectif.HexValueToSolidColorBrush(Curent.Layer.class_specialsoptions.BackgroundColor);
             StackPanel_ImageTilePreview_0.Background = brush;
             StackPanel_ImageTilePreview_1.Background = brush;
             StackPanel_ImageTilePreview_2.Background = brush;

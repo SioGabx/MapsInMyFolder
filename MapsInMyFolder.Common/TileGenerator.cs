@@ -47,14 +47,8 @@ namespace MapsInMyFolder.Commun
 
     public static class TileGeneratorSettings
     {
-        //public static string Temp_folder { get; set; } = Commun.Settings.temp_folder;
-        //public static int Tiles_cache_expire_after_x_days { get; set; } = Commun.Settings.tiles_cache_expire_after_x_days;
-
-        //public static int Max_redirection_download_tile { get; set; } = Commun.Settings.max_redirection_download_tile;
-        public static int Number_tile_converted { get; set; } = 0;
         public static bool AcceptJavascriptPrint { get; set; } = false;
 
-        public static Dictionary<int, int> Numbers_tiles_converted { get; set; } = new Dictionary<int, int>();
         public static HttpClientHandler handler = new HttpClientHandler
         {
             AllowAutoRedirect = true,
@@ -62,7 +56,7 @@ namespace MapsInMyFolder.Commun
             AutomaticDecompression = System.Net.DecompressionMethods.GZip | System.Net.DecompressionMethods.Deflate
         };
 
-        public static HttpClient HttpClient { get; set; } = new HttpClient(handler) { Timeout = TimeSpan.FromSeconds(30) };
+        public static HttpClient HttpClient { get; set; } = new HttpClient(handler) { Timeout = TimeSpan.FromSeconds(Settings.http_client_timeout_in_seconds) };
         public static TileGenerator TileLoaderGenerator = new TileGenerator();
         public static List<string> SupportedFileType = new List<string>()
         {
@@ -96,7 +90,6 @@ namespace MapsInMyFolder.Commun
                     return await GetTilePBF(layerID, urlBase, TileX, TileY, TileZoom, save_temp_directory, Layer.class_tiles_size * TileSize, TileSize, 0.5, pbfdisableadjacent).ConfigureAwait(false);
 
                 default:
-                    //Debug.WriteLine("Classic format start Converting");
                     return await GetTile(layerID, urlBase, TileX, TileY, TileZoom).ConfigureAwait(false);
             }
         }
