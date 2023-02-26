@@ -240,6 +240,26 @@
             filter: brightness(1.1)
         }
 
+        .warning {
+            width: 23px;
+            height: 25px;
+            position: absolute;
+            left: 5px;
+            top: 0px;
+            opacity: 0.9;
+            transition: opacity 150ms;
+        }
+
+        .warning {
+            background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNDEuNzMiIGhlaWdodD0iMTQxLjczIiB2aWV3Qm94PSIwIDAgMTQxLjczIDE0MS43MyI+PGRlZnM+PHN0eWxlPi5he2ZpbGw6I2ZkZDQ1NTtzdHJva2U6IzFlMWUxYztzdHJva2Utd2lkdGg6NHB4O30uYSwuYntzdHJva2UtbGluZWpvaW46cm91bmQ7fS5ie2ZpbGw6I2FmYWZhZjtzdHJva2U6IzAwMDtzdHJva2Utd2lkdGg6M3B4O308L3N0eWxlPjwvZGVmcz48dGl0bGU+cGljdG9ncmFtbWVzLTIwPC90aXRsZT48cG9seWdvbiBjbGFzcz0iYSIgcG9pbnRzPSIyLjEzIDEzMy44NyAxMzkuNjEgMTMzLjg3IDcwLjg3IDUuNzcgMi4xMyAxMzMuODciLz48cmVjdCBjbGFzcz0iYiIgeD0iNjYuMjgiIHk9IjQ1LjE1IiB3aWR0aD0iOS4xOCIgaGVpZ2h0PSI1Mi43OSIvPjxyZWN0IGNsYXNzPSJiIiB4PSI2Ni4yOCIgeT0iMTA4Ljk5IiB3aWR0aD0iOS4xOCIgaGVpZ2h0PSI5LjE4Ii8+PC9zdmc+");
+            background-size: contain;
+            background-repeat: no-repeat;
+        }
+
+        li:hover .warning {
+            opacity: 1;
+        }
+
 
         /*  ------------------ CONTEXT MENU ------------------ */
 
@@ -914,6 +934,13 @@
             }
         }
 
+        function show_warning(event, id) {
+            if (event != null) {
+                event.stopPropagation();
+                event.preventDefault();
+            }
+            layer_Csharp_call_from_js.layer_show_warning(parseInt(id));
+        }
 
         function ajouter_aux_favoris(event, star, id) {
             if (event != null) {

@@ -142,6 +142,7 @@
     <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.ValueTuple.4.5.0\lib\net47\System.ValueTuple.dll</HintPath>
     </Reference>
+    <Reference Include="System.Web" />
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -152,6 +153,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Collectif.cs" />
+    <Compile Include="DiffMatchPatch.cs" />
     <Compile Include="Map.cs" />
     <Compile Include="Database.cs" />
     <Compile Include="Extensions.cs" />

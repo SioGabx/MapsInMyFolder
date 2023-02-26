@@ -33,6 +33,10 @@ namespace MapsInMyFolder.Commun
             {
                 System.Threading.Thread.Sleep(5000);
                 (RootObject Release, Asset FileAsset) = GetGithubAssets.GetReleaseAssetsFromGithub(new Uri(Settings.github_repository_url).PathAndQuery, "MapsInMyFolder.Setup.msi");
+                if (Release is null)
+                {
+                    return false;
+                }
                 string GithubVersion = Collectif.FilterDigitOnly(Release.Tag_name, new System.Collections.Generic.List<char>() { '.' }, false, false);
 
                 //Debug.WriteLine("LatestGithubRelease : " + FileAsset);

@@ -521,7 +521,7 @@ namespace MapsInMyFolder
                 Debug.WriteLine("Adding to EDITEDLAYERS");
                 int FAVORITE = Layers.GetLayerById(LayerId).class_favorite ? 1 : 0;
                 Database.ExecuteNonQuerySQLCommand("INSERT INTO 'main'.'EDITEDLAYERS'('ID', 'NOM', 'DESCRIPTION', 'CATEGORIE', 'IDENTIFIANT', 'TILE_URL', 'TILE_FALLBACK_URL', 'MIN_ZOOM', 'MAX_ZOOM', 'FORMAT', 'SITE', 'SITE_URL', 'TILE_SIZE', 'FAVORITE', 'TILECOMPUTATIONSCRIPT', 'VISIBILITY', 'SPECIALSOPTIONS', 'VERSION') " +
-                $"VALUES('{LayerId}', '{NOM}', '{DESCRIPTION}', '{CATEGORIE}', '{IDENTIFIANT}', '{TILE_URL}', '{TILE_FALLBACK_URL}', '{MIN_ZOOM}', '{MAX_ZOOM}', '{FORMAT}', '{SITE}', '{SITE_URL}', '{TILE_SIZE}', '{FAVORITE}',  '{TILECOMPUTATIONSCRIPT}',  '{Visibility.Visible.ToString()}',  '{SPECIALSOPTIONS}',  '{1}')");
+                $"VALUES('{LayerId}', '{NOM}', '{DESCRIPTION}', '{CATEGORIE}', '{IDENTIFIANT}', '{TILE_URL}', '{TILE_FALLBACK_URL}', '{MIN_ZOOM}', '{MAX_ZOOM}', '{FORMAT}', '{SITE}', '{SITE_URL}', '{TILE_SIZE}', '{FAVORITE}',  '{TILECOMPUTATIONSCRIPT}',  '{Visibility.Visible.ToString()}',  '{SPECIALSOPTIONS}',  '{Layers.GetLayerById(LayerId).class_version}')");
             }
             else
             {

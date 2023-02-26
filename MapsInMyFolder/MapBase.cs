@@ -378,7 +378,6 @@ namespace MapsInMyFolder
             }
         }
 
-
         public List<double> Map_location_to_mouse_location(System.Windows.Input.MouseEventArgs mouse_position)
         {
             System.Windows.Point LocationXY = new System.Windows.Point(mouse_position.GetPosition(mapviewer).X, mouse_position.GetPosition(mapviewer).Y);
@@ -389,8 +388,6 @@ namespace MapsInMyFolder
         private void Map_panel_open_location_panel_Click(object sender, RoutedEventArgs e)
         {
             Message.NoReturnBoxAsync("Cette fonctionnalité fait l'objet d'une prochaine mise à jour, elle n'as pas encore été ajoutée à cette version !", "Erreur");
-            //Notification pageNotification = new Text("Notification 1", "Hello", () => { MessageBox.Show("Hello"); }) { NotificationId = "Batavia"};
-            //pageNotification.Register();
         }
 
         public void UpdatePushpinPositionAndDrawRectangle()

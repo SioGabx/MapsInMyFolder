@@ -12,7 +12,7 @@ namespace MapsInMyFolder.Commun
     public static class Database
     {
         public static event EventHandler RefreshPanels;
-        public static event EventHandler NewUpdateFoundEvent;
+        public static event EventHandler<int> NewUpdateFoundEvent;
 
         private static string GetDatabasePath()
         {
@@ -41,13 +41,18 @@ namespace MapsInMyFolder.Commun
                 }
                 else if (result == ContentDialogResult.Secondary)
                 {
-                    SQLiteConnection.CreateFile(database_pathname);
-                    DB_CreateTables(database_pathname);
-                    RefreshPanels.Invoke(null, EventArgs.Empty);
+                    CreateEmptyDatabase(database_pathname);
                     return;
                 }
             }
 
+        }
+        private static void CreateEmptyDatabase(string database_pathname)
+        {
+            SQLiteConnection.CreateFile(database_pathname);
+            DB_CreateTables(database_pathname);
+            RefreshPanels.Invoke(null, EventArgs.Empty);
+            Database.CheckIfNewerVersionAvailable();
         }
 
         private static async Task<bool> DB_DownloadFile(string database_url, string database_pathname)
@@ -131,9 +136,7 @@ namespace MapsInMyFolder.Commun
                     }
                 }
             }
-            SQLiteConnection.CreateFile(database_pathname);
-            DB_CreateTables(database_pathname);
-            RefreshPanels.Invoke(null, EventArgs.Empty);
+            CreateEmptyDatabase(database_pathname);
         }
 
         static public void ExecuteNonQuerySQLCommand(string querry)
@@ -149,6 +152,19 @@ namespace MapsInMyFolder.Commun
             sqlite_cmd.ExecuteNonQuery();
         }
 
+        static public SQLiteDataReader ExecuteExecuteReaderSQLCommand(string querry)
+        {
+            SQLiteConnection conn = DB_Connection();
+            if (conn is null)
+            {
+                Debug.WriteLine("La connection à la base de donnée est null");
+                return null;
+            }
+            SQLiteCommand sqlite_cmd = conn.CreateCommand();
+            sqlite_cmd.CommandText = querry;
+            return sqlite_cmd.ExecuteReader();
+        }
+
         static public int ExecuteScalarSQLCommand(string querry)
         {
             SQLiteConnection conn = DB_Connection();
@@ -160,6 +176,70 @@ namespace MapsInMyFolder.Commun
             SQLiteCommand sqlite_cmd = conn.CreateCommand();
             sqlite_cmd.CommandText = querry;
             return Convert.ToInt32(sqlite_cmd.ExecuteScalar());
+        }
+
+        public static int GetOrdinal(SQLiteDataReader sqlite_datareader, string name)
+        {
+            if (string.IsNullOrEmpty(name))
+            {
+                throw new ArgumentException("Invalid Ordinal name");
+            }
+            int ordinal = sqlite_datareader.GetOrdinal(name);
+            if (sqlite_datareader.IsDBNull(ordinal))
+            {
+                return -1;
+            }
+            return ordinal;
+        }
+
+        public static string GetStringFromOrdinal(this SQLiteDataReader sqlite_datareader, string name)
+        {
+            try
+            {
+                int ordinal = GetOrdinal(sqlite_datareader, name);
+                if (ordinal == -1)
+                {
+                    return "";
+                }
+                if (sqlite_datareader.IsDBNull(ordinal))
+                {
+                    return "";
+                }
+                var get_setring = sqlite_datareader.GetString(ordinal);
+                if (string.IsNullOrEmpty(get_setring))
+                {
+                    return "";
+                }
+                else
+                {
+                    return Collectif.HTMLEntities(get_setring, true);
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("Get : " + name + " - Erreur : " + ex.ToString());
+                return "";
+            }
+        }
+        public static int GetIntFromOrdinal(this SQLiteDataReader sqlite_datareader, string name)
+        {
+            try
+            {
+                int ordinal = sqlite_datareader.GetOrdinal(name);
+                if (ordinal == -1)
+                {
+                    return 0;
+                }
+                if (sqlite_datareader.IsDBNull(ordinal))
+                {
+                    return 0;
+                }
+                return sqlite_datareader.GetInt32(ordinal);
+            }
+            catch (Exception)
+            {
+                return 0;
+            }
         }
 
         //CONNEXION A LA BASE DE DONNEES
@@ -186,7 +266,6 @@ namespace MapsInMyFolder.Commun
             return DB_CreateTables(dbFile);
         }
 
-
         public static SQLiteConnection DB_CreateTables(string datasource)
         {
             SQLiteConnection sqlite_conn = new SQLiteConnection("Data Source=" + datasource + "; Version = 3; New = True; Compress = True; ");
@@ -201,13 +280,12 @@ namespace MapsInMyFolder.Commun
             }
             SQLiteCommand sqlite_cmd = sqlite_conn.CreateCommand();
             const string commande_arg = "('ID' INTEGER UNIQUE, 'NOM' TEXT, 'DESCRIPTION' TEXT, 'CATEGORIE' TEXT, 'IDENTIFIANT' TEXT, 'TILE_URL' TEXT,'TILE_FALLBACK_URL' TEXT, 'MIN_ZOOM' INTEGER DEFAULT 0, 'MAX_ZOOM' INTEGER DEFAULT 0, 'FORMAT' TEXT, 'SITE' TEXT, 'SITE_URL' TEXT, 'TILE_SIZE' INTEGER DEFAULT 256, 'FAVORITE' INTEGER DEFAULT 0, 'TILECOMPUTATIONSCRIPT' TEXT DEFAULT '','VISIBILITY' TEXT DEFAULT 'Visible' ,'SPECIALSOPTIONS' TEXT DEFAULT '', 'VERSION' INTEGER DEFAULT 1 ";
-            sqlite_cmd.CommandText = "CREATE TABLE IF NOT EXISTS 'CUSTOMSLAYERS' " + commande_arg + ");";
+            sqlite_cmd.CommandText = $@"
+            CREATE TABLE IF NOT EXISTS 'CUSTOMSLAYERS' {commande_arg});
+            CREATE TABLE IF NOT EXISTS 'LAYERS' {commande_arg},PRIMARY KEY('ID' AUTOINCREMENT));
+            CREATE TABLE IF NOT EXISTS 'EDITEDLAYERS' {commande_arg});
+            ";
             sqlite_cmd.ExecuteNonQuery();
-            sqlite_cmd.CommandText = "CREATE TABLE IF NOT EXISTS 'LAYERS' " + commande_arg + ",PRIMARY KEY('ID' AUTOINCREMENT))";
-            sqlite_cmd.ExecuteNonQuery();
-            sqlite_cmd.CommandText = "CREATE TABLE IF NOT EXISTS 'EDITEDLAYERS' " + commande_arg + ");";
-            sqlite_cmd.ExecuteNonQuery();
-
             return sqlite_conn;
         }
 
@@ -228,12 +306,6 @@ namespace MapsInMyFolder.Commun
 
         public static int DB_Download_Write(Status STATE, string FILE_NAME, int NBR_TILES, int ZOOM, double NO_LAT, double NO_LONG, double SE_LAT, double SE_LONG, int LAYER_ID, string TEMP_DIRECTORY, string SAVE_DIRECTORY, string TIMESTAMP, int QUALITY, int REDIMWIDTH, int REDIMHEIGHT, string COLORINTERPRETATION)
         {
-            //staticc
-            //CREATE TABLE IF NOT EXISTS some_table (id INTEGER PRIMARY KEY AUTOINCREMENT,
-
-            // CREATE TABLE IF NOT EXISTS "DOWNLOADS" ("ID" INTEGER NOT NULL UNIQUE,"STATE" TEXT,"FILE_NAME" TEXT,"NBR_TILES" INTEGER,"ZOOM" INTEGER,"NO_LAT" REAL,"NO_LONG" REAL,"SE_LAT" REAL,"SE_LONG" REAL,"LAYER_ID" INTEGER,"TEMP_DIRECTORY" TEXT,"SAVE_DIRECTORY" TEXT,PRIMARY KEY("ID" AUTOINCREMENT));
-            //INSERT INTO "DOWNLOADS" ("STATE","FILE_NAME","NBR_TILES","ZOOM","NO_LAT","NO_LONG","SE_LAT","SE_LONG","LAYER_ID","TEMP_DIRECTORY","SAVE_DIRECTORY") VALUES (\"" + STATE + \"",\"" + FILE_NAME + \"",\"" + NBR_TILES + \"",\"" + ZOOM + \"",\"" + NO_LAT + \"",\"" + NO_LONG + \"",\"" + SE_LAT + \"",\"" + SE_LONG + \"","LAYER_ID + \"",\"" + TEMP_DIRECTORY + \"",\"" + SAVE_DIRECTORY + \"")
-
             try
             {
                 SQLiteConnection conn = DB_Connection();
@@ -294,12 +366,61 @@ namespace MapsInMyFolder.Commun
 
         public static async void CheckIfNewerVersionAvailable()
         {
-            if (await CompareVersion())
+            (bool IsNewVersionAvailable, int NewVersionNumber) NewVersion = await CompareVersion();
+            if (NewVersion.IsNewVersionAvailable)
             {
-                NewUpdateFoundEvent(null, EventArgs.Empty);
+                NewUpdateFoundEvent(null, NewVersion.NewVersionNumber);
             }
         }
 
+        private static async Task<(bool IsNewVersionAvailable, int NewVersionNumber)> CompareVersion()
+        {
+            int UserVersion = Database.ExecuteScalarSQLCommand("PRAGMA user_version");
+            int LastCheckDatabaseVersion = Convert.ToInt32(XMLParser.Cache.Read("dbVersion"));
+            string LastCheckDatabaseSha = XMLParser.Cache.ReadAttribute("dbVersion", "dbSha");
+
+            GitHubFile githubAssets = GetGithubAssets.GetContentAssetsFromGithub(new Uri(Settings.github_repository_url).PathAndQuery, String.Empty, Settings.github_database_name);
+            if (githubAssets == null)
+            {
+                return (false, UserVersion);
+            }
+
+            if (LastCheckDatabaseSha == githubAssets.Sha)
+            {
+                //Latest downloaded version is equal to latest release version
+                if (LastCheckDatabaseVersion > UserVersion)
+                {
+                    return (true, LastCheckDatabaseVersion);
+                }
+                else
+                {
+                    return (false, UserVersion);
+                }
+            }
+            //Download database from github
+            string downloadedDatabasePath = Path.Combine(Settings.temp_folder, "Github" + Settings.github_database_name);
+            Collectif.HttpClientDownloadWithProgress client = new Collectif.HttpClientDownloadWithProgress(githubAssets.Download_url, downloadedDatabasePath);
+            await client.StartDownload().ConfigureAwait(false);
+            int GithubDatabaseVersion;
+            using (SQLiteConnection sqlite_conn = new SQLiteConnection("Data Source=" + downloadedDatabasePath + "; Version = 3; New = True; Compress = True; "))
+            {
+                sqlite_conn.Open();
+                SQLiteCommand sqlite_cmd = sqlite_conn.CreateCommand();
+                sqlite_cmd.CommandText = "PRAGMA user_version";
+                GithubDatabaseVersion = Convert.ToInt32(sqlite_cmd.ExecuteScalar());
+            }
+            XMLParser.Cache.Write("dbVersion", GithubDatabaseVersion.ToString());
+            XMLParser.Cache.WriteAttribute("dbVersion", "dbSha", githubAssets.Sha);
+
+            if (GithubDatabaseVersion > UserVersion)
+            {
+                return (true, GithubDatabaseVersion);
+            }
+            else
+            {
+                return (false, UserVersion);
+            }
+        }
         public static async void StartUpdating()
         {
             GitHubFile githubAssets = GetGithubAssets.GetContentAssetsFromGithub(new Uri(Settings.github_repository_url).PathAndQuery, String.Empty, Settings.github_database_name);
@@ -338,7 +459,6 @@ namespace MapsInMyFolder.Commun
                 sqlite_cmd.CommandText = "PRAGMA user_version;";
                 string user_version = sqlite_cmd.ExecuteScalar().ToString();
                 Sql.Append($"PRAGMA user_version={user_version};");
-
                 SQLiteDataReader sqlite_datareader;
                 sqlite_cmd.CommandText = "SELECT sql FROM 'main'.'sqlite_master' WHERE name = 'LAYERS';";
                 using (sqlite_datareader = sqlite_cmd.ExecuteReader())
@@ -353,55 +473,55 @@ namespace MapsInMyFolder.Commun
             ExecuteNonQuerySQLCommand(Sql.ToString());
         }
 
-        private static async Task<bool> CompareVersion()
+        public static void FixEditedLayers()
         {
-            int UserVersion = Database.ExecuteScalarSQLCommand("PRAGMA user_version");
-            int LastCheckDatabaseVersion = Convert.ToInt32(XMLParser.Cache.Read("dbVersion"));
-            string LastCheckDatabaseSha = XMLParser.Cache.ReadAttribute("dbVersion", "dbSha");
-
-            GitHubFile githubAssets = GetGithubAssets.GetContentAssetsFromGithub(new Uri(Settings.github_repository_url).PathAndQuery, String.Empty, Settings.github_database_name);
-
-            if (githubAssets == null)
+            using (SQLiteDataReader editedlayers_sqlite_datareader = ExecuteExecuteReaderSQLCommand("SELECT * FROM 'EDITEDLAYERS'"))
             {
-                return false;
-            }
-
-            if (LastCheckDatabaseSha == githubAssets.Sha)
-            {
-                //Latest downloaded version is equal to latest release version
-                if (LastCheckDatabaseVersion > UserVersion)
+                StringBuilder SQLExecute = new StringBuilder();
+                SQLExecute.Append("BEGIN TRANSACTION;");
+                while (editedlayers_sqlite_datareader.Read())
                 {
-                    return true;
+                    int DB_Layer_ID = editedlayers_sqlite_datareader.GetIntFromOrdinal("ID");
+                    int EditedDB_VERSION = editedlayers_sqlite_datareader.GetIntFromOrdinal("VERSION");
+                    string EditedDB_TILECOMPUTATIONSCRIPT = editedlayers_sqlite_datareader.GetStringFromOrdinal("TILECOMPUTATIONSCRIPT");
+                    string EditedDB_TILE_URL = editedlayers_sqlite_datareader.GetStringFromOrdinal("TILE_URL");
+
+                    using (SQLiteDataReader layers_sqlite_datareader = ExecuteExecuteReaderSQLCommand($"SELECT * FROM 'LAYERS' WHERE ID = {DB_Layer_ID}"))
+                    {
+                        layers_sqlite_datareader.Read();
+                        int DB_Layer_MIN_ZOOM = layers_sqlite_datareader.GetIntFromOrdinal("MIN_ZOOM");
+                        int DB_Layer_MAX_ZOOM = layers_sqlite_datareader.GetIntFromOrdinal("MAX_ZOOM");
+                        int DB_Layer_TILE_SIZE = layers_sqlite_datareader.GetIntFromOrdinal("TILE_SIZE");
+                        int LastDB_VERSION = layers_sqlite_datareader.GetIntFromOrdinal("VERSION");
+                        string LastDB_TILECOMPUTATIONSCRIPT = layers_sqlite_datareader.GetStringFromOrdinal("TILECOMPUTATIONSCRIPT");
+                        string LastDB_TILE_URL = layers_sqlite_datareader.GetStringFromOrdinal("TILE_URL");
+
+                        SQLExecute.Append($"UPDATE 'main'.'EDITEDLAYERS' SET 'MIN_ZOOM'='{DB_Layer_MIN_ZOOM}','MAX_ZOOM'='{DB_Layer_MAX_ZOOM}','TILE_SIZE'='{DB_Layer_TILE_SIZE}' WHERE ID = {DB_Layer_ID};");
+                        bool VersionCanBeUpdated = true;
+                        if (LastDB_VERSION <= EditedDB_VERSION)
+                        {
+                            VersionCanBeUpdated = false;
+                        }
+                        else if (LastDB_TILECOMPUTATIONSCRIPT != EditedDB_TILECOMPUTATIONSCRIPT && LastDB_TILE_URL != EditedDB_TILE_URL)
+                        {
+                            if (string.IsNullOrWhiteSpace(EditedDB_TILECOMPUTATIONSCRIPT) && string.IsNullOrWhiteSpace(EditedDB_TILE_URL))
+                            {
+                                VersionCanBeUpdated = true;
+                            }
+                            else
+                            {
+                                VersionCanBeUpdated = false;
+                            }
+                        }
+
+                        if (VersionCanBeUpdated)
+                        {
+                            SQLExecute.Append($"UPDATE 'main'.'EDITEDLAYERS' SET 'VERSION'='{LastDB_VERSION}' WHERE ID = {DB_Layer_ID};");
+                        }
+                    }
                 }
-                else
-                {
-                    return false;
-                }
-            }
-            //Download database from github
-            string downloadedDatabasePath = Path.Combine(Settings.temp_folder, "Github" + Settings.github_database_name);
-            Collectif.HttpClientDownloadWithProgress client = new Collectif.HttpClientDownloadWithProgress(githubAssets.Download_url, downloadedDatabasePath);
-            await client.StartDownload().ConfigureAwait(false);
-
-            int GithubDatabaseVersion;
-            using (SQLiteConnection sqlite_conn = new SQLiteConnection("Data Source=" + downloadedDatabasePath + "; Version = 3; New = True; Compress = True; "))
-            {
-                sqlite_conn.Open();
-                SQLiteCommand sqlite_cmd = sqlite_conn.CreateCommand();
-                sqlite_cmd.CommandText = "PRAGMA user_version";
-                GithubDatabaseVersion = Convert.ToInt32(sqlite_cmd.ExecuteScalar());
-            }
-
-            XMLParser.Cache.Write("dbVersion", GithubDatabaseVersion.ToString());
-            XMLParser.Cache.WriteAttribute("dbVersion", "dbSha", githubAssets.Sha);
-
-            if (GithubDatabaseVersion > UserVersion)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
+                SQLExecute.Append("COMMIT;");
+                Database.ExecuteNonQuerySQLCommand(SQLExecute.ToString());
             }
         }
     }

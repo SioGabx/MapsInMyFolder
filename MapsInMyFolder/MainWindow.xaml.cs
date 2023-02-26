@@ -89,7 +89,7 @@ namespace MapsInMyFolder
             Database.RefreshPanels += (o, e) => RefreshAllPanels();
             Update.NewUpdateFoundEvent += (o, e) =>
             {
-                try { 
+                try {
                     Application.Current.Dispatcher.Invoke(ApplicationUpdateFoundEvent); 
                 }
                 catch (Exception ex)
@@ -122,7 +122,23 @@ namespace MapsInMyFolder
 
         public void DatabaseUpdateFoundEvent()
         {
-            Notification DatabaseUpdateNotification = new NText("Une nouvelle version de la base de donnée est disponible. Cliquez ici pour mettre à jour.", "MapsInMyFolder", Database.StartUpdating)
+            int ActualUserVersion = Database.ExecuteScalarSQLCommand("PRAGMA user_version");
+            string Message;
+            if (ActualUserVersion == -1)
+            {
+                //no database found
+                return;
+            }
+            if (ActualUserVersion == 0)
+            {
+                Message = "Une base de données de calques est disponible en ligne. Voullez-vous la télécharger ?";
+            }
+            else
+            {
+                Message = "Une nouvelle version de la base de donnée est disponible. Cliquez ici pour mettre à jour.";
+            }
+
+            Notification DatabaseUpdateNotification = new NText(Message, "MapsInMyFolder", Database.StartUpdating)
             {
                 NotificationId = "DatabaseUpdateNotification",
                 DisappearAfterAMoment = false,
@@ -153,7 +169,6 @@ namespace MapsInMyFolder
             _instance.MainPage.Init_download_panel();
             _instance.MainPage.Set_current_layer(Settings.layer_startup_id);
         }
-
 
         private void Window_ContentRendered(object sender, EventArgs e)
         {

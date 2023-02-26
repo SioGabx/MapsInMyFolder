@@ -295,6 +295,61 @@ namespace MapsInMyFolder.Commun
             return new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(255, (byte)R, (byte)G, (byte)B));
         }
 
+        public static ScrollViewer FormatDiffGetScrollViewer(string texteBase, string texteModif)
+        {
+            TextBlock FormatDiffTextblock = FormatDiff(texteBase, texteModif);
+            FormatDiffTextblock.Padding = new Thickness(5, 5, 5, 5);
+            ScrollViewer ScrollViewerElement = new ScrollViewer()
+            {
+                MaxHeight = 200,
+                Margin = new Thickness(0, 5, 0, 20),
+                VerticalScrollBarVisibility = ScrollBarVisibility.Auto
+            };
+            StackPanel ScrollViewerElementContent = new StackPanel()
+            {
+                Margin = new Thickness(0, 0, 25, 0),
+                Background = Collectif.HexValueToSolidColorBrush("#303031"),
+            };
+            ScrollViewerElementContent.Children.Add(FormatDiffTextblock);
+            ScrollViewerElement.Content = ScrollViewerElementContent;
+            return ScrollViewerElement;
+        }
+
+
+        public static TextBlock FormatDiff(string texteBase, string texteModif)
+        {
+            DiffMatchPatch dmp = new DiffMatchPatch();
+            dmp.Diff_Timeout = 0;
+            TextBlock ContentTextBlock = new TextBlock()
+            {
+                TextWrapping = TextWrapping.WrapWithOverflow,
+                Foreground = Collectif.HexValueToSolidColorBrush("#FFE2E2E1"),
+                TextAlignment = TextAlignment.Justify
+            };
+            List<Diff> diffs = dmp.diff_main(texteBase, texteModif);
+            SolidColorBrush BackgroundGreen = Collectif.HexValueToSolidColorBrush("#6b803f");
+            SolidColorBrush BackgroundRed = Collectif.HexValueToSolidColorBrush("#582e2e");
+            foreach (var diff in diffs)
+            {
+                SolidColorBrush curentBrush = Brushes.Transparent;
+                if (diff.operation == Operation.INSERT)
+                {
+                    curentBrush = BackgroundGreen;
+                }
+                else if (diff.operation == Operation.DELETE)
+                {
+                    curentBrush = BackgroundRed;
+                }
+
+                ContentTextBlock.Inlines.Add(new System.Windows.Documents.Run()
+                {
+                    Text = diff.text,
+                    Background = curentBrush,
+                });
+            }
+            return ContentTextBlock;
+        }
+
         public static void setBackgroundOnUIElement(UIElement element, string hexcolor)
         {
             SolidColorBrush brush;

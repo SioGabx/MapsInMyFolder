@@ -14,6 +14,8 @@ using MapsInMyFolder.Commun;
 using System.Text.Json;
 using System.Reflection;
 using System.Text;
+using System.Windows.Controls;
+using ModernWpf.Controls;
 
 namespace MapsInMyFolder
 {
@@ -78,63 +80,22 @@ namespace MapsInMyFolder
         {
             List<Layers> layersFavorite = new List<Layers>();
             List<Layers> layersClassicSort = new List<Layers>();
-            SQLiteDataReader sqlite_datareader;
-            SQLiteCommand sqlite_cmd = conn.CreateCommand();
-            sqlite_cmd.CommandText = query_command;
-            sqlite_datareader = sqlite_cmd.ExecuteReader();
+            using SQLiteDataReader sqlite_datareader = Database.ExecuteExecuteReaderSQLCommand(query_command);
 
             while (sqlite_datareader.Read())
             {
                 try
                 {
-                    int GetOrdinal(string name)
-                    {
-                        if (string.IsNullOrEmpty(name))
-                        {
-                            throw new ArgumentException("Invalid Ordinal name");
-                        }
-                        int ordinal = sqlite_datareader.GetOrdinal(name);
-                        if (sqlite_datareader.IsDBNull(ordinal))
-                        {
-                            return -1;
-                        }
-                        return ordinal;
-                    }
-
+                    SQLiteDataReader sqlite_datareaderCopy = sqlite_datareader;
                     string GetStringFromOrdinal(string name)
                     {
-                        try
-                        {
-                            int ordinal = GetOrdinal(name);
-                            if (ordinal == -1)
-                            {
-                                return "";
-                            }
-                            string get_setring = sqlite_datareader.GetString(ordinal);
-                            if (string.IsNullOrEmpty(get_setring))
-                            {
-                                return "";
-                            }
-                            else
-                            {
-                                return Collectif.HTMLEntities(get_setring, true);
-                            }
-                        }
-                        catch (Exception)
-                        {
-                            return "";
-                        }
+                        return Database.GetStringFromOrdinal(sqlite_datareaderCopy, name);
                     }
                     int GetIntFromOrdinal(string name)
                     {
-                        int ordinal = GetOrdinal(name);
-                        if (ordinal == -1)
-                        {
-                            return 0;
-                        }
-                        return sqlite_datareader.GetInt32(ordinal);
+                        return Database.GetIntFromOrdinal(sqlite_datareaderCopy, name);
                     }
-
+                    
                     int DB_Layer_ID = GetIntFromOrdinal("ID");
                     string DB_Layer_NOM = GetStringFromOrdinal("NOM").RemoveNewLineChar();
                     bool DB_Layer_FAVORITE = Convert.ToBoolean(GetIntFromOrdinal("FAVORITE"));
@@ -248,6 +209,7 @@ namespace MapsInMyFolder
                 List<Layers> layersRejected = new List<Layers>();
                 foreach (Layers InitialLayerFromList in ListOfLayers)
                 {
+                    int Initial_ClassVersion = InitialLayerFromList.class_version;
                     Layers LayerWithReplacement = InitialLayerFromList;
                     bool layerHasReplacement = EditedLayersDictionnary.TryGetValue(InitialLayerFromList.class_id, out Layers replacementLayer);
                     if (layerHasReplacement)
@@ -323,6 +285,14 @@ namespace MapsInMyFolder
                         supplement_class += "displaynone";
                     }
 
+                    string WarningMessageDiv = string.Empty;
+                    //Debug.WriteLine($"InitialLayerFromList.class_version {LayerWithReplacement.class_id} : {InitialLayerFromList.class_version} - {LayerWithReplacement.class_version} - {class_version}");
+                    if (Initial_ClassVersion > LayerWithReplacement.class_version)
+                    {
+                        WarningMessageDiv = $"<div class=\"warning\" title=\"Une erreur sur le calque à été détéctée.\nCliquez pour en savoir +\" onclick=\"show_warning(event, '{LayerWithReplacement.class_id}');\"></div>";
+                    }
+
+
                     generated_layers += $@"
                         <li class=""inview {visibility}"" id =""{LayerWithReplacement.class_id}"">
                             <div class=""layer_main_div"" style=""background-image:url({imgbase64.Trim()});{overideBackgroundColor}"">
@@ -336,6 +306,7 @@ namespace MapsInMyFolder
                                     </div>
                                     <div {orangestar} onclick=""ajouter_aux_favoris(event, this, {LayerWithReplacement.class_id})""></div>
                                     <div {orangelayervisibility} onclick=""change_visibility(event, this, {LayerWithReplacement.class_id})""></div>
+                                    {WarningMessageDiv}
                                 </div>
                             </div>
                         </li>";
@@ -494,6 +465,71 @@ namespace MapsInMyFolder
             }
             return DirectorySize;
         }
+
+        public static async void ShowLayerWarning(int id)
+        {
+            using SQLiteDataReader editedlayers_sqlite_datareader = Database.ExecuteExecuteReaderSQLCommand($"SELECT * FROM 'EDITEDLAYERS' WHERE ID = {id}");
+            if (!editedlayers_sqlite_datareader.Read())
+            {
+                return;
+            }
+
+            int EditedDB_VERSION = editedlayers_sqlite_datareader.GetIntFromOrdinal("VERSION");
+            string EditedDB_TILECOMPUTATIONSCRIPT = editedlayers_sqlite_datareader.GetStringFromOrdinal("TILECOMPUTATIONSCRIPT");
+            string EditedDB_TILE_URL = editedlayers_sqlite_datareader.GetStringFromOrdinal("TILE_URL");
+            editedlayers_sqlite_datareader.Close();
+            using SQLiteDataReader layers_sqlite_datareader = Database.ExecuteExecuteReaderSQLCommand($"SELECT * FROM 'LAYERS' WHERE ID = {id}");
+            layers_sqlite_datareader.Read();
+            int LastDB_VERSION = layers_sqlite_datareader.GetIntFromOrdinal("VERSION");
+            string LastDB_TILECOMPUTATIONSCRIPT = layers_sqlite_datareader.GetStringFromOrdinal("TILECOMPUTATIONSCRIPT");
+            string LastDB_TILE_URL = layers_sqlite_datareader.GetStringFromOrdinal("TILE_URL");
+            layers_sqlite_datareader.Close();
+            if (EditedDB_VERSION != LastDB_VERSION)
+            {
+                StackPanel AskMsg = new StackPanel();
+                string RemoveSQL = "";
+                if (EditedDB_TILECOMPUTATIONSCRIPT != LastDB_TILECOMPUTATIONSCRIPT && !string.IsNullOrWhiteSpace(EditedDB_TILECOMPUTATIONSCRIPT))
+                {
+                    TextBlock textBlock = new TextBlock();
+                    textBlock.Text = "Le script de chargement des tuiles de ce calque à été modifiée lors de la dernière mise à jour mais ce calque comporte des remplacements.";
+                    textBlock.TextWrapping = TextWrapping.Wrap;
+                    AskMsg.Children.Add(textBlock);
+                    AskMsg.Children.Add(Collectif.FormatDiffGetScrollViewer(EditedDB_TILECOMPUTATIONSCRIPT, LastDB_TILECOMPUTATIONSCRIPT));
+                    RemoveSQL += $",'TILECOMPUTATIONSCRIPT'=NULL";
+                }
+                if (EditedDB_TILE_URL != LastDB_TILE_URL && !string.IsNullOrWhiteSpace(EditedDB_TILE_URL))
+                {
+                    TextBlock textBlock = new TextBlock();
+                    textBlock.Text = "L'URL de chargement des tuiles à été modifiée lors de la dernière mise à jour mais ce calque comporte des remplacements.";
+                    textBlock.TextWrapping = TextWrapping.Wrap;
+                    AskMsg.Children.Add(textBlock);
+                    AskMsg.Children.Add(Collectif.FormatDiffGetScrollViewer(EditedDB_TILE_URL, LastDB_TILE_URL));
+                    RemoveSQL += $",'TILE_URL'=NULL";
+                }
+                TextBlock textBlockAsk = new TextBlock();
+                textBlockAsk.Text = "Voullez-vous mettre à jour les champs suivant la dernière mise à jour ?";
+                textBlockAsk.TextWrapping = TextWrapping.Wrap;
+                textBlockAsk.FontWeight = FontWeight.FromOpenTypeWeight(600);
+                AskMsg.Children.Add(textBlockAsk);
+                ContentDialog dialog = Message.SetContentDialog(AskMsg, "MapsInMyFolder", MessageDialogButton.YesNoCancel);
+                ContentDialogResult result = await dialog.ShowAsync();
+                if (result == ContentDialogResult.Primary)
+                {
+                    Database.ExecuteNonQuerySQLCommand($"UPDATE 'main'.'EDITEDLAYERS' SET 'VERSION'='{LastDB_VERSION}'{RemoveSQL}  WHERE ID = {id};");
+                }
+                else if (result == ContentDialogResult.Secondary)
+                {
+                    Database.ExecuteNonQuerySQLCommand($"UPDATE 'main'.'EDITEDLAYERS' SET 'VERSION'='{LastDB_VERSION}' WHERE ID = {id};");
+                }
+                else
+                {
+                    return;
+                }
+                MainWindow.RefreshAllPanels();
+            }
+        }
+
+      
 
         public static void DBLayerFavorite(int id, bool favBooleanState)
         {
@@ -667,6 +703,14 @@ namespace MapsInMyFolder
             Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
             {
                 MainWindow._instance.MainPage.Set_current_layer(id_int);
+            }, null);
+        }
+        public void Layer_show_warning(double id = 0)
+        {
+            int id_int = Convert.ToInt32(id);
+            Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
+            {
+                MainPage.ShowLayerWarning(id_int);
             }, null);
         }
         public void Request_search_update()
