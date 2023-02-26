@@ -192,11 +192,8 @@ namespace MapsInMyFolder.Commun
 
                 foreach (var file in files)
                 {
-                    Debug.WriteLine(file.Name);
                     if (file.Name == filename)
                     {
-                        //string AssetSerializeObject = JsonConvert.SerializeObject(file);
-                        //XMLParser.Write("GithubAsset_" + filename, AssetSerializeObject);
                         return file;
                     }
                 }
@@ -213,7 +210,7 @@ namespace MapsInMyFolder.Commun
             //$"https://api.github.com/repos/SioGabx/MapsInMyFolder/contents/MapsInMyFolder/cursors/
 
             Debug.WriteLine(url);
-            string ETag = XMLParser.Read("ETag_" + filename);
+            string ETag = XMLParser.Cache.Read("ETag_" + filename);
             if (!string.IsNullOrEmpty(ETag))
             {
                 TileGeneratorSettings.HttpClient.DefaultRequestHeaders.Add("If-None-Match", ETag);
@@ -227,17 +224,17 @@ namespace MapsInMyFolder.Commun
             if (HttpResponse.ResponseMessage.IsSuccessStatusCode)
             {
                 ETag = HttpResponse.ResponseMessage.Headers.TryGetValues("etag", out var values) ? values.FirstOrDefault() : null;
-                XMLParser.Write("ETag_" + filename, ETag);
+                XMLParser.Cache.Write("ETag_" + filename, ETag);
             }
             else
             {
                 Debug.WriteLine(HttpResponse.ResponseMessage.StatusCode);
                 //if 301 not modified, then we have a cache version inside Settings.xml, else we try to fetch and give back null if not
-                return XMLParser.Read("GithubAsset_" + filename);
+                return XMLParser.Cache.Read("GithubAsset_" + filename);
 
             }
             string ResponseMsg = Collectif.ByteArrayToString(HttpResponse.Buffer);
-            XMLParser.Write("GithubAsset_" + filename, ResponseMsg);
+            XMLParser.Cache.Write("GithubAsset_" + filename, ResponseMsg);
             return ResponseMsg;
         }
     }

@@ -50,13 +50,13 @@ namespace MapsInMyFolder
 
         public void FrameLoad_PrepareDownload()
         {
-            if (Curent.Layer.class_tile_url is null)
+            if (Layers.Curent.class_tile_url is null)
             {
                 Message.NoReturnBoxAsync("Une erreur s'est produite lors du chargement du calque.");
                 return;
             }
             Popup_opening(false);
-            PrepareDownloadPage.default_filename = Curent.Layer.class_name.Trim().Replace(" ", "_").ToLowerInvariant();
+            PrepareDownloadPage.default_filename = Layers.Curent.class_name.Trim().Replace(" ", "_").ToLowerInvariant();
             PrepareDownloadPage.Init();
             MainContentFrame.Navigate(PrepareDownloadPage);
         }
@@ -74,13 +74,10 @@ namespace MapsInMyFolder
         }
 
         //SQLiteConnection global_conn;
-        public async void Init()
+        public void Init()
         {
             this.Title = "MapsInMyFolder";
             TitleTextBox.Text = "MapsInMyFolder";
-            //Settings.SaveSettings();
-            //Settings.LoadSettingsAsync();
-            Database.DB_Download();
             ThemeManager.Current.ApplicationTheme = ApplicationTheme.Dark;
             ImageLoader.HttpClient.DefaultRequestHeaders.Add("User-Agent", Settings.user_agent);
             TileGeneratorSettings.HttpClient.DefaultRequestHeaders.Add("User-Agent", Settings.user_agent);
@@ -90,21 +87,61 @@ namespace MapsInMyFolder
             JavascriptLocationInstance.LocationChanged += (o, e) => MainPage.MapViewerSetSelection(Javascript.JavascriptInstance.Location, Javascript.JavascriptInstance.ZoomToNewLocation);
             Network.IsNetworkNowAvailable += (o, e) => CheckIfReadyToStartDownloadAfterNetworkChange();
             Database.RefreshPanels += (o, e) => RefreshAllPanels();
-            Update.NewUpdateFoundEvent += (o, e) => Application.Current.Dispatcher.Invoke(NewUpdateFoundEvent);
+            Update.NewUpdateFoundEvent += (o, e) =>
+            {
+                try { 
+                    Application.Current.Dispatcher.Invoke(ApplicationUpdateFoundEvent); 
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex.ToString());
+                }
+            };  
+            Database.NewUpdateFoundEvent += (o, e) =>
+            {
+                try { 
+                    Application.Current.Dispatcher.Invoke(DatabaseUpdateFoundEvent); 
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex.ToString());
+                }
+            };
+        }
 
+        public void ApplicationUpdateFoundEvent()
+        {
+            Notification ApplicationUpdateNotification = new NText($"Une nouvelle version de l'application ({Update.UpdateRelease.Tag_name}) est disponible. Cliquez ici pour mettre à jour.", "MapsInMyFolder", Update.StartUpdating)
+            {
+                NotificationId = "ApplicationUpdateNotification",
+                DisappearAfterAMoment = false,
+                IsPersistant = true,
+            };
+            ApplicationUpdateNotification.Register();
+        }
+
+        public void DatabaseUpdateFoundEvent()
+        {
+            Notification DatabaseUpdateNotification = new NText("Une nouvelle version de la base de donnée est disponible. Cliquez ici pour mettre à jour.", "MapsInMyFolder", Database.StartUpdating)
+            {
+                NotificationId = "DatabaseUpdateNotification",
+                DisappearAfterAMoment = false,
+                IsPersistant = true,
+            };
+            DatabaseUpdateNotification.Register();
+        }
+
+        private async void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            Init();
 
             if (await Update.CheckIfNewerVersionAvailableOnGithub())
             {
                 Debug.WriteLine("Une nouvelle mise à jour est disponible : Version " + Update.UpdateRelease.Tag_name);
             }
-        }
 
-        public void NewUpdateFoundEvent()
-        {
-            Action Callback = () => Update.StartUpdating();
-            MainPage.CreateNotification("MapsInMyFolder", $"Une nouvelle version de l'application ({Update.UpdateRelease.Tag_name}) est disponible. Cliquez ici pour mettre à jour.", Callback);
+            Database.CheckIfNewerVersionAvailable();
         }
-
 
         public static void RefreshAllPanels()
         {
@@ -132,10 +169,6 @@ namespace MapsInMyFolder
             Cef.Shutdown();
         }
 
-        private void Window_Loaded(object sender, RoutedEventArgs e)
-        {
-            Init();
-        }
 
         public void Popup_closing()
         {

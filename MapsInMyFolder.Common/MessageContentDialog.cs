@@ -12,16 +12,15 @@ namespace MapsInMyFolder.Commun
     {
         public static async Task<ContentDialogResult> ShowContentDialogAsync(ContentDialog dialog)
         {
-            ContentDialogResult result2 = ContentDialogResult.None;
             try
             {
-                result2 = await dialog.ShowAsync();
+                return await dialog.ShowAsync().ConfigureAwait(false);
             }
             catch (Exception ex)
             {
-                Debug.WriteLine(ex.ToString());
+                Debug.WriteLine("Erreur affichage ContentDialog : " + ex.ToString());
+                return ContentDialogResult.None;
             }
-            return result2;
         }
 
         //public static string InputBoxDialog(object text, object caption = null, MessageDialogButton messageBoxButton = MessageDialogButton.OK, DispatcherFrame frame = null)
@@ -79,95 +78,98 @@ namespace MapsInMyFolder.Commun
 
         public static ContentDialog SetContentDialog(object text, object caption = null, MessageDialogButton messageBoxButton = MessageDialogButton.OK, bool showTextbox = false)
         {
-            ContentDialog dialog = new ContentDialog
-            {
-                Title = caption ?? "",
-                Content = text,
-                CloseButtonText = "",
-                PrimaryButtonText = "",
-                SecondaryButtonText = "",
-                IsPrimaryButtonEnabled = false,
-                IsSecondaryButtonEnabled = false,
-                DefaultButton = ContentDialogButton.Primary,
-                Background = Collectif.HexValueToSolidColorBrush("#171719")
-            };
+            return Application.Current.Dispatcher.Invoke(delegate
+             {
+                 ContentDialog dialog = new ContentDialog
+                 {
+                     Title = caption ?? "",
+                     Content = text,
+                     CloseButtonText = "",
+                     PrimaryButtonText = "",
+                     SecondaryButtonText = "",
+                     IsPrimaryButtonEnabled = false,
+                     IsSecondaryButtonEnabled = false,
+                     DefaultButton = ContentDialogButton.Primary,
+                     Background = Collectif.HexValueToSolidColorBrush("#171719")
+                 };
+ 
+                 if (showTextbox)
+                 {
+                    //alert("Veuillez indiquer l'adresse URL du panorama à télécharger :","Google Maps")
+                    StackPanel stackPanel = new StackPanel();
+                     TextBlock textBlock = new TextBlock();
+                     if (!string.IsNullOrEmpty(text?.ToString()))
+                     {
+                         textBlock.Text = text.ToString();
+                         textBlock.TextWrapping = TextWrapping.Wrap;
+                     }
+                     TextBox textBox = new TextBox
+                     {
+                         Style = (Style)Application.Current.Resources["TextBoxCleanStyle_13"],
+                         HorizontalAlignment = HorizontalAlignment.Stretch,
+                         Margin = new Thickness(0, 10, 0, 0)
+                     };
+                     stackPanel.Children.Add(textBlock);
+                     stackPanel.Children.Add(textBox);
+                     dialog.Content = stackPanel;
+                 }
 
-            if (showTextbox)
-            {
-                //alert("Veuillez indiquer l'adresse URL du panorama à télécharger :","Google Maps")
-                StackPanel stackPanel = new StackPanel();
-                TextBlock textBlock = new TextBlock();
-                if (!string.IsNullOrEmpty(text?.ToString()))
-                {
-                    textBlock.Text = text.ToString();
-                    textBlock.TextWrapping = TextWrapping.Wrap;
-                }
-                TextBox textBox = new TextBox
-                {
-                    Style = (Style)Application.Current.Resources["TextBoxCleanStyle_13"],
-                    HorizontalAlignment = HorizontalAlignment.Stretch,
-                    Margin = new Thickness(0, 10, 0, 0)
-                };
-                stackPanel.Children.Add(textBlock);
-                stackPanel.Children.Add(textBox);
-                dialog.Content = stackPanel;
-            }
 
+                 Debug.WriteLine("DialogMsg" + text);
 
-            Debug.WriteLine("DialogMsg" + text);
+                 switch (messageBoxButton)
+                 {
+                     case MessageDialogButton.OK:
+                         ShowButtonPrimary("Ok");
+                         break;
+                     case MessageDialogButton.OKCancel:
+                         ShowButtonPrimary("Oui");
+                         ShowButtonCancel("Annuler");
+                         break;
+                     case MessageDialogButton.YesNo:
+                         ShowButtonPrimary("Oui");
+                         ShowButtonSecondary("Non");
+                         break;
+                     case MessageDialogButton.YesNoCancel:
+                         ShowButtonPrimary("Oui");
+                         ShowButtonSecondary("Non");
+                         ShowButtonCancel("Annuler");
+                         break;
+                     case MessageDialogButton.YesNoRetry:
+                         ShowButtonPrimary("Oui");
+                         ShowButtonSecondary("Non");
+                         ShowButtonCancel("Réessayer");
+                         break;
+                     case MessageDialogButton.YesCancel:
+                         ShowButtonPrimary("Oui");
+                         ShowButtonCancel("Annuler");
+                         break;
+                     case MessageDialogButton.YesRetry:
+                         ShowButtonPrimary("Oui");
+                         ShowButtonCancel("Réessayer");
+                         break;
+                     case MessageDialogButton.RetryCancel:
+                         ShowButtonCancel("Annuler");
+                         ShowButtonPrimary("Réessayer");
+                         break;
+                 }
 
-            switch (messageBoxButton)
-            {
-                case MessageDialogButton.OK:
-                    ShowButtonPrimary("Ok");
-                    break;
-                case MessageDialogButton.OKCancel:
-                    ShowButtonPrimary("Oui");
-                    ShowButtonCancel("Annuler");
-                    break;
-                case MessageDialogButton.YesNo:
-                    ShowButtonPrimary("Oui");
-                    ShowButtonSecondary("Non");
-                    break;
-                case MessageDialogButton.YesNoCancel:
-                    ShowButtonPrimary("Oui");
-                    ShowButtonSecondary("Non");
-                    ShowButtonCancel("Annuler");
-                    break;
-                case MessageDialogButton.YesNoRetry:
-                    ShowButtonPrimary("Oui");
-                    ShowButtonSecondary("Non");
-                    ShowButtonCancel("Réessayer");
-                    break;
-                case MessageDialogButton.YesCancel:
-                    ShowButtonPrimary("Oui");
-                    ShowButtonCancel("Annuler");
-                    break;
-                case MessageDialogButton.YesRetry:
-                    ShowButtonPrimary("Oui");
-                    ShowButtonCancel("Réessayer");
-                    break;
-                case MessageDialogButton.RetryCancel:
-                    ShowButtonCancel("Annuler");
-                    ShowButtonPrimary("Réessayer");
-                    break;
-            }
-
-            void ShowButtonPrimary(string text_args)
-            {
-                dialog.PrimaryButtonText = text_args;
-                dialog.IsPrimaryButtonEnabled = true;
-            }
-            void ShowButtonSecondary(string text_args)
-            {
-                dialog.SecondaryButtonText = text_args;
-                dialog.IsSecondaryButtonEnabled = true;
-            }
-            void ShowButtonCancel(string text_args)
-            {
-                dialog.CloseButtonText = text_args;
-            }
-            return dialog;
+                 void ShowButtonPrimary(string text_args)
+                 {
+                     dialog.PrimaryButtonText = text_args;
+                     dialog.IsPrimaryButtonEnabled = true;
+                 }
+                 void ShowButtonSecondary(string text_args)
+                 {
+                     dialog.SecondaryButtonText = text_args;
+                     dialog.IsSecondaryButtonEnabled = true;
+                 }
+                 void ShowButtonCancel(string text_args)
+                 {
+                     dialog.CloseButtonText = text_args;
+                 }
+                 return dialog;
+             });
         }
 
         public static async void NoReturnBoxAsync(object text, object caption = null)

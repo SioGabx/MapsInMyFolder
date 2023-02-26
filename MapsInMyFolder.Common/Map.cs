@@ -1,10 +1,8 @@
 ﻿namespace MapsInMyFolder.Commun
 {
-    public static class Curent
+    public static class Map
     {
-        public static Layers Layer = Layers.Empty();
-
-        public static class Selection
+        public static class CurentSelection
         {
             public static double NO_Latitude;
             public static double NO_Longitude;

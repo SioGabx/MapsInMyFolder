@@ -3,132 +3,137 @@ using System;
 using System.Data.SQLite;
 using System.Diagnostics;
 using System.IO;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows;
 
 namespace MapsInMyFolder.Commun
 {
     public static class Database
     {
         public static event EventHandler RefreshPanels;
-        public static async void DB_Download(bool force_download = false)
+        public static event EventHandler NewUpdateFoundEvent;
+
+        private static string GetDatabasePath()
         {
-            //https://api.github.com/repos/SioGabx/MapsInMyFolder/releases
-            //https://api.github.com/repos/SioGabx/MapsInMyFolder/releases/latest
+            return Path.Combine(Settings.working_folder, Settings.database_pathname);
+        }
+
+        public static async Task DB_AskDownload(bool force_download = false)
+        {
+            string database_pathname = GetDatabasePath();
+
+            while (true)
+            {
+                if (File.Exists(database_pathname) && !force_download)
+                {
+                    //Si le fichier existe et que (force_download == false) alors return
+                    RefreshPanels.Invoke(null, EventArgs.Empty);
+                    return;
+                }
+
+                ContentDialogResult result = await Message.SetContentDialog($"La base de données n'as pas été trouvée à partir du chemin \"{database_pathname}\".\nVoullez-vous en crée une nouvelle depuis la ressource en ligne ?", "Confirmer", MessageDialogButton.YesNoRetry).ShowAsync();
+
+                if (result == ContentDialogResult.Primary)
+                {
+                    DB_Download();
+                    break;
+                }
+                else if (result == ContentDialogResult.Secondary)
+                {
+                    SQLiteConnection.CreateFile(database_pathname);
+                    DB_CreateTables(database_pathname);
+                    RefreshPanels.Invoke(null, EventArgs.Empty);
+                    return;
+                }
+            }
+
+        }
+
+        private static async Task<bool> DB_DownloadFile(string database_url, string database_pathname)
+        {
+            if (string.IsNullOrEmpty(database_url) || string.IsNullOrEmpty(database_pathname))
+            {
+                return false;
+            }
+            string NotificationMsg = $"Téléchargement en cours de la base de donnée depuis {new Uri(database_url).Host}...";
+            NProgress DatabaseDownloadNotification = new NProgress(NotificationMsg, "MapsInMyFolder", null, 0, false) { };
+            DatabaseDownloadNotification.Register();
+
+            Collectif.HttpClientDownloadWithProgress client = new Collectif.HttpClientDownloadWithProgress(database_url, database_pathname);
+            client.ProgressChanged += (totalFileSize, totalBytesDownloaded, progressPercentage) =>
+            {
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    DatabaseDownloadNotification.Text(NotificationMsg + $" {progressPercentage}% - {Collectif.FormatBytes(totalBytesDownloaded)}/{Collectif.FormatBytes((long)totalFileSize)}");
+                    DatabaseDownloadNotification.SetProgress((double)progressPercentage);
+                });
+            };
+
+            bool IsDownloadSuccess = true;
             try
             {
-                ContentDialogResult result;
-                string database_pathname = String.Empty;
-                while (true)
+                await client.StartDownload();
+            }
+            catch (Exception ex)
+            {
+                IsDownloadSuccess = false;
+                Debug.WriteLine("DB_DownloadFile error :" + ex.ToString());
+            }
+
+            if (IsDownloadSuccess)
+            {
+                RefreshPanels.Invoke(null, EventArgs.Empty);
+            }
+            else
+            {
+                DatabaseDownloadNotification.Remove();
+            }
+            return IsDownloadSuccess;
+        }
+
+        public static async void DB_Download()
+        {
+            string database_pathname = GetDatabasePath();
+            if (!Directory.Exists(Settings.working_folder))
+            {
+                Directory.CreateDirectory(Settings.working_folder);
+            }
+
+            while (true)
+            {
+                if (Network.IsNetworkAvailable())
                 {
-                    database_pathname = Path.Combine(Settings.working_folder, Settings.database_pathname);
-                    if (File.Exists(database_pathname) && !force_download)
+                    GitHubFile githubAssets = GetGithubAssets.GetContentAssetsFromGithub(new Uri(Settings.github_repository_url).PathAndQuery, String.Empty, Settings.github_database_name);
+                    if (!(githubAssets is null) && await DB_DownloadFile(githubAssets?.Download_url, database_pathname))
                     {
-                        //Si le fichier existe et que force dowbload == false alors return
-                        return;
-                    }
-                    var dialog = Message.SetContentDialog("La base de données n'as pas été trouvée à partir du chemin \"" + database_pathname + "\".\nVoullez-vous en crée une nouvelle depuis la ressource en ligne ?", "Confirmer", MessageDialogButton.YesNoRetry);
-                    result = await dialog.ShowAsync();
-                    if (result == ContentDialogResult.Secondary)
-                    {
-                        SQLiteConnection.CreateFile(database_pathname);
-                        DB_CreateTables(database_pathname);
+                        int UserVersion = Database.ExecuteScalarSQLCommand("PRAGMA user_version");
+                        XMLParser.Cache.Write("dbVersion", UserVersion.ToString());
+                        XMLParser.Cache.WriteAttribute("dbVersion", "dbSha", githubAssets?.Sha);
                         RefreshPanels.Invoke(null, EventArgs.Empty);
                         return;
                     }
-                    else if (result == ContentDialogResult.Primary)
+
+                    ContentDialogResult ErrorDetectedWantToAbord = await Message.SetContentDialog("Une erreur s'est produite lors du téléchargement.\nVoullez-vous reessayer ou annuler (et donc créer une database vide) ?", "Confirmer", MessageDialogButton.RetryCancel).ShowAsync();
+                    if (ErrorDetectedWantToAbord != ContentDialogResult.Primary)
                     {
                         break;
                     }
                 }
-
-
-                if (!Directory.Exists(Settings.working_folder))
+                else
                 {
-                    Directory.CreateDirectory(Settings.working_folder);
-                }
+                    //print network not available
+                    ContentDialogResult NoConnexionDetectedWantToAbord = await Message.SetContentDialog("Impossible de télécharger la dernière base de données en ligne car vous n'êtes pas connecté à internet. Voullez-vous reessayer ?", "Confirmer", MessageDialogButton.YesNo).ShowAsync();
 
-                //Ask if we want to download remote database or create empty
-
-                while (true)
-                {
-                    if (Network.IsNetworkAvailable())
+                    if (NoConnexionDetectedWantToAbord != ContentDialogResult.Primary)
                     {
-                        GitHubFile githubAssets = GetGithubAssets.GetContentAssetsFromGithub(new Uri(Settings.github_repository_url).PathAndQuery, String.Empty, Settings.github_database_name);
-                        if (!(githubAssets is null))
-                        {
-                            string database_url = githubAssets.Download_url;
-                            Debug.WriteLine("database_github_url : " + database_url);
-                            HttpResponse response = await Collectif.ByteDownloadUri(new Uri(database_url), 0, true);
-                            if (response?.Buffer != null && response.ResponseMessage.IsSuccessStatusCode)
-                            {
-                                byte[] arrBytes = response.Buffer;
-                                File.WriteAllBytes(database_pathname, arrBytes);
-                                RefreshPanels.Invoke(null, EventArgs.Empty);
-                                return;
-                            }
-                            else
-                            {
-                                var dialog = Message.SetContentDialog("Une erreur s'est produite lors du téléchargement.\nError StatusCode :" + response.ResponseMessage.StatusCode + ".\nVoullez-vous reessayer ou annuler et crée une database vide ?", "Confirmer", MessageDialogButton.RetryCancel);
-                                ContentDialogResult result2 = ContentDialogResult.None;
-                                try
-                                {
-                                    result2 = await dialog.ShowAsync();
-                                }
-                                catch (Exception ex)
-                                {
-                                    Debug.WriteLine(ex.ToString());
-                                }
-
-                                if (result2 != ContentDialogResult.Primary)
-                                {
-                                    break;
-                                }
-                            }
-                        }
-
-                        var dialog2 = Message.SetContentDialog("Une erreur s'est produite lors du téléchargement.\nVoullez-vous reessayer ou annuler et crée une database vide ?", "Confirmer", MessageDialogButton.RetryCancel);
-                        ContentDialogResult result3 = ContentDialogResult.None;
-                        try
-                        {
-                            result3 = await dialog2.ShowAsync();
-                        }
-                        catch (Exception ex)
-                        {
-                            Debug.WriteLine(ex.ToString());
-                        }
-
-                        if (result3 != ContentDialogResult.Primary)
-                        {
-                            break;
-                        }
-                    }
-                    else
-                    {
-                        //print network not available
-                        var dialog = Message.SetContentDialog("Impossible de télécharger la dernière base de données en ligne car vous n'êtes pas connecté à internet. Voullez-vous reessayer ?", "Confirmer", MessageDialogButton.YesNo);
-                        ContentDialogResult result2 = ContentDialogResult.None;
-                        try
-                        {
-                            result2 = await dialog.ShowAsync();
-                        }
-                        catch (Exception ex)
-                        {
-                            Debug.WriteLine(ex.ToString());
-                        }
-
-                        if (result2 != ContentDialogResult.Primary)
-                        {
-                            break;
-                        }
+                        break;
                     }
                 }
-                SQLiteConnection.CreateFile(database_pathname);
-                DB_CreateTables(database_pathname);
-                RefreshPanels.Invoke(null, EventArgs.Empty);
             }
-            catch (Exception ex)
-            {
-                Debug.WriteLine("fonction DB_Layer_Download : " + ex.Message);
-            }
+            SQLiteConnection.CreateFile(database_pathname);
+            DB_CreateTables(database_pathname);
+            RefreshPanels.Invoke(null, EventArgs.Empty);
         }
 
         static public void ExecuteNonQuerySQLCommand(string querry)
@@ -154,8 +159,7 @@ namespace MapsInMyFolder.Commun
             }
             SQLiteCommand sqlite_cmd = conn.CreateCommand();
             sqlite_cmd.CommandText = querry;
-            int RowCount = Convert.ToInt32(sqlite_cmd.ExecuteScalar());
-            return RowCount;
+            return Convert.ToInt32(sqlite_cmd.ExecuteScalar());
         }
 
         //CONNEXION A LA BASE DE DONNEES
@@ -169,14 +173,14 @@ namespace MapsInMyFolder.Commun
                 if (filinfo.Length == 0)
                 {
                     Debug.WriteLine("DB Taille corrompu");
-                    DB_Download(true);
+                    DB_AskDownload(true).ConfigureAwait(true);
                     return null;
                 }
             }
             else
             {
                 Debug.WriteLine("DB Le fichier n'existe pas");
-                DB_Download();
+                DB_AskDownload().ConfigureAwait(true);
                 return null;
             }
             return DB_CreateTables(dbFile);
@@ -278,7 +282,6 @@ namespace MapsInMyFolder.Commun
                 SQLiteConnection conn = DB_Connection();
                 DB_Download_Init(conn);
                 SQLiteCommand sqlite_cmd = conn.CreateCommand();
-                //DELETE FROM "main"."DOWNLOADS" WHERE _rowid_ IN ('11');
                 sqlite_cmd.CommandText = "DELETE FROM 'DOWNLOADS' WHERE ID=" + Math.Abs(bdid);
                 sqlite_cmd.ExecuteNonQuery();
                 conn.Close();
@@ -289,5 +292,117 @@ namespace MapsInMyFolder.Commun
             }
         }
 
+        public static async void CheckIfNewerVersionAvailable()
+        {
+            if (await CompareVersion())
+            {
+                NewUpdateFoundEvent(null, EventArgs.Empty);
+            }
+        }
+
+        public static async void StartUpdating()
+        {
+            GitHubFile githubAssets = GetGithubAssets.GetContentAssetsFromGithub(new Uri(Settings.github_repository_url).PathAndQuery, String.Empty, Settings.github_database_name);
+            string downloadedDatabasePath = Path.Combine(Settings.temp_folder, "Github" + Settings.github_database_name);
+            bool IsUpdateSuccessful = await DB_DownloadFile(githubAssets.Download_url, downloadedDatabasePath);
+            if (IsUpdateSuccessful)
+            {
+                MergeDatabase(downloadedDatabasePath);
+                using (SQLiteConnection sqlite_conn = new SQLiteConnection("Data Source=" + downloadedDatabasePath + "; Version = 3; New = True; Compress = True;"))
+                {
+                    sqlite_conn.Open();
+                    SQLiteCommand sqlite_cmd = sqlite_conn.CreateCommand();
+                    sqlite_cmd.CommandText = "PRAGMA user_version;";
+                    XMLParser.Cache.Write("dbVersion", sqlite_cmd.ExecuteScalar().ToString());
+                    XMLParser.Cache.WriteAttribute("dbVersion", "dbSha", githubAssets?.Sha);
+                }
+                Notification ApplicationUpdateNotification = new NText("La mise à jour de la base de donnée à été effectuée avec succès", "MapsInMyFolder")
+                {
+                    NotificationId = "DatabaseUpdateNotification",
+                    DisappearAfterAMoment = true,
+                    IsPersistant = true,
+                };
+                ApplicationUpdateNotification.Register();
+                RefreshPanels.Invoke(null, EventArgs.Empty);
+            }
+        }
+
+        public static void MergeDatabase(string downloadedDatabasePath)
+        {
+            StringBuilder Sql = new StringBuilder();
+            Sql.Append("DROP TABLE IF EXISTS main.'LAYERS';");
+            using (SQLiteConnection sqlite_conn = new SQLiteConnection("Data Source=" + downloadedDatabasePath + "; Version = 3; New = True; Compress = True;"))
+            {
+                sqlite_conn.Open();
+                SQLiteCommand sqlite_cmd = sqlite_conn.CreateCommand();
+                sqlite_cmd.CommandText = "PRAGMA user_version;";
+                string user_version = sqlite_cmd.ExecuteScalar().ToString();
+                Sql.Append($"PRAGMA user_version={user_version};");
+
+                SQLiteDataReader sqlite_datareader;
+                sqlite_cmd.CommandText = "SELECT sql FROM 'main'.'sqlite_master' WHERE name = 'LAYERS';";
+                using (sqlite_datareader = sqlite_cmd.ExecuteReader())
+                {
+                    sqlite_datareader.Read();
+                    Sql.Append(sqlite_datareader.GetString(0) + ";");
+                }
+            }
+            Sql.Append($"ATTACH '{downloadedDatabasePath}' AS githubdatabase;");
+            Sql.Append("INSERT INTO main.LAYERS SELECT * FROM githubdatabase.LAYERS;");
+            Sql.Append("DETACH githubdatabase;");
+            ExecuteNonQuerySQLCommand(Sql.ToString());
+        }
+
+        private static async Task<bool> CompareVersion()
+        {
+            int UserVersion = Database.ExecuteScalarSQLCommand("PRAGMA user_version");
+            int LastCheckDatabaseVersion = Convert.ToInt32(XMLParser.Cache.Read("dbVersion"));
+            string LastCheckDatabaseSha = XMLParser.Cache.ReadAttribute("dbVersion", "dbSha");
+
+            GitHubFile githubAssets = GetGithubAssets.GetContentAssetsFromGithub(new Uri(Settings.github_repository_url).PathAndQuery, String.Empty, Settings.github_database_name);
+
+            if (githubAssets == null)
+            {
+                return false;
+            }
+
+            if (LastCheckDatabaseSha == githubAssets.Sha)
+            {
+                //Latest downloaded version is equal to latest release version
+                if (LastCheckDatabaseVersion > UserVersion)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            //Download database from github
+            string downloadedDatabasePath = Path.Combine(Settings.temp_folder, "Github" + Settings.github_database_name);
+            Collectif.HttpClientDownloadWithProgress client = new Collectif.HttpClientDownloadWithProgress(githubAssets.Download_url, downloadedDatabasePath);
+            await client.StartDownload().ConfigureAwait(false);
+
+            int GithubDatabaseVersion;
+            using (SQLiteConnection sqlite_conn = new SQLiteConnection("Data Source=" + downloadedDatabasePath + "; Version = 3; New = True; Compress = True; "))
+            {
+                sqlite_conn.Open();
+                SQLiteCommand sqlite_cmd = sqlite_conn.CreateCommand();
+                sqlite_cmd.CommandText = "PRAGMA user_version";
+                GithubDatabaseVersion = Convert.ToInt32(sqlite_cmd.ExecuteScalar());
+            }
+
+            XMLParser.Cache.Write("dbVersion", GithubDatabaseVersion.ToString());
+            XMLParser.Cache.WriteAttribute("dbVersion", "dbSha", githubAssets.Sha);
+
+            if (GithubDatabaseVersion > UserVersion)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
     }
 }

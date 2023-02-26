@@ -9,6 +9,7 @@ using MapsInMyFolder.Commun;
 using System.Windows.Threading;
 using System.Threading;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace MapsInMyFolder
 {
@@ -16,8 +17,7 @@ namespace MapsInMyFolder
     {
         public void MapLoad()
         {
-            UIElement EmptyMapTileLayer = new MapTileLayer();
-            mapviewer.MapLayer = EmptyMapTileLayer;
+            mapviewer.MapLayer = new MapTileLayer();
             NO_PIN.Visibility = Settings.visibility_pins;
             SE_PIN.Visibility = Settings.visibility_pins;
 
@@ -30,13 +30,12 @@ namespace MapsInMyFolder
 
             mapviewer.Center = new Location(NO_PIN_starting_location.Latitude - ((NO_PIN_starting_location.Latitude - SE_PIN_starting_location.Latitude) / 2), NO_PIN_starting_location.Longitude - ((NO_PIN_starting_location.Longitude - SE_PIN_starting_location.Longitude) / 2));
             mapviewer.ZoomLevel = Settings.map_defaut_zoom_level;
-            System.Windows.Media.SolidColorBrush brush = new System.Windows.Media.SolidColorBrush(
+            mapviewer.Background = new System.Windows.Media.SolidColorBrush(
                 System.Windows.Media.Color.FromArgb(255,
                 (byte)Settings.background_layer_color_R,
                 (byte)Settings.background_layer_color_G,
                 (byte)Settings.background_layer_color_B)
             );
-            mapviewer.Background = brush;
         }
 
         public Point MakeSquareIfShift(Point targetPoint, int OpositeCorner = 0, string overrideWidthValue = null)
@@ -164,7 +163,6 @@ namespace MapsInMyFolder
             return returnPoint;
         }
 
-
         public static void MapViewerSetSelection(Dictionary<string, double> locations, bool ZoomToNewLocation = true)
         {
             Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
@@ -208,12 +206,10 @@ namespace MapsInMyFolder
                 }
             }, null);
         }
-
         private void Mapviewer_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
         {
             RightClickUp(MakeSquareIfShift(e.GetPosition(mapviewer)));
         }
-
 
         public void MiddleClickUp(object sender, MouseButtonEventArgs e)
         {
@@ -223,7 +219,6 @@ namespace MapsInMyFolder
                 MapviewerMouseDownEvent(sender, e, false);
             }
         }
-
 
         public void RightClickUp(Point p)
         {
@@ -270,7 +265,6 @@ namespace MapsInMyFolder
                 DrawRectangleCelectionArroundPushpin();
                 UpdatePushpinPositionAndDrawRectangle();
                 is_right_mouse_down = false;
-                //Selection_Rectangle.IsHitTestVisible = true;
             }
         }
 
@@ -290,7 +284,6 @@ namespace MapsInMyFolder
             NO_PIN.Location = mapviewer.ViewToLocation(e.GetPosition(mapviewer));
             StartDownloadButton.Focus();
         }
-
 
         private void Mapviewer_MouseMove(object sender, System.Windows.Input.MouseEventArgs e)
         {
@@ -377,18 +370,11 @@ namespace MapsInMyFolder
                 }
             }
 
-            if (e.RightButton == MouseButtonState.Pressed)
+            if (e.RightButton == MouseButtonState.Pressed && !Settings.disable_selection_rectangle_moving)
             {
-                if (is_left_mouse_down)
-                {
-                    return;
-                }
-                else if (!Settings.disable_selection_rectangle_moving)
-                {
-                    is_right_mouse_down = true;
-                    origin_saved_left_click_mouse_position = saved_left_click_mouse_position = e.GetPosition(mapviewer);
-                    StartRightClick(e);
-                }
+                is_right_mouse_down = true;
+                origin_saved_left_click_mouse_position = saved_left_click_mouse_position = e.GetPosition(mapviewer);
+                StartRightClick(e);
             }
         }
 
@@ -403,6 +389,8 @@ namespace MapsInMyFolder
         private void Map_panel_open_location_panel_Click(object sender, RoutedEventArgs e)
         {
             Message.NoReturnBoxAsync("Cette fonctionnalité fait l'objet d'une prochaine mise à jour, elle n'as pas encore été ajoutée à cette version !", "Erreur");
+            //Notification pageNotification = new Text("Notification 1", "Hello", () => { MessageBox.Show("Hello"); }) { NotificationId = "Batavia"};
+            //pageNotification.Register();
         }
 
         public void UpdatePushpinPositionAndDrawRectangle()
@@ -469,15 +457,15 @@ namespace MapsInMyFolder
                 selection_map_rectange_y_decalage = 45;
             }
 
-            Curent.Selection.SE_Latitude = SE_PIN.Location.Latitude;
-            Curent.Selection.SE_Longitude = SE_PIN.Location.Longitude;
-            Curent.Selection.NO_Latitude = NO_PIN.Location.Latitude;
-            Curent.Selection.NO_Longitude = NO_PIN.Location.Longitude;
+            Commun.Map.CurentSelection.SE_Latitude = SE_PIN.Location.Latitude;
+            Commun.Map.CurentSelection.SE_Longitude = SE_PIN.Location.Longitude;
+            Commun.Map.CurentSelection.NO_Latitude = NO_PIN.Location.Latitude;
+            Commun.Map.CurentSelection.NO_Longitude = NO_PIN.Location.Longitude;
         }
 
-        public Boolean is_left_mouse_down;
-        public Boolean is_right_mouse_down;
-        public Boolean is_middle_mouse_down;
+        public bool is_left_mouse_down;
+        public bool is_right_mouse_down;
+        public bool is_middle_mouse_down;
         Point saved_left_click_mouse_position;
         Point origin_saved_left_click_mouse_position;
         Point SavedNo_Placement = new Point();
@@ -518,7 +506,6 @@ namespace MapsInMyFolder
                             else
                             {
                                 deplacement_X = 0;
-
                             }
                         }
                         else
@@ -759,7 +746,6 @@ namespace MapsInMyFolder
                     {
                         origin_saved_left_click_mouse_position = saved_left_click_mouse_position = e.GetPosition(mapviewer);
                     }
-
                 }
 
                 if (e.RightButton == MouseButtonState.Pressed)
@@ -776,7 +762,6 @@ namespace MapsInMyFolder
                             StartRightClick(e);
                             origin_saved_left_click_mouse_position = saved_left_click_mouse_position = e.GetPosition(mapviewer);
                         }
-                        //Debug.WriteLine(saved_left_click_mouse_position.X + " " + saved_left_click_mouse_position.Y);
                     }
                 }
             }
@@ -807,11 +792,6 @@ namespace MapsInMyFolder
 
     public partial class MainWindow : Window
     {
-        private void Window_MouseLeave(object sender, MouseEventArgs e)
-        {
-            //RightClickUp(e.GetPosition(mapviewer));
-        }
-
         private void Window_MouseUp(object sender, MouseButtonEventArgs e)
         {
             if (Mouse.MiddleButton != MouseButtonState.Pressed)

@@ -86,19 +86,23 @@ namespace MapsInMyFolder.Commun
                 }
                 options.CancellationToken(JsCancelToken.Token);
             });
+
             Action<object> PrintAction = stringtext => Print(stringtext, LayerId);
             add.SetValue("print", PrintAction);
-            //Action<object> AlertAction = stringtext => Javascript.Alert(stringtext, LayerId);
-            //add.SetValue("alert", AlertAction);
+
             Action<object> PrintClearAction = _ => PrintClear();
             add.SetValue("printClear", PrintClearAction);
             add.SetValue("cls", PrintClearAction);
+
             Action<object> helpAction = _ => Help(LayerId);
             add.SetValue("help", helpAction);
+
             Func<object, object, bool, object> setVarAction = (variable, value, isglobalvar) => SetVar(variable, value, isglobalvar, LayerId);
             add.SetValue("setVar", setVarAction); //setVar("variable1","valeur1")
+
             Func<object, object> getVarFunction = (variablename) => GetVar(variablename, LayerId);
             add.SetValue("getVar", getVarFunction); //getVar("variable1")
+
             Func<object, bool> clearVarFunction = (variablename) => ClearVar(LayerId, variablename);
             add.SetValue("clearVar", clearVarFunction);
 
@@ -117,8 +121,12 @@ namespace MapsInMyFolder.Commun
 
             Action<object, object> alertAction = (texte, caption) => Alert(LayerId, texte, caption);
             add.SetValue("alert", alertAction);
+
             Func<object, object, object> inputboxAction = (texte, caption) => InputBox(LayerId, texte, caption);
             add.SetValue("inputbox", inputboxAction);
+
+            Func<object, object, object, object> SendNotificationFunction = (texte, caption, callback) => SendNotification(LayerId, texte, caption, callback);
+            add.SetValue("sendNotification", SendNotificationFunction);
             return add;
         }
 
@@ -226,7 +234,7 @@ namespace MapsInMyFolder.Commun
 
         public static void SetSelection(double NO_Latitude, double NO_Longitude, double SE_Latitude, double SE_Longitude, bool ZoomToNewLocation, int LayerId)
         {
-            if (Curent.Layer.class_id == LayerId)
+            if (Layers.Curent.class_id == LayerId)
             {
                 JavascriptInstance.Location = new Dictionary<string, double>(){
                     {"SE_Latitude",SE_Latitude },
@@ -245,16 +253,16 @@ namespace MapsInMyFolder.Commun
                 {
                     "SE",
                     new Dictionary<string, double>() {
-            {"lat",Curent.Selection.SE_Latitude },
-            {"long",Curent.Selection.SE_Longitude }
+            {"lat",Map.CurentSelection.SE_Latitude },
+            {"long",Map.CurentSelection.SE_Longitude }
             }
                 },
 
                 {
                     "NO",
                     new Dictionary<string, double>() {
-            {"lat",Curent.Selection.NO_Latitude },
-            {"long",Curent.Selection.NO_Longitude }
+            {"lat",Map.CurentSelection.NO_Latitude },
+            {"long",Map.CurentSelection.NO_Longitude }
             }
                 }
             };
@@ -370,6 +378,25 @@ namespace MapsInMyFolder.Commun
                 }));
                 Dispatcher.PushFrame(frame);
             }
+        }
+
+
+        static public string SendNotification(int LayerId, object texte, object caption = null, object javascriptCallback = null)
+        {
+            if (LayerId == -2 || LayerId != Layers.Curent.class_id)
+            {
+                PrintError("Impossible d'envoyer une notification depuis l'editeur ou si le calque n'est pas courant");
+                return null;
+            }
+            Notification notification = null;
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                Action callback = () => Javascript.ExecuteScript(Layers.GetLayerById(LayerId).class_tilecomputationscript, null, LayerId, javascriptCallback.ToString());
+
+                notification = new NText(texte.ToString(), caption.ToString(), callback);
+                notification.Register();
+            });
+            return notification?.NotificationId;
         }
 
         static public void Help(int LayerId)
@@ -533,10 +560,12 @@ namespace MapsInMyFolder.Commun
             }
         }
 
-
         public static Jint.Native.JsValue ExecuteScript(string script, Dictionary<string, object> arguments, int LayerId, Collectif.GetUrl.InvokeFunction InvokeFunction)
         {
-            string InvokeFunctionString = InvokeFunction.ToString();
+            return ExecuteScript(script, arguments, LayerId, InvokeFunction.ToString());
+        }
+        public static Jint.Native.JsValue ExecuteScript(string script, Dictionary<string, object> arguments, int LayerId, string InvokeFunctionString)
+        {
             lock (locker)
             {
                 Engine add = EngineGetById(LayerId, script);
@@ -555,7 +584,7 @@ namespace MapsInMyFolder.Commun
                     if (ex.Message == "Can only invoke functions")
                     {
                         //PrintError("No main function fund. Use \"function getT(args) {}\"");
-                        PrintError("La fontion " + InvokeFunction.ToString() + " n'as pas été trouvé dans le script. Faite help() pour obtenir de l'aide sur cette commande.");
+                        PrintError("La fontion " + InvokeFunctionString + " n'as pas été trouvé dans le script. Faite help() pour obtenir de l'aide sur cette commande.");
                     }
                     else
                     {

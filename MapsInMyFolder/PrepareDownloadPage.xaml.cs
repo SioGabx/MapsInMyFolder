@@ -50,8 +50,8 @@ namespace MapsInMyFolder
             UpdateTimer.AutoReset = false;
             UpdateTimer.Enabled = true;
 
-            int minimum_zoom = Curent.Layer.class_min_zoom;
-            int maximum_zoom = Curent.Layer.class_max_zoom;
+            int minimum_zoom = Layers.Curent.class_min_zoom;
+            int maximum_zoom = Layers.Curent.class_max_zoom;
             if (ZoomSlider.Value < minimum_zoom)
             {
                 ZoomSlider.Value = minimum_zoom;
@@ -67,7 +67,7 @@ namespace MapsInMyFolder
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
             //Init();
-            System.Windows.Media.SolidColorBrush brush = Collectif.HexValueToSolidColorBrush(Curent.Layer.class_specialsoptions.BackgroundColor);
+            System.Windows.Media.SolidColorBrush brush = Collectif.HexValueToSolidColorBrush(Layers.Curent.class_specialsoptions.BackgroundColor);
             StackPanel_ImageTilePreview_0.Background = brush;
             StackPanel_ImageTilePreview_1.Background = brush;
             StackPanel_ImageTilePreview_2.Background = brush;
@@ -92,7 +92,7 @@ namespace MapsInMyFolder
             TextBox_Redim_WUnit.Opacity = 0.56;
             WrapPanel_Largeur.IsEnabled = false;
             WrapPanel_Hauteur.IsEnabled = false;
-            Label_SliderMinMax.Content = "Niveau de zoom (min=" + Curent.Layer.class_min_zoom + ", max=" + Curent.Layer.class_max_zoom + ")";
+            Label_SliderMinMax.Content = "Niveau de zoom (min=" + Layers.Curent.class_min_zoom + ", max=" + Layers.Curent.class_max_zoom + ")";
             RedimSwitch.IsOn = false;
             ZoomSlider.Value = MainWindow._instance.MainPage.mapviewer.ZoomLevel;
             TextBox_quality_number.Text = "100";
@@ -125,13 +125,13 @@ namespace MapsInMyFolder
             ImageIsLoading.BeginAnimation(OpacityProperty, Collectif.GetOpacityAnimation(1, 0.2));
             //ImageIsLoading.Visibility = Visibility.Visible;
             LastResquestZoom = ZoomSlider.Value;
-            int LayerID = Curent.Layer.class_id;
+            int LayerID = Layers.Curent.class_id;
             List<Double> NO_PIN_Location = new List<Double>() { MainWindow._instance.MainPage.NO_PIN.Location.Latitude, MainWindow._instance.MainPage.NO_PIN.Location.Longitude };
             List<Double> SE_PIN_Location = new List<Double>() { MainWindow._instance.MainPage.SE_PIN.Location.Latitude, MainWindow._instance.MainPage.SE_PIN.Location.Longitude };
             List<Double> LocaMillieux = Collectif.GetCenterBetweenTwoPoints(NO_PIN_Location, SE_PIN_Location);
 
             int zoom = Convert.ToInt32(ZoomSlider.Value);
-            int maximum_zoom = Curent.Layer.class_max_zoom;
+            int maximum_zoom = Layers.Curent.class_max_zoom;
             if (zoom > maximum_zoom)
             {
                 zoom = maximum_zoom;
@@ -156,7 +156,7 @@ namespace MapsInMyFolder
                     {
                         for (int index_y = 0; index_y < 2; index_y++)
                         {
-                            string urlbase = Collectif.GetUrl.FromTileXYZ(Curent.Layer.class_tile_url, TileX + index_x, TileY + index_y, zoom, LayerID, Collectif.GetUrl.InvokeFunction.getTile);
+                            string urlbase = Collectif.GetUrl.FromTileXYZ(Layers.Curent.class_tile_url, TileX + index_x, TileY + index_y, zoom, LayerID, Collectif.GetUrl.InvokeFunction.getTile);
                             ListOfUrls.Add(new { url = urlbase, index_x, index_y });
                         }
                     }
@@ -205,13 +205,13 @@ namespace MapsInMyFolder
                     //quality 1 is the minimum value
                     qualityInt = 1;
                 }
-                string format = Curent.Layer.class_format;
+                string format = Layers.Curent.class_format;
                 if (format != "png")
                 {
                     format = "jpeg";
                 }
 
-                NetVips.VOption saveVOption = Collectif.getSaveVOption(format, qualityInt, Curent.Layer.class_tiles_size);
+                NetVips.VOption saveVOption = Collectif.getSaveVOption(format, qualityInt, Layers.Curent.class_tiles_size);
                 BitmapSource ApplyEffectOnImageFromBuffer(byte[] ImgArray)
                 {
                     if (ImgArray is null) { return null; }
@@ -406,16 +406,16 @@ namespace MapsInMyFolder
 
             void Update_Label_TileSize()
             {
-                Label_LargeurTuile.Content = Curent.Layer.class_tiles_size;
+                Label_LargeurTuile.Content = Layers.Curent.class_tiles_size;
             }
             void Update_Label_LayerName()
             {
-                Label_NomCalque.Content = Curent.Layer.class_name;
+                Label_NomCalque.Content = Layers.Curent.class_name;
             }
 
             void Update_Label_TileSource()
             {
-                Label_Source.Content = Curent.Layer.class_site_url;
+                Label_Source.Content = Layers.Curent.class_site_url;
             }
 
             void Update_Label_NbrTiles()
@@ -573,7 +573,7 @@ namespace MapsInMyFolder
             double SE_PIN_Latitude = MainWindow._instance.MainPage.SE_PIN.Location.Latitude;
             double SE_PIN_Longitude = MainWindow._instance.MainPage.SE_PIN.Location.Longitude;
             int Zoom = Convert.ToInt16(Math.Floor(ZoomSlider.Value));
-            Dictionary<string, int> rognage_info = MainWindow.GetRognageValue(NO_PIN_Latitude, NO_PIN_Longitude, SE_PIN_Latitude, SE_PIN_Longitude, Zoom, Curent.Layer.class_tiles_size);
+            Dictionary<string, int> rognage_info = MainWindow.GetRognageValue(NO_PIN_Latitude, NO_PIN_Longitude, SE_PIN_Latitude, SE_PIN_Longitude, Zoom, Layers.Curent.class_tiles_size);
             return rognage_info;
         }
         Dictionary<string, int> GetResizedImageSize()
@@ -928,15 +928,15 @@ namespace MapsInMyFolder
             {
                 return filter1 + "|" + filter2;
             }
-            if (string.Equals(Curent.Layer.class_format, "png", StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(Layers.Curent.class_format, "png", StringComparison.OrdinalIgnoreCase))
             {
                 filter = pngfilter;
             }
-            else if (string.Equals(Curent.Layer.class_format, "jpeg", StringComparison.OrdinalIgnoreCase))
+            else if (string.Equals(Layers.Curent.class_format, "jpeg", StringComparison.OrdinalIgnoreCase))
             {
                 filter = jpgfilter;
             }
-            else if (string.Equals(Curent.Layer.class_format, "pbf", StringComparison.OrdinalIgnoreCase))
+            else if (string.Equals(Layers.Curent.class_format, "pbf", StringComparison.OrdinalIgnoreCase))
             {
                 filter = filterconcat(jpgfilter, pngfilter);
             }

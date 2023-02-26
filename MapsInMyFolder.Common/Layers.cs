@@ -48,6 +48,8 @@ namespace MapsInMyFolder.Commun
             this.class_version = class_version;
         }
 
+        public static Layers Curent = Layers.Empty();
+
         public class SpecialsOptions
         {
             private string _BackgroundColor;
@@ -81,25 +83,26 @@ namespace MapsInMyFolder.Commun
         {
             public static Layers CurentLayerToLayer()
             {
-                return GetLayerById(Curent.Layer.class_id);
+                return GetLayerById(Curent.class_id);
             }
 
             public static void ToCurentLayer(Layers layer)
             {
-                Curent.Layer.class_id = layer.class_id;
-                Curent.Layer.class_tiles_size = layer.class_tiles_size;
-                Curent.Layer.class_name = layer.class_name;
-                Curent.Layer.class_description = layer.class_description;
-                Curent.Layer.class_categorie = layer.class_categorie;
-                Curent.Layer.class_identifiant = layer.class_identifiant;
-                Curent.Layer.class_tile_url = layer.class_tile_url;
-                Curent.Layer.class_site = layer.class_site;
-                Curent.Layer.class_site_url = layer.class_site_url;
-                Curent.Layer.class_min_zoom = layer.class_min_zoom;
-                Curent.Layer.class_max_zoom = layer.class_max_zoom;
-                Curent.Layer.class_format = layer.class_format;
-                Curent.Layer.class_tilecomputationscript = layer.class_tilecomputationscript;
-                Curent.Layer.class_specialsoptions = layer.class_specialsoptions;
+                Curent = (Layers)layer.MemberwiseClone();
+                //Curent.class_id = layer.class_id;
+                //Curent.class_tiles_size = layer.class_tiles_size;
+                //Curent.class_name = layer.class_name;
+                //Curent.class_description = layer.class_description;
+                //Curent.Layer.class_categorie = layer.class_categorie;
+                //Curent.Layer.class_identifiant = layer.class_identifiant;
+                //Curent.Layer.class_tile_url = layer.class_tile_url;
+                //Curent.Layer.class_site = layer.class_site;
+                //Curent.Layer.class_site_url = layer.class_site_url;
+                //Curent.Layer.class_min_zoom = layer.class_min_zoom;
+                //Curent.Layer.class_max_zoom = layer.class_max_zoom;
+                //Curent.Layer.class_format = layer.class_format;
+                //Curent.Layer.class_tilecomputationscript = layer.class_tilecomputationscript;
+                //Curent.Layer.class_specialsoptions = layer.class_specialsoptions;
             }
         }
 

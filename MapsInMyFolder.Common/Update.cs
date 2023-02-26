@@ -3,12 +3,13 @@ using System;
 using System.Diagnostics;
 using System.Reflection;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace MapsInMyFolder.Commun
 {
     public static class Update
     {
-        public static System.Version AssemblyVersion = Assembly.GetEntryAssembly().GetName().Version;
+        public static Version AssemblyVersion = Assembly.GetEntryAssembly().GetName().Version;
         public static bool IsUpdateAvailable = false;
         public static RootObject UpdateRelease = null;
         public static Asset UpdateFileAsset = null;
@@ -33,7 +34,6 @@ namespace MapsInMyFolder.Commun
                 System.Threading.Thread.Sleep(5000);
                 (RootObject Release, Asset FileAsset) = GetGithubAssets.GetReleaseAssetsFromGithub(new Uri(Settings.github_repository_url).PathAndQuery, "MapsInMyFolder.Setup.msi");
                 string GithubVersion = Collectif.FilterDigitOnly(Release.Tag_name, new System.Collections.Generic.List<char>() { '.' }, false, false);
-
 
                 //Debug.WriteLine("LatestGithubRelease : " + FileAsset);
                 //Debug.WriteLine("Download URL : " + FileAsset.Browser_download_url);
@@ -71,14 +71,13 @@ namespace MapsInMyFolder.Commun
             }
 
             Version AssemblyVersion = Update.AssemblyVersion;
-            XMLParser.Write("LastUpdateCheck", DateTime.Now.Ticks.ToString());
-            Debug.WriteLine("Version actuelle : " + GetActualVersionFormatedString());
-            Debug.WriteLine("Version github : " + GithubVersion);
+            XMLParser.Cache.Write("LastUpdateCheck", DateTime.Now.Ticks.ToString());
+            //Debug.WriteLine("Version actuelle : " + GetActualVersionFormatedString());
+            //Debug.WriteLine("Version github : " + GithubVersion);
 
-
-            Debug.WriteLine("versionMajor :" + (AssemblyVersion.Major < versionMajor));
-            Debug.WriteLine("versionMinor :" + (AssemblyVersion.Major <= versionMajor && AssemblyVersion.Minor < versionMinor));
-            Debug.WriteLine("versionBuild :" + (AssemblyVersion.Major <= versionMajor && AssemblyVersion.Minor <= versionMinor && AssemblyVersion.Build < versionBuild));
+            //Debug.WriteLine("versionMajor :" + (AssemblyVersion.Major < versionMajor));
+            //Debug.WriteLine("versionMinor :" + (AssemblyVersion.Major <= versionMajor && AssemblyVersion.Minor < versionMinor));
+            //Debug.WriteLine("versionBuild :" + (AssemblyVersion.Major <= versionMajor && AssemblyVersion.Minor <= versionMinor && AssemblyVersion.Build < versionBuild));
             if (GetActualVersionFormatedString() == GithubVersion)
             {
                 return false;
@@ -96,7 +95,6 @@ namespace MapsInMyFolder.Commun
                 return false;
             }
         }
-
 
         public static async void StartUpdating()
         {
@@ -116,12 +114,30 @@ namespace MapsInMyFolder.Commun
                 return;
             }
 
-
-
             Debug.WriteLine("La nouvelle version " + UpdateRelease.Tag_name + " va être installée");
-            Message.NoReturnBoxAsync("Cette fonctionalitée est en cours de déployement...", "Erreur");
+
+            var downloadFileUrl = new Uri(UpdateFileAsset.Browser_download_url);
+            string UpdateFilePath = System.IO.Path.Combine(Settings.temp_folder, UpdateFileAsset.Id + UpdateFileAsset.Name);
+
+            string NotificationMsg = $"Téléchargement en cours de '{UpdateFileAsset.Name}' depuis {downloadFileUrl.Host}...";
+            NProgress UpdateNotification = new NProgress(NotificationMsg, "MapsInMyFolder", null, 0, false) { };
+            UpdateNotification.Register();
+
+            Collectif.HttpClientDownloadWithProgress client = new Collectif.HttpClientDownloadWithProgress(downloadFileUrl.ToString(), UpdateFilePath);
+            client.ProgressChanged += (totalFileSize, totalBytesDownloaded, progressPercentage) =>
+            {
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    UpdateNotification.Text(NotificationMsg + $" {progressPercentage}% - {Collectif.FormatBytes(totalBytesDownloaded)}/{Collectif.FormatBytes((long)totalFileSize)}");
+                    UpdateNotification.SetProgress((double)progressPercentage);
+                });
+            };
+            await client.StartDownload();
+            
+            UpdateNotification.Text("Installation...");
+            UpdateNotification.SendUpdate();
+            Application.Current.Shutdown();
+            Process.Start(new ProcessStartInfo(UpdateFilePath) { UseShellExecute = true });
         }
-
-
     }
 }

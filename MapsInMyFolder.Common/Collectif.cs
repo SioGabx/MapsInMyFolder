@@ -280,7 +280,7 @@ namespace MapsInMyFolder.Commun
             {
                 if (hexvalue.Length == 3)
                 {
-                    return (SolidColorBrush)new BrushConverter().ConvertFrom('#' + string.Concat(hexvalue[0], hexvalue[0],hexvalue[1], hexvalue[1],hexvalue[2], hexvalue[2]));
+                    return (SolidColorBrush)new BrushConverter().ConvertFrom('#' + string.Concat(hexvalue[0], hexvalue[0], hexvalue[1], hexvalue[1], hexvalue[2], hexvalue[2]));
                 }
                 else if (hexvalue.Length == 6)
                 {
@@ -515,10 +515,6 @@ namespace MapsInMyFolder.Commun
 
             bool do_need_retry;
 
-            //List<System.Net.HttpStatusCode> ListResponseMessagesToRetry = new List<System.Net.HttpStatusCode>()
-            //{
-            //    System.Net.HttpStatusCode.Found,
-            //};
             Uri parsing_url = url;
 
             do
@@ -532,7 +528,7 @@ namespace MapsInMyFolder.Commun
                     {
                         if (responseMessage is null)
                         {
-                            Debug.WriteLine("Error null response");
+                            DebugMode.WriteLine("Error null response");
                             return response;
                         }
 
@@ -545,13 +541,13 @@ namespace MapsInMyFolder.Commun
                         {
                             // Redirect found (autodetect)  System.Net.HttpStatusCode.Found
                             Uri new_location = responseMessage.Headers.Location;
-                            Debug.WriteLine($"DownloadByteUrl Retry : {parsing_url} to {new_location}: {(int)responseMessage.StatusCode} {responseMessage.ReasonPhrase}");
+                            DebugMode.WriteLine($"DownloadByteUrl Retry : {parsing_url} to {new_location}: {(int)responseMessage.StatusCode} {responseMessage.ReasonPhrase}");
                             do_need_retry = true;
                             parsing_url = new_location;
                         }
                         else
                         {
-                            Debug.WriteLine($"DownloadByteUrl: {parsing_url}: {(int)responseMessage.StatusCode} {responseMessage.ReasonPhrase}");
+                            DebugMode.WriteLine($"DownloadByteUrl: {parsing_url}: {(int)responseMessage.StatusCode} {responseMessage.ReasonPhrase}");
                             if (LayerId == -2)
                             {
                                 Javascript.PrintError($"DownloadUrl - Error {(int)responseMessage.StatusCode} : {responseMessage.ReasonPhrase}. Url : {parsing_url}");
@@ -588,6 +584,105 @@ namespace MapsInMyFolder.Commun
 
             return response;
         }
+
+        public class HttpClientDownloadWithProgress
+        {
+            private readonly string _downloadUrl;
+            private readonly string _destinationFilePath;
+
+            public delegate void ProgressChangedHandler(long? totalFileSize, long totalBytesDownloaded, double? progressPercentage);
+
+            public event ProgressChangedHandler ProgressChanged;
+
+            public HttpClientDownloadWithProgress(string downloadUrl, string destinationFilePath)
+            {
+                _downloadUrl = downloadUrl;
+                _destinationFilePath = destinationFilePath;
+            }
+
+            public async Task StartDownload()
+            {
+                using (var response = await TileGeneratorSettings.HttpClient.GetAsync(_downloadUrl, HttpCompletionOption.ResponseHeadersRead))
+                {
+                    await DownloadFileFromHttpResponseMessage(response);
+                }
+            }
+
+            private async Task DownloadFileFromHttpResponseMessage(HttpResponseMessage response)
+            {
+                response.EnsureSuccessStatusCode();
+
+                var totalBytes = response.Content.Headers.ContentLength;
+
+                using (var contentStream = await response.Content.ReadAsStreamAsync())
+                {
+                    await ProcessContentStream(totalBytes, contentStream);
+                }
+            }
+
+            private async Task ProcessContentStream(long? totalDownloadSize, Stream contentStream)
+            {
+                var totalBytesRead = 0L;
+                var readCount = 0L;
+                var buffer = new byte[8192];
+                var isMoreToRead = true;
+
+                using (var fileStream = new FileStream(_destinationFilePath, FileMode.Create, FileAccess.Write, FileShare.None, 8192, true))
+                {
+                    do
+                    {
+                        var bytesRead = await contentStream.ReadAsync(buffer, 0, buffer.Length);
+                        if (bytesRead == 0)
+                        {
+                            isMoreToRead = false;
+                            TriggerProgressChanged(totalDownloadSize, totalBytesRead);
+                            continue;
+                        }
+
+                        await fileStream.WriteAsync(buffer, 0, bytesRead);
+
+                        totalBytesRead += bytesRead;
+                        readCount += 1;
+
+                        if (readCount % 100 == 0)
+                        {
+                            TriggerProgressChanged(totalDownloadSize, totalBytesRead);
+                        }
+                    }
+                    while (isMoreToRead);
+                }
+            }
+
+            private void TriggerProgressChanged(long? totalDownloadSize, long totalBytesRead)
+            {
+                if (ProgressChanged == null)
+                {
+                    return;
+                }
+
+                double? progressPercentage = null;
+                if (totalDownloadSize.HasValue)
+                {
+                    progressPercentage = Math.Round((double)totalBytesRead / totalDownloadSize.Value * 100, 2);
+                }
+
+                ProgressChanged(totalDownloadSize, totalBytesRead, progressPercentage);
+            }
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         public static string ByteArrayToString(byte[] data)
         {
@@ -648,7 +743,7 @@ namespace MapsInMyFolder.Commun
             {
                 TextBox.SelectedText = text;
                 TextBox.CaretIndex += TextBox.SelectedText.Length;
-                TextBox.SelectionLength = 0; 
+                TextBox.SelectionLength = 0;
             }
             int lineIndex = TextBox.GetLineIndexFromCharacterIndex(TextBox.CaretIndex);
             TextBox.ScrollToLine(lineIndex);

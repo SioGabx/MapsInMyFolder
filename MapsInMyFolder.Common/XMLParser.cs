@@ -8,82 +8,64 @@ namespace MapsInMyFolder.Commun
 {
     public static class XMLParser
     {
-        public static string Read(string key_arg)
+        public static XMLSettingsParser Settings = new XMLSettingsParser();
+        public static XMLCacheParser Cache = new XMLCacheParser();
+    }
+
+    public abstract class XMLParserBase
+    {
+        public abstract string Type { get; }
+        public string Read(string key)
         {
-            string key = key_arg;
             if (string.IsNullOrEmpty(key))
             {
                 return null;
             }
-            else
-            {
-                key = key_arg.Trim();
-            }
 
             XDocument doc = XDocument.Load(GetPathAndCreateIfNotExist());
-            XElement KeyElement = doc.Descendants(key).FirstOrDefault<XElement>();
-            if (KeyElement != null)
-            {
-                return KeyElement.Value;
-            }
-            return null;
+            XElement KeyElement = doc.Descendants(key.Trim()).FirstOrDefault<XElement>();
+
+            return KeyElement?.Value;
         }
 
-        public static string GetPathAndCreateIfNotExist()
+        public virtual string GetPathAndCreateIfNotExist()
         {
-            string strSettingsXmlFilePath = Settings.SettingsPath();
-            if (!File.Exists(strSettingsXmlFilePath))
+            string FilePath = System.IO.Path.Combine(Settings.working_folder, Type + ".xml");
+            if (!File.Exists(FilePath))
             {
-                Directory.CreateDirectory(Path.GetDirectoryName(strSettingsXmlFilePath));
-                var sts = new XmlWriterSettings()
-                {
-                    Indent = true,
-                };
-                string newPath = Settings.SettingsPath(true);
-                XmlWriter xmlWriter = XmlWriter.Create(newPath, sts);
-                xmlWriter.WriteStartDocument();
-                xmlWriter.WriteStartElement("Settings");
-                xmlWriter.WriteEndElement();
-                xmlWriter.WriteEndDocument();
-                xmlWriter.Close();
-                return newPath;
+                CreateFile(FilePath);
             }
-            return strSettingsXmlFilePath;
+            return FilePath;
         }
 
-        public static void Write(string key_arg, string value_arg = null, string description_arg = null)
+        public void CreateFile(string FilePath)
         {
-            string key = key_arg;
-            string value = value_arg;
-            string description = description_arg;
+            Directory.CreateDirectory(Path.GetDirectoryName(FilePath));
+            var sts = new XmlWriterSettings()
+            {
+                Indent = true,
+            };
+            XmlWriter xmlWriter = XmlWriter.Create(FilePath, sts);
+            xmlWriter.WriteStartDocument();
+            xmlWriter.WriteStartElement(Type);
+            xmlWriter.WriteEndElement();
+            xmlWriter.WriteEndDocument();
+            xmlWriter.Close();
+        }
+
+        public void Write(string key, string value, string description = null)
+        {
             if (string.IsNullOrEmpty(key))
             {
                 return;
             }
-            else
-            {
-                key = key_arg.Trim();
-            }
-            if (string.IsNullOrEmpty(value_arg))
+            if (string.IsNullOrEmpty(value))
             {
                 value = String.Empty;
             }
-            if (string.IsNullOrEmpty(description_arg))
-            {
-                description = String.Empty;
-            }
-            string strSettingsXmlFilePath = Settings.SettingsPath();
-            XDocument doc;
-            try
-            {
-                doc = XDocument.Load(GetPathAndCreateIfNotExist());
-            }
-            catch (FileNotFoundException)
-            {
-                Settings.SettingsPath(true);
-                doc = XDocument.Load(GetPathAndCreateIfNotExist());
-            }
-            XElement KeyElement = doc.Descendants(key).FirstOrDefault<XElement>();
+            string strSettingsXmlFilePath = GetPathAndCreateIfNotExist();
+            XDocument doc = XDocument.Load(strSettingsXmlFilePath);
+            XElement KeyElement = doc.Descendants(key.Trim()).FirstOrDefault<XElement>();
             if (KeyElement != null)
             {
                 if (KeyElement.Value != value)
@@ -97,19 +79,76 @@ namespace MapsInMyFolder.Commun
             }
             else
             {
-                XElement Settings = doc.Descendants("Settings").FirstOrDefault<XElement>();
-                if (Settings != null)
+                XElement XMLFileDocument = doc.Descendants(Type).FirstOrDefault<XElement>();
+                if (XMLFileDocument != null)
                 {
                     XElement xElement = new XElement(key, value);
                     if (!string.IsNullOrEmpty(description))
                     {
                         XComment xRoleComment = new XComment(description);
-                        Settings.Add(xRoleComment);
+                        XMLFileDocument.Add(xRoleComment);
                     }
-                    Settings.Add(xElement);
+                    XMLFileDocument.Add(xElement);
                 }
             }
             doc.Save(strSettingsXmlFilePath);
         }
+
+        public void WriteAttribute(string key, string attribute, string attribute_value)
+        {
+            if (string.IsNullOrEmpty(key) || string.IsNullOrEmpty(attribute))
+            {
+                return;
+            }
+            if (string.IsNullOrEmpty(attribute_value))
+            {
+                attribute_value = String.Empty;
+            }
+
+            string strSettingsXmlFilePath = GetPathAndCreateIfNotExist();
+            XDocument doc = XDocument.Load(strSettingsXmlFilePath);
+            XElement KeyElement = doc.Descendants(key.Trim()).FirstOrDefault<XElement>();
+            if (KeyElement != null)
+            {
+                KeyElement.SetAttributeValue(attribute.Trim(), attribute_value);
+            }
+            doc.Save(strSettingsXmlFilePath);
+        }
+
+        public string ReadAttribute(string key, string attribute)
+        {
+            if (string.IsNullOrEmpty(key) || string.IsNullOrEmpty(attribute))
+            {
+                return null;
+            }
+
+            XDocument doc = XDocument.Load(GetPathAndCreateIfNotExist());
+            XElement KeyElement = doc.Descendants(key.Trim()).FirstOrDefault<XElement>();
+            return KeyElement?.Attribute(attribute.Trim())?.Value;
+        }
+
     }
+
+    public class XMLSettingsParser : XMLParserBase
+    {
+        public override string Type => "Settings";
+        public override string GetPathAndCreateIfNotExist()
+        {
+            string strSettingsXmlFilePath = Settings.SettingsPath();
+            if (!File.Exists(strSettingsXmlFilePath))
+            {
+                string newPath = Settings.SettingsPath(true);
+                CreateFile(newPath);
+                return newPath;
+            }
+            return strSettingsXmlFilePath;
+        }
+    }
+
+    public class XMLCacheParser : XMLParserBase
+    {
+        public override string Type => "Cache";
+    }
+
+
 }

@@ -484,27 +484,11 @@ namespace MapsInMyFolder
                 //set int ? 
 
                 Layers DB_Layer = MainPage.DB_Layer_Read(conn, $"SELECT * FROM LAYERS WHERE ID='{LayerId}'")[0];
-                //NOM = (NOM == DB_Layer.class_name) ? null : NOM;
-                //DESCRIPTION = (DESCRIPTION == DB_Layer.class_description) ? null : DESCRIPTION;
-                //CATEGORIE = (CATEGORIE == DB_Layer.class_categorie) ? null : CATEGORIE;
-                //IDENTIFIANT = (IDENTIFIANT == DB_Layer.class_identifiant) ? null : IDENTIFIANT;
-                //TILE_URL = (TILE_URL == DB_Layer.class_tile_url) ? null : TILE_URL;
-                ////MIN_ZOOM = (MIN_ZOOM == DB_Layer.class_min_zoom) ? null : MIN_ZOOM;
-                ////MAX_ZOOM = (MAX_ZOOM == DB_Layer.class_max_zoom) ? null : MAX_ZOOM;
-                //FORMAT = (FORMAT == DB_Layer.class_format) ? null : FORMAT;
-                //SITE = (SITE == DB_Layer.class_site) ? null : SITE;
-                //Debug.WriteLine($"SITE_URL : {SITE_URL} & DB_Layer.class_site_url : {DB_Layer.class_site_url}");
-                //SITE_URL = (SITE_URL == DB_Layer.class_site_url) ? null : SITE_URL;
-                //TILECOMPUTATIONSCRIPT = (TILECOMPUTATIONSCRIPT == Collectif.HTMLEntities(layers.class_tilecomputationscript)) ? null : TILECOMPUTATIONSCRIPT;
-                //SPECIALSOPTIONS = (SPECIALSOPTIONS == JsonSerializer.Serialize<Layers.SpecialsOptions>(DB_Layer.class_specialsoptions)) ? null : SPECIALSOPTIONS;
-                //TILE_FALLBACK_URL = (TILE_FALLBACK_URL == DB_Layer.class_tile_fallback_url) ? null : TILE_FALLBACK_URL;
                 NOM = getSavingStringOptimalValue(NOM, DB_Layer.class_name);
                 DESCRIPTION = getSavingStringOptimalValue(DESCRIPTION, DB_Layer.class_description);
                 CATEGORIE = getSavingStringOptimalValue(CATEGORIE, DB_Layer.class_categorie);
                 IDENTIFIANT = getSavingStringOptimalValue(IDENTIFIANT, DB_Layer.class_identifiant);
                 TILE_URL = getSavingStringOptimalValue(TILE_URL, DB_Layer.class_tile_url);
-                //MIN_ZOOM = (MIN_ZOOM == DB_Layer.class_min_zoom) ? null : MIN_ZOOM;
-                //MAX_ZOOM = (MAX_ZOOM == DB_Layer.class_max_zoom) ? null : MAX_ZOOM;
                 FORMAT = getSavingStringOptimalValue(FORMAT, DB_Layer.class_format);
                 SITE = getSavingStringOptimalValue(SITE, DB_Layer.class_site);
                 SITE_URL = getSavingStringOptimalValue(SITE_URL, DB_Layer.class_site_url);
@@ -551,7 +535,7 @@ namespace MapsInMyFolder
             MainWindow._instance.FrameBack();
             MainPage._instance.ReloadPage();
 
-            if (Curent.Layer.class_id == LayerId)
+            if (Layers.Curent.class_id == LayerId)
             {
                 MainPage._instance.Set_current_layer(LayerId);
             }

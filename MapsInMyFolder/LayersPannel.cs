@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using MapsInMyFolder.Commun;
 using System.Text.Json;
 using System.Reflection;
+using System.Text;
 
 namespace MapsInMyFolder
 {
@@ -205,39 +206,38 @@ namespace MapsInMyFolder
 
         string DB_Layer_Load()
         {
-            string query = "SELECT *,'LAYERS' AS TYPE FROM LAYERS UNION SELECT *,'CUSTOMSLAYERS' FROM CUSTOMSLAYERS ORDER BY " + Settings.layers_Sort.ToString() + " " + Settings.Layers_Order.ToString() + " NULLS LAST";
-            string query2 = "SELECT * FROM EDITEDLAYERS ORDER BY " + Settings.layers_Sort.ToString() + " " + Settings.Layers_Order.ToString() + " NULLS LAST";
+            string OriginalLayersGetQuery = $"SELECT *,'LAYERS' AS TYPE FROM LAYERS UNION SELECT *,'CUSTOMSLAYERS' FROM CUSTOMSLAYERS ORDER BY {Settings.layers_Sort} {Settings.Layers_Order} NULLS LAST";
+            string EditedLayersGetQuery = $"SELECT * FROM EDITEDLAYERS ORDER BY {Settings.layers_Sort} {Settings.Layers_Order} NULLS LAST";
             SQLiteConnection conn = Database.DB_Connection();
             if (conn is null)
             {
                 return "<style>p{font-family: \"Segoe UI\";color:#888989;font-size:14px;}</style><p>Aucune base de données trouvée. Veuillez relancer l'application.</p><p>Si le problème persiste, veuillez réessayer ultérieurement</p>";
             }
 
-            string baseHTML = DB_Layer_CreateHTML(DB_Layer_Read(conn, query), DB_Layer_Read(conn, query2));
-
+            string baseHTML = DB_Layer_CreateHTML(DB_Layer_Read(conn, OriginalLayersGetQuery), DB_Layer_Read(conn, EditedLayersGetQuery));
             conn.Close();
-            string finalHTML = baseHTML;
+
             if (Settings.show_layer_devtool)
             {
                 layer_browser.ShowDevTools();
             }
 
-            string injection = @"<script>
-                document.body.style.setProperty(""--opacity_preview_background"", " + (1 - Settings.background_layer_opacity) + @");
-                document.body.style.setProperty(""--background_layer_color_R"", " + Settings.background_layer_color_R + @");
-                document.body.style.setProperty(""--background_layer_color_G"", " + Settings.background_layer_color_G + @");
-                document.body.style.setProperty(""--background_layer_color_B"", " + Settings.background_layer_color_B + @");
-               </script>";
+            StringBuilder PropertyBuilder = new StringBuilder();
+            PropertyBuilder.Append("<script>");
+            PropertyBuilder.Append($"document.body.style.setProperty(\"--opacity_preview_background\", {1 - Settings.background_layer_opacity});");
+            PropertyBuilder.Append($"document.body.style.setProperty(\"--background_layer_color_R\", {Settings.background_layer_color_R});");
+            PropertyBuilder.Append($"document.body.style.setProperty(\"--background_layer_color_G\", {Settings.background_layer_color_G});");
+            PropertyBuilder.Append($"document.body.style.setProperty(\"--background_layer_color_B\", {Settings.background_layer_color_B});");
+            PropertyBuilder.Append("</script>");
 
-            finalHTML += injection;
+            baseHTML += PropertyBuilder.ToString();
 
-            return finalHTML;
+            return baseHTML;
         }
         static string DB_Layer_CreateHTML(List<Layers> layers, List<Layers> editedlayers)
         {
             Layers.Layers_Dictionary_List.Clear();
-            string generated_layers = String.Empty;
-            generated_layers += "<ul class=\"" + Settings.layerpanel_displaystyle.ToString().ToLower() + "\">";
+            string generated_layers = $"<ul class=\"{Settings.layerpanel_displaystyle.ToString().ToLower()}\">";
             Dictionary<int, Layers> EditedLayersDictionnary = new Dictionary<int, Layers>();
             foreach (Layers individual_editedlayer in editedlayers)
             {
@@ -272,10 +272,6 @@ namespace MapsInMyFolder
                             {
                                 field.SetValue(LayerWithReplacement, replacementValue);
                             }
-                            //else if (replacementValueType == typeof(int))
-                            //{
-                            //    int replacementValueTypeToInt = (int)replacementValue;
-                            //}
                         }
                     }
 
@@ -291,7 +287,7 @@ namespace MapsInMyFolder
 
                     Layers.Layers_Dictionary_List.Add(temp_Layers_dictionnary);
 
-                    string orangestar = "";
+                    string orangestar;
                     if (LayerWithReplacement.class_favorite)
                     {
                         orangestar = @"class=""star orange"" title=""Supprimer le calque des favoris""";
@@ -321,26 +317,28 @@ namespace MapsInMyFolder
                     {
                         overideBackgroundColor = "background-color:" + LayerWithReplacement.class_specialsoptions.BackgroundColor;
                     }
-                    string supplement_class = "";
+                    string supplement_class = " ";
                     if (!Settings.layerpanel_website_IsVisible)
                     {
-                        supplement_class += " displaynone";
+                        supplement_class += "displaynone";
                     }
-                    generated_layers = generated_layers + @"<li class=""inview layer" + visibility + @""" id=""" + LayerWithReplacement.class_id + @""">
-          <div class=""layer_main_div"" style=""background-image:url(" + imgbase64.Trim() + @");" + overideBackgroundColor + @""">
-             <div class=""layer_main_div_background_image""></div>
-            <div class=""layer_content"" data-layer=""" + LayerWithReplacement.class_identifiant + @""" title=""Sélectionner ce calque"">
-                  <div class=""layer_texte"" title=""" + Collectif.HTMLEntities(LayerWithReplacement.class_description) + @""">
-                      <p class=""display_name"">" + Collectif.HTMLEntities(LayerWithReplacement.class_name) + @"</p>
-                      <p class=""zoom"">[" + LayerWithReplacement.class_min_zoom + "-" + LayerWithReplacement.class_max_zoom + @"] - " + LayerWithReplacement.class_site + @"</p>
-                      <p class=""layer_website" + supplement_class + @""">" + LayerWithReplacement.class_site + @"</p>
-                      <p class=""layer_categorie" + supplement_class + @""">" + LayerWithReplacement.class_categorie + @"</p>
-                  </div>
-                  <div " + orangestar + @" onclick=""ajouter_aux_favoris(event, this," + LayerWithReplacement.class_id + @")""></div>
-                  <div " + orangelayervisibility + @" onclick=""change_visibility(event, this," + LayerWithReplacement.class_id + @")""></div>
-              </div>
-          </div>
-      </li>";
+
+                    generated_layers += $@"
+                        <li class=""inview layer {visibility}"" id =""{LayerWithReplacement.class_id}"">
+                            <div class=""layer_main_div"" style=""background-image:url({imgbase64.Trim()});{overideBackgroundColor}"">
+                                <div class=""layer_main_div_background_image""></div>
+                                <div class=""layer_content"" data-layer=""{LayerWithReplacement.class_identifiant}"" title=""Sélectionner ce calque"">
+                                    <div class=""layer_texte"" title=""{Collectif.HTMLEntities(LayerWithReplacement.class_description)}"">
+                                        <p class=""display_name"">{Collectif.HTMLEntities(LayerWithReplacement.class_name)}</p>
+                                        <p class=""zoom"">[{LayerWithReplacement.class_min_zoom}-{LayerWithReplacement.class_max_zoom}] - {LayerWithReplacement.class_site}</p>
+                                        <p class=""layer_website{supplement_class}"">{LayerWithReplacement.class_site}</p>
+                                        <p class=""layer_categorie{supplement_class}"">{LayerWithReplacement.class_categorie}</p>
+                                    </div>
+                                    <div {orangestar} onclick=""ajouter_aux_favoris(event, this, {LayerWithReplacement.class_id})""></div>
+                                    <div {orangelayervisibility} onclick=""change_visibility(event, this, {LayerWithReplacement.class_id})""></div>
+                                </div>
+                            </div>
+                        </li>";
                 }
                 return layersRejected;
             }
@@ -350,7 +348,7 @@ namespace MapsInMyFolder
 
             generated_layers += "</ul>";
             string resource_data = Collectif.ReadResourceString("html/layer_panel.html");
-            return resource_data.Replace("<!--htmllayerplaceholder-->", generated_layers);
+            return resource_data.Replace("<!--htmllayerplaceholder-->", generated_layers.ToString());
         }
 
         public void Set_current_layer(int id)
@@ -358,9 +356,9 @@ namespace MapsInMyFolder
             int layer_startup_id = Settings.layer_startup_id;
             DebugMode.WriteLine("Set layer");
             string last_format = "";
-            if (Curent.Layer.class_format is not null && Curent.Layer.class_format.Trim() != "")
+            if (Layers.Curent.class_format is not null && Layers.Curent.class_format.Trim() != "")
             {
-                last_format = Curent.Layer.class_format;
+                last_format = Layers.Curent.class_format;
             }
 
             Layers layer = Layers.GetLayerById(id);
@@ -369,7 +367,6 @@ namespace MapsInMyFolder
                 layer = Layers.Empty(0);
                 Dictionary<int, Layers> x = new Dictionary<int, Layers> { { 0, layer } };
                 Layers.Layers_Dictionary_List.Add(x);
-                DebugMode.WriteLine("Ajout layer vide");
             }
             if (layer is null || layer_startup_id == 0)
             {
@@ -502,61 +499,23 @@ namespace MapsInMyFolder
         {
             if (id == 0) { return; }
             int fav_state = favBooleanState ? 1 : 0;
-            try
-            {
-                SQLiteConnection conn = Database.DB_Connection();
-                if (conn is null)
-                {
-                    DebugMode.WriteLine("Connection to bdd is null");
-                    return;
-                }
-                SQLiteCommand sqlite_cmd = conn.CreateCommand();
-                sqlite_cmd.CommandText = "UPDATE LAYERS SET FAVORITE = " + fav_state + " WHERE ID=" + id;
-                sqlite_cmd.ExecuteNonQuery();
 
-                sqlite_cmd.CommandText = "UPDATE EDITEDLAYERS SET FAVORITE = " + fav_state + " WHERE ID=" + id;
-                sqlite_cmd.ExecuteNonQuery();
+            Database.ExecuteNonQuerySQLCommand($"UPDATE LAYERS SET FAVORITE = {fav_state} WHERE ID={id}");
+            Database.ExecuteNonQuerySQLCommand($"UPDATE EDITEDLAYERS SET FAVORITE = {fav_state} WHERE ID={id}");
+            Database.ExecuteNonQuerySQLCommand($"UPDATE CUSTOMSLAYERS SET FAVORITE = {fav_state} WHERE ID={id}");
 
-                sqlite_cmd.CommandText = "UPDATE CUSTOMSLAYERS SET FAVORITE = " + fav_state + " WHERE ID=" + id;
-                sqlite_cmd.ExecuteNonQuery();
-                conn.Close();
-
-                Layers.GetLayerById(id).class_favorite = Convert.ToBoolean(fav_state);
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine("fonction DB_Layer_Favorite : " + ex.Message);
-            }
+            Layers.GetLayerById(id).class_favorite = Convert.ToBoolean(fav_state);
         }
 
         public static void DBLayerVisibility(int id, string visibility_state)
         {
             if (id == 0) { return; }
-            try
-            {
-                SQLiteConnection conn = Database.DB_Connection();
-                if (conn is null)
-                {
-                    DebugMode.WriteLine("Connection to bdd is null");
-                    return;
-                }
-                SQLiteCommand sqlite_cmd = conn.CreateCommand();
-                sqlite_cmd.CommandText = "UPDATE LAYERS SET VISIBILITY = '" + visibility_state + "' WHERE ID=" + id;
-                sqlite_cmd.ExecuteNonQuery();
 
-                sqlite_cmd.CommandText = "UPDATE EDITEDLAYERS SET VISIBILITY = '" + visibility_state + "' WHERE ID=" + id;
-                sqlite_cmd.ExecuteNonQuery();
+            Database.ExecuteNonQuerySQLCommand($"UPDATE LAYERS SET VISIBILITY = '{visibility_state}' WHERE ID={id}");
+            Database.ExecuteNonQuerySQLCommand($"UPDATE EDITEDLAYERS SET VISIBILITY = '{visibility_state}' WHERE ID={id}");
+            Database.ExecuteNonQuerySQLCommand($"UPDATE CUSTOMSLAYERS SET VISIBILITY = '{visibility_state}' WHERE ID={id}");
 
-                sqlite_cmd.CommandText = "UPDATE CUSTOMSLAYERS SET VISIBILITY = '" + visibility_state + "' WHERE ID=" + id;
-                sqlite_cmd.ExecuteNonQuery();
-                conn.Close();
-
-                Layers.GetLayerById(id).class_visibility = visibility_state;
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine("fonction DBLayerVisibility : " + ex.Message);
-            }
+            Layers.GetLayerById(id).class_visibility = visibility_state;
         }
 
         public void LayerTilePreview_RequestUpdate()

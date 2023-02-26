@@ -153,10 +153,6 @@ namespace MapsInMyFolder.Commun
                     new List<VectorTileRenderer.Sources.PbfTileSource>() { null, null, null }
                 };
 
-
-
-                Stopwatch stopWatch = new Stopwatch();
-                stopWatch.Start();
                 lock (PBF_SetProviders_Locker)
                 {
                     providers[1][1] = provider;
@@ -178,7 +174,6 @@ namespace MapsInMyFolder.Commun
 
                 void SetProviders(int ArrayX, int ArrayY, int ComputedTileX, int ComputedTileY)
                 {
-
                     VectorTileRenderer.Sources.PbfTileSource pbfTileSource = GetProviderFromXYZ(LayerID, urlBase, ComputedTileX, ComputedTileY, zoom, cache_tile, save_temp_directory_rawBPF, save_temp_directory, filename, settings_max_tiles_cache_days).Result;
                     lock (PBF_SetProviders_Locker)
                     {
@@ -193,11 +188,7 @@ namespace MapsInMyFolder.Commun
                     }
                 }
 
-                stopWatch.Stop();
-                DebugMode.WriteLine($"Tache n° {tache} : Telechargement de la tuile en {stopWatch.ElapsedMilliseconds} Milliseconds");
-                stopWatch.Restart();
-                SkiaCanvas canvas = new SkiaCanvas();
-                ICanvas bitmap = canvas;
+                ICanvas bitmap = new SkiaCanvas();
                 MapsInMyFolder.VectorTileRenderer.Renderer.ICanvasCollisions ReturnCanvasAndCollisions;
                 MapsInMyFolder.VectorTileRenderer.Renderer.Collisions ListOfEntitiesCollisions = new MapsInMyFolder.VectorTileRenderer.Renderer.Collisions();
                 Renderer.ROptions Roptions = null;
@@ -261,11 +252,6 @@ namespace MapsInMyFolder.Commun
                     StreamPBFFile.Dispose();
                 }
                 ReturnCanvasAndCollisions = null;
-
-                stopWatch.Stop();
-                //Debug.WriteLine($"Creation des tuiles en {stopWatch.ElapsedMilliseconds} Milliseconds");
-                stopWatch.Restart();
-
                 async Task<MapsInMyFolder.VectorTileRenderer.Renderer.ICanvasCollisions> CreateBitmap(ICanvas bitmapf, int PosX, int PosY, VectorTileRenderer.Sources.PbfTileSource pbfTileSource, MapsInMyFolder.VectorTileRenderer.Renderer.Collisions collisions, bool createCanvas = false, int NbrTileHeightWidth = 1)
                 {
                     if (pbfTileSource != null)
@@ -315,8 +301,6 @@ namespace MapsInMyFolder.Commun
                 }
                 img_cropped.Freeze();
                 img = null;
-                stopWatch.Stop();
-                // Debug.WriteLine($"Finalizing in {stopWatch.ElapsedMilliseconds} Milliseconds");
                 DebugMode.WriteLine("Tache n°" + tache + " : Cropping to byte");
 
                 return new HttpResponse(Collectif.GetBytesFromBitmapSource(img_cropped), response.ResponseMessage);

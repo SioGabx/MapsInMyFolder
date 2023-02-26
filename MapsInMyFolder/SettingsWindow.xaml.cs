@@ -249,7 +249,7 @@ namespace MapsInMyFolder
 
         public void UpdateLastUpdateSearch()
         {
-            string LastUpdateCheckDateTimeTick = Collectif.FilterDigitOnly(XMLParser.Read("LastUpdateCheck"), null, false, false);
+            string LastUpdateCheckDateTimeTick = Collectif.FilterDigitOnly(XMLParser.Cache.Read("LastUpdateCheck"), null, false, false);
             string LastUpdateCheckDate = "/";
             if (!string.IsNullOrEmpty(LastUpdateCheckDateTimeTick))
             {

@@ -152,7 +152,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Collectif.cs" />
-    <Compile Include="CurentLayer.cs" />
+    <Compile Include="Map.cs" />
     <Compile Include="Database.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="GlobalSuppressions.cs" />
@@ -160,6 +160,7 @@
     <Compile Include="Layers.cs" />
     <Compile Include="MessageContentDialog.cs" />
     <Compile Include="Network.cs" />
+    <Compile Include="PageNotification.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="TileGenerator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

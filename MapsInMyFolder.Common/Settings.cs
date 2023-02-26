@@ -110,7 +110,7 @@ namespace MapsInMyFolder.Commun
             {
                 var fieldValue = field.GetValue(null);
                 var fieldName = field.Name;
-                string value = XMLParser.Read(fieldName);
+                string value = XMLParser.Settings.Read(fieldName);
                 bool IsErrorOnConvert = false;
 
                 if (!(value is null))
@@ -146,7 +146,7 @@ namespace MapsInMyFolder.Commun
                     {
                         if (IsErrorOnConvert)
                         {
-                            XMLParser.Write(fieldName, fieldValue.ToString());
+                            XMLParser.Settings.Write(fieldName, fieldValue.ToString());
                         }
                     }
                     type.GetField(fieldName).SetValue(null, ConvertedValue);
@@ -162,7 +162,7 @@ namespace MapsInMyFolder.Commun
             {
                 var fieldValue = field.GetValue(null);
                 var fieldName = field.Name;
-                XMLParser.Write(fieldName, fieldValue.ToString());
+                XMLParser.Settings.Write(fieldName, fieldValue.ToString());
             }
         }
     }

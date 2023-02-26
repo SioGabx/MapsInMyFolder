@@ -318,18 +318,18 @@ namespace MapsInMyFolder
             MainPage.Download_panel_open();
             MainPage.download_panel_browser?.ExecuteScriptAsync("document.getElementById(\"main\").scrollIntoView({ behavior: \"smooth\", block: \"start\", inline: \"nearest\"})");
             Download_Options download_Options_edited = download_Options;
-            download_Options_edited.id_layer = Curent.Layer.class_id;
-            download_Options_edited.identifiant = Curent.Layer.class_identifiant;
-            download_Options_edited.name = Curent.Layer.class_name;
-            download_Options_edited.tile_size = Curent.Layer.class_tiles_size;
-            download_Options_edited.urlbase = Curent.Layer.class_tile_url;
+            download_Options_edited.id_layer = Layers.Curent.class_id;
+            download_Options_edited.identifiant = Layers.Curent.class_identifiant;
+            download_Options_edited.name = Layers.Curent.class_name;
+            download_Options_edited.tile_size = Layers.Curent.class_tiles_size;
+            download_Options_edited.urlbase = Layers.Curent.class_tile_url;
             StartDownload(download_Options_edited);
         }
 
         void StartDownload(Download_Options download_Options)
         {
             int downloadid = DownloadClass.GetId();
-            string format = Curent.Layer.class_format;
+            string format = Layers.Curent.class_format;
             string final_saveformat = download_Options.format;
             int z = download_Options.zoom;
             int quality = download_Options.quality;
@@ -369,12 +369,12 @@ namespace MapsInMyFolder
                     { "SE_Longitude", download_Options.SE_PIN_Location.Longitude }
                 };
 
-                List<Url_class> urls = Collectif.GetUrl.GetListOfUrlFromLocation(location, z, urlbase, Curent.Layer.class_id, downloadid);
+                List<Url_class> urls = Collectif.GetUrl.GetListOfUrlFromLocation(location, z, urlbase, Layers.Curent.class_id, downloadid);
                 CancellationTokenSource tokenSource2 = new CancellationTokenSource();
                 CancellationToken ct = tokenSource2.Token;
                 string timestamp = Convert.ToString(new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds());
                 int dbid = Database.DB_Download_Write(Status.waitfordownloading, filename, nbr_of_tiles, z, download_Options.NO_PIN_Location.Latitude, download_Options.NO_PIN_Location.Longitude, download_Options.SE_PIN_Location.Latitude, download_Options.SE_PIN_Location.Longitude, download_Options.id_layer, save_temp_directory, save_directory, timestamp, download_Options.quality, download_Options.RedimWidth, download_Options.RedimHeignt, download_Options.interpretation.ToString());
-                DownloadClass engine = new DownloadClass(downloadid, dbid, Curent.Layer.class_id, urls, tokenSource2, ct, format, final_saveformat, z, save_temp_directory, save_directory, filename, filetempname, location, download_Options.RedimWidth, download_Options.RedimHeignt, new TileGenerator(), download_Options.interpretation, nbr_of_tiles, urlbase, identifiant, Status.waitfordownloading, tile_size, nbr_of_tiles, quality);
+                DownloadClass engine = new DownloadClass(downloadid, dbid, Layers.Curent.class_id, urls, tokenSource2, ct, format, final_saveformat, z, save_temp_directory, save_directory, filename, filetempname, location, download_Options.RedimWidth, download_Options.RedimHeignt, new TileGenerator(), download_Options.interpretation, nbr_of_tiles, urlbase, identifiant, Status.waitfordownloading, tile_size, nbr_of_tiles, quality);
                 DownloadClass.Add(engine, downloadid);
 
                 Status status;
