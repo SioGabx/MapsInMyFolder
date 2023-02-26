@@ -298,16 +298,16 @@ namespace MapsInMyFolder
                     }
 
                     string orangelayervisibility;
-                    string visibility;
+                    string visibility = "layer";
                     if (LayerWithReplacement.class_visibility == "Hidden")
                     {
                         orangelayervisibility = @"class=""eye"" title=""Afficher le calque""";
-                        visibility = "Hidden";
+                        visibility += "Hidden";
                     }
                     else
                     {
                         orangelayervisibility = @"class=""eye orange"" title=""Masquer le calque"""; ;
-                        visibility = "Visible";
+                        visibility += "Visible";
                     }
 
                     const string imgbase64 = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"; //1 pixel gif transparent -> disable base 
@@ -324,7 +324,7 @@ namespace MapsInMyFolder
                     }
 
                     generated_layers += $@"
-                        <li class=""inview layer {visibility}"" id =""{LayerWithReplacement.class_id}"">
+                        <li class=""inview {visibility}"" id =""{LayerWithReplacement.class_id}"">
                             <div class=""layer_main_div"" style=""background-image:url({imgbase64.Trim()});{overideBackgroundColor}"">
                                 <div class=""layer_main_div_background_image""></div>
                                 <div class=""layer_content"" data-layer=""{LayerWithReplacement.class_identifiant}"" title=""Sélectionner ce calque"">

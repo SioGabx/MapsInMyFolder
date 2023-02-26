@@ -19,17 +19,10 @@ namespace MapsInMyFolder
             InitializeComponent();
             this.Title = "MapsInMyFolder - Settings";
             TitleTextBox.Text = "MapsInMyFolder - Settings";
-            //int RGBint = Convert.ToInt32("FFD700", 16);
-            //byte Red = (byte)((RGBint >> 16) & 255);
-            //byte Green = (byte)((RGBint >> 8) & 255);
-            //byte Blue = (byte)(RGBint & 255);
-            //Color.FromRgb(Red, Green, Blue);
-
         }
 
         int DefaultValuesHachCode = 0;
         private void Window_Initialized(object sender, EventArgs e) { }
-
 
         void DoIScrollToElement(UIElement element, System.Windows.Input.MouseButtonEventArgs e)
         {
@@ -37,11 +30,7 @@ namespace MapsInMyFolder
             {
                 SettingsScrollViewer.ScrollToElement(element);
             }
-            //NameHiddenIdValue layer_startup_idSelectedItem = (NameHiddenIdValue)layer_startup_id.SelectedItem;
-            //MessageBox.Show(layer_startup_idSelectedItem.Id.ToString());
-            //MessageBox.Show(Commun.Collectif.CheckIfInputValueHaveChange(SettingsScrollViewer).ToString());
         }
-
 
         private void MenuItem_Telechargement(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
@@ -78,10 +67,8 @@ namespace MapsInMyFolder
             InitSettingsWindow();
         }
 
-
         void InitSettingsWindow()
         {
-            //layer_startup_id
             foreach (Layers layer in Layers.GetLayersList())
             {
                 if (layer.class_id == -1)
@@ -95,7 +82,6 @@ namespace MapsInMyFolder
                     {
                         layer_startup_id.SelectedIndex = index;
                     }
-
                 }
             }
 
@@ -285,8 +271,6 @@ namespace MapsInMyFolder
                 Collectif.RestartApplication();
             }
         }
-
-
         public void SaveSettings()
         {
             //layer_startup_id = ;
@@ -418,7 +402,6 @@ namespace MapsInMyFolder
                 Settings.Layers_Order = Commun.LayersOrder.DESC;
             }
 
-
             //visibility_pins = ;
             if (visibility_pins.IsChecked ?? false)
             {
@@ -462,9 +445,6 @@ namespace MapsInMyFolder
             //register here values to files
             Settings.SaveSettings();
         }
-
-   
-
         private async void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             int ValuesHachCode = Collectif.CheckIfInputValueHaveChange(SettingsScrollViewer);
@@ -545,7 +525,8 @@ namespace MapsInMyFolder
         {
             searchForUpdates.IsEnabled = false;
             searchForUpdatesLastUpdateCheck.Content = "Recherche en cours...";
-            Debug.WriteLine("Nouvelle mise à jour disponible ? : "  + await Commun.Update.CheckIfNewerVersionAvailableOnGithub());
+            Debug.WriteLine("Nouvelle mise à jour disponible ? : " + await Commun.Update.CheckIfNewerVersionAvailableOnGithub());
+            Database.CheckIfNewerVersionAvailable();
             searchForUpdates.IsEnabled = true;
             UpdateLastUpdateSearch();
         }
