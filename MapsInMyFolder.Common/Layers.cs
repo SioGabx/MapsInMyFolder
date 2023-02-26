@@ -61,7 +61,7 @@ namespace MapsInMyFolder.Commun
                 }
                 set
                 {
-                    if (!value.StartsWith("#"))
+                    if (!value.StartsWith("#") && !string.IsNullOrWhiteSpace(value))
                     {
                         this._BackgroundColor = "#" + value;
                     }

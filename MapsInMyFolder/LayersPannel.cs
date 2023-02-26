@@ -237,6 +237,11 @@ namespace MapsInMyFolder
                         }
                     }
 
+                    if (LayerWithReplacement?.class_visibility?.Trim() == "DELETED")
+                    {
+                        continue;
+                    }
+
                     if (Settings.layerpanel_put_non_letter_layername_at_the_end)
                     {
                         if (DoRejectLayer && (string.IsNullOrEmpty(LayerWithReplacement.class_name) || !Char.IsLetter(LayerWithReplacement.class_name.Trim()[0])))
@@ -525,7 +530,8 @@ namespace MapsInMyFolder
                 {
                     return;
                 }
-                MainWindow.RefreshAllPanels();
+                MainPage._instance.ReloadPage();
+                MainPage._instance.Set_current_layer(Layers.Curent.class_id);
             }
         }
 

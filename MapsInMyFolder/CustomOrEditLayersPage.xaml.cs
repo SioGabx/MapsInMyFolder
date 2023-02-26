@@ -179,7 +179,7 @@ namespace MapsInMyFolder
             TextBoxSetValueAndLock(TextBoxLayerMaxZoom, LayerInEditMode.class_max_zoom.ToString());
             TextBoxSetValueAndLock(TextboxLayerTileUrl, LayerInEditMode.class_tile_url);
             TextBoxSetValueAndLock(TextboxLayerTileWidth, tileSize);
-            TextBoxSetValueAndLock(TextboxSpecialOptionBackgroundColor, LayerInEditMode.class_specialsoptions.BackgroundColor);
+            TextBoxSetValueAndLock(TextboxSpecialOptionBackgroundColor, LayerInEditMode.class_specialsoptions.BackgroundColor?.TrimEnd('#'));
             TextBoxSetValueAndLock(TextboxSpecialOptionPBFJsonStyle, LayerInEditMode.class_specialsoptions.PBFJsonStyle);
             DefaultValuesHachCode = Collectif.CheckIfInputValueHaveChange(EditeurStackPanel);
 
@@ -462,11 +462,13 @@ namespace MapsInMyFolder
             int TILE_SIZE = layers.class_tiles_size;
             string TILECOMPUTATIONSCRIPT = Collectif.HTMLEntities(layers.class_tilecomputationscript);
             string SPECIALSOPTIONS = JsonSerializer.Serialize<Layers.SpecialsOptions>(layers.class_specialsoptions);
-            string TILE_FALLBACK_URL = "TILE_FALLBACK_URL";
+            string TILE_FALLBACK_URL = "";
             SQLiteConnection conn = Database.DB_Connection();
 
             string getSavingStringOptimalValue(string formValue, string layerValue)
             {
+                formValue = formValue.Trim();
+                layerValue = layerValue.Trim();
                 if (formValue == layerValue || formValue == Collectif.HTMLEntities(layerValue))
                 {
                     return null;
@@ -820,9 +822,17 @@ namespace MapsInMyFolder
                 {
                     Javascript.EngineStopAll();
                     Javascript.EngineClearList();
-                    Database.ExecuteNonQuerySQLCommand("DELETE FROM EDITEDLAYERS WHERE ID=" + LayerId);
-                    Database.ExecuteNonQuerySQLCommand("DELETE FROM CUSTOMSLAYERS WHERE ID=" + LayerId);
-                    Database.ExecuteNonQuerySQLCommand("DELETE FROM LAYERS WHERE ID=" + LayerId);
+                    Database.ExecuteNonQuerySQLCommand(@$"
+                    DELETE FROM EDITEDLAYERS WHERE ID={LayerId};
+                    DELETE FROM CUSTOMSLAYERS WHERE ID={LayerId};
+                    DELETE FROM LAYERS WHERE ID={LayerId};
+                    ");
+
+                    if (Database.ExecuteScalarSQLCommand($"UPDATE EDITEDLAYERS SET 'VISIBILITY'='DELETED' WHERE ID={LayerId};") == 0)
+                    {
+                        Database.ExecuteScalarSQLCommand($"INSERT INTO EDITEDLAYERS ('ID', 'VISIBILITY') VALUES ({LayerId},'DELETED')");
+                    }
+
                     MainWindow._instance.FrameBack();
                 }
                 result = ContentDialogResult.None;
