@@ -46,10 +46,12 @@
     <None Remove="closedhand.cur" />
     <None Remove="download_panel.html" />
     <None Remove="layer_panel.html" />
+    <None Remove="ScriptEditorTheme.xshd" />
   </ItemGroup>
 
   <ItemGroup>
     <Content Include="icone\icone_v2.ico" />
+    <EmbeddedResource Include="ScriptEditorTheme.xshd" />
   </ItemGroup>
 
   <ItemGroup>
@@ -58,6 +60,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="AvalonEdit" Version="6.2.0.78" />
     <PackageReference Include="cef.redist.x64" Version="107.1.12" />
     <PackageReference Include="CefSharp.Common" Version="107.1.120" />
     <PackageReference Include="CefSharp.Common.NETCore" Version="107.1.120" />

@@ -3,6 +3,8 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:avalonEdit="clr-namespace:ICSharpCode.AvalonEdit;assembly=ICSharpCode.AvalonEdit" 
+      xmlns:editing="clr-namespace:ICSharpCode.AvalonEdit.Editing;assembly=ICSharpCode.AvalonEdit"
       xmlns:local="clr-namespace:MapsInMyFolder" xmlns:ui="http://schemas.modernwpf.com/2019" xmlns:map="clr-namespace:MapsInMyFolder.MapControl;assembly=MapsInMyFolder.MapControl" xmlns:sys="clr-namespace:System;assembly=netstandard"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
@@ -15,7 +17,7 @@
 
         </ResourceDictionary>
     </Page.Resources>
-    <Grid>
+    <Grid x:Name="EditeurGrid">
 
 
 
@@ -51,7 +53,7 @@
                     </LinearGradientBrush>
                 </Rectangle.Fill>
             </Rectangle>
-            <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.Row="1" Grid.Column="0">
+            <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.Row="1" Grid.Column="0" x:Name="EditeurScrollBar" CanContentScroll="False">
                 <StackPanel Margin="17,0,32,0" x:Name="EditeurStackPanel">
                     <Label x:Name="EditeurType" Content="Editeur : " HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" Width="Auto" Height="25" FontSize="16.5" FontFamily="Segoe UI Semilight" Foreground="#FFE2E2E1"/>
 
@@ -73,7 +75,7 @@
                         </Grid.RowDefinitions>
                         <Label Content="Descriptif :" Foreground="#888989" Grid.Row="0"></Label>
                         <!--<RichTextBox x:Name="TextboxLayerDescriptif" HorizontalAlignment="Stretch" Grid.Row="1" Style="{DynamicResource RichTextBoxCleanStyle}" VerticalScrollBarVisibility="Hidden" Cursor="IBeam" Height="Auto" MinHeight="80" SpellCheck.IsEnabled="False" ></RichTextBox>-->
-                        <TextBox x:Name="TextboxLayerDescriptif" Height="Auto"  HorizontalAlignment="Stretch" TextWrapping="Wrap" Grid.Row="1" Style="{DynamicResource TextBoxCleanStyle_13}" Cursor="IBeam" AcceptsReturn="True" AcceptsTab="True" AutoWordSelection="False" MinHeight="80" VerticalContentAlignment="Top"></TextBox>
+                        <TextBox x:Name="TextboxLayerDescriptif" Height="Auto"  HorizontalAlignment="Stretch" TextWrapping="Wrap" Grid.Row="1" Style="{DynamicResource TextBoxCleanStyle_13}" Cursor="IBeam" AcceptsReturn="True" AcceptsTab="True" AutoWordSelection="False" MinHeight="80" VerticalContentAlignment="Top" RequestBringIntoView="DisableTextBoxRequestBringIntoView" ></TextBox>
 
                     </Grid>
 
@@ -121,8 +123,7 @@
                             <RowDefinition/>
                         </Grid.RowDefinitions>
                         <Label Content="Script :" Foreground="#888989" Grid.Row="0"></Label>
-                        <!--<RichTextBox x:Name="TextboxLayerScript" HorizontalAlignment="Stretch" Grid.Row="1" Style="{DynamicResource RichTextBoxCleanStyle}" VerticalScrollBarVisibility="Hidden" Cursor="IBeam" Height="Auto" MinHeight="80" TextChanged="TextboxLayerScript_TextChanged" KeyUp="TextboxLayerScript_KeyUp" AutoWordSelection="False"></RichTextBox>-->
-                        <TextBox x:Name="TextboxLayerScript" Height="Auto"  HorizontalAlignment="Stretch" TextWrapping="NoWrap" Grid.Row="1" Style="{DynamicResource TextBoxCleanStyle_13}" Cursor="IBeam" AcceptsReturn="True" AcceptsTab="True" AutoWordSelection="False" HorizontalScrollBarVisibility="Auto" MinHeight="80" SpellCheck.IsEnabled="False"  VerticalContentAlignment="Top" KeyUp="TextboxLayerScript_KeyUp" Padding="0,0,0,20">
+                        <!--<TextBox x:Name="TextboxLayerScript" Height="Auto"  HorizontalAlignment="Stretch" TextWrapping="NoWrap" Grid.Row="1" Style="{DynamicResource TextBoxCleanStyle_13}" Cursor="IBeam" AcceptsReturn="True" AcceptsTab="True" AutoWordSelection="False" HorizontalScrollBarVisibility="Auto" MinHeight="80" SpellCheck.IsEnabled="False"  VerticalContentAlignment="Top" KeyUp="TextboxLayerScript_KeyUp" Padding="0,0,0,20">
                             <TextBox.ContextMenu>
                                 <ContextMenu Foreground="#E2E2E1" Background="#171719" >
                                     <StaticResourceExtension ResourceKey="ContextMenu_Copier" />
@@ -130,9 +131,17 @@
                                     <StaticResourceExtension ResourceKey="ContextMenu_Coller" />
                                 </ContextMenu>
                             </TextBox.ContextMenu>
-                            
-                        </TextBox>
 
+                        </TextBox>-->
+                        <avalonEdit:TextEditor x:Name="TextboxLayerScript" Grid.Row="1" KeyUp="TextboxLayerScript_KeyUp" HorizontalAlignment="Stretch" SyntaxHighlighting="MIMF_JavaScript" MinHeight="80" ShowLineNumbers="True" Height="Auto" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" RequestBringIntoView="DisableAllRequestBringIntoView" >
+                            <avalonEdit:TextEditor.ContextMenu>
+                                <ContextMenu Foreground="#E2E2E1" Background="#171719" >
+                                    <StaticResourceExtension ResourceKey="ContextMenu_Copier" />
+                                    <StaticResourceExtension ResourceKey="ContextMenu_Couper" />
+                                    <StaticResourceExtension ResourceKey="ContextMenu_Coller" />
+                                </ContextMenu>
+                            </avalonEdit:TextEditor.ContextMenu>
+                        </avalonEdit:TextEditor>
                     </Grid>
 
                     <Grid Margin="0,10,0,0">

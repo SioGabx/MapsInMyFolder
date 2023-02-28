@@ -19,10 +19,36 @@ namespace MapsInMyFolder
             InitializeComponent();
             this.Title = "MapsInMyFolder - Settings";
             TitleTextBox.Text = "MapsInMyFolder - Settings";
+
+            tileloader_default_script.TextArea.Caret.CaretBrush = Collectif.HexValueToSolidColorBrush("#f18712");//rgb(241 135 18)
+            tileloader_template_script.TextArea.Caret.CaretBrush = Collectif.HexValueToSolidColorBrush("#f18712");//rgb(241 135 18)
+            tileloader_default_script.TextArea.Caret.PositionChanged += (_, _) => Collectif.TextEditorCursorPositionChanged(tileloader_default_script, SettingsGrid, SettingsScrollViewer, 100); ;
+            tileloader_template_script.TextArea.Caret.PositionChanged += (_, _) => Collectif.TextEditorCursorPositionChanged(tileloader_template_script, SettingsGrid, SettingsScrollViewer, 100); ;
+            ScrollViewerHelper.SetFixMouseWheel(Collectif.GetDescendantByType(tileloader_default_script, typeof(ScrollViewer)) as ScrollViewer, true);
+            ScrollViewerHelper.SetFixMouseWheel(Collectif.GetDescendantByType(tileloader_template_script, typeof(ScrollViewer)) as ScrollViewer, true);
+            
+            MenuItem IndentermenuItem_tileloader_default_script = new MenuItem();
+            IndentermenuItem_tileloader_default_script.Header = "Indenter";
+            IndentermenuItem_tileloader_default_script.Icon = new ModernWpf.Controls.FontIcon() { Glyph = "\uE12F", Foreground = Collectif.HexValueToSolidColorBrush("#888989") };
+            IndentermenuItem_tileloader_default_script.Click += (sender, e) => Collectif.IndenterCode(sender, e, tileloader_default_script);
+            tileloader_default_script.ContextMenu.Items.Add(IndentermenuItem_tileloader_default_script);  
+            
+            MenuItem IndentermenuItem_tileloader_template_script = new MenuItem();
+            IndentermenuItem_tileloader_template_script.Header = "Indenter";
+            IndentermenuItem_tileloader_template_script.Icon = new ModernWpf.Controls.FontIcon() { Glyph = "\uE12F", Foreground = Collectif.HexValueToSolidColorBrush("#888989") };
+            IndentermenuItem_tileloader_template_script.Click += (sender, e) => Collectif.IndenterCode(sender, e, tileloader_template_script);
+            tileloader_template_script.ContextMenu.Items.Add(IndentermenuItem_tileloader_template_script);
+
+
+            tileloader_default_script.TextArea.Options.ConvertTabsToSpaces = true;
+            tileloader_default_script.TextArea.Options.IndentationSize = 4;
+            tileloader_template_script.TextArea.Options.ConvertTabsToSpaces = true;
+            tileloader_template_script.TextArea.Options.IndentationSize = 4;
         }
 
         int DefaultValuesHachCode = 0;
         private void Window_Initialized(object sender, EventArgs e) { }
+       
 
         void DoIScrollToElement(UIElement element, System.Windows.Input.MouseButtonEventArgs e)
         {
@@ -529,6 +555,11 @@ namespace MapsInMyFolder
             Database.CheckIfNewerVersionAvailable();
             searchForUpdates.IsEnabled = true;
             UpdateLastUpdateSearch();
+        }
+
+        private void DisableRequestBringIntoView(object sender, RequestBringIntoViewEventArgs e)
+        {
+            e.Handled = true;
         }
     }
 }

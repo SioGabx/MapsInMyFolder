@@ -8,6 +8,9 @@ using System.Windows.Input;
 using System.Windows.Media.Animation;
 using MapsInMyFolder.Commun;
 using ModernWpf.Media.Animation;
+using ICSharpCode.AvalonEdit.Highlighting;
+using System.Xml;
+using System.IO;
 
 namespace MapsInMyFolder
 {
@@ -150,6 +153,23 @@ namespace MapsInMyFolder
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
             Init();
+            IHighlightingDefinition customHighlighting;
+            using (Stream s = Collectif.ReadResourceStream("ScriptEditorTheme.xshd"))
+            {
+                if (s == null)
+                {
+                    Collectif.GetAllManifestResourceNames();
+                    throw new InvalidOperationException("Le theme de l'editeur de script n'as pas été trouvé");
+                }
+
+                using (XmlReader reader = new XmlTextReader(s))
+                {
+                    customHighlighting = ICSharpCode.AvalonEdit.Highlighting.Xshd.
+                        HighlightingLoader.Load(reader, HighlightingManager.Instance);
+                }
+            }
+            // and register it in the HighlightingManager
+            HighlightingManager.Instance.RegisterHighlighting("MIMF_JavaScript", new string[] { ".js" }, customHighlighting);
 
             if (await Update.CheckIfNewerVersionAvailableOnGithub())
             {

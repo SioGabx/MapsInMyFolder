@@ -302,8 +302,8 @@ namespace MapsInMyFolder
                         <li class=""inview {visibility}"" id =""{LayerWithReplacement.class_id}"">
                             <div class=""layer_main_div"" style=""background-image:url({imgbase64.Trim()});{overideBackgroundColor}"">
                                 <div class=""layer_main_div_background_image""></div>
-                                <div class=""layer_content"" data-layer=""{LayerWithReplacement.class_identifiant}"" title=""Sélectionner ce calque"">
-                                    <div class=""layer_texte"" title=""{Collectif.HTMLEntities(LayerWithReplacement.class_description)}"">
+                                <div class=""layer_content"" data-layer=""{LayerWithReplacement.class_identifiant}"" title=""{Collectif.HTMLEntities(LayerWithReplacement.class_description)}"">
+                                    <div class=""layer_texte"">
                                         <p class=""display_name"">{Collectif.HTMLEntities(LayerWithReplacement.class_name)}</p>
                                         <p class=""zoom"">[{LayerWithReplacement.class_min_zoom}-{LayerWithReplacement.class_max_zoom}] - {LayerWithReplacement.class_site}</p>
                                         <p class=""layer_website{supplement_class}"">{LayerWithReplacement.class_site}</p>

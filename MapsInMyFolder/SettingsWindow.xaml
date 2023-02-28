@@ -5,6 +5,8 @@
         xmlns:ui="http://schemas.modernwpf.com/2019"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MapsInMyFolder"
+        xmlns:avalonEdit="clr-namespace:ICSharpCode.AvalonEdit;assembly=ICSharpCode.AvalonEdit" 
+        xmlns:editing="clr-namespace:ICSharpCode.AvalonEdit.Editing;assembly=ICSharpCode.AvalonEdit"
         xmlns:sc="clr-namespace:MapsInMyFolder;assembly=MapsInMyFolder"
         mc:Ignorable="d"
         ui:WindowHelper.UseModernWindowStyle="True" ResizeMode="CanMinimize" Title="Paramêtres" Height="450" Width="800"
@@ -38,7 +40,7 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Window.Resources>
-    <Grid Background="#FF0A0C0C">
+    <Grid Background="#FF0A0C0C"  x:Name="SettingsGrid">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition />
@@ -237,7 +239,18 @@
                                         <RowDefinition Height="*" />
                                     </Grid.RowDefinitions>
                                     <Label Content="Script par défault pour le calcul des tuiles :" Foreground="#888989" Grid.Row="0"></Label>
-                                    <TextBox x:Name="tileloader_default_script" Height="Auto"  HorizontalAlignment="Stretch" TextWrapping="NoWrap" Grid.Row="1" Style="{DynamicResource TextBoxCleanStyle_13}" Cursor="IBeam" AcceptsReturn="True" AcceptsTab="True" AutoWordSelection="False" HorizontalScrollBarVisibility="Auto" MinHeight="80" SpellCheck.IsEnabled="False"  VerticalContentAlignment="Top"></TextBox>
+                                    <!--<TextBox x:Name="tileloader_default_script" Height="Auto"  HorizontalAlignment="Stretch" TextWrapping="NoWrap" Grid.Row="1" Style="{DynamicResource TextBoxCleanStyle_13}" Cursor="IBeam" AcceptsReturn="True" AcceptsTab="True" AutoWordSelection="False" HorizontalScrollBarVisibility="Auto" MinHeight="80" SpellCheck.IsEnabled="False"  VerticalContentAlignment="Top"></TextBox>-->
+                                    <avalonEdit:TextEditor x:Name="tileloader_default_script" Grid.Row="1" RequestBringIntoView="DisableRequestBringIntoView" HorizontalAlignment="Stretch" SyntaxHighlighting="MIMF_JavaScript" MinHeight="80" ShowLineNumbers="True" Height="Auto" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+                                        <avalonEdit:TextEditor.ContextMenu>
+                                            <ContextMenu Foreground="#E2E2E1" Background="#171719" >
+                                                <StaticResourceExtension ResourceKey="ContextMenu_Copier" />
+                                                <StaticResourceExtension ResourceKey="ContextMenu_Couper" />
+                                                <StaticResourceExtension ResourceKey="ContextMenu_Coller" />
+                                            </ContextMenu>
+                                        </avalonEdit:TextEditor.ContextMenu>
+                                    </avalonEdit:TextEditor>
+
+
                                 </Grid>
 
                                 <Grid Margin="0,10,0,0">
@@ -246,7 +259,16 @@
                                         <RowDefinition Height="*" />
                                     </Grid.RowDefinitions>
                                     <Label Content="Script template pour le calcul des tuiles (clic droit lors de l'edition du script) :" Foreground="#888989" Grid.Row="0"></Label>
-                                    <TextBox x:Name="tileloader_template_script" Height="Auto"  HorizontalAlignment="Stretch" TextWrapping="NoWrap" Grid.Row="1" Style="{DynamicResource TextBoxCleanStyle_13}" Cursor="IBeam" AcceptsReturn="True" AcceptsTab="True" AutoWordSelection="False" HorizontalScrollBarVisibility="Auto" MinHeight="80" SpellCheck.IsEnabled="False"  VerticalContentAlignment="Top"></TextBox>
+                                    <!--<TextBox x:Name="tileloader_template_script" Height="Auto"  HorizontalAlignment="Stretch" TextWrapping="NoWrap" Grid.Row="1" Style="{DynamicResource TextBoxCleanStyle_13}" Cursor="IBeam" AcceptsReturn="True" AcceptsTab="True" AutoWordSelection="False" HorizontalScrollBarVisibility="Auto" MinHeight="80" SpellCheck.IsEnabled="False"  VerticalContentAlignment="Top"></TextBox>-->
+                                    <avalonEdit:TextEditor x:Name="tileloader_template_script" Grid.Row="1" RequestBringIntoView="DisableRequestBringIntoView" HorizontalAlignment="Stretch" SyntaxHighlighting="MIMF_JavaScript" MinHeight="80" ShowLineNumbers="True" Height="Auto" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+                                        <avalonEdit:TextEditor.ContextMenu>
+                                            <ContextMenu Foreground="#E2E2E1" Background="#171719" >
+                                                <StaticResourceExtension ResourceKey="ContextMenu_Copier" />
+                                                <StaticResourceExtension ResourceKey="ContextMenu_Couper" />
+                                                <StaticResourceExtension ResourceKey="ContextMenu_Coller" />
+                                            </ContextMenu>
+                                        </avalonEdit:TextEditor.ContextMenu>
+                                    </avalonEdit:TextEditor>
                                 </Grid>
 
                             </StackPanel>

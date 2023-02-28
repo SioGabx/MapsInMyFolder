@@ -12,6 +12,9 @@ using System.Windows.Input;
 using System.Windows.Threading;
 using MapsInMyFolder.Commun;
 using System.Text.Json;
+using ICSharpCode.AvalonEdit.Highlighting;
+using System.Xml;
+using System.IO;
 
 namespace MapsInMyFolder
 {
@@ -57,7 +60,15 @@ namespace MapsInMyFolder
             Javascript.LogsChanged += (o, e) => SetTextboxLayerScriptConsoleText(e.Logs);
             var keyeventHandler = new KeyEventHandler(TextboxLayerScriptConsoleSender_KeyDown);
             TextboxLayerScriptConsoleSender.AddHandler(PreviewKeyDownEvent, keyeventHandler, handledEventsToo: true);
+
+
+            TextboxLayerScript.TextArea.Caret.CaretBrush = Collectif.HexValueToSolidColorBrush("#f18712");//rgb(241 135 18)
+            TextboxLayerScript.TextArea.Caret.PositionChanged += (_, _) => Collectif.TextEditorCursorPositionChanged(TextboxLayerScript, EditeurGrid, EditeurScrollBar, 75);
+            ScrollViewerHelper.SetFixMouseWheel(Collectif.GetDescendantByType(TextboxLayerScript, typeof(ScrollViewer)) as ScrollViewer, true);
         }
+
+      
+
 
         public void SetTextboxLayerScriptConsoleText(string text)
         {
@@ -96,7 +107,7 @@ namespace MapsInMyFolder
                 {
                     Categories.Add(class_categorie);
                     TextboxLayerCategories.Items.Add(class_categorie);
-                   //Debug.WriteLine("Adding " + class_categorie + " From " + layer.class_id);
+                    //Debug.WriteLine("Adding " + class_categorie + " From " + layer.class_id);
                 }
                 string class_site = layer.class_site.Trim();
                 if (!Site.Contains(class_site))
@@ -184,24 +195,47 @@ namespace MapsInMyFolder
             DefaultValuesHachCode = Collectif.CheckIfInputValueHaveChange(EditeurStackPanel);
 
             Collectif.setBackgroundOnUIElement(mapviewerappercu, LayerInEditMode?.class_specialsoptions?.BackgroundColor);
-            MenuItem menuItem = new MenuItem();
-            menuItem.Header = "Script template";
-            menuItem.Icon = new ModernWpf.Controls.FontIcon() { Glyph = "\uE15C", Foreground = Collectif.HexValueToSolidColorBrush("#888989") };
-            menuItem.Click += (sender, e) => putScriptTemplate(sender, e, TextboxLayerScript);
-            TextboxLayerScript.ContextMenu.Items.Add(menuItem);
+            MenuItem IndentermenuItem = new MenuItem();
+            IndentermenuItem.Header = "Indenter";
+            IndentermenuItem.Icon = new ModernWpf.Controls.FontIcon() { Glyph = "\uE12F", Foreground = Collectif.HexValueToSolidColorBrush("#888989") };
+            IndentermenuItem.Click += (sender, e) => IndenterCode(sender, e, TextboxLayerScript);
+            TextboxLayerScript.ContextMenu.Items.Add(IndentermenuItem); 
+            
+            MenuItem templateMenuItem = new MenuItem();
+            templateMenuItem.Header = "Script template";
+            templateMenuItem.Icon = new ModernWpf.Controls.FontIcon() { Glyph = "\uE15C", Foreground = Collectif.HexValueToSolidColorBrush("#888989") };
+            templateMenuItem.Click += (sender, e) => putScriptTemplate(sender, e, TextboxLayerScript);
+            TextboxLayerScript.ContextMenu.Items.Add(templateMenuItem);
+                        
+            TextboxLayerScript.TextArea.Options.ConvertTabsToSpaces = true;
+            TextboxLayerScript.TextArea.Options.IndentationSize = 4;
         }
 
-        void putScriptTemplate(object sender, EventArgs e, TextBox textBox)
+        void putScriptTemplate(object sender, EventArgs e, ICSharpCode.AvalonEdit.TextEditor textBox)
         {
-            Collectif.InsertTextAtCaretPosition(textBox, Settings.tileloader_template_script); 
+            Collectif.InsertTextAtCaretPosition(textBox, Settings.tileloader_template_script);
+            DoWeNeedToUpdateMoinsUnLayer();
+        }
+
+        void IndenterCode(object sender, EventArgs e, ICSharpCode.AvalonEdit.TextEditor textBox)
+        {
+            Collectif.IndenterCode(sender, e, textBox);
             DoWeNeedToUpdateMoinsUnLayer();
         }
 
 
         static void TextBoxSetValueAndLock(TextBox textBox, string value)
         {
+            if (textBox is null) { return; }
             textBox.Text = value;
             Collectif.LockPreviousUndo(textBox);
+        }
+
+        static void TextBoxSetValueAndLock(ICSharpCode.AvalonEdit.TextEditor textBox, string value)
+        {
+            if (textBox is null) { return; }
+            textBox.Text = value;
+            //Collectif.LockPreviousUndo(textBox);
         }
 
         void SetAppercuLayers(string url = "")
@@ -287,26 +321,6 @@ namespace MapsInMyFolder
                 DebugMode.WriteLine(ex.Message);
             }
         }
-
-        //static void DB_Download_Init(SQLiteConnection conn)
-        //{
-        //    try
-        //    {
-        //        SQLiteCommand sqlite_cmd = conn.CreateCommand();
-        //        sqlite_cmd.CommandText = @"CREATE TABLE IF NOT EXISTS 'EDITEDLAYERS' ('ID' INTEGER UNIQUE, 'NOM' TEXT, 'DESCRIPTION' TEXT, 'CATEGORIE' TEXT, 'IDENTIFIANT' TEXT, 
-        //        'TILE_URL' TEXT, 'MIN_ZOOM' INTEGER DEFAULT 0, 'MAX_ZOOM' INTEGER DEFAULT 0, 'FORMAT' TEXT, 'SITE' TEXT, 'SITE_URL' TEXT,
-        //        'TILE_SIZE' INTEGER DEFAULT 256, 'FAVORITE' INTEGER DEFAULT 0, 'TILECOMPUTATIONSCRIPT'	TEXT DEFAULT '', 'SPECIALSOPTIONS'   TEXT DEFAULT '')";
-        //        sqlite_cmd.ExecuteNonQuery();
-        //        sqlite_cmd.CommandText = @"CREATE TABLE IF NOT EXISTS 'CUSTOMSLAYERS' ('ID' INTEGER UNIQUE, 'NOM' TEXT, 'DESCRIPTION' TEXT, 'CATEGORIE' TEXT, 'IDENTIFIANT' TEXT, 
-        //        'TILE_URL' TEXT, 'MIN_ZOOM' INTEGER DEFAULT 0, 'MAX_ZOOM' INTEGER DEFAULT 0, 'FORMAT' TEXT, 'SITE' TEXT, 'SITE_URL' TEXT, 
-        //        'TILE_SIZE' INTEGER DEFAULT 256, 'FAVORITE' INTEGER DEFAULT 0, 'TILECOMPUTATIONSCRIPT'	TEXT DEFAULT '', 'SPECIALSOPTIONS'   TEXT DEFAULT '')";
-        //        sqlite_cmd.ExecuteNonQuery();
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        MessageBox.Show("Une erreur s'est produite au niveau de la base de donnée.\n" + e.Message);
-        //    }
-        //}
 
         private void TextboxLayerTileUrl_TextChanged(object sender, TextChangedEventArgs e)
         {
@@ -528,7 +542,8 @@ namespace MapsInMyFolder
             else
             {
                 Debug.WriteLine("Update to EDITEDLAYERS");
-                Database.ExecuteNonQuerySQLCommand($"UPDATE 'main'.'EDITEDLAYERS' SET 'NOM'='{NOM}','DESCRIPTION'='{DESCRIPTION}','CATEGORIE'='{CATEGORIE}','IDENTIFIANT'='{IDENTIFIANT}','TILE_URL'='{TILE_URL}','TILE_FALLBACK_URL'='{TILE_FALLBACK_URL}','MIN_ZOOM'='{MIN_ZOOM}','MAX_ZOOM'='{MAX_ZOOM}','FORMAT'='{FORMAT}','SITE'='{SITE}','SITE_URL'='{SITE_URL}','TILE_SIZE'='{TILE_SIZE}','TILECOMPUTATIONSCRIPT'='{TILECOMPUTATIONSCRIPT}','VISIBILITY'='{Visibility.Visible.ToString()}','SPECIALSOPTIONS'='{SPECIALSOPTIONS}','VERSION'='{1}' WHERE ID = {LayerId}");
+                int LastVersion = Database.ExecuteScalarSQLCommand("SELECT VERSION FROM 'main'.'LAYERS' WHERE ID=" + LayerId);
+                Database.ExecuteNonQuerySQLCommand($"UPDATE 'main'.'EDITEDLAYERS' SET 'NOM'='{NOM}','DESCRIPTION'='{DESCRIPTION}','CATEGORIE'='{CATEGORIE}','IDENTIFIANT'='{IDENTIFIANT}','TILE_URL'='{TILE_URL}','TILE_FALLBACK_URL'='{TILE_FALLBACK_URL}','MIN_ZOOM'='{MIN_ZOOM}','MAX_ZOOM'='{MAX_ZOOM}','FORMAT'='{FORMAT}','SITE'='{SITE}','SITE_URL'='{SITE_URL}','TILE_SIZE'='{TILE_SIZE}','TILECOMPUTATIONSCRIPT'='{TILECOMPUTATIONSCRIPT}','VISIBILITY'='{Visibility.Visible.ToString()}','SPECIALSOPTIONS'='{SPECIALSOPTIONS}','VERSION'='{LastVersion}' WHERE ID = {LayerId}");
             }
             MainPage.ClearCache(LayerId, false);
 
@@ -861,7 +876,7 @@ namespace MapsInMyFolder
 
         private void TextboxSpecialOptionBackgroundColor_KeyUp(object sender, KeyEventArgs e)
         {
-            
+
             DoWeNeedToUpdateMoinsUnLayer();
             Collectif.setBackgroundOnUIElement(mapviewerappercu, TextboxSpecialOptionBackgroundColor.Text);
         }
@@ -898,6 +913,17 @@ namespace MapsInMyFolder
         private void TextboxSpecialOptionBackgroundColor_TextChanged(object sender, TextChangedEventArgs e)
         {
             Collectif.FilterDigitOnlyWhileWritingInTextBox((TextBox)sender, new List<char>() { 'A', 'a', 'B', 'b', 'C', 'c', 'D', 'd', 'E', 'e', 'F', 'f', '#' });
+        }
+
+        private void DisableTextBoxRequestBringIntoView(object sender, RequestBringIntoViewEventArgs e)
+        {   
+            bool DoHandle = (e.OriginalSource is TextBox);
+            e.Handled = DoHandle;
+        } 
+        
+        private void DisableAllRequestBringIntoView(object sender, RequestBringIntoViewEventArgs e)
+        {   
+            e.Handled = true;
         }
     }
 }

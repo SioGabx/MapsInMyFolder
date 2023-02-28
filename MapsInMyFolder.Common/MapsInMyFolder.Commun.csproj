@@ -77,6 +77,9 @@
     <Reference Include="Esprima, Version=3.0.0.0, Culture=neutral, PublicKeyToken=2e92ba9c8d81157f, processorArchitecture=MSIL">
       <HintPath>..\packages\Esprima.3.0.0-beta-9\lib\net462\Esprima.dll</HintPath>
     </Reference>
+    <Reference Include="ICSharpCode.AvalonEdit, Version=6.2.0.78, Culture=neutral, PublicKeyToken=9cc39be672370310, processorArchitecture=MSIL">
+      <HintPath>..\packages\AvalonEdit.6.2.0.78\lib\net462\ICSharpCode.AvalonEdit.dll</HintPath>
+    </Reference>
     <Reference Include="Jint, Version=3.0.0.0, Culture=neutral, PublicKeyToken=2e92ba9c8d81157f, processorArchitecture=MSIL">
       <HintPath>..\packages\Jint.3.0.0-beta-2043\lib\net462\Jint.dll</HintPath>
     </Reference>
@@ -143,6 +146,7 @@
       <HintPath>..\packages\System.ValueTuple.4.5.0\lib\net47\System.ValueTuple.dll</HintPath>
     </Reference>
     <Reference Include="System.Web" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -154,6 +158,7 @@
   <ItemGroup>
     <Compile Include="Collectif.cs" />
     <Compile Include="DiffMatchPatch.cs" />
+    <Compile Include="JSBeautify.cs" />
     <Compile Include="Map.cs" />
     <Compile Include="Database.cs" />
     <Compile Include="Extensions.cs" />

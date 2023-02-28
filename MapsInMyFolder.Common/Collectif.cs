@@ -19,6 +19,7 @@ using System.Text.RegularExpressions;
 using System.Windows.Media.Animation;
 using MapsInMyFolder.Commun;
 using NetVips;
+using System.Windows.Input;
 
 namespace MapsInMyFolder.Commun
 {
@@ -218,17 +219,17 @@ namespace MapsInMyFolder.Commun
             };
         }
 
-        //private static void GetAllManifestResourceNames()
-        //{
-        //    Assembly assembly = Assembly.GetEntryAssembly();
-        //    //get assembly ManifestResourceNames
-        //    Debug.WriteLine("get assembly ManifestResourceNames");
-        //    for (int i = 0; i < assembly.GetManifestResourceNames().Length; i++)
-        //    {
-        //        string name = assembly.GetManifestResourceNames()[i];
-        //        Debug.WriteLine("ManifestResourceNames : " + name);
-        //    }
-        //}
+        public static void GetAllManifestResourceNames()
+        {
+            Assembly assembly = Assembly.GetEntryAssembly();
+            //get assembly ManifestResourceNames
+            Debug.WriteLine("get assembly ManifestResourceNames");
+            for (int i = 0; i < assembly.GetManifestResourceNames().Length; i++)
+            {
+                string name = assembly.GetManifestResourceNames()[i];
+                Debug.WriteLine("ManifestResourceNames : " + name);
+            }
+        }
 
         public static string ReadResourceString(string pathWithSlash)
         {
@@ -786,24 +787,79 @@ namespace MapsInMyFolder.Commun
             uIElement.UndoLimit = 0;
             uIElement.UndoLimit = undo_limit;
         }
-        public static void InsertTextAtCaretPosition(TextBox TextBox, string text)
+
+        public static void InsertTextAtCaretPosition(ICSharpCode.AvalonEdit.TextEditor TextBox, string text)
         {
             if (TextBox.SelectionLength == 0)
             {
-                int CaretIndex = TextBox.CaretIndex;
-                TextBox.Text = TextBox.Text.Insert(CaretIndex, text);
-                TextBox.CaretIndex = CaretIndex + text.Length;
+                int CaretIndex = TextBox.CaretOffset;
+                TextBox.TextArea.Document.Insert(CaretIndex, text);
+                
+                TextBox.CaretOffset = CaretIndex + text.Length;
             }
             else
             {
                 TextBox.SelectedText = text;
-                TextBox.CaretIndex += TextBox.SelectedText.Length;
+                TextBox.CaretOffset += TextBox.SelectedText.Length;
                 TextBox.SelectionLength = 0;
             }
-            int lineIndex = TextBox.GetLineIndexFromCharacterIndex(TextBox.CaretIndex);
-            TextBox.ScrollToLine(lineIndex);
+            
+            //int lineIndex = TextBox.GetLineIndexFromCharacterIndex(TextBox.CaretIndex);
+            //TextBox.ScrollToLine(lineIndex);
+        }
+        public static void TextEditorCursorPositionChanged(ICSharpCode.AvalonEdit.TextEditor textEditor, Grid grid, ScrollViewer scrollViewer, int MarginTop = 25)
+        {
+            double Margin = 40;
+
+            double TextboxLayerScriptTopPosition = textEditor.TranslatePoint(new Point(0, 0), grid).Y;
+            double TextboxLayerScriptCaretTopPosition = textEditor.TextArea.Caret.CalculateCaretRectangle().Top + TextboxLayerScriptTopPosition;
+            if (TextboxLayerScriptCaretTopPosition > (grid.ActualHeight - Margin))
+            {
+                scrollViewer.ScrollToVerticalOffset(scrollViewer.VerticalOffset + (TextboxLayerScriptCaretTopPosition - (grid.ActualHeight - Margin)));
+                Debug.WriteLine("Scroll down");
+                return;
+            }else if (TextboxLayerScriptCaretTopPosition < MarginTop)
+            {
+                scrollViewer.ScrollToVerticalOffset(scrollViewer.VerticalOffset - Math.Abs((MarginTop) - TextboxLayerScriptCaretTopPosition));
+                Debug.WriteLine("Scroll up");
+                return;
+            }
+           // e.
+            Debug.WriteLine($"-----\nEditeurScrollBar.VerticalOffset : {scrollViewer.VerticalOffset}\nTextboxLayerScript.TextArea.Caret :{textEditor.TextArea.Caret.CalculateCaretRectangle().Top}\nTextboxLayerScript.ActualHeight :{textEditor.ActualHeight}\nTextboxLayerScriptCaretTopPosition : {TextboxLayerScriptCaretTopPosition}\nEditeurGrid.ActualHeight : {grid.ActualHeight}\nTextboxLayerScriptTopPosition : {TextboxLayerScriptTopPosition}");
         }
 
+        public static void IndenterCode(object sender, EventArgs e, ICSharpCode.AvalonEdit.TextEditor textBox)
+        {
+            Commun.JSBeautify jSBeautify = new JSBeautify(textBox.Text, new JSBeautifyOptions() { preserve_newlines = false, indent_char = ' ', indent_size = 4 });
+            textBox.Text = jSBeautify.GetResult();
+        }
+
+        public static Visual GetDescendantByType(Visual element, Type type)
+        {
+            if (element == null)
+            {
+                return null;
+            }
+            if (element.GetType() == type)
+            {
+                return element;
+            }
+            Visual foundElement = null;
+            if (element is FrameworkElement)
+            {
+                (element as FrameworkElement).ApplyTemplate();
+            }
+            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(element); i++)
+            {
+                Visual visual = VisualTreeHelper.GetChild(element, i) as Visual;
+                foundElement = GetDescendantByType(visual, type);
+                if (foundElement != null)
+                {
+                    break;
+                }
+            }
+            return foundElement;
+        }
 
         public static List<UIElement> FindVisualChildren(UIElement obj, List<System.Type> BlackListNoSearchChildren = null)
         {
@@ -813,7 +869,14 @@ namespace MapsInMyFolder.Commun
             {
                 for (int i = 0; i < VisualTreeHelper.GetChildrenCount(obj); i++)
                 {
-                    UIElement objChild = (UIElement)VisualTreeHelper.GetChild(obj, i);
+                    UIElement objChild;
+                    try {
+                    objChild = (UIElement)VisualTreeHelper.GetChild(obj, i);
+                    }catch(InvalidCastException)
+                    {
+                        //Unable to cast object to type 'System.Windows.UIElement'
+                        continue;
+                    }
                     if (!(objChild is null))
                     {
                         children.Add(objChild);
@@ -890,7 +953,8 @@ namespace MapsInMyFolder.Commun
                 typeof(TextBox),
                 typeof(ComboBox),
                 typeof(CheckBox),
-                typeof(RadioButton)
+                typeof(RadioButton),
+                typeof(ICSharpCode.AvalonEdit.TextEditor)
             };
 
             var ListOfisualChildren = FindVisualChildren(SourcePanel, TypeOfSearchElement);
@@ -914,7 +978,15 @@ namespace MapsInMyFolder.Commun
                                 hachCode = value.GetHashCode();
                             }
                         }
-                        else if (type == typeof(ComboBox))
+                        else if (type == typeof(ICSharpCode.AvalonEdit.TextEditor))
+                        {
+                            ICSharpCode.AvalonEdit.TextEditor TextEditor = (ICSharpCode.AvalonEdit.TextEditor)element;
+                            string value = TextEditor.Text;
+                            if (!string.IsNullOrEmpty(value))
+                            {
+                                hachCode = value.GetHashCode();
+                            }
+                        }else if (type == typeof(ComboBox))
                         {
                             ComboBox ComboBox = (ComboBox)element;
                             string value = ComboBox.Text;
@@ -1283,4 +1355,59 @@ namespace MapsInMyFolder.Commun
         }
 
     }
+
+    public static class ScrollViewerHelper
+    {
+        //from https://stackoverflow.com/questions/8932720/listview-inside-of-scrollviewer-prevents-scrollviewer-scroll/61092700#61092700
+        // Attached property boilerplate
+        public static bool GetFixMouseWheel(ScrollViewer scrollViewer) => (bool)scrollViewer?.GetValue(FixMouseWheelProperty);
+        public static void SetFixMouseWheel(ScrollViewer scrollViewer, bool value) => scrollViewer?.SetValue(FixMouseWheelProperty, value);
+        public static readonly DependencyProperty FixMouseWheelProperty =
+            DependencyProperty.RegisterAttached("FixMouseWheel", typeof(bool), typeof(ScrollViewerHelper),
+                new PropertyMetadata(OnFixMouseWheelChanged));
+        // End attached property boilerplate
+
+        static void OnFixMouseWheelChanged(DependencyObject d,
+                                           DependencyPropertyChangedEventArgs e)
+        {
+            var scrollViewer = d as ScrollViewer;
+            if (scrollViewer == null) return;
+
+            scrollViewer.PreviewMouseWheel += (s2, e2) =>
+            {
+                var parent = scrollViewer.Parent as UIElement;
+                bool hitTopOrBottom = HitTopOrBottom(e2.Delta, scrollViewer);
+                if (parent is null || !hitTopOrBottom) return;
+
+                var argsCopy = Copy(e2);
+                parent.RaiseEvent(argsCopy);
+            };
+        }
+
+        static bool HitTopOrBottom(double delta, ScrollViewer scrollViewer)
+        {
+            return true;
+            //var contentVerticalOffset = scrollViewer.ContentVerticalOffset;
+
+            //var atTop = contentVerticalOffset == 0;
+            //var movedUp = delta > 0;
+            //var hitTop = atTop && movedUp;
+
+            //var atBottom =
+            //    contentVerticalOffset == scrollViewer.ScrollableHeight;
+            //var movedDown = delta < 0;
+            //var hitBottom = atBottom && movedDown;
+
+            //return hitTop || hitBottom;
+        }
+
+        static MouseWheelEventArgs Copy(MouseWheelEventArgs e)
+            => new MouseWheelEventArgs(e.MouseDevice, e.Timestamp, e.Delta)
+            {
+                RoutedEvent = UIElement.MouseWheelEvent,
+                Source = e.Source,
+            };
+    }
+
+
 }
