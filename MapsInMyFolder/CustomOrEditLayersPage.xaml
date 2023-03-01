@@ -8,7 +8,7 @@
       xmlns:local="clr-namespace:MapsInMyFolder" xmlns:ui="http://schemas.modernwpf.com/2019" xmlns:map="clr-namespace:MapsInMyFolder.MapControl;assembly=MapsInMyFolder.MapControl" xmlns:sys="clr-namespace:System;assembly=netstandard"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
-      Title="CustomOrEditLayersPage">
+      Title="CustomOrEditLayersPage" KeyDown="Page_KeyDown">
     <Page.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -74,7 +74,6 @@
                             <RowDefinition/>
                         </Grid.RowDefinitions>
                         <Label Content="Descriptif :" Foreground="#888989" Grid.Row="0"></Label>
-                        <!--<RichTextBox x:Name="TextboxLayerDescriptif" HorizontalAlignment="Stretch" Grid.Row="1" Style="{DynamicResource RichTextBoxCleanStyle}" VerticalScrollBarVisibility="Hidden" Cursor="IBeam" Height="Auto" MinHeight="80" SpellCheck.IsEnabled="False" ></RichTextBox>-->
                         <TextBox x:Name="TextboxLayerDescriptif" Height="Auto"  HorizontalAlignment="Stretch" TextWrapping="Wrap" Grid.Row="1" Style="{DynamicResource TextBoxCleanStyle_13}" Cursor="IBeam" AcceptsReturn="True" AcceptsTab="True" AutoWordSelection="False" MinHeight="80" VerticalContentAlignment="Top" RequestBringIntoView="DisableTextBoxRequestBringIntoView" ></TextBox>
 
                     </Grid>
@@ -123,16 +122,6 @@
                             <RowDefinition/>
                         </Grid.RowDefinitions>
                         <Label Content="Script :" Foreground="#888989" Grid.Row="0"></Label>
-                        <!--<TextBox x:Name="TextboxLayerScript" Height="Auto"  HorizontalAlignment="Stretch" TextWrapping="NoWrap" Grid.Row="1" Style="{DynamicResource TextBoxCleanStyle_13}" Cursor="IBeam" AcceptsReturn="True" AcceptsTab="True" AutoWordSelection="False" HorizontalScrollBarVisibility="Auto" MinHeight="80" SpellCheck.IsEnabled="False"  VerticalContentAlignment="Top" KeyUp="TextboxLayerScript_KeyUp" Padding="0,0,0,20">
-                            <TextBox.ContextMenu>
-                                <ContextMenu Foreground="#E2E2E1" Background="#171719" >
-                                    <StaticResourceExtension ResourceKey="ContextMenu_Copier" />
-                                    <StaticResourceExtension ResourceKey="ContextMenu_Couper" />
-                                    <StaticResourceExtension ResourceKey="ContextMenu_Coller" />
-                                </ContextMenu>
-                            </TextBox.ContextMenu>
-
-                        </TextBox>-->
                         <avalonEdit:TextEditor x:Name="TextboxLayerScript" Grid.Row="1" KeyUp="TextboxLayerScript_KeyUp" HorizontalAlignment="Stretch" SyntaxHighlighting="MIMF_JavaScript" MinHeight="80" ShowLineNumbers="True" Height="Auto" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" RequestBringIntoView="DisableAllRequestBringIntoView" >
                             <avalonEdit:TextEditor.ContextMenu>
                                 <ContextMenu Foreground="#E2E2E1" Background="#171719" >
@@ -247,31 +236,12 @@
                                  AutoWordSelection="False" HorizontalScrollBarVisibility="Auto" MinHeight="80" MaxHeight="500" SpellCheck.IsEnabled="False"  
                                  VerticalContentAlignment="Top" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True" KeyUp="TextboxSpecialOptionPBFJsonStyle_KeyUp" >
                             <TextBox.Resources>
-                                <Style TargetType="{x:Type ScrollBar}"
-                BasedOn="{StaticResource ScrollBarDefaultNoPadding}"></Style>
+                                <Style TargetType="{x:Type ScrollBar}" BasedOn="{StaticResource ScrollBarDefaultNoPadding}"></Style>
                             </TextBox.Resources>
                         </TextBox>
-
                     </Grid>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                    <Rectangle Height="20" Width="1" Fill="Transparent"></Rectangle>
-
-                    <Grid Margin="0,10,0,0">
+                    <Grid Margin="0,30,0,0">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="20"/>
                             <RowDefinition Height="20" />
@@ -280,8 +250,7 @@
                         <Label x:Name="ResetInfoLayerClikableLabel" Content="→ Rétablir les information de calque par default" Foreground="#888989" Grid.Row="0" MouseEnter="ClickableLabel_MouseEnter" MouseLeave="ClickableLabel_MouseLeave" MouseUp="ResetInfoLayerClikableLabel_MouseUp"></Label>
                         <Label x:Name="DeleteLayerClikableLabel" Content="→ Supprimer ce calque" Foreground="#888989" Grid.Row="1" MouseEnter="ClickableLabel_MouseEnter" MouseLeave="ClickableLabel_MouseLeave" MouseUp="DeleteLayerClikableLabel_MouseUp"></Label>
                     </Grid>
-                    <Rectangle Height="20" Width="1" Fill="Transparent"></Rectangle>
-
+                    <Rectangle Height="20" Width="1"></Rectangle>
                 </StackPanel>
             </ScrollViewer>
         </Grid>
@@ -294,73 +263,65 @@
                 <RowDefinition Height="20" />
                 <RowDefinition Height="15" />
             </Grid.RowDefinitions>
-            <!--<Label Grid.Row="1" Grid.Column="0" Content="Apperçu de la couche : " HorizontalAlignment="Left" Margin="10,-5,0,0" VerticalAlignment="Top" Width="Auto" Height="50" FontSize="16.5" FontFamily="Segoe UI Semilight" Foreground="#FFE2E2E1"/>-->
             <Button Grid.Row="0" Grid.Column="1" x:Name="ClosePage_button" Style="{DynamicResource IconButton}" Margin="0,15,0,0" VerticalAlignment="Top" HorizontalAlignment="Right" Click="ClosePage_button_Click" Height="30" Width="30" Foreground="#FFE2E2E1" Cursor="Hand" ToolTip="Fermer cette fenêtre">
-                <Path Panel.ZIndex="999" Fill="Transparent" StrokeStartLineCap="round" StrokeEndLineCap="round" StrokeLineJoin="round" StrokeThickness="0.8" Data="{StaticResource CloseButton}" Stroke="{Binding Foreground, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Button}}" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center" RenderTransformOrigin="0,0" Height="20" Width="20"/>
+                <Path Panel.ZIndex="999" StrokeStartLineCap="round" StrokeEndLineCap="round" StrokeLineJoin="round" StrokeThickness="0.8" Data="{StaticResource CloseButton}" Stroke="{Binding Foreground, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Button}}" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center" RenderTransformOrigin="0,0" Height="20" Width="20"/>
             </Button>
             <Grid Margin="10,0,0,0" Grid.Row="1" Grid.Column="0">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="25" />
-                    <!--0-->
-                    <RowDefinition Height="*"/>
-                    <!--2-->
-                    <RowDefinition Height="*"/>
-                    <!--3-->
-                    <RowDefinition Height="15" />
-                    <!--5-->
-                    <RowDefinition Height="25" />
-                    <!--6-->
-                    <RowDefinition Height="*" />
-                    <!--7-->
-                    <RowDefinition Height="*" MaxHeight="60" />
-                    <RowDefinition Height="30" />
+                    <RowDefinition Height="35" />
+                    <RowDefinition Height="3*"/>
+                    <RowDefinition Height="45"/>
+                    <RowDefinition Height="2*" />
+                    <RowDefinition Height="50" />
                 </Grid.RowDefinitions>
-                <!--<Label Grid.Row="1" Grid.Column="0" Content="Apperçu :" Foreground="#888989"></Label>-->
                 <Label Grid.Row="0" Grid.Column="0" Content="Apperçu : " HorizontalAlignment="Left" Margin="0,-4,0,0" VerticalAlignment="Top" Width="Auto" FontSize="16.5" FontFamily="Segoe UI Semilight" Foreground="#FFE2E2E1"/>
-                <map:Map Grid.Row="1" Grid.Column="0" Grid.RowSpan="2"  x:Name="mapviewerappercu" ZoomLevel="18" MinHeight="30" MinWidth="30" Background="White">
+                <map:Map Grid.Row="1" Grid.Column="0" x:Name="mapviewerappercu" ZoomLevel="18" MinHeight="30" MinWidth="30" Background="White">
                     <map:Map.Center>
                         <map:Location Longitude="6.429381" Latitude="48.198846"/>
                     </map:Map.Center>
                     <map:MapTileLayer x:Name="MapTileLayer_Transparent"/>
                 </map:Map>
-                <Label Grid.Row="4" Grid.Column="0" Content="Console : " HorizontalAlignment="Left" Margin="0,-4,0,0" VerticalAlignment="Top" Width="Auto" FontSize="16.5" FontFamily="Segoe UI Semilight" Foreground="#FFE2E2E1"/>
 
+                <StackPanel Grid.Row="1" Grid.Column="0"  HorizontalAlignment="Right" VerticalAlignment="Top" Orientation="Horizontal">
+                    <Button Background="#303031" Foreground="#888989" Click="Button_Click">
+                        <ui:FontIcon Glyph="&#xE149;" RenderTransformOrigin="0.5,0.5"  >
+                            <ui:FontIcon.RenderTransform>
+                                <TransformGroup>
+                                    <ScaleTransform ScaleX="0.8" ScaleY="0.8"/>
+                                    <SkewTransform/>
+                                    <RotateTransform/>
+                                    <TranslateTransform/>
+                                </TransformGroup>
+                            </ui:FontIcon.RenderTransform>
+                        </ui:FontIcon>
+                    </Button>
 
-                <TextBox x:Name="TextboxLayerScriptConsole" IsReadOnly="True"  VerticalAlignment="Stretch" Height="Auto" HorizontalAlignment="Stretch" Grid.Row="5" Style="{DynamicResource TextBoxCleanStyleNoBorder}" Padding="0,5,13,15"
+                    <ui:DropDownButton AutomationProperties.Name="Email" Background="#303031" Foreground="#888989" Margin="5">
+                        <ui:DropDownButton.Content>
+                            <ui:FontIcon Glyph="&#xE10C;" />
+                        </ui:DropDownButton.Content>
+                        <ui:DropDownButton.Flyout >
+                            <ui:MenuFlyout Placement="BottomEdgeAlignedRight" >
+                                <MenuItem x:Name="AutoUpdateLayer" Foreground="#BCBCBC" Header="Mettre à jour la carte automatiquement" IsCheckable="True" IsChecked="False" Checked="AutoUpdateLayer_Checked"></MenuItem>
+                                <MenuItem x:Name="BackgroundSwitch" Foreground="#BCBCBC" Header="Afficher le calque de fond" IsCheckable="True" IsChecked="True" Unchecked="BackgroundSwitch_Toggle" Checked="BackgroundSwitch_Toggle"></MenuItem>
+                            </ui:MenuFlyout>
+                        </ui:DropDownButton.Flyout>
+                    </ui:DropDownButton>
+
+                </StackPanel>
+                <Label Grid.Row="2" Grid.Column="0" Content="Console : " HorizontalAlignment="Left" Margin="0,10,0,0" VerticalAlignment="Top" Width="Auto" FontSize="16.5" FontFamily="Segoe UI Semilight" Foreground="#FFE2E2E1"/>
+                <TextBox x:Name="TextboxLayerScriptConsole" IsReadOnly="True"  VerticalAlignment="Stretch" Height="Auto" HorizontalAlignment="Stretch" Grid.Row="3" Style="{DynamicResource TextBoxCleanStyleNoBorder}" Padding="0,5,13,15"
                          ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" Cursor="IBeam" MinHeight="20" ScrollViewer.CanContentScroll="True" SpellCheck.IsEnabled="False" TextWrapping="NoWrap" VerticalContentAlignment="Bottom">
                     <TextBox.Resources>
-                        <Style TargetType="{x:Type ScrollBar}"
-                BasedOn="{StaticResource ScrollBarDefaultNoPadding}"></Style>
+                        <Style TargetType="{x:Type ScrollBar}" BasedOn="{StaticResource ScrollBarDefaultNoPadding}"></Style>
                     </TextBox.Resources>
                 </TextBox>
-                <TextBox x:Name="TextboxLayerScriptConsoleSender" Height="Auto" HorizontalAlignment="Stretch" Grid.Row="6" Style="{DynamicResource TextBoxCleanStyle_13}" SpellCheck.IsEnabled="False" AcceptsReturn="True" Cursor="IBeam" ScrollViewer.CanContentScroll="True" TextWrapping="NoWrap" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" Padding="0,0,20,5">
+                <TextBox x:Name="TextboxLayerScriptConsoleSender" Height="Auto" HorizontalAlignment="Stretch" Grid.Row="4" Style="{DynamicResource TextBoxCleanStyle_13}" SpellCheck.IsEnabled="False" AcceptsReturn="True" Cursor="IBeam" ScrollViewer.CanContentScroll="True" TextWrapping="NoWrap" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" Padding="0,0,20,5">
                     <TextBox.Resources>
-                        <Style TargetType="{x:Type ScrollBar}"
-                BasedOn="{StaticResource ScrollBarDefaultNoPadding}"></Style>
+                        <Style TargetType="{x:Type ScrollBar}" BasedOn="{StaticResource ScrollBarDefaultNoPadding}"></Style>
                     </TextBox.Resources>
                 </TextBox>
-
-                <!--<map:Map Grid.Row="0" Grid.Column="0" Grid.RowSpan="2"  x:Name="mapviewerappercu" ZoomLevel="18" Margin="10,0,0,0" MinHeight="30" MinWidth="30" Background="White">
-
-                    <map:Map.Center>
-                        <map:Location Longitude="6.429381" Latitude="48.198846"/>
-                    </map:Map.Center>
-                    <map:MapTileLayer x:Name="MapTileLayer_Transparent"/>
-                </map:Map>
-                <Label Grid.Row="3"  Content="Console : " HorizontalAlignment="Left" Margin="10,-5,0,0" VerticalAlignment="Top" Width="Auto" Height="50" FontSize="16.5" FontFamily="Segoe UI Semilight" Foreground="#FFE2E2E1"/>
-
-                <RichTextBox x:Name="TextboxLayerScriptConsole" HorizontalAlignment="Stretch" Grid.Row="4" Style="{DynamicResource RichTextBoxCleanStyle}" VerticalScrollBarVisibility="Visible" Cursor="IBeam" MinHeight="80" Margin="10,0,0,0"></RichTextBox>-->
-
             </Grid>
-
-            <Label Grid.Row="2" Margin="10,-10,0,0" Grid.Column="0" Content="Affichage de la carte de fond :" HorizontalAlignment="Left" VerticalAlignment="Top" Width="Auto" Height="25" FontSize="10.5" FontFamily="Segoe UI" Foreground="#888989" Padding="0"/>
-
-            <ui:ToggleSwitch Foreground="#FFE2E2E1" Margin="10,0,0,0" x:Name="BackgroundSwitch"  Grid.Row="2"  Grid.RowSpan="3" Grid.Column="0" AutomationProperties.Name="simple ToggleSwitch"  IsOn="True" OffContent="Désactivé" OnContent="Activé" Toggled="BackgroundSwitch_Toggled">
-                <ui:ToggleSwitch.RenderTransform>
-                    <ScaleTransform ScaleX="0.85" ScaleY="0.85" CenterX="0" CenterY="0" />
-                </ui:ToggleSwitch.RenderTransform>
-
-            </ui:ToggleSwitch>
             <Button x:Name="SaveEditButton" Grid.Row="2" Grid.RowSpan="2" Grid.Column="1" Style="{DynamicResource RoundedButton}" Content="Enregistrer" Height="40" Width="180" Margin="0,-15,0,0" VerticalAlignment="Center" HorizontalAlignment="Right" Foreground="#fff" FontSize="18" Click="SaveEditButton_Click"/>
         </Grid>
     </Grid>

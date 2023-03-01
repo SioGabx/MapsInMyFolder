@@ -29,9 +29,15 @@
             </Setter.Value>
         </Setter>
         <Setter Property="SelectionCornerRadius" Value="0"></Setter>
-
     </Style>
-    
+
+
+    <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="#454546" />
+    <SolidColorBrush x:Key="ButtonBackgroundPressed" Color="#454546" />
+    <SolidColorBrush x:Key="ButtonForegroundPointerOver" Color="#888989" />
+    <SolidColorBrush x:Key="ButtonForegroundPressed" Color="#BCBCBC" />
+    <SolidColorBrush x:Key="DropDownButtonForegroundSecondaryPressed" Color="#BCBCBC" />
+
     <MenuItem x:Key="ContextMenu_Copier" x:Shared="false" Header="Copier" InputGestureText="Ctrl+C" Command="{x:Static ApplicationCommands.Copy}">
         <MenuItem.Icon>
             <ui:FontIcon Glyph="&#xE16F;" Foreground="#888989" />
@@ -75,11 +81,9 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type TextBox}">
-
                     <Border x:Name="border" BorderThickness="0,0,0,2" Background="#303031" SnapsToDevicePixels="True" BorderBrush="Transparent">
                         <ScrollViewer x:Name="PART_ContentHost" Focusable="false" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden"/>
                     </Border>
-
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsEnabled" Value="false">
                             <Setter Property="Opacity" TargetName="border" Value="0.56"/>
@@ -120,11 +124,9 @@
             </Setter.Value>
         </Setter>
         <Setter Property="ContextMenu" Value="{StaticResource CopyPasteContextMenu}"/>
-
     </Style>
 
     <Style x:Key="TextBoxCleanStyleNoBorder" TargetType="{x:Type TextBox}">
-
         <Setter Property="Foreground" Value="#5A5A5A"></Setter>
         <Setter Property="BorderBrush" Value="#5A5A5A"/>
         <Setter Property="FontSize" Value="13"/>
@@ -165,25 +167,16 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type ListBoxItem}">
-                    <Border x:Name="border_list"
-                            BorderBrush="Transparent"
-                            BorderThickness="0"
-                            Background="Transparent"
-                                Padding="8"
-                            SnapsToDevicePixels="true">
+                    <Border x:Name="border_list" BorderBrush="Transparent" BorderThickness="0" Background="Transparent" Padding="8" SnapsToDevicePixels="true">
                         <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
                     </Border>
                     <ControlTemplate.Triggers>
                         <MultiTrigger>
                             <MultiTrigger.Conditions>
-                                <Condition Property="Selector.IsSelectionActive"
-                                            Value="True" />
-                                <Condition Property="IsSelected"
-                                            Value="True" />
+                                <Condition Property="Selector.IsSelectionActive" Value="True" />
+                                <Condition Property="IsSelected" Value="True" />
                             </MultiTrigger.Conditions>
-                            <Setter Property="BorderBrush"
-                                    TargetName="border_list"
-                                    Value="#F18712" />
+                            <Setter Property="BorderBrush" TargetName="border_list" Value="#F18712" />
                         </MultiTrigger>
                         <Trigger Property="IsMouseOver" Value="true">
                             <Setter TargetName="border_list" Property="Background" Value="#5A5A5A"/>

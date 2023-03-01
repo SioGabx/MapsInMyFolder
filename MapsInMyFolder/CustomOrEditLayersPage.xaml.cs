@@ -55,20 +55,13 @@ namespace MapsInMyFolder
                 ResetInfoLayerClikableLabel.IsEnabled = false;
                 ResetInfoLayerClikableLabel.Opacity = 0.6;
             }
-
-            //Javascript JavascriptLogInstance = Javascript.JavascriptInstance;
             Javascript.LogsChanged += (o, e) => SetTextboxLayerScriptConsoleText(e.Logs);
             var keyeventHandler = new KeyEventHandler(TextboxLayerScriptConsoleSender_KeyDown);
             TextboxLayerScriptConsoleSender.AddHandler(PreviewKeyDownEvent, keyeventHandler, handledEventsToo: true);
-
-
             TextboxLayerScript.TextArea.Caret.CaretBrush = Collectif.HexValueToSolidColorBrush("#f18712");//rgb(241 135 18)
             TextboxLayerScript.TextArea.Caret.PositionChanged += (_, _) => Collectif.TextEditorCursorPositionChanged(TextboxLayerScript, EditeurGrid, EditeurScrollBar, 75);
             ScrollViewerHelper.SetFixMouseWheel(Collectif.GetDescendantByType(TextboxLayerScript, typeof(ScrollViewer)) as ScrollViewer, true);
         }
-
-      
-
 
         public void SetTextboxLayerScriptConsoleText(string text)
         {
@@ -131,7 +124,6 @@ namespace MapsInMyFolder
                 listSortDirection = System.ComponentModel.ListSortDirection.Descending;
             }
 
-
             TextboxLayerCategories.Items.SortDescriptions.Add(new System.ComponentModel.SortDescription("", listSortDirection));
             TextboxLayerSite.Items.SortDescriptions.Add(new System.ComponentModel.SortDescription("", listSortDirection));
             TextboxLayerSiteUrl.Items.SortDescriptions.Add(new System.ComponentModel.SortDescription("", listSortDirection));
@@ -149,7 +141,7 @@ namespace MapsInMyFolder
             TextboxLayerName.Text = LayerInEditMode.class_name;
             if (LayerId > 0 && !string.IsNullOrEmpty(LayerInEditMode.class_name.Trim()))
             {
-                CalqueType.Content = String.Concat("Calque - ", LayerInEditMode.class_name);
+                CalqueType.Content = string.Concat("Calque - ", LayerInEditMode.class_name);
             }
             else if (LayerId != prefilLayerId)
             {
@@ -199,19 +191,19 @@ namespace MapsInMyFolder
             IndentermenuItem.Header = "Indenter";
             IndentermenuItem.Icon = new ModernWpf.Controls.FontIcon() { Glyph = "\uE12F", Foreground = Collectif.HexValueToSolidColorBrush("#888989") };
             IndentermenuItem.Click += (sender, e) => IndenterCode(sender, e, TextboxLayerScript);
-            TextboxLayerScript.ContextMenu.Items.Add(IndentermenuItem); 
-            
+            TextboxLayerScript.ContextMenu.Items.Add(IndentermenuItem);
+
             MenuItem templateMenuItem = new MenuItem();
             templateMenuItem.Header = "Script template";
             templateMenuItem.Icon = new ModernWpf.Controls.FontIcon() { Glyph = "\uE15C", Foreground = Collectif.HexValueToSolidColorBrush("#888989") };
-            templateMenuItem.Click += (sender, e) => putScriptTemplate(sender, e, TextboxLayerScript);
+            templateMenuItem.Click += (sender, e) => putScriptTemplate(TextboxLayerScript);
             TextboxLayerScript.ContextMenu.Items.Add(templateMenuItem);
-                        
+
             TextboxLayerScript.TextArea.Options.ConvertTabsToSpaces = true;
             TextboxLayerScript.TextArea.Options.IndentationSize = 4;
         }
 
-        void putScriptTemplate(object sender, EventArgs e, ICSharpCode.AvalonEdit.TextEditor textBox)
+        void putScriptTemplate(ICSharpCode.AvalonEdit.TextEditor textBox)
         {
             Collectif.InsertTextAtCaretPosition(textBox, Settings.tileloader_template_script);
             DoWeNeedToUpdateMoinsUnLayer();
@@ -235,19 +227,19 @@ namespace MapsInMyFolder
         {
             if (textBox is null) { return; }
             textBox.Text = value;
-            //Collectif.LockPreviousUndo(textBox);
         }
 
-        void SetAppercuLayers(string url = "")
+        void SetAppercuLayers(string url = "", bool forceUpdate = false)
         {
+            if (!(AutoUpdateLayer.IsChecked || forceUpdate))
+            {
+                return;
+            }
             try
             {
-                if (string.IsNullOrEmpty(url))
+                if (string.IsNullOrEmpty(url) && !string.IsNullOrEmpty(TextboxLayerTileUrl.Text))
                 {
-                    if (!string.IsNullOrEmpty(TextboxLayerTileUrl.Text))
-                    {
-                        url = TextboxLayerTileUrl.Text;
-                    }
+                    url = TextboxLayerTileUrl.Text;
                 }
                 if (string.IsNullOrEmpty(TextBoxLayerMinZoom.Text))
                 {
@@ -291,7 +283,7 @@ namespace MapsInMyFolder
                 UIElement basemap;
                 try
                 {
-                    if (BackgroundSwitch.IsOn)
+                    if (BackgroundSwitch?.IsChecked == true)
                     {
                         Layers Layer = Layers.GetLayerById(Settings.layer_startup_id) ?? Layers.Empty();
                         basemap = new MapTileLayer
@@ -330,12 +322,6 @@ namespace MapsInMyFolder
             }, null);
         }
 
-        private void BackgroundSwitch_Toggled(object sender, RoutedEventArgs e)
-        {
-            SetAppercuLayers();
-        }
-
-
         private void TextboxLayerTileWidth_TextChanged(object sender, TextChangedEventArgs e)
         {
             Collectif.FilterDigitOnlyWhileWritingInTextBox(TextboxLayerTileWidth, TextboxLayerTileWidth_TextChanged, 4096);
@@ -355,6 +341,11 @@ namespace MapsInMyFolder
             {
                 SetAppercuLayers();
             }
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            SetAppercuLayers(forceUpdate:true);
         }
 
         Boolean HasErrorZoomLevelMinZoom = false;
@@ -452,9 +443,8 @@ namespace MapsInMyFolder
             return number;
         }
 
-        private void SaveEditButton_Click(object sender, RoutedEventArgs e)
+        private void SaveLayer()
         {
-            DisposeElementOnLeave();
             UpdateMoinsUnLayer();
             DebugMode.WriteLine("Saving...");
 
@@ -493,12 +483,8 @@ namespace MapsInMyFolder
                 }
             }
 
-
             try
             {
-                //check both : with HTMLEntities and not -> set a function
-                //set int ? 
-
                 Layers DB_Layer = MainPage.DB_Layer_Read(conn, $"SELECT * FROM LAYERS WHERE ID='{LayerId}'")[0];
                 NOM = getSavingStringOptimalValue(NOM, DB_Layer.class_name);
                 DESCRIPTION = getSavingStringOptimalValue(DESCRIPTION, DB_Layer.class_description);
@@ -545,13 +531,17 @@ namespace MapsInMyFolder
                 int LastVersion = Database.ExecuteScalarSQLCommand("SELECT VERSION FROM 'main'.'LAYERS' WHERE ID=" + LayerId);
                 Database.ExecuteNonQuerySQLCommand($"UPDATE 'main'.'EDITEDLAYERS' SET 'NOM'='{NOM}','DESCRIPTION'='{DESCRIPTION}','CATEGORIE'='{CATEGORIE}','IDENTIFIANT'='{IDENTIFIANT}','TILE_URL'='{TILE_URL}','TILE_FALLBACK_URL'='{TILE_FALLBACK_URL}','MIN_ZOOM'='{MIN_ZOOM}','MAX_ZOOM'='{MAX_ZOOM}','FORMAT'='{FORMAT}','SITE'='{SITE}','SITE_URL'='{SITE_URL}','TILE_SIZE'='{TILE_SIZE}','TILECOMPUTATIONSCRIPT'='{TILECOMPUTATIONSCRIPT}','VISIBILITY'='{Visibility.Visible.ToString()}','SPECIALSOPTIONS'='{SPECIALSOPTIONS}','VERSION'='{LastVersion}' WHERE ID = {LayerId}");
             }
-            MainPage.ClearCache(LayerId, false);
+        }
 
+        private void SaveEditButton_Click(object sender, RoutedEventArgs e)
+        {
+            DisposeElementOnLeave();
+            SaveLayer();
+            MainPage.ClearCache(LayerId, false);
             Javascript.EngineStopAll();
             Javascript.EngineClearList();
             MainWindow._instance.FrameBack();
             MainPage._instance.ReloadPage();
-
             if (Layers.Curent.class_id == LayerId)
             {
                 MainPage._instance.Set_current_layer(LayerId);
@@ -646,37 +636,31 @@ namespace MapsInMyFolder
                         int result = Collectif.CheckIfDownloadSuccess(url);
                         if (result == 200)
                         {
-                            if (!IsSuccessLastRequest)
+                            if (!IsSuccessLastRequest && ZoomMinimum == -1)
                             {
-                                if (ZoomMinimum == -1)
+                                ZoomMinimum = i;
+                                Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
                                 {
-                                    ZoomMinimum = i;
-                                    Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
-                                    {
-                                        Javascript.Print("Zoom minimum détecté (" + ZoomMinimum + ") !", -2);
-                                        TextBoxLayerMinZoom.Text = ZoomMinimum.ToString();
-                                    }, null);
-                                }
+                                    Javascript.Print("Zoom minimum détecté (" + ZoomMinimum + ") !", -2);
+                                    TextBoxLayerMinZoom.Text = ZoomMinimum.ToString();
+                                }, null);
                             }
                             IsSuccessLastRequest = true;
                         }
                         else
                         {
-                            if (IsSuccessLastRequest)
+                            if (IsSuccessLastRequest && ZoomMaximum == -1)
                             {
-                                if (ZoomMaximum == -1)
+                                ZoomMaximum = i - 1;
+                                Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
                                 {
-                                    ZoomMaximum = i - 1;
-                                    Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
-                                    {
-                                        Javascript.Print("Zoom maximal détecté (" + ZoomMaximum + ") !", -2);
-                                        TextBoxLayerMaxZoom.Text = ZoomMaximum.ToString();
-                                        ClickableLabel.Content = label_base_content;
-                                        ClickableLabel.IsEnabled = true;
-                                    }, null);
-                                    i = 30;
-                                    return;
-                                }
+                                    Javascript.Print("Zoom maximal détecté (" + ZoomMaximum + ") !", -2);
+                                    TextBoxLayerMaxZoom.Text = ZoomMaximum.ToString();
+                                    ClickableLabel.Content = label_base_content;
+                                    ClickableLabel.IsEnabled = true;
+                                }, null);
+                                i = 30;
+                                return;
                             }
                             IsSuccessLastRequest = false;
                         }
@@ -713,13 +697,10 @@ namespace MapsInMyFolder
             UpdateTimer.Elapsed += UpdateTimerElapsed_StartUpdateMoinsUnLayer;
             UpdateTimer.AutoReset = false;
             UpdateTimer.Enabled = true;
-
-            Debug.WriteLine(UpdateTimer.Interval);
         }
 
         void UpdateTimerElapsed_StartUpdateMoinsUnLayer(object source, EventArgs e)
         {
-            //TextboxLayerScriptConsoleSender.KeyDown += TextboxLayerScriptConsoleSender_KeyDown;
             try
             {
                 Dispatcher.Invoke(new Action(() =>
@@ -749,15 +730,12 @@ namespace MapsInMyFolder
 
         private void TextboxLayerScriptConsoleSender_KeyDown(object sender, KeyEventArgs e)
         {
-            if (Keyboard.IsKeyDown(Key.Enter))
+            if (Keyboard.IsKeyDown(Key.Enter) && !(Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift)))
             {
-                if (!(Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift)))
-                {
-                    string commande = TextboxLayerScriptConsoleSender.Text;
-                    TextboxLayerScriptConsoleSender.Text = "";
-                    Javascript.ExecuteCommand(commande, -2);
-                    e.Handled = true;
-                }
+                string commande = TextboxLayerScriptConsoleSender.Text;
+                TextboxLayerScriptConsoleSender.Text = "";
+                Javascript.ExecuteCommand(commande, -2);
+                e.Handled = true;
             }
         }
 
@@ -772,7 +750,9 @@ namespace MapsInMyFolder
             }
             if (result == ContentDialogResult.Primary)
             {
-                DisposeElementOnLeave(); Javascript.EngineStopAll();
+                MainWindow.RefreshAllPanels();
+                DisposeElementOnLeave(); 
+                Javascript.EngineStopAll();
                 Javascript.EngineClearList();
                 MainWindow._instance.FrameBack();
             }
@@ -847,7 +827,6 @@ namespace MapsInMyFolder
                     {
                         Database.ExecuteScalarSQLCommand($"INSERT INTO EDITEDLAYERS ('ID', 'VISIBILITY') VALUES ({LayerId},'DELETED')");
                     }
-
                     MainWindow._instance.FrameBack();
                 }
                 result = ContentDialogResult.None;
@@ -916,14 +895,34 @@ namespace MapsInMyFolder
         }
 
         private void DisableTextBoxRequestBringIntoView(object sender, RequestBringIntoViewEventArgs e)
-        {   
+        {
             bool DoHandle = (e.OriginalSource is TextBox);
             e.Handled = DoHandle;
-        } 
-        
+        }
+
         private void DisableAllRequestBringIntoView(object sender, RequestBringIntoViewEventArgs e)
-        {   
+        {
             e.Handled = true;
+        }
+
+        private void BackgroundSwitch_Toggle(object sender, RoutedEventArgs e)
+        {
+            SetAppercuLayers();
+        }
+
+        private void AutoUpdateLayer_Checked(object sender, RoutedEventArgs e)
+        {
+            SetAppercuLayers();
+        }
+
+        private void Page_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == System.Windows.Input.Key.S && System.Windows.Input.Keyboard.Modifiers == System.Windows.Input.ModifierKeys.Control)
+            {
+                //CTRL + S
+                SaveLayer();
+                DefaultValuesHachCode = Collectif.CheckIfInputValueHaveChange(EditeurStackPanel);
+            }
         }
     }
 }
