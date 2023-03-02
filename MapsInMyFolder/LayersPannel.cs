@@ -55,6 +55,9 @@ namespace MapsInMyFolder
             {
                 layer_browser.ExecuteScriptAsync("CefSharp.BindObjectAsync(\"layer_Csharp_call_from_js\");");
                 layer_browser.ExecuteScriptAsync("StartObserving();");
+                layer_browser.ToolTipOpening += (o, e) => { e.Handled = true; };
+
+
             }
             catch (Exception ex)
             {
@@ -325,6 +328,11 @@ namespace MapsInMyFolder
             generated_layers += "</ul>";
             string resource_data = Collectif.ReadResourceString("html/layer_panel.html");
             return resource_data.Replace("<!--htmllayerplaceholder-->", generated_layers.ToString());
+        }
+
+        public void RefreshMap()
+        {
+            Set_current_layer(Layers.Curent.class_id);
         }
 
         public void Set_current_layer(int id)

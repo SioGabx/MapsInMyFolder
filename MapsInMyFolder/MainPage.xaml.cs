@@ -255,7 +255,7 @@ namespace MapsInMyFolder
                 else
                 {
                     ContentGrid.Opacity = 0;
-                    var doubleAnimation = new DoubleAnimation(0, 1, Settings.animations_duration);
+                    var doubleAnimation = new DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(Settings.animations_duration_millisecond));
                     ContentGrid.BeginAnimation(UIElement.OpacityProperty, doubleAnimation);
                     sender.InsertPosition = NotificationZone.Children.Add(ContentGrid);
                 }

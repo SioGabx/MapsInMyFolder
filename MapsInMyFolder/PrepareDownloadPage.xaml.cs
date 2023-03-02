@@ -1026,7 +1026,7 @@ namespace MapsInMyFolder
 
         public void ClosePage()
         {
-            DoubleAnimation hide_anim = new DoubleAnimation(0, Settings.animations_duration * 0)
+            DoubleAnimation hide_anim = new DoubleAnimation(0, TimeSpan.FromMilliseconds(Settings.animations_duration_millisecond * 0))
             {
                 EasingFunction = new PowerEase { EasingMode = EasingMode.EaseOut },
                 BeginTime = new TimeSpan(0, 0, 0, 0, 500),

@@ -13,6 +13,9 @@ namespace MapsInMyFolder.Commun
 {
     public class Javascript
     {
+        public enum JavascriptAction { refreshMap }
+        public static event EventHandler<JavascriptAction> JavascriptActionEvent;
+
         #region logs
         //Register logger to the CustomOrEditPage
         public static Javascript JavascriptInstance = new Javascript();
@@ -125,8 +128,15 @@ namespace MapsInMyFolder.Commun
             Func<object, object, object> inputboxAction = (texte, caption) => InputBox(LayerId, texte, caption);
             add.SetValue("inputbox", inputboxAction);
 
-            Func<object, object, object, object> SendNotificationFunction = (texte, caption, callback) => SendNotification(LayerId, texte, caption, callback);
+            Func<object, object, object, object, object> SendNotificationFunction = (texte, caption, callback, notifId) => SendNotification(LayerId, texte, caption, callback, notifId);
             add.SetValue("sendNotification", SendNotificationFunction);
+
+            Func<object> refreshMap = () =>
+            {
+                JavascriptActionEvent?.Invoke(LayerId, JavascriptAction.refreshMap);
+                return null;
+            };
+            add.SetValue("refreshMap", refreshMap);
             return add;
         }
 
@@ -381,7 +391,7 @@ namespace MapsInMyFolder.Commun
         }
 
 
-        static public string SendNotification(int LayerId, object texte, object caption = null, object javascriptCallback = null)
+        static public string SendNotification(int LayerId, object texte, object caption = null, object javascriptCallback = null, object notifId = null)
         {
             if (LayerId == -2 || LayerId != Layers.Curent.class_id)
             {
@@ -389,13 +399,23 @@ namespace MapsInMyFolder.Commun
                 return null;
             }
             Notification notification = null;
-            Application.Current.Dispatcher.Invoke(() =>
+
+            void SetupNotification()
             {
                 Action callback = () => Javascript.ExecuteScript(Layers.GetLayerById(LayerId).class_tilecomputationscript, null, LayerId, javascriptCallback.ToString());
 
                 notification = new NText(texte.ToString(), caption.ToString(), callback);
+                if (notifId != null && !string.IsNullOrWhiteSpace(notifId.ToString()))
+                {
+                    notification.NotificationId = "LayerId_" + LayerId + "_" + notifId;
+                }
                 notification.Register();
-            });
+            }
+            if (System.Threading.Thread.CurrentThread.GetApartmentState() == ApartmentState.STA)
+            {
+                SetupNotification();
+            }
+          
             return notification?.NotificationId;
         }
 

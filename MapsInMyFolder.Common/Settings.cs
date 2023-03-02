@@ -53,20 +53,21 @@ namespace MapsInMyFolder.Commun
         public static Visibility visibility_pins = Visibility.Hidden;
         public static double selection_rectangle_resize_tblr_gap = 15;
         public static double selection_rectangle_resize_angle_gap = 20;
-        public static TimeSpan animations_duration = new TimeSpan(0, 0, 0, 00, 300);
+        public static int animations_duration_millisecond = 300;
         public static int maps_margin_ZoomToBounds = 100;
         public static bool disable_selection_rectangle_moving = false;
         public static bool map_show_tile_border = false;
         public static string github_repository_url = "https://github.com/SioGabx/MapsInMyFolder";
         public static string github_database_name = "MapsInMyFolder_Database.db";
 
+        public static bool search_application_update_on_startup = true;
+        public static bool search_database_update_on_startup = true;
 
         public static (Type, FieldInfo[]) SettingsGetFields()
         {
             Type type = typeof(Settings);
             FieldInfo[] fields = type.GetFields(BindingFlags.Static | BindingFlags.Public);
-            var returnTurple = (type, fields);
-            return returnTurple;
+            return (type, fields);
         }
 
         public static string SettingsPath(bool save = false)

@@ -213,7 +213,7 @@ namespace MapsInMyFolder.Commun
 
         public static DoubleAnimation GetOpacityAnimation(int toValue, double durationMultiplicator = 1)
         {
-            return new DoubleAnimation(toValue, TimeSpan.FromTicks((long)(Settings.animations_duration.Ticks * durationMultiplicator)))
+            return new DoubleAnimation(toValue, TimeSpan.FromMilliseconds((long)(Settings.animations_duration_millisecond * durationMultiplicator)))
             {
                 EasingFunction = new PowerEase { EasingMode = EasingMode.EaseOut }
             };
@@ -437,37 +437,27 @@ namespace MapsInMyFolder.Commun
         {
             const int tile_size = 300;
             const int border_size = 1;
+            const int border_tile_size = tile_size - (border_size * 2);
+            const string format = "jpeg";
+            var color = new double[] { Settings.background_layer_color_R, Settings.background_layer_color_G, Settings.background_layer_color_B };
+            NetVips.VOption saveVOption = getSaveVOption(format, 100, tile_size);
+
             if (string.IsNullOrEmpty(BitmapErrorsMessage))
             {
                 return null;
             }
             lock (Locker)
             {
-
                 using (NetVips.Image text = NetVips.Image.Text(WordWrap(BitmapErrorsMessage, 20), null, null, null, NetVips.Enums.Align.Centre, null, 100, true, 5, null))
                 {
-                    const int border_tile_size = tile_size - (border_size * 2);
                     int offsetX = (int)Math.Floor((double)(border_tile_size - text.Width) / 2);
                     int offsetY = (int)Math.Floor((double)(border_tile_size - text.Height) / 2);
-                    int[] graycolor = new int[] { 100, 100, 100 };
-                    const string format = "jpeg";
-                    NetVips.VOption saveVOption = getSaveVOption(format, 100, tile_size);
-                    var color = new double[] { Settings.background_layer_color_R, Settings.background_layer_color_G, Settings.background_layer_color_B };
                     using (NetVips.Image image = NetVips.Image.Black(border_tile_size, border_tile_size).Linear(color, color).Composite2(text, NetVips.Enums.BlendMode.Atop, offsetX, offsetY))
-                    using (NetVips.Image border = NetVips.Image.Black(tile_size, tile_size))
                     {
-                        try
-                        {
-                            return border.Insert(image, border_size, border_size).WriteToBuffer("." + format, saveVOption);
-                        }
-                        catch (Exception ex)
-                        {
-                            Debug.WriteLine(ex.ToString());
-                        }
+                       return image.Gravity(Enums.CompassDirection.Centre, tile_size, tile_size, Enums.Extend.Black).WriteToBuffer("." + format, saveVOption); ;
                     }
                 }
             }
-            return null;
         }
 
         public static long GetDirectorySize(string folderPath)

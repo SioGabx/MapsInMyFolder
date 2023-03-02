@@ -50,14 +50,19 @@ namespace MapsInMyFolder.Commun
             }
         }
 
-        public void Register()
+        public bool Register()
         {
+            if (ListOfNotificationsOnShow.Contains(this))
+            {
+                return false;
+            }
             ListOfNotificationsOnShow.Add(this);
             SendUpdate();
             if (DisappearAfterAMoment)
             {
                 Task.Delay(TimeSpan.FromSeconds(6)).ContinueWith(_ => Remove());
             }
+            return true;
         }
 
         public void Remove()

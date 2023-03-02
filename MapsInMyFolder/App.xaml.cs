@@ -1,5 +1,6 @@
 ﻿using CefSharp;
 using CefSharp.SchemeHandler;
+using CefSharp.Wpf;
 using MapsInMyFolder.Commun;
 using System;
 using System.Diagnostics;

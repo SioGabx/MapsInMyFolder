@@ -142,117 +142,48 @@ namespace MapsInMyFolder
                 }
             }
 
-            //tileloader_default_script
             tileloader_default_script.Text = Settings.tileloader_default_script;
-
-            //tileloader_template_script
             tileloader_template_script.Text = Settings.tileloader_template_script;
-
-            //working_folder
             working_folder.Text = Settings.working_folder;
-
-            //temp_folder
             temp_folder.Text = Settings.temp_folder;
-
-            //max_retry_download
             max_retry_download.Text = Settings.max_retry_download.ToString();
-
-            //max_redirection_download_tile
             max_redirection_download_tile.Text = Settings.max_redirection_download_tile.ToString();
-
-            //tiles_cache_expire_after_x_days
             tiles_cache_expire_after_x_days.Text = Settings.tiles_cache_expire_after_x_days.ToString();
-
-            //http_client_timeout_in_seconds
             http_client_timeout_in_seconds.Text = Settings.http_client_timeout_in_seconds.ToString();
-
-            //max_download_project_in_parralele
             max_download_project_in_parralele.Text = Settings.max_download_project_in_parralele.ToString();
-
-            //max_download_tiles_in_parralele
             max_download_tiles_in_parralele.Text = Settings.max_download_tiles_in_parralele.ToString();
-
-            //waiting_before_start_another_tile_download
             waiting_before_start_another_tile_download.Text = Settings.waiting_before_start_another_tile_download.ToString();
-
-            //user_agent
             user_agent.Text = Settings.user_agent;
-
-            //generate_transparent_tiles_on_error
             generate_transparent_tiles_on_error.IsChecked = Settings.generate_transparent_tiles_on_error;
-
-            //generate_transparent_tiles_on_404
             generate_transparent_tiles_on_404.IsChecked = Settings.generate_transparent_tiles_on_404;
-
-            //generate_transparent_tiles_never
             generate_transparent_tiles_never.IsChecked = (!Settings.generate_transparent_tiles_on_error && !Settings.generate_transparent_tiles_on_404);
-
-            //background_layer_color
             int R = Settings.background_layer_color_R;
             int G = Settings.background_layer_color_G;
             int B = Settings.background_layer_color_B;
             string hex = (((byte)R << 16) | ((byte)G << 8) | ((byte)B << 0)).ToString("X");
             background_layer_color.Text = "#" + hex;
-
-            //background_layer_opacity
             background_layer_opacity.Text = (Settings.background_layer_opacity * 100).ToString() + "%";
-
-            //NO_PIN_starting_location_latitude
             NO_PIN_starting_location_latitude.Text = Settings.NO_PIN_starting_location_latitude.ToString();
-
-            //NO_PIN_starting_location_longitude
             NO_PIN_starting_location_longitude.Text = Settings.NO_PIN_starting_location_longitude.ToString();
-
-            //NO_PIN_starting_location_latitude
             SE_PIN_starting_location_latitude.Text = Settings.SE_PIN_starting_location_latitude.ToString();
-
-            //NO_PIN_starting_location_latitude
             SE_PIN_starting_location_longitude.Text = Settings.SE_PIN_starting_location_longitude.ToString();
-
-            //visibility_pins
             visibility_pins.IsChecked = Settings.visibility_pins == Visibility.Visible;
-
-            //map_defaut_zoom_level
             map_defaut_zoom_level.Text = Settings.map_defaut_zoom_level.ToString();
-
-            //maps_margin_ZoomToBounds
             maps_margin_ZoomToBounds.Text = Settings.maps_margin_ZoomToBounds.ToString();
-
-            //zoom_limite_taille_carte
             zoom_limite_taille_carte.IsChecked = Settings.zoom_limite_taille_carte;
-
-            //map_show_tile_border
             map_show_tile_border.IsChecked = Settings.map_show_tile_border;
-
-            //database_pathname
             database_pathname.Text = Settings.database_pathname;
-
-            //database_pathname
             selection_rectangle_resize_tblr_gap.Text = Settings.selection_rectangle_resize_tblr_gap.ToString();
-
-            //database_pathname
             selection_rectangle_resize_angle_gap.Text = Settings.selection_rectangle_resize_angle_gap.ToString();
-
-            //github_repository_url
             github_repository_url.Text = Settings.github_repository_url;
-
-            //github_database_name
             github_database_name.Text = Settings.github_database_name;
-
-            //is_in_debug_mode
             is_in_debug_mode.IsChecked = Settings.is_in_debug_mode;
-
-            //show_layer_devtool
             show_layer_devtool.IsChecked = Settings.show_layer_devtool;
-
-            //show_download_devtool
             show_download_devtool.IsChecked = Settings.show_download_devtool;
-
-            //nettoyer_cache_browser_au_demarrage
             nettoyer_cache_browser_au_demarrage.IsChecked = Settings.nettoyer_cache_browser_au_demarrage;
-
-            //nettoyer_cache_browser_au_demarrage
             nettoyer_cache_layers_au_demarrage.IsChecked = Settings.nettoyer_cache_layers_au_demarrage;
+            search_application_update_on_startup.IsChecked = Settings.search_application_update_on_startup;
+            search_database_update_on_startup.IsChecked = Settings.search_database_update_on_startup;
 
             DefaultValuesHachCode = Collectif.CheckIfInputValueHaveChange(SettingsScrollViewer);
             SettingsVersionInformation.Content = Update.GetActualProductVersionFormatedString();
@@ -323,102 +254,41 @@ namespace MapsInMyFolder
             Settings.background_layer_color_G = Green;
             Settings.background_layer_color_B = Blue;
 
-            //working_folder = ;
             Settings.working_folder = working_folder.Text;
-
-            //temp_folder = ;
             Settings.temp_folder = temp_folder.Text;
-
-            //max_retry_download = ;
             Settings.max_retry_download = Convert.ToInt32(max_retry_download.Text);
-
-            //max_redirection_download_tile = ;
             Settings.max_redirection_download_tile = Convert.ToInt32(max_redirection_download_tile.Text);
-
-            //tiles_cache_expire_after_x_days = ;
             Settings.tiles_cache_expire_after_x_days = Convert.ToInt32(tiles_cache_expire_after_x_days.Text);
-
-            //http_client_timeout_in_seconds = ;
             Settings.http_client_timeout_in_seconds = Convert.ToInt32(http_client_timeout_in_seconds.Text);
-
-            //max_download_project_in_parralele = ;
             Settings.max_download_project_in_parralele = Convert.ToInt32(max_download_project_in_parralele.Text);
-
-            //max_download_tiles_in_parralele = ;
             Settings.max_download_tiles_in_parralele = Convert.ToInt32(max_download_tiles_in_parralele.Text);
-
-            //waiting_before_start_another_tile_download = ;
             Settings.waiting_before_start_another_tile_download = Convert.ToInt32(waiting_before_start_another_tile_download.Text);
-
-            //generate_transparent_tiles_on_404 = ;
             Settings.generate_transparent_tiles_on_404 = generate_transparent_tiles_on_404.IsChecked ?? false;
-
-            //generate_transparent_tiles_on_error = ;
             Settings.generate_transparent_tiles_on_error = generate_transparent_tiles_on_error.IsChecked ?? false;
-
-            //is_in_debug_mode = ;
             Settings.is_in_debug_mode = is_in_debug_mode.IsChecked ?? false;
-
-            //show_layer_devtool = ;
             Settings.show_layer_devtool = show_layer_devtool.IsChecked ?? false;
-
-            //show_download_devtool = ;
             Settings.show_download_devtool = show_download_devtool.IsChecked ?? false;
-
-            //show_download_devtool = ;
             Settings.nettoyer_cache_browser_au_demarrage = nettoyer_cache_browser_au_demarrage.IsChecked ?? false;
-
-            //show_download_devtool = ;
             Settings.nettoyer_cache_layers_au_demarrage = nettoyer_cache_layers_au_demarrage.IsChecked ?? false;
-
-            //layerpanel_website_IsVisible = ;
-            //layerpanel_livepreview = ;
-
-            //layerpanel_put_non_letter_layername_at_the_end = ;
             Settings.layerpanel_put_non_letter_layername_at_the_end = layerpanel_put_non_letter_layername_at_the_end.IsChecked ?? false;
-
-            //layerpanel_favorite_at_top = ;
             Settings.layerpanel_favorite_at_top = layerpanel_favorite_at_top.IsChecked ?? false;
-
-            //layerpanel_displaystyle = ;
             string layerpanel_displaystylevalue = layerpanel_displaystyle.SelectedValue.ToString().ToUpperInvariant();
             Settings.layerpanel_displaystyle = (ListDisplayType)Enum.Parse(typeof(ListDisplayType), layerpanel_displaystylevalue);
-
-            //NO_PIN_starting_location_latitude = ;
             Settings.NO_PIN_starting_location_latitude = Convert.ToDouble(NO_PIN_starting_location_latitude.Text);
-
-            //NO_PIN_starting_location_longitude = ;
             Settings.NO_PIN_starting_location_longitude = Convert.ToDouble(NO_PIN_starting_location_longitude.Text);
-
-            //SE_PIN_starting_location_latitude = ;
             Settings.SE_PIN_starting_location_latitude = Convert.ToDouble(SE_PIN_starting_location_latitude.Text);
-
-            //SE_PIN_starting_location_longitude = ;
             Settings.SE_PIN_starting_location_longitude = Convert.ToDouble(SE_PIN_starting_location_longitude.Text);
-
-            //map_defaut_zoom_level = ;
             Settings.map_defaut_zoom_level = Convert.ToInt32(map_defaut_zoom_level.Text);
-
-            //zoom_limite_taille_carte = ;
             Settings.zoom_limite_taille_carte = zoom_limite_taille_carte.IsChecked ?? false;
-
-            //tileloader_default_script = ;
             Settings.tileloader_default_script = tileloader_default_script.Text;
-
-            //tileloader_template_script = ;
             Settings.tileloader_template_script = tileloader_template_script.Text;
-
-            //user_agent = ;
             Settings.user_agent = user_agent.Text;
-
-            //default_database_pathname = ;
             Settings.database_pathname = database_pathname.Text;
 
-            //layers_Sort = ;
+            Settings.search_application_update_on_startup = search_application_update_on_startup.IsChecked ?? false;
+            Settings.search_database_update_on_startup = search_database_update_on_startup.IsChecked ?? false;
             string layers_Sortvalue = layersSort.SelectedValue.ToString().ToUpperInvariant();
             Settings.layers_Sort = (LayersSort)Enum.Parse(typeof(LayersSort), layers_Sortvalue);
-
-            //Layers_Order = ;
             if (LayersOrder.IsChecked == true)
             {
                 Settings.Layers_Order = Commun.LayersOrder.ASC;
@@ -427,8 +297,6 @@ namespace MapsInMyFolder
             {
                 Settings.Layers_Order = Commun.LayersOrder.DESC;
             }
-
-            //visibility_pins = ;
             if (visibility_pins.IsChecked ?? false)
             {
                 Settings.visibility_pins = Visibility.Visible;
@@ -437,24 +305,11 @@ namespace MapsInMyFolder
             {
                 Settings.visibility_pins = Visibility.Hidden;
             }
-
-            //selection_rectangle_resize_tblr_gap = ;
             Settings.selection_rectangle_resize_tblr_gap = Convert.ToInt32(selection_rectangle_resize_tblr_gap.Text);
-
-            //selection_rectangle_resize_angle_gap = ;
             Settings.selection_rectangle_resize_angle_gap = Convert.ToInt32(selection_rectangle_resize_angle_gap.Text);
-
-            //maps_margin_ZoomToBounds = ;
             Settings.maps_margin_ZoomToBounds = Convert.ToInt32(maps_margin_ZoomToBounds.Text);
-
-            //disable_selection_rectangle_moving = ;
-            //map_show_tile_border = ;
             Settings.map_show_tile_border = map_show_tile_border.IsChecked ?? false;
-
-            //github_repository_url
             Settings.github_repository_url = github_repository_url.Text;
-
-            //github_repository_url
             Settings.github_database_name = github_database_name.Text;
 
             string actualSettingsPath = Settings.SettingsPath();
@@ -468,7 +323,6 @@ namespace MapsInMyFolder
                 }
             }
 
-            //register here values to files
             Settings.SaveSettings();
         }
         private async void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)

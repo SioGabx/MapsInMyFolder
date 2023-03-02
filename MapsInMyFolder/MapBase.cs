@@ -215,6 +215,7 @@ namespace MapsInMyFolder
         {
             if (e.MiddleButton != MouseButtonState.Pressed)
             {
+                e.Handled = true;
                 is_middle_mouse_down = false;
                 MapviewerMouseDownEvent(sender, e, false);
             }
@@ -356,9 +357,11 @@ namespace MapsInMyFolder
                 if (!Settings.disable_selection_rectangle_moving && Mouse.MiddleButton != MouseButtonState.Pressed)
                 {
                     is_left_mouse_down = true;
-                    origin_saved_left_click_mouse_position = saved_left_click_mouse_position = e.GetPosition(mapviewer);
+                   
+                  
                     if (UpdateHitType)
                     {
+                        DefineSavedPoint(e);
                         MouseHitType = SetHitType(e.GetPosition(mapviewer));
 
                     }
@@ -373,8 +376,11 @@ namespace MapsInMyFolder
             if (e.RightButton == MouseButtonState.Pressed && !Settings.disable_selection_rectangle_moving)
             {
                 is_right_mouse_down = true;
-                origin_saved_left_click_mouse_position = saved_left_click_mouse_position = e.GetPosition(mapviewer);
-                StartRightClick(e);
+                if (UpdateHitType)
+                {
+                    DefineSavedPoint(e);StartRightClick(e);
+                }
+                
             }
         }
 
@@ -392,10 +398,11 @@ namespace MapsInMyFolder
 
         public void UpdatePushpinPositionAndDrawRectangle()
         {
-            void CheckPositionOutOfBound(Pushpin pushpin)
+            void CheckPositionOutOfBound(Pushpin pushpin, Pushpin pushpin_oppose)
             {
                 if (pushpin.Location.Latitude > 85)
                 {
+                    pushpin_oppose.Location.Latitude -= pushpin.Location.Latitude - 85;
                     pushpin.Location.Latitude = 85;
                 }
 
@@ -404,19 +411,19 @@ namespace MapsInMyFolder
                     pushpin.Location.Latitude = -85;
                 }
 
-                if (pushpin.Location.Longitude > 180)
+                if (pushpin.Location.Longitude > 180 && !(pushpin_oppose.Location.Longitude > 180))
                 {
                     pushpin.Location.Longitude = 180;
                 }
 
-                if (pushpin.Location.Longitude < -180)
+                if (pushpin.Location.Longitude < -180 && !(pushpin_oppose.Location.Longitude < -180))
                 {
                     pushpin.Location.Longitude = -180;
                 }
             }
 
-            CheckPositionOutOfBound(NO_PIN);
-            CheckPositionOutOfBound(SE_PIN);
+            CheckPositionOutOfBound(NO_PIN, SE_PIN);
+            CheckPositionOutOfBound(SE_PIN, NO_PIN);
 
             Location NO_PIN_Temp_Loc = NO_PIN.Location;
             Location SE_PIN_Temp_Loc = SE_PIN.Location;
@@ -463,12 +470,24 @@ namespace MapsInMyFolder
         public bool is_left_mouse_down;
         public bool is_right_mouse_down;
         public bool is_middle_mouse_down;
-        Point saved_left_click_mouse_position;
-        Point origin_saved_left_click_mouse_position;
-        Point SavedNo_Placement = new Point();
-        Point SavedSe_Placement = new Point();
 
+        Location SavedNo_Placement = new Location();
+        Location SavedSe_Placement = new Location();
 
+        Point OriginClickPlacement = new Point();
+        Point OriginNoPlacement = new Point();
+        Point OriginSePlacement = new Point();
+        Point SavedLeftClickPreviousActions;
+        public void DefineSavedPoint(MouseEventArgs e)
+        {
+            if (Mouse.MiddleButton != MouseButtonState.Pressed) { 
+            OriginClickPlacement = e.GetPosition(mapviewer);
+            //origin_saved_left_click_mouse_position = e.GetPosition(mapviewer);
+            SavedLeftClickPreviousActions = e.GetPosition(mapviewer);
+            OriginNoPlacement = mapviewer.LocationToView(NO_PIN.Location);
+            OriginSePlacement = mapviewer.LocationToView(SE_PIN.Location);
+            }
+        }
         public void UpdateSelectionRectangle(MouseEventArgs e)
         {
             //e.Handled = true;
@@ -487,15 +506,21 @@ namespace MapsInMyFolder
                     case HitType.Body:
                         double deplacement_X;
                         double deplacement_Y;
+                        Point SavedNo_PlacementPoint;
+                        Point SavedSe_PlacementPoint;
+                        double XPourcent = (OriginClickPlacement.X - OriginNoPlacement.X) / (OriginSePlacement.X - OriginNoPlacement.X);
+                        double YPourcent = (OriginClickPlacement.Y - OriginNoPlacement.Y) / (OriginSePlacement.Y - OriginNoPlacement.Y);
                         if ((Keyboard.Modifiers & ModifierKeys.Shift) == ModifierKeys.Shift)
                         {
-                            deplacement_X = mouse_location.X - origin_saved_left_click_mouse_position.X;
-                            deplacement_Y = mouse_location.Y - origin_saved_left_click_mouse_position.Y;
-                            if (origin_saved_left_click_mouse_position == saved_left_click_mouse_position)
+                            if (OriginClickPlacement == SavedLeftClickPreviousActions)
                             {
-                                SavedNo_Placement = mapviewer.LocationToView(NO_PIN.Location);
-                                SavedSe_Placement = mapviewer.LocationToView(SE_PIN.Location);
+                                SavedNo_Placement = NO_PIN.Location;
+                                SavedSe_Placement = SE_PIN.Location;
                             }
+                            SavedNo_PlacementPoint = mapviewer.LocationToView(SavedNo_Placement);
+                            SavedSe_PlacementPoint = mapviewer.LocationToView(SavedSe_Placement);
+                            deplacement_X = mouse_location.X - (SavedNo_PlacementPoint.X + (SavedSe_PlacementPoint.X - SavedNo_PlacementPoint.X) * XPourcent);
+                            deplacement_Y = mouse_location.Y - (SavedNo_PlacementPoint.Y + (SavedSe_PlacementPoint.Y - SavedNo_PlacementPoint.Y) * YPourcent);
                             if (Math.Abs(deplacement_X) > Math.Abs(deplacement_Y))
                             {
                                 deplacement_Y = 0;
@@ -507,16 +532,17 @@ namespace MapsInMyFolder
                         }
                         else
                         {
-                            origin_saved_left_click_mouse_position = e.GetPosition(mapviewer);
-                            SavedNo_Placement = mapviewer.LocationToView(NO_PIN.Location);
-                            SavedSe_Placement = mapviewer.LocationToView(SE_PIN.Location);
-                            deplacement_X = mouse_location.X - saved_left_click_mouse_position.X;
-                            deplacement_Y = mouse_location.Y - saved_left_click_mouse_position.Y;
+                            SavedNo_Placement = NO_PIN.Location;
+                            SavedSe_Placement = SE_PIN.Location;
+                            SavedNo_PlacementPoint = mapviewer.LocationToView(SavedNo_Placement);
+                            SavedSe_PlacementPoint = mapviewer.LocationToView(SavedSe_Placement);
+                            deplacement_X = mouse_location.X - (SavedNo_PlacementPoint.X + (SavedSe_PlacementPoint.X - SavedNo_PlacementPoint.X) * XPourcent);
+                            deplacement_Y = mouse_location.Y - (SavedNo_PlacementPoint.Y + (SavedSe_PlacementPoint.Y - SavedNo_PlacementPoint.Y) * YPourcent);
                         }
 
-                        NO_PIN.Location = mapviewer.ViewToLocation(new Point(SavedNo_Placement.X + deplacement_X, SavedNo_Placement.Y + deplacement_Y));
-                        SE_PIN.Location = mapviewer.ViewToLocation(new Point(SavedSe_Placement.X + deplacement_X, SavedSe_Placement.Y + deplacement_Y));
-                        saved_left_click_mouse_position = e.GetPosition(mapviewer);
+                        NO_PIN.Location = mapviewer.ViewToLocation(new Point(SavedNo_PlacementPoint.X + deplacement_X, SavedNo_PlacementPoint.Y + deplacement_Y));
+                        SE_PIN.Location = mapviewer.ViewToLocation(new Point(SavedSe_PlacementPoint.X + deplacement_X, SavedSe_PlacementPoint.Y + deplacement_Y));
+                        SavedLeftClickPreviousActions = e.GetPosition(mapviewer);
                         break;
                     case HitType.UL:
                         //top left
@@ -739,10 +765,8 @@ namespace MapsInMyFolder
                     if (is_right_mouse_down) { e.Handled = true; return; }
                     e.Handled = true;
                     is_left_mouse_down = true;
-                    if (Mouse.MiddleButton != MouseButtonState.Pressed)
-                    {
-                        origin_saved_left_click_mouse_position = saved_left_click_mouse_position = e.GetPosition(mapviewer);
-                    }
+                   
+                        DefineSavedPoint(e);
                 }
 
                 if (e.RightButton == MouseButtonState.Pressed)
@@ -751,14 +775,6 @@ namespace MapsInMyFolder
                     if (is_left_mouse_down)
                     {
                         return;
-                    }
-                    else
-                    {
-                        if (Mouse.MiddleButton != MouseButtonState.Pressed)
-                        {
-                            StartRightClick(e);
-                            origin_saved_left_click_mouse_position = saved_left_click_mouse_position = e.GetPosition(mapviewer);
-                        }
                     }
                 }
             }

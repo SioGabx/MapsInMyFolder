@@ -175,7 +175,15 @@ namespace MapsInMyFolder.Commun
             }
             SQLiteCommand sqlite_cmd = conn.CreateCommand();
             sqlite_cmd.CommandText = querry;
-            return Convert.ToInt32(sqlite_cmd.ExecuteScalar());
+            object ScalarValue = sqlite_cmd.ExecuteScalar();
+            if (ScalarValue != null && DBNull.Value != ScalarValue)
+            {
+                return Convert.ToInt32(ScalarValue);
+            }
+            else
+            {
+                return -1;
+            }
         }
 
         public static int GetOrdinal(SQLiteDataReader sqlite_datareader, string name)

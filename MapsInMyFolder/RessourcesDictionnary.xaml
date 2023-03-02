@@ -31,11 +31,6 @@
         <Setter Property="SelectionCornerRadius" Value="0"></Setter>
     </Style>
 
-
-    <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="#454546" />
-    <SolidColorBrush x:Key="ButtonBackgroundPressed" Color="#454546" />
-    <SolidColorBrush x:Key="ButtonForegroundPointerOver" Color="#888989" />
-    <SolidColorBrush x:Key="ButtonForegroundPressed" Color="#BCBCBC" />
     <SolidColorBrush x:Key="DropDownButtonForegroundSecondaryPressed" Color="#BCBCBC" />
 
     <MenuItem x:Key="ContextMenu_Copier" x:Shared="false" Header="Copier" InputGestureText="Ctrl+C" Command="{x:Static ApplicationCommands.Copy}">

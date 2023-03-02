@@ -84,12 +84,13 @@ namespace MapsInMyFolder
             ThemeManager.Current.ApplicationTheme = ApplicationTheme.Dark;
             ImageLoader.HttpClient.DefaultRequestHeaders.Add("User-Agent", Settings.user_agent);
             TileGeneratorSettings.HttpClient.DefaultRequestHeaders.Add("User-Agent", Settings.user_agent);
-            MainPage.mapviewer.AnimationDuration = Settings.animations_duration;
+            MainPage.mapviewer.AnimationDuration = TimeSpan.FromMilliseconds(Settings.animations_duration_millisecond);
             Debug.WriteLine("Version dotnet :" + Environment.Version.ToString());
             Javascript JavascriptLocationInstance = Javascript.JavascriptInstance;
             JavascriptLocationInstance.LocationChanged += (o, e) => MainPage.MapViewerSetSelection(Javascript.JavascriptInstance.Location, Javascript.JavascriptInstance.ZoomToNewLocation);
             Network.IsNetworkNowAvailable += (o, e) => CheckIfReadyToStartDownloadAfterNetworkChange();
             Database.RefreshPanels += (o, e) => RefreshAllPanels();
+            Javascript.JavascriptActionEvent += JavascriptActionEvent;
             Update.NewUpdateFoundEvent += (o, e) =>
             {
                 try {
@@ -110,6 +111,20 @@ namespace MapsInMyFolder
                     Debug.WriteLine(ex.ToString());
                 }
             };
+        }
+
+
+        public void JavascriptActionEvent(object sender, Javascript.JavascriptAction javascriptAction)
+        {
+            switch (javascriptAction)
+            {
+                case Javascript.JavascriptAction.refreshMap:
+                    MainPage.RefreshMap();
+                    break;
+                default:
+                    Debug.WriteLine("Cette JSEvent action n'existe pas");
+                    break;
+            }
         }
 
         public void ApplicationUpdateFoundEvent()
@@ -171,12 +186,15 @@ namespace MapsInMyFolder
             // and register it in the HighlightingManager
             HighlightingManager.Instance.RegisterHighlighting("MIMF_JavaScript", new string[] { ".js" }, customHighlighting);
 
-            if (await Update.CheckIfNewerVersionAvailableOnGithub())
+            if (Settings.search_application_update_on_startup && await Update.CheckIfNewerVersionAvailableOnGithub())
             {
                 Debug.WriteLine("Une nouvelle mise à jour est disponible : Version " + Update.UpdateRelease.Tag_name);
             }
 
-            Database.CheckIfNewerVersionAvailable();
+            if (Settings.search_database_update_on_startup)
+            {
+                Database.CheckIfNewerVersionAvailable();
+            }
         }
 
         public static void RefreshAllPanels()
@@ -208,7 +226,7 @@ namespace MapsInMyFolder
         public void Popup_closing()
         {
             AppTitleBar.Opacity = 1;
-            DoubleAnimation hide_anim = new DoubleAnimation(0d, Settings.animations_duration / 1.3)
+            DoubleAnimation hide_anim = new DoubleAnimation(0d, TimeSpan.FromMilliseconds(Settings.animations_duration_millisecond / 1.3))
             {
                 EasingFunction = new PowerEase { EasingMode = EasingMode.EaseInOut }
             };
@@ -223,7 +241,7 @@ namespace MapsInMyFolder
             if (ReduceOpacity)
             {
                 MainPage.popup_background.Visibility = Visibility.Visible;
-                DoubleAnimation show_anim = new DoubleAnimation(1, Settings.animations_duration * 1)
+                DoubleAnimation show_anim = new DoubleAnimation(1, TimeSpan.FromMilliseconds(Settings.animations_duration_millisecond))
                 {
                     EasingFunction = new PowerEase { EasingMode = EasingMode.EaseInOut }
                 };

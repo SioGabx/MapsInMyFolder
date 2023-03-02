@@ -48,7 +48,7 @@ namespace MapsInMyFolder
             mapviewerappercu.ZoomLevel = MainPage._instance.mapviewer.ZoomLevel;
 
             Init_LayerEditableTextbox(prefilLayerId);
-            SetAppercuLayers();
+            SetAppercuLayers(forceUpdate:true);
 
             if (Database.ExecuteScalarSQLCommand("SELECT COUNT(*) FROM 'main'.'EDITEDLAYERS' WHERE ID = " + LayerId) == 0)
             {
@@ -56,11 +56,20 @@ namespace MapsInMyFolder
                 ResetInfoLayerClikableLabel.Opacity = 0.6;
             }
             Javascript.LogsChanged += (o, e) => SetTextboxLayerScriptConsoleText(e.Logs);
+            Javascript.JavascriptActionEvent += JavascriptActionEvent;
             var keyeventHandler = new KeyEventHandler(TextboxLayerScriptConsoleSender_KeyDown);
             TextboxLayerScriptConsoleSender.AddHandler(PreviewKeyDownEvent, keyeventHandler, handledEventsToo: true);
             TextboxLayerScript.TextArea.Caret.CaretBrush = Collectif.HexValueToSolidColorBrush("#f18712");//rgb(241 135 18)
             TextboxLayerScript.TextArea.Caret.PositionChanged += (_, _) => Collectif.TextEditorCursorPositionChanged(TextboxLayerScript, EditeurGrid, EditeurScrollBar, 75);
             ScrollViewerHelper.SetFixMouseWheel(Collectif.GetDescendantByType(TextboxLayerScript, typeof(ScrollViewer)) as ScrollViewer, true);
+        }
+
+        public void JavascriptActionEvent(object sender, Javascript.JavascriptAction javascriptAction)
+        {
+            if (javascriptAction == Javascript.JavascriptAction.refreshMap)
+            {
+                SetAppercuLayers(forceUpdate: true);
+            }
         }
 
         public void SetTextboxLayerScriptConsoleText(string text)
@@ -529,6 +538,10 @@ namespace MapsInMyFolder
             {
                 Debug.WriteLine("Update to EDITEDLAYERS");
                 int LastVersion = Database.ExecuteScalarSQLCommand("SELECT VERSION FROM 'main'.'LAYERS' WHERE ID=" + LayerId);
+                if (LastVersion < 1)
+                {
+                    LastVersion = 1;
+                }
                 Database.ExecuteNonQuerySQLCommand($"UPDATE 'main'.'EDITEDLAYERS' SET 'NOM'='{NOM}','DESCRIPTION'='{DESCRIPTION}','CATEGORIE'='{CATEGORIE}','IDENTIFIANT'='{IDENTIFIANT}','TILE_URL'='{TILE_URL}','TILE_FALLBACK_URL'='{TILE_FALLBACK_URL}','MIN_ZOOM'='{MIN_ZOOM}','MAX_ZOOM'='{MAX_ZOOM}','FORMAT'='{FORMAT}','SITE'='{SITE}','SITE_URL'='{SITE_URL}','TILE_SIZE'='{TILE_SIZE}','TILECOMPUTATIONSCRIPT'='{TILECOMPUTATIONSCRIPT}','VISIBILITY'='{Visibility.Visible.ToString()}','SPECIALSOPTIONS'='{SPECIALSOPTIONS}','VERSION'='{LastVersion}' WHERE ID = {LayerId}");
             }
         }

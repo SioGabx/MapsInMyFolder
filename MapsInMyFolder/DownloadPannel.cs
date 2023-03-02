@@ -177,7 +177,7 @@ namespace MapsInMyFolder
         {
             MainWindow._instance.open_download_panel_titlebar_button.Opacity = 1;
             MainWindow._instance.open_download_panel_titlebar_button.IsHitTestVisible = true;
-            DoubleAnimation hide_anim = new DoubleAnimation(0d, Settings.animations_duration / 1.5)
+            DoubleAnimation hide_anim = new DoubleAnimation(0d, TimeSpan.FromMilliseconds(Settings.animations_duration_millisecond / 1.5))
             {
                 EasingFunction = new PowerEase { EasingMode = EasingMode.EaseInOut }
             };
@@ -191,7 +191,7 @@ namespace MapsInMyFolder
             MainWindow._instance.open_download_panel_titlebar_button.Opacity = 0.5;
             MainWindow._instance.open_download_panel_titlebar_button.IsHitTestVisible = false;
             download_panel.Visibility = Visibility.Visible;
-            DoubleAnimation show_anim = new DoubleAnimation(1, Settings.animations_duration / 1.5)
+            DoubleAnimation show_anim = new DoubleAnimation(1, TimeSpan.FromMilliseconds(Settings.animations_duration_millisecond / 1.5))
             {
                 EasingFunction = new PowerEase { EasingMode = EasingMode.EaseInOut }
             };
