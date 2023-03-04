@@ -54,7 +54,6 @@ namespace MapsInMyFolder.Commun
         public static double selection_rectangle_resize_tblr_gap = 15;
         public static double selection_rectangle_resize_angle_gap = 20;
         public static int animations_duration_millisecond = 300;
-        public static int maps_margin_ZoomToBounds = 100;
         public static bool disable_selection_rectangle_moving = false;
         public static bool map_show_tile_border = false;
         public static string github_repository_url = "https://github.com/SioGabx/MapsInMyFolder";

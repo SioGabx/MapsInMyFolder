@@ -318,11 +318,7 @@ namespace MapsInMyFolder
                {
                    try
                    {
-                       //double NO_Latitude = Convert.ToDouble(engine.location["NO_Latitude"]);
-                       //double NO_Longitude = Convert.ToDouble(engine.location["NO_Longitude"]);
-                       //double SE_Latitude = Convert.ToDouble(engine.location["SE_Latitude"]);
-                       //double SE_Longitude = Convert.ToDouble(engine.location["SE_Longitude"]);
-                       MainPage.MapViewerSetSelection(engine.location, true);
+                       MainPage._instance.MapViewerSetSelection(engine.location, true);
                    }
                    catch (Exception ex)
                    {

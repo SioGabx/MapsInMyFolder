@@ -1,10 +1,14 @@
 ﻿using MapsInMyFolder.Commun;
+using MapsInMyFolder.MapControl;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media.Animation;
+using System.Windows.Threading;
 
 namespace MapsInMyFolder
 {
@@ -15,6 +19,8 @@ namespace MapsInMyFolder
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2211:Les champs non constants ne doivent pas être visibles", Justification = "for access everywhere")]
         public static MainPage _instance;
+        bool isInitialised = false;
+        public static MapSelectable mapSelectable;
         public MainPage()
         {
             _instance = this;
@@ -25,30 +31,31 @@ namespace MapsInMyFolder
         {
             if (!isInitialised)
             {
+                Location NO_PIN_starting_location = new Location(Settings.NO_PIN_starting_location_latitude, Settings.NO_PIN_starting_location_longitude);
+                Location SE_PIN_starting_location = new Location(Settings.SE_PIN_starting_location_latitude, Settings.SE_PIN_starting_location_longitude);
+                mapSelectable = new MapSelectable(mapviewer, NO_PIN_starting_location, SE_PIN_starting_location, null, this);
                 Preload();
                 Init();
             }
         }
 
-        bool isInitialised = false;
         public void Preload()
         {
             ReloadPage();
             MapLoad();
-            DrawRectangleCelectionArroundPushpin();
-            UpdatePushpinPositionAndDrawRectangle();
         }
         void Init()
         {
             Init_download_panel();
             Init_layer_panel();
             isInitialised = true;
-
             Notification.UpdateNotification += (Notification, NotificationId) => UpdateNotification((Notification)Notification, NotificationId);
         }
-
-        private void Page_Initialized(object sender, EventArgs e)
+        private void Map_panel_open_location_panel_Click(object sender, RoutedEventArgs e)
         {
+            Message.NoReturnBoxAsync("Cette fonctionnalité fait l'objet d'une prochaine mise à jour, elle n'as pas encore été ajoutée à cette version !", "Erreur");
+            //FullscreenMap FullscreenMap = new FullscreenMap { };
+            //MainWindow._instance.MainContentFrame.Navigate(FullscreenMap);
         }
 
         private void Download_panel_close_button_Click(object sender, RoutedEventArgs e)
@@ -100,145 +107,6 @@ namespace MapsInMyFolder
             SearchLayerStart();
         }
 
-        //public Grid CreateNotification(string Title, string Information, Action callback = null, string NotificationInternalName = null)
-        //{
-        //<Grid Background="#303031" MaxHeight="400">
-        //    <Border BorderThickness="3" BorderBrush="Transparent" Margin="5,2,25,5" Grid.Column="0">
-        //        <TextBlock TextWrapping="WrapWithOverflow" Foreground="#FFE2E2E1"  TextAlignment="Justify">
-        //                    <Span>MapsInMyFolder</Span>
-        //                    <Span>&#160;:&#160;</Span>
-        //                    <!--<Span FontWeight="Light">Une nouvelle version est disponible. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</Span>-->
-        //                    <Span FontWeight="Light">Une nouvelle version est disponible. </Span>
-        //        </TextBlock>
-        //    </Border>
-        //    <Button  Style="{DynamicResource IconButton}" HorizontalAlignment="Right" Height="10" Width="10" Foreground="#FFE2E2E1" Cursor="Hand" ToolTip="Fermer cette notification" Margin="5,10,5,0" VerticalAlignment="Top">
-        //        <Path StrokeStartLineCap="round" StrokeEndLineCap="round" StrokeLineJoin="round" StrokeThickness="0.8" Data="{StaticResource CloseButton}" Stroke="{Binding Foreground, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Button}}" Stretch="Uniform" Height="10" Width="10"/>
-        //    </Button>
-        //    <Rectangle Fill="#62626b" Height="1" VerticalAlignment="Bottom"></Rectangle>
-        //</Grid>
-
-
-        //    Grid ContentGrid = new Grid()
-        //    {
-        //        Background = Collectif.HexValueToSolidColorBrush("#303031"),
-        //        MaxHeight = 400
-        //    };
-        //    ContentGrid.RowDefinitions.Add(new RowDefinition());
-        //    ContentGrid.ColumnDefinitions.Add(new ColumnDefinition());
-        //    if (!string.IsNullOrEmpty(NotificationInternalName))
-        //    {
-        //        ContentGrid.Name = NotificationInternalName;
-        //    }
-
-
-        //    Border ContentBorder = new Border()
-        //    {
-        //        BorderThickness = new Thickness(3),
-        //        BorderBrush = System.Windows.Media.Brushes.Transparent,
-        //        Margin = new Thickness(5, 2, 20, 5),
-        //    };
-        //    ContentBorder.SetValue(Grid.RowProperty, 0);
-
-        //    TextBlock ContentTextBlock = new TextBlock()
-        //    {
-        //        TextWrapping = TextWrapping.WrapWithOverflow,
-        //        Foreground = Collectif.HexValueToSolidColorBrush("#FFE2E2E1"),
-        //        TextAlignment = TextAlignment.Justify
-        //    };
-
-        //    if (callback != null)
-        //    {
-        //        ContentTextBlock.Cursor = Cursors.Hand;
-        //        ContentGrid.MouseLeftButtonUp += (_, _) =>
-        //        {
-        //            CloseNotification(ContentGrid, null);
-        //            callback();
-        //        };
-        //    }
-
-        //    ContentTextBlock.Inlines.Add(new System.Windows.Documents.Run()
-        //    {
-        //        Text = Title
-        //    });
-        //    ContentTextBlock.Inlines.Add(new System.Windows.Documents.Run()
-        //    {
-        //        Text = "\u00A0:\u00A0"
-        //    });
-        //    ContentTextBlock.Inlines.Add(new System.Windows.Documents.Run()
-        //    {
-        //        Text = Information,
-        //        FontWeight = FontWeights.Light,
-        //    });
-        //    ContentBorder.Child = ContentTextBlock;
-
-        //    Button CloseButton = new Button()
-        //    {
-        //        Style = (Style)Application.Current.Resources["IconButton"],
-        //        Height = 26,
-        //        Width = 25,
-        //        Foreground = Collectif.HexValueToSolidColorBrush("#FFE2E2E1"),
-        //        Cursor = Cursors.Hand,
-        //        ToolTip = "Fermer cette notification",
-        //        Margin = new Thickness(0, 0, 0, 0),
-        //        VerticalAlignment = VerticalAlignment.Top,
-        //        HorizontalAlignment = HorizontalAlignment.Right
-        //    };
-
-        //    CloseButton.Content = new System.Windows.Shapes.Path()
-        //    {
-        //        Margin = new Thickness(0, 4, 0, 0),
-        //        StrokeStartLineCap = System.Windows.Media.PenLineCap.Round,
-        //        StrokeEndLineCap = System.Windows.Media.PenLineCap.Round,
-        //        StrokeLineJoin = System.Windows.Media.PenLineJoin.Round,
-        //        StrokeThickness = 0.8,
-        //        Data = (System.Windows.Media.Geometry)Application.Current.Resources["CloseButton"],
-        //        Stroke = Collectif.HexValueToSolidColorBrush("#FFE2E2E1"),
-        //        Stretch = System.Windows.Media.Stretch.Uniform,
-        //        Height = 10,
-        //        Width = 10
-        //    };
-        //    CloseButton.Click += (_, e) =>
-        //    {
-        //        CloseNotification(ContentGrid, e);
-        //        CloseButton.IsEnabled = false;
-        //    };
-
-        //    System.Windows.Shapes.Rectangle BorderBottom = new System.Windows.Shapes.Rectangle()
-        //    {
-        //        Fill = Collectif.HexValueToSolidColorBrush("#62626b"),
-        //        Height = 1,
-        //        VerticalAlignment = VerticalAlignment.Bottom
-        //    };
-        //    BorderBottom.PreviewMouseUp += (_, e) => e.Handled = true;
-
-        //    ContentGrid.Children.Add(ContentBorder);
-        //    ContentGrid.Children.Add(CloseButton);
-        //    ContentGrid.Children.Add(BorderBottom);
-
-        //    ContentGrid.Opacity = 0;
-        //    var doubleAnimation = new DoubleAnimation(0, 1, Settings.animations_duration);
-        //    ContentGrid.BeginAnimation(UIElement.OpacityProperty, doubleAnimation);
-
-        //    if (Collectif.FindChild<Grid>(NotificationZone, NotificationInternalName) != null)
-        //    {
-        //        NotificationZone.Children.Remove(Collectif.FindChild<Grid>(NotificationZone, NotificationInternalName));
-        //    }
-        //    NotificationZone.Children.Add(ContentGrid);
-
-        //    return ContentGrid;
-        //}
-
-        //public void CloseNotification(object sender, RoutedEventArgs e)
-        //{
-        //    if (e is not null)
-        //    {
-        //        e.Handled = true;
-        //    }
-        //    Grid ContentGrid = (Grid)sender;
-        //    var doubleAnimation = new DoubleAnimation(ContentGrid.ActualHeight, 0, new Duration(TimeSpan.FromSeconds(0.1)));
-        //    ContentGrid.BeginAnimation(Grid.MaxHeightProperty, doubleAnimation);
-        //}
-
         public void UpdateNotification(Notification sender, string NotificationInternalId)
         {
             if (sender is not null)
@@ -246,7 +114,7 @@ namespace MapsInMyFolder
                 Grid ContentGrid = sender.Get();
                 if (Collectif.FindChild<Grid>(NotificationZone, NotificationInternalId) != null)
                 {
-                   Grid NotificationZoneContentGrid = Collectif.FindChild<Grid>(NotificationZone, NotificationInternalId);
+                    Grid NotificationZoneContentGrid = Collectif.FindChild<Grid>(NotificationZone, NotificationInternalId);
                     NotificationZone.Children.Remove(NotificationZoneContentGrid);
                     NotificationZone.Children.Insert(Math.Min(sender.InsertPosition, NotificationZone.Children.Count), ContentGrid);
                     NotificationZoneContentGrid.Children.Clear();
@@ -260,37 +128,73 @@ namespace MapsInMyFolder
                     sender.InsertPosition = NotificationZone.Children.Add(ContentGrid);
                 }
             }
-            else
+            else if (Collectif.FindChild<Grid>(NotificationZone, NotificationInternalId) != null)
             {
-
-                if (Collectif.FindChild<Grid>(NotificationZone, NotificationInternalId) != null)
+                Grid ContentGrid = Collectif.FindChild<Grid>(NotificationZone, NotificationInternalId);
+                var doubleAnimation = new DoubleAnimation(ContentGrid.ActualHeight, 0, new Duration(TimeSpan.FromSeconds(0.1)));
+                doubleAnimation.Completed += (sender, e) =>
                 {
-                    Grid ContentGrid = Collectif.FindChild<Grid>(NotificationZone, NotificationInternalId);
-                    var doubleAnimation = new DoubleAnimation(ContentGrid.ActualHeight, 0, new Duration(TimeSpan.FromSeconds(0.1)));
-                    doubleAnimation.Completed += (sender, e) =>
-                    {
-                        ContentGrid?.Children?.Clear();
-                        ContentGrid = null;
-                        NotificationZone.Children.Remove(ContentGrid);
-                    };
-                    ContentGrid.BeginAnimation(Grid.MaxHeightProperty, doubleAnimation);
-                }
-
-
+                    ContentGrid?.Children?.Clear();
+                    ContentGrid = null;
+                    NotificationZone.Children.Remove(ContentGrid);
+                };
+                ContentGrid.BeginAnimation(Grid.MaxHeightProperty, doubleAnimation);
             }
         }
 
-        //public void CloseNotification(object sender, RoutedEventArgs e)
-        //{
-        //    if (e is not null)
-        //    {
-        //        e.Handled = true;
-        //    }
-        //    Grid ContentGrid = (Grid)sender;
-        //    var doubleAnimation = new DoubleAnimation(ContentGrid.ActualHeight, 0, new Duration(TimeSpan.FromSeconds(0.1)));
-        //    ContentGrid.BeginAnimation(Grid.MaxHeightProperty, doubleAnimation);
-        //}
+        public void MapLoad()
+        {
+            mapviewer.MapLayer = new MapTileLayer();
+            NO_PIN.Visibility = Settings.visibility_pins;
+            SE_PIN.Visibility = Settings.visibility_pins;
+
+            mapviewer.Center = new Location((Settings.NO_PIN_starting_location_latitude + Settings.SE_PIN_starting_location_latitude) / 2, (Settings.NO_PIN_starting_location_longitude + Settings.SE_PIN_starting_location_longitude) / 2);
+            mapviewer.ZoomLevel = Settings.map_defaut_zoom_level;
+            mapviewer.Background = new System.Windows.Media.SolidColorBrush(
+                System.Windows.Media.Color.FromArgb(255,
+                (byte)Settings.background_layer_color_R,
+                (byte)Settings.background_layer_color_G,
+                (byte)Settings.background_layer_color_B)
+            );
+
+            mapSelectable.OnLocationUpdated = () =>
+            {
+                var ActiveRectangleSelection = mapSelectable.GetRectangleLocation();
+                NO_PIN.Location = ActiveRectangleSelection.NO;
+                SE_PIN.Location = ActiveRectangleSelection.SE;
+                Commun.Map.CurentSelection.NO_Latitude = ActiveRectangleSelection.NO.Latitude;
+                Commun.Map.CurentSelection.NO_Longitude = ActiveRectangleSelection.NO.Longitude;
+                Commun.Map.CurentSelection.SE_Latitude = ActiveRectangleSelection.SE.Latitude;
+                Commun.Map.CurentSelection.SE_Longitude = ActiveRectangleSelection.SE.Longitude;
+            };
+
+        }
+
+        public void MapViewerSetSelection(Dictionary<string, double> locations, bool ZoomToNewLocation = true)
+        {
+            var ActiveRectangleSelection = mapSelectable.GetRectangleLocation();
+            if (ActiveRectangleSelection.NO.Latitude != locations["NO_Latitude"] &&
+                ActiveRectangleSelection.NO.Longitude != locations["NO_Longitude"] &&
+                ActiveRectangleSelection.SE.Latitude != locations["SE_Latitude"] &&
+                ActiveRectangleSelection.SE.Longitude != locations["SE_Longitude"])
+            {
+                ActiveRectangleSelection.NO = new Location(locations["NO_Latitude"], locations["NO_Longitude"]);
+                ActiveRectangleSelection.SE = new Location(locations["SE_Latitude"], locations["SE_Longitude"]);
+                mapSelectable.SetRectangleLocation(ActiveRectangleSelection.NO, ActiveRectangleSelection.SE);
+            }
 
 
+            if (ZoomToNewLocation)
+            {
+                ActiveRectangleSelection = mapSelectable.GetRectangleLocation();
+                Point NO_Point_Bounds = mapviewer.LocationToView(ActiveRectangleSelection.NO);
+                Point SE_Point_Bounds = mapviewer.LocationToView(ActiveRectangleSelection.SE);
+                double pourcentage_Lat = Math.Abs((ActiveRectangleSelection.NO.Latitude - ActiveRectangleSelection.SE.Latitude) / 2);
+                double pourcentage_Lng = Math.Abs((ActiveRectangleSelection.NO.Latitude - ActiveRectangleSelection.SE.Latitude) / 2);
+                Location NO_Location_Bounds = new Location(ActiveRectangleSelection.NO.Latitude - pourcentage_Lat, ActiveRectangleSelection.NO.Longitude - pourcentage_Lng);
+                Location SE_Location_Bounds = new Location(pourcentage_Lat + ActiveRectangleSelection.SE.Latitude, pourcentage_Lng + ActiveRectangleSelection.SE.Longitude);
+                mapviewer.ZoomToBounds(new BoundingBox(NO_Location_Bounds.Latitude, NO_Location_Bounds.Longitude, SE_Location_Bounds.Latitude, SE_Location_Bounds.Longitude));
+            }
+        }
     }
 }

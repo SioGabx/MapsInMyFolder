@@ -301,7 +301,7 @@ namespace MapsInMyFolder
                             SourceName = Layer.class_identifiant,
                             MaxZoomLevel = Layer.class_max_zoom,
                             MinZoomLevel = Layer.class_min_zoom,
-                            Description = "© [OpenStreetMap contributors](http://www.openstreetmap.org/copyright)"
+                            Description = ""
                         };
                     }
                     else

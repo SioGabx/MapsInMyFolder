@@ -169,7 +169,6 @@ namespace MapsInMyFolder
             SE_PIN_starting_location_longitude.Text = Settings.SE_PIN_starting_location_longitude.ToString();
             visibility_pins.IsChecked = Settings.visibility_pins == Visibility.Visible;
             map_defaut_zoom_level.Text = Settings.map_defaut_zoom_level.ToString();
-            maps_margin_ZoomToBounds.Text = Settings.maps_margin_ZoomToBounds.ToString();
             zoom_limite_taille_carte.IsChecked = Settings.zoom_limite_taille_carte;
             map_show_tile_border.IsChecked = Settings.map_show_tile_border;
             database_pathname.Text = Settings.database_pathname;
@@ -307,7 +306,6 @@ namespace MapsInMyFolder
             }
             Settings.selection_rectangle_resize_tblr_gap = Convert.ToInt32(selection_rectangle_resize_tblr_gap.Text);
             Settings.selection_rectangle_resize_angle_gap = Convert.ToInt32(selection_rectangle_resize_angle_gap.Text);
-            Settings.maps_margin_ZoomToBounds = Convert.ToInt32(maps_margin_ZoomToBounds.Text);
             Settings.map_show_tile_border = map_show_tile_border.IsChecked ?? false;
             Settings.github_repository_url = github_repository_url.Text;
             Settings.github_database_name = github_database_name.Text;

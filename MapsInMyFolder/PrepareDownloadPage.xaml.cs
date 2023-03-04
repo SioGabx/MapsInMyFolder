@@ -126,8 +126,9 @@ namespace MapsInMyFolder
             //ImageIsLoading.Visibility = Visibility.Visible;
             LastResquestZoom = ZoomSlider.Value;
             int LayerID = Layers.Curent.class_id;
-            List<Double> NO_PIN_Location = new List<Double>() { MainWindow._instance.MainPage.NO_PIN.Location.Latitude, MainWindow._instance.MainPage.NO_PIN.Location.Longitude };
-            List<Double> SE_PIN_Location = new List<Double>() { MainWindow._instance.MainPage.SE_PIN.Location.Latitude, MainWindow._instance.MainPage.SE_PIN.Location.Longitude };
+            var SelectionLocation = MainPage.mapSelectable.GetRectangleLocation();
+            List<Double> NO_PIN_Location = new List<Double>() { SelectionLocation.NO.Latitude, SelectionLocation.NO.Longitude };
+            List<Double> SE_PIN_Location = new List<Double>() { SelectionLocation.SE.Latitude, SelectionLocation.SE.Longitude };
             List<Double> LocaMillieux = Collectif.GetCenterBetweenTwoPoints(NO_PIN_Location, SE_PIN_Location);
 
             int zoom = Convert.ToInt32(ZoomSlider.Value);
@@ -318,8 +319,9 @@ namespace MapsInMyFolder
 
         async void GetCenterViewCityName()
         {
-            List<Double> NO_PIN_Location = new List<Double>() { MainWindow._instance.MainPage.NO_PIN.Location.Latitude, MainWindow._instance.MainPage.NO_PIN.Location.Longitude };
-            List<Double> SE_PIN_Location = new List<Double>() { MainWindow._instance.MainPage.SE_PIN.Location.Latitude, MainWindow._instance.MainPage.SE_PIN.Location.Longitude };
+            var SelectionLocation = MainPage.mapSelectable.GetRectangleLocation();
+            List<Double> NO_PIN_Location = new List<Double>() { SelectionLocation.NO.Latitude, SelectionLocation.NO.Longitude };
+            List<Double> SE_PIN_Location = new List<Double>() { SelectionLocation.SE.Latitude, SelectionLocation.SE.Longitude };
             List<Double> LocaMillieux = Collectif.GetCenterBetweenTwoPoints(NO_PIN_Location, SE_PIN_Location);
             MapControl.Location Mloc = new MapControl.Location(LocaMillieux[0], LocaMillieux[1]);
             await Task.Run(() =>
@@ -394,10 +396,11 @@ namespace MapsInMyFolder
         {
             if (!IsInitialized) { return; }
             Dictionary<string, int> rognage_info = GetOriginalImageSize();
-            double NO_PIN_Latitude = MainWindow._instance.MainPage.NO_PIN.Location.Latitude;
-            double NO_PIN_Longitude = MainWindow._instance.MainPage.NO_PIN.Location.Longitude;
-            double SE_PIN_Latitude = MainWindow._instance.MainPage.SE_PIN.Location.Latitude;
-            double SE_PIN_Longitude = MainWindow._instance.MainPage.SE_PIN.Location.Longitude;
+            var SelectionLocation = MainPage.mapSelectable.GetRectangleLocation();
+            double NO_PIN_Latitude = SelectionLocation.NO.Latitude;
+            double NO_PIN_Longitude = SelectionLocation.NO.Longitude;
+            double SE_PIN_Latitude = SelectionLocation.SE.Latitude;
+            double SE_PIN_Longitude = SelectionLocation.SE.Longitude;
             int Zoom = Convert.ToInt16(Math.Floor(ZoomSlider.Value));
             List<int> NO_tile = Collectif.CoordonneesToTile(NO_PIN_Latitude, NO_PIN_Longitude, Zoom);
             List<int> SE_tile = Collectif.CoordonneesToTile(SE_PIN_Latitude, SE_PIN_Longitude, Zoom);
@@ -568,10 +571,12 @@ namespace MapsInMyFolder
         Dictionary<string, int> GetOriginalImageSize()
         {
             if (!IsInitialized) { return null; }
-            double NO_PIN_Latitude = MainWindow._instance.MainPage.NO_PIN.Location.Latitude;
-            double NO_PIN_Longitude = MainWindow._instance.MainPage.NO_PIN.Location.Longitude;
-            double SE_PIN_Latitude = MainWindow._instance.MainPage.SE_PIN.Location.Latitude;
-            double SE_PIN_Longitude = MainWindow._instance.MainPage.SE_PIN.Location.Longitude;
+
+            var SelectionLocation = MainPage.mapSelectable.GetRectangleLocation();
+            double NO_PIN_Latitude = SelectionLocation.NO.Latitude;
+            double NO_PIN_Longitude = SelectionLocation.NO.Longitude;
+            double SE_PIN_Latitude = SelectionLocation.SE.Latitude;
+            double SE_PIN_Longitude = SelectionLocation.SE.Longitude;
             int Zoom = Convert.ToInt16(Math.Floor(ZoomSlider.Value));
             Dictionary<string, int> rognage_info = MainWindow.GetRognageValue(NO_PIN_Latitude, NO_PIN_Longitude, SE_PIN_Latitude, SE_PIN_Longitude, Zoom, Layers.Curent.class_tiles_size);
             return rognage_info;
@@ -960,8 +965,9 @@ namespace MapsInMyFolder
             }
             string save_directory = Path.GetDirectoryName(saveFileDialog1.FileName) + @"\";
             string filename = Path.GetFileName(saveFileDialog1.FileName);
-            MapControl.Location NO_PIN_Location = MainWindow._instance.MainPage.NO_PIN.Location;
-            MapControl.Location SE_PIN_Location = MainWindow._instance.MainPage.SE_PIN.Location;
+
+            //MapControl.Location NO_PIN_Location = MainWindow._instance.MainPage.NO_PIN.Location;
+           // MapControl.Location SE_PIN_Location = MainWindow._instance.MainPage.SE_PIN.Location;
             string format = Path.GetExtension(saveFileDialog1.FileName);
             format = format switch
             {
@@ -1006,7 +1012,9 @@ namespace MapsInMyFolder
             ComboBoxItem SelectedComboBoxItem = Combobox_color_conversion.SelectedItem as ComboBoxItem;
             string ComboboxColorConversionSelectedItemTag = SelectedComboBoxItem.Tag as string;
             NetVips.Enums.Interpretation interpretation = (NetVips.Enums.Interpretation)Enum.Parse(typeof(NetVips.Enums.Interpretation), ComboboxColorConversionSelectedItemTag);
-            Download_Options download_Options = new Download_Options(0, save_directory, format, filename, "", "", 0, zoom, quality, "", NO_PIN_Location, SE_PIN_Location, RedimWidth, RedimHeight, interpretation);
+
+            var SelectionLocation = MainPage.mapSelectable.GetRectangleLocation();
+            Download_Options download_Options = new Download_Options(0, save_directory, format, filename, "", "", 0, zoom, quality, "", SelectionLocation.NO, SelectionLocation.SE, RedimWidth, RedimHeight, interpretation);
             MainWindow._instance.PrepareDownloadBeforeStart(download_Options);
             ClosePage();
         }

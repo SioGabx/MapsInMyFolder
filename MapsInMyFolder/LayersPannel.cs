@@ -384,7 +384,7 @@ namespace MapsInMyFolder
                                     SourceName = Layers.GetLayerById(layer_startup_id).class_identifiant + new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds(),
                                     MaxZoomLevel = Layers.GetLayerById(layer_startup_id).class_max_zoom,
                                     MinZoomLevel = Layers.GetLayerById(layer_startup_id).class_min_zoom,
-                                    Description = "© [OpenStreetMap contributors](http://www.openstreetmap.org/copyright)"
+                                    Description = ""
                                 };
 
                                 basemap.Opacity = Settings.background_layer_opacity;

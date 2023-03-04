@@ -277,13 +277,13 @@ namespace MapsInMyFolder.Commun
             {
                 hexvalue = hexvalue.Trim('#');
             }
-            if (!string.IsNullOrEmpty(hexvalue) && (Int32.TryParse(hexvalue, System.Globalization.NumberStyles.HexNumber, null, out _)))
+            if (!string.IsNullOrWhiteSpace(hexvalue) && (Int32.TryParse(hexvalue, System.Globalization.NumberStyles.HexNumber, null, out _)))
             {
                 if (hexvalue.Length == 3)
                 {
                     return (SolidColorBrush)new BrushConverter().ConvertFrom('#' + string.Concat(hexvalue[0], hexvalue[0], hexvalue[1], hexvalue[1], hexvalue[2], hexvalue[2]));
                 }
-                else if (hexvalue.Length == 6)
+                else if (hexvalue.Length == 6 || hexvalue.Length == 8)
                 {
                     return (SolidColorBrush)new BrushConverter().ConvertFrom('#' + hexvalue);
                 }

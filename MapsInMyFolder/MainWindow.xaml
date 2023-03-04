@@ -9,7 +9,7 @@
         MinWidth="750" MinHeight="450" Background="#FF0A0C0C"
         ui:TitleBar.ExtendViewIntoTitleBar="True" ui:TitleBar.IsBackButtonVisible="False" ui:TitleBar.Style="{DynamicResource AppTitleBarStyle}"
         ui:TitleBar.ButtonStyle="{DynamicResource AppTitleBarButtonStyle}"
-        ui:ThemeManager.RequestedTheme="Dark" KeyDown="Window_KeyDown" MouseUp="Window_MouseUp" MouseMove="Window_MouseMove">
+        ui:ThemeManager.RequestedTheme="Dark" KeyDown="Window_KeyDown">
     
     <Window.TaskbarItemInfo>
         <TaskbarItemInfo />
