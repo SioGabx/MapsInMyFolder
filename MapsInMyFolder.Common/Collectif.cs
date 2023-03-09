@@ -78,9 +78,9 @@ namespace MapsInMyFolder.Commun
                 {
                     finalurl = urlbase;
                 }
-                List<double> location_topleft = TileToCoordonnees(Tilex, Tiley, z);
-                List<double> location_bottomright = TileToCoordonnees(Tilex + 1, Tiley + 1, z);
-                List<double> location = GetCenterBetweenTwoPoints(location_topleft, location_bottomright);
+                var location_topleft = TileToCoordonnees(Tilex, Tiley, z);
+                var location_bottomright = TileToCoordonnees(Tilex + 1, Tiley + 1, z);
+                var location = GetCenterBetweenTwoPoints(location_topleft, location_bottomright);
 
                 Dictionary<string, object> argument = new Dictionary<string, object>()
                 {
@@ -88,13 +88,13 @@ namespace MapsInMyFolder.Commun
                       { "y",  Tiley.ToString() },
                       { "z",  z.ToString() },
                       { "zoom",  z.ToString() },
-                      { "lat",  location[0].ToString() },
-                      { "lng",  location[1].ToString()},
+                      { "lat",  location.Latitude.ToString() },
+                      { "lng",  location.Longitude.ToString()},
 
-                      { "t_lat",  location_topleft[0].ToString() },
-                      { "t_lng",  location_topleft[1].ToString()},
-                      { "b_lat",  location_bottomright[0].ToString() },
-                      { "b_lng",  location_bottomright[1].ToString()},
+                      { "t_lat",  location_topleft.Latitude.ToString() },
+                      { "t_lng",  location_topleft.Longitude.ToString()},
+                      { "b_lat",  location_bottomright.Latitude.ToString() },
+                      { "b_lng",  location_bottomright.Longitude.ToString()},
 
                       { "layerid",  LayerID.ToString() },
                       { "url",  urlbase },
@@ -181,12 +181,12 @@ namespace MapsInMyFolder.Commun
 
             public static List<Url_class> GetListOfUrlFromLocation(Dictionary<string, double> location, int z, string urlbase, int LayerID, int downloadid = 0)
             {
-                List<int> NO_tile = CoordonneesToTile(location["NO_Latitude"], location["NO_Longitude"], z);
-                List<int> SE_tile = CoordonneesToTile(location["SE_Latitude"], location["SE_Longitude"], z);
-                int NO_x = NO_tile[0];
-                int NO_y = NO_tile[1];
-                int SE_x = SE_tile[0];
-                int SE_y = SE_tile[1];
+                var NO_tile = CoordonneesToTile(location["NO_Latitude"], location["NO_Longitude"], z);
+                var SE_tile = CoordonneesToTile(location["SE_Latitude"], location["SE_Longitude"], z);
+                int NO_x = NO_tile.X;
+                int NO_y = NO_tile.Y;
+                int SE_x = SE_tile.X;
+                int SE_y = SE_tile.Y;
 
                 List<Url_class> list_of_url_to_download = new List<Url_class>();
                 int Download_X_tile = 0;
@@ -271,7 +271,7 @@ namespace MapsInMyFolder.Commun
             Application.Current.Shutdown();
         }
 
-        public static SolidColorBrush HexValueToSolidColorBrush(string hexvalue)
+        public static SolidColorBrush HexValueToSolidColorBrush(string hexvalue, string defaulthexvalue = null)
         {
             if (!string.IsNullOrEmpty(hexvalue))
             {
@@ -288,7 +288,16 @@ namespace MapsInMyFolder.Commun
                     return (SolidColorBrush)new BrushConverter().ConvertFrom('#' + hexvalue);
                 }
             }
-            return RgbValueToSolidColorBrush(Settings.background_layer_color_R, Settings.background_layer_color_G, Settings.background_layer_color_B);
+
+            if (string.IsNullOrWhiteSpace(defaulthexvalue))
+            {
+                return RgbValueToSolidColorBrush(Settings.background_layer_color_R, Settings.background_layer_color_G, Settings.background_layer_color_B);
+            }
+            else
+            {
+                return HexValueToSolidColorBrush(defaulthexvalue);
+            }
+            
         }
 
         public static SolidColorBrush RgbValueToSolidColorBrush(int R, int G, int B)
@@ -799,7 +808,10 @@ namespace MapsInMyFolder.Commun
         }
         public static void TextEditorCursorPositionChanged(ICSharpCode.AvalonEdit.TextEditor textEditor, Grid grid, ScrollViewer scrollViewer, int MarginTop = 25)
         {
-            double Margin = 40;
+            if (Mouse.LeftButton == MouseButtonState.Pressed) { return; }
+
+
+                double Margin = 40;
 
             double TextboxLayerScriptTopPosition = textEditor.TranslatePoint(new Point(0, 0), grid).Y;
             double TextboxLayerScriptCaretTopPosition = textEditor.TextArea.Caret.CalculateCaretRectangle().Top + TextboxLayerScriptTopPosition;
@@ -1090,7 +1102,7 @@ namespace MapsInMyFolder.Commun
             return return_texte;
         }
 
-        public static bool FilterDigitOnlyWhileWritingInTextBox(TextBox textbElement, List<char> char_supplementaire = null)
+        public static bool FilterDigitOnlyWhileWritingInTextBox(TextBox textbElement, List<char> char_supplementaire = null, bool onlyOnePoint = true, bool limitLenght = true)
         {
             string textboxtext = textbElement.Text;
             var cursor_position = textbElement.SelectionStart;
@@ -1098,17 +1110,17 @@ namespace MapsInMyFolder.Commun
             textbElement.Text = filtered_string;
             if (textboxtext != filtered_string)
             {
-                textbElement.SelectionStart = cursor_position - 1;
+                if (cursor_position > 0) textbElement.SelectionStart = cursor_position - 1;
                 return false;
             }
             else
             {
-                textbElement.SelectionStart = cursor_position;
+                if (cursor_position > 0) textbElement.SelectionStart = cursor_position;
                 return true;
             }
         }
 
-        public static bool FilterDigitOnlyWhileWritingInTextBox(TextBox textbElement, System.Windows.Controls.TextChangedEventHandler action, int MaxInt = -1)
+        public static bool FilterDigitOnlyWhileWritingInTextBox(TextBox textbElement, System.Windows.Controls.TextChangedEventHandler action, int MaxInt = -1, List<char> char_supplementaire = null)
         {
             if (textbElement is null)
             {
@@ -1116,9 +1128,9 @@ namespace MapsInMyFolder.Commun
             }
             bool TextHasBeenFilteredAndChanged = false;
             textbElement.TextChanged -= action;
-            if (FilterDigitOnlyWhileWritingInTextBox(textbElement))
+            if (FilterDigitOnlyWhileWritingInTextBox(textbElement, char_supplementaire))
             {
-                if (MaxInt != -1 && Convert.ToUInt32(textbElement.Text) > MaxInt)
+                if (MaxInt != -1 && Convert.ToUInt32(textbElement?.Text) > MaxInt)
                 {
                     string MaxIntString = MaxInt.ToString();
                     textbElement.Text = MaxIntString;
@@ -1198,8 +1210,7 @@ namespace MapsInMyFolder.Commun
                 return HttpStatusCode.SeeOther;
             }
 
-            HttpStatusCode code = InternalCheckIfDownloadSuccess(url).Result;
-            switch (code)
+            switch (InternalCheckIfDownloadSuccess(url).Result)
             {
                 case HttpStatusCode.NotFound:
                     return 404;
@@ -1209,7 +1220,7 @@ namespace MapsInMyFolder.Commun
             }
         }
 
-        public static List<Double> GetCenterBetweenTwoPoints(List<Double> PointA, List<Double> PointB)
+        public static (double Latitude, double Longitude) GetCenterBetweenTwoPoints((double Latitude, double Longitude) PointA, (double Latitude, double Longitude) PointB)
         {
             //method midpoint from http://www.geomidpoint.com/ -> Thanks
             double RAD(double dg)
@@ -1236,7 +1247,7 @@ namespace MapsInMyFolder.Commun
                 return lon;
             }
 
-            List<Double> Calculate(List<Double> C_PointA, List<Double> C_PointB)
+            (double Latitude, double Longitude) Calculate()
             {
                 double x = 0;
                 double y = 0;
@@ -1244,10 +1255,10 @@ namespace MapsInMyFolder.Commun
                 var latslong = new (double Latitude, double Longitude)[] { (0, 0), (0, 0) };
                 var sincos_lats = new (double Sin_Latitude, double Cos_Latitude)[] { (0, 0), (0, 0) };
                 var totdays = 0;
-                latslong[0].Latitude = RAD(C_PointA[0]);
-                latslong[0].Longitude = RAD(C_PointA[1]);
-                latslong[1].Latitude = RAD(C_PointB[0]);
-                latslong[1].Longitude = RAD(C_PointB[1]);
+                latslong[0].Latitude = RAD(PointA.Latitude);
+                latslong[0].Longitude = RAD(PointA.Longitude);
+                latslong[1].Latitude = RAD(PointB.Latitude);
+                latslong[1].Longitude = RAD(PointB.Longitude);
                 sincos_lats[0].Sin_Latitude = Math.Sin(latslong[0].Latitude);
                 sincos_lats[0].Cos_Latitude = Math.Cos(latslong[0].Latitude);
                 sincos_lats[1].Sin_Latitude = Math.Sin(latslong[1].Latitude);
@@ -1276,12 +1287,12 @@ namespace MapsInMyFolder.Commun
                 midlng = normalizeLongitude((x / totdays) + midlng);
                 midlat = DEG(midlat);
                 midlng = DEG(midlng);
-                return new List<Double>() { midlat, midlng };
+                return (midlat, midlng);
             }
-            return Calculate(PointA, PointB);
+            return Calculate();
         }
 
-        public static List<int> CoordonneesToTile(double Latitude, double Longitude, int zoom)
+        public static (int X, int Y) CoordonneesToTile(double Latitude, double Longitude, int zoom)
         {
             double ValuetoRadians(float value)
             {
@@ -1289,14 +1300,14 @@ namespace MapsInMyFolder.Commun
             }
             int x = Convert.ToInt32(Math.Floor(((float)Longitude + 180) / 360 * Math.Pow(2, zoom)));
             int y = Convert.ToInt32(Math.Floor((1 - (Math.Log(Math.Tan(ValuetoRadians((float)Latitude)) + (1 / Math.Cos(ValuetoRadians((float)Latitude)))) / Math.PI)) / 2 * Math.Pow(2, zoom)));
-            return new List<int>() { x, y };
+            return (x, y);
         }
 
-        public static List<double> TileToCoordonnees(int TileX, int TileY, int zoom)
+        public static (double Latitude, double Longitude) TileToCoordonnees(int TileX, int TileY, int zoom)
         {
-            double x = (TileX / Math.Pow(2, zoom) * 360) - 180;
-            double y = Math.Atan(Math.Sinh(Math.PI * (1 - (2 * TileY / Math.Pow(2, zoom))))) * 180 / Math.PI;
-            return new List<double>() { x, y };
+            double Longitude = (TileX / Math.Pow(2, zoom) * 360) - 180;
+            double Latitude = Math.Atan(Math.Sinh(Math.PI * (1 - (2 * TileY / Math.Pow(2, zoom))))) * 180 / Math.PI;
+            return (Latitude, Longitude);
         }
 
         public static string WordWrap(string text, int width)

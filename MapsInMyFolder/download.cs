@@ -216,6 +216,7 @@ namespace MapsInMyFolder
     {
         private void Start_Download_Click(object sender, RoutedEventArgs e)
         {
+            mapSelectable.CleanRectangleLocations();
             MainWindow._instance.FrameLoad_PrepareDownload();
         }
     }
@@ -351,10 +352,10 @@ namespace MapsInMyFolder
             string urlbase = download_Options.urlbase;
             if (urlbase.Trim() != "" && tile_size != 0)
             {
-                List<int> NO_tile = Collectif.CoordonneesToTile(download_Options.NO_PIN_Location.Latitude, download_Options.NO_PIN_Location.Longitude, z);
-                List<int> SE_tile = Collectif.CoordonneesToTile(download_Options.SE_PIN_Location.Latitude, download_Options.SE_PIN_Location.Longitude, z);
-                int lat_tile_number = Math.Abs(SE_tile[0] - NO_tile[0]) + 1;
-                int long_tile_number = Math.Abs(SE_tile[1] - NO_tile[1]) + 1;
+                var NO_tile = Collectif.CoordonneesToTile(download_Options.NO_PIN_Location.Latitude, download_Options.NO_PIN_Location.Longitude, z);
+                var SE_tile = Collectif.CoordonneesToTile(download_Options.SE_PIN_Location.Latitude, download_Options.SE_PIN_Location.Longitude, z);
+                int lat_tile_number = Math.Abs(SE_tile.X - NO_tile.X) + 1;
+                int long_tile_number = Math.Abs(SE_tile.Y - NO_tile.Y) + 1;
                 int nbr_of_tiles = lat_tile_number * long_tile_number;
                 if (lat_tile_number * tile_size >= 65500 || long_tile_number * tile_size >= 65500)
                 {
@@ -905,12 +906,12 @@ namespace MapsInMyFolder
             string save_filename = curent_engine.file_name;
             int tile_size = curent_engine.tile_size;
 
-            List<int> NO_tile = Collectif.CoordonneesToTile(curent_engine.location["NO_Latitude"], curent_engine.location["NO_Longitude"], curent_engine.zoom);
-            List<int> SE_tile = Collectif.CoordonneesToTile(curent_engine.location["SE_Latitude"], curent_engine.location["SE_Longitude"], curent_engine.zoom);
-            int NO_x = NO_tile[0];
-            int NO_y = NO_tile[1];
-            int SE_x = SE_tile[0];
-            int SE_y = SE_tile[1];
+            var NO_tile = Collectif.CoordonneesToTile(curent_engine.location["NO_Latitude"], curent_engine.location["NO_Longitude"], curent_engine.zoom);
+            var SE_tile = Collectif.CoordonneesToTile(curent_engine.location["SE_Latitude"], curent_engine.location["SE_Longitude"], curent_engine.zoom);
+            int NO_x = NO_tile.X;
+            int NO_y = NO_tile.Y;
+            int SE_x = SE_tile.X;
+            int SE_y = SE_tile.Y;
             int decalage_x = SE_x - NO_x;
             int decalage_y = SE_y - NO_y;
 
@@ -1201,15 +1202,15 @@ namespace MapsInMyFolder
         {
             List<int> GetRognageFromLocation(double Latitude, double Longitude)
             {
-                List<int> list_of_tile_number_from_given_lat_and_long = Collectif.CoordonneesToTile(Latitude, Longitude, zoom);
+                var list_of_tile_number_from_given_lat_and_long = Collectif.CoordonneesToTile(Latitude, Longitude, zoom);
 
-                List<double> CoinsHautGaucheLocationFromTile = Collectif.TileToCoordonnees(list_of_tile_number_from_given_lat_and_long[0], list_of_tile_number_from_given_lat_and_long[1], zoom);
-                double longitude_coins_haut_gauche_curent_tileX = CoinsHautGaucheLocationFromTile[0];
-                double latitude_coins_haut_gauche_curent_tileY = CoinsHautGaucheLocationFromTile[1];
+                var CoinsHautGaucheLocationFromTile = Collectif.TileToCoordonnees(list_of_tile_number_from_given_lat_and_long.X, list_of_tile_number_from_given_lat_and_long.Y, zoom);
+                double longitude_coins_haut_gauche_curent_tileX = CoinsHautGaucheLocationFromTile.Longitude;
+                double latitude_coins_haut_gauche_curent_tileY = CoinsHautGaucheLocationFromTile.Latitude;
 
-                List<double> NextCoinsHautGaucheLocationFromTile = Collectif.TileToCoordonnees(list_of_tile_number_from_given_lat_and_long[0] + 1, list_of_tile_number_from_given_lat_and_long[1] + 1, zoom);
-                double longitude_coins_haut_gauche_next_tileX = NextCoinsHautGaucheLocationFromTile[0];
-                double latitude_coins_haut_gauche_next_tileY = NextCoinsHautGaucheLocationFromTile[1];
+                var NextCoinsHautGaucheLocationFromTile = Collectif.TileToCoordonnees(list_of_tile_number_from_given_lat_and_long.X + 1, list_of_tile_number_from_given_lat_and_long.Y + 1, zoom);
+                double longitude_coins_haut_gauche_next_tileX = NextCoinsHautGaucheLocationFromTile.Longitude;
+                double latitude_coins_haut_gauche_next_tileY = NextCoinsHautGaucheLocationFromTile.Latitude;
 
                 double longitude_decalage = Math.Abs(Longitude - longitude_coins_haut_gauche_curent_tileX) * 100 / Math.Abs(longitude_coins_haut_gauche_curent_tileX - longitude_coins_haut_gauche_next_tileX) / 100;
                 double latitude_decalage = Math.Abs(Latitude - latitude_coins_haut_gauche_curent_tileY) * 100 / Math.Abs(latitude_coins_haut_gauche_curent_tileY - latitude_coins_haut_gauche_next_tileY) / 100;
@@ -1220,8 +1221,8 @@ namespace MapsInMyFolder
 
             List<int> NO_decalage = GetRognageFromLocation(NO_Latitude, NO_Longitude);
             List<int> SE_decalage = GetRognageFromLocation(SE_Latitude, SE_Longitude);
-            int NbrtilesInCol = Collectif.CoordonneesToTile(SE_Latitude, SE_Longitude, zoom)[0] - Collectif.CoordonneesToTile(NO_Latitude, NO_Longitude, zoom)[0] + 1;
-            int NbrtilesInRow = Collectif.CoordonneesToTile(SE_Latitude, SE_Longitude, zoom)[1] - Collectif.CoordonneesToTile(NO_Latitude, NO_Longitude, zoom)[1] + 1;
+            int NbrtilesInCol = Collectif.CoordonneesToTile(SE_Latitude, SE_Longitude, zoom).X - Collectif.CoordonneesToTile(NO_Latitude, NO_Longitude, zoom).X + 1;
+            int NbrtilesInRow = Collectif.CoordonneesToTile(SE_Latitude, SE_Longitude, zoom).Y - Collectif.CoordonneesToTile(NO_Latitude, NO_Longitude, zoom).Y + 1;
             int final_image_width = Math.Abs((NbrtilesInCol * tile_width) - (NO_decalage[0] + (tile_width - SE_decalage[0])));
             int final_image_height = Math.Abs((NbrtilesInRow * tile_width) - (NO_decalage[1] + (tile_width - SE_decalage[1])));
             if (final_image_width < 10 || final_image_height < 10)

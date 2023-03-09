@@ -106,7 +106,7 @@ namespace MapsInMyFolder.MapControl
 
             if (parentMap.MapProjection.IsNormalCylindrical && IsOutsideViewport(position))
             {
-                location = new Location(location.Latitude, parentMap.ConstrainedLongitude(location.Longitude));
+                //location = new Location(location.Latitude, parentMap.ConstrainedLongitude(location.Longitude));
 
                 position = parentMap.LocationToView(location);
             }
@@ -232,6 +232,7 @@ namespace MapsInMyFolder.MapControl
 
         private bool IsOutsideViewport(Point point)
         {
+            return false;
             return point.X < 0d || point.X > parentMap.RenderSize.Width
                 || point.Y < 0d || point.Y > parentMap.RenderSize.Height;
         }

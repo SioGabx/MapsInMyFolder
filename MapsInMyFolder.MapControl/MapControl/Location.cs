@@ -16,6 +16,7 @@ namespace MapsInMyFolder.MapControl
     public class Location : IEquatable<Location>
     {
         private double latitude;
+        private double longitude;
 
         public Location()
         {
@@ -33,7 +34,12 @@ namespace MapsInMyFolder.MapControl
             set { latitude = Math.Min(Math.Max(value, -90d), 90d); }
         }
 
-        public double Longitude { get; set; }
+        //public double Longitude { get; set; }
+        public double Longitude
+        {
+            get { return longitude; }
+            set { longitude = Math.Min(Math.Max(value, -180), 180); }
+        }
 
         public bool Equals(Location location)
         {
@@ -83,14 +89,17 @@ namespace MapsInMyFolder.MapControl
         /// </summary>
         public static double NormalizeLongitude(double longitude)
         {
-            if (longitude < -180d)
-            {
-                longitude = ((longitude + 180d) % 360d) + 180d;
-            }
-            else if (longitude > 180d)
-            {
-                longitude = ((longitude - 180d) % 360d) - 180d;
-            }
+
+            //TODO : Disable ?
+
+            //if (longitude < -180d)
+            //{
+            //    longitude = ((longitude + 180d) % 360d) + 180d;
+            //}
+            //else if (longitude > 180d)
+            //{
+            //    longitude = ((longitude - 180d) % 360d) - 180d;
+            //}
 
             return longitude;
         }

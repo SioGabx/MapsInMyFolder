@@ -23,10 +23,11 @@ namespace MapsInMyFolder.Commun
         public string class_tilecomputationscript;
         public string class_visibility;
         public SpecialsOptions class_specialsoptions;
+        public string class_rectangles;
         public int class_version;
 
 
-        public Layers(int class_id, bool class_favorite, string class_name, string class_description, string class_categorie, string class_identifiant, string class_tile_url, string class_tile_fallback_url, string class_site, string class_site_url, int class_min_zoom, int class_max_zoom, string class_format, int class_tiles_size, string class_tilecomputationscript, string class_visibility, SpecialsOptions class_specialsoptions, int class_version)
+        public Layers(int class_id, bool class_favorite, string class_name, string class_description, string class_categorie, string class_identifiant, string class_tile_url, string class_tile_fallback_url, string class_site, string class_site_url, int class_min_zoom, int class_max_zoom, string class_format, int class_tiles_size, string class_tilecomputationscript, string class_visibility, SpecialsOptions class_specialsoptions, string class_rectangles, int class_version)
         {
             this.class_id = class_id;
             this.class_favorite = class_favorite;
@@ -45,6 +46,7 @@ namespace MapsInMyFolder.Commun
             this.class_tilecomputationscript = class_tilecomputationscript;
             this.class_visibility = class_visibility;
             this.class_specialsoptions = class_specialsoptions;
+            this.class_rectangles = class_rectangles;
             this.class_version = class_version;
         }
 
@@ -76,7 +78,7 @@ namespace MapsInMyFolder.Commun
 
         public static Layers Empty(int LayerId = -1)
         {
-            return new Layers(LayerId, false, "", "Une erreur s'est produite dans la lecture des données. \n Données de secours fournie par OpenStreetMap.", "", "", "http://tile.openstreetmap.org/{z}/{x}/{y}.png", "FALLBACK_URL", "", "", 0, 19, "jpeg", 256, "function getTile(args){return args;}", "Visible", new SpecialsOptions(), 0);
+            return new Layers(LayerId, false, "", "Une erreur s'est produite dans la lecture des données. \n Données de secours fournie par OpenStreetMap.", "", "", "http://tile.openstreetmap.org/{z}/{x}/{y}.png", "FALLBACK_URL", "", "", 0, 19, "jpeg", 256, "function getTile(args){return args;}", "Visible", new SpecialsOptions(),"", 0);
         }
 
         public static class Convert

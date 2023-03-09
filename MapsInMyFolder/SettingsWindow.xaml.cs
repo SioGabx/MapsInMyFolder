@@ -1,9 +1,9 @@
 ﻿using MapsInMyFolder.Commun;
 using ModernWpf.Controls;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
-using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -26,13 +26,13 @@ namespace MapsInMyFolder
             tileloader_template_script.TextArea.Caret.PositionChanged += (_, _) => Collectif.TextEditorCursorPositionChanged(tileloader_template_script, SettingsGrid, SettingsScrollViewer, 100); ;
             ScrollViewerHelper.SetFixMouseWheel(Collectif.GetDescendantByType(tileloader_default_script, typeof(ScrollViewer)) as ScrollViewer, true);
             ScrollViewerHelper.SetFixMouseWheel(Collectif.GetDescendantByType(tileloader_template_script, typeof(ScrollViewer)) as ScrollViewer, true);
-            
+
             MenuItem IndentermenuItem_tileloader_default_script = new MenuItem();
             IndentermenuItem_tileloader_default_script.Header = "Indenter";
             IndentermenuItem_tileloader_default_script.Icon = new ModernWpf.Controls.FontIcon() { Glyph = "\uE12F", Foreground = Collectif.HexValueToSolidColorBrush("#888989") };
             IndentermenuItem_tileloader_default_script.Click += (sender, e) => Collectif.IndenterCode(sender, e, tileloader_default_script);
-            tileloader_default_script.ContextMenu.Items.Add(IndentermenuItem_tileloader_default_script);  
-            
+            tileloader_default_script.ContextMenu.Items.Add(IndentermenuItem_tileloader_default_script);
+
             MenuItem IndentermenuItem_tileloader_template_script = new MenuItem();
             IndentermenuItem_tileloader_template_script.Header = "Indenter";
             IndentermenuItem_tileloader_template_script.Icon = new ModernWpf.Controls.FontIcon() { Glyph = "\uE12F", Foreground = Collectif.HexValueToSolidColorBrush("#888989") };
@@ -48,7 +48,7 @@ namespace MapsInMyFolder
 
         int DefaultValuesHachCode = 0;
         private void Window_Initialized(object sender, EventArgs e) { }
-       
+
 
         void DoIScrollToElement(UIElement element, System.Windows.Input.MouseButtonEventArgs e)
         {
@@ -58,32 +58,32 @@ namespace MapsInMyFolder
             }
         }
 
-        private void MenuItem_Telechargement(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        private void ScrollMenuItem_Telechargement(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             DoIScrollToElement(TelechargementSettingsLabel, e);
         }
 
-        private void MenuItem_Calques(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        private void ScrollMenuItem_Calque(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             DoIScrollToElement(CalqueSettingsLabel, e);
         }
 
-        private void MenuItem_Carte(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        private void ScrollMenuItem_Carte(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             DoIScrollToElement(CarteSettingsLabel, e);
         }
 
-        private void MenuItem_Avance(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        private void ScrollMenuItem_Avance(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             DoIScrollToElement(AvanceSettingsLabel, e);
         }
 
-        private void MenuItem_Update(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        private void ScrollMenuItem_Update(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             DoIScrollToElement(UpdateSettingsLabel, e);
         }
 
-        private void MenuItem_APropos(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        private void ScrollMenuItem_APropos(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             DoIScrollToElement(AProposSettingsLabel, e);
         }
@@ -187,6 +187,8 @@ namespace MapsInMyFolder
             DefaultValuesHachCode = Collectif.CheckIfInputValueHaveChange(SettingsScrollViewer);
             SettingsVersionInformation.Content = Update.GetActualProductVersionFormatedString();
             UpdateLastUpdateSearch();
+
+            SettingsScrollViewer.ScrollToTop();
         }
 
         public void UpdateLastUpdateSearch()
@@ -412,6 +414,34 @@ namespace MapsInMyFolder
         private void DisableRequestBringIntoView(object sender, RequestBringIntoViewEventArgs e)
         {
             e.Handled = true;
+        }
+
+        private void SettingsScrollViewer_ScrollChanged(object sender, ScrollChangedEventArgs e)
+        {
+            if (!IsInitialized) { return; } 
+            List<(StackPanel, Grid)> ListOfSubMenu = new List<(StackPanel, Grid)>()
+            {
+                (CalqueSettings, MenuItem_Calque),
+                (TelechargementSettings, MenuItem_Telechargement),
+                (CarteSettings, MenuItem_Carte),
+                (AvanceSettings, MenuItem_Avance),
+                (UpdateSettings, MenuItem_Update),
+                (AProposSettings, MenuItem_APropos)
+            };
+            ListOfSubMenu.Reverse();
+            const int Margin = 100;
+            foreach ((StackPanel SettingsPanel, Grid MenuLabel) item in ListOfSubMenu)
+            {
+                var UIElementPosition = item.SettingsPanel.TranslatePoint(new Point(0, 0), SettingsScrollViewer).Y;
+                if (UIElementPosition - Margin <= 0 && UIElementPosition > -(item.SettingsPanel.ActualHeight - Margin))
+                {
+                    item.MenuLabel.Style = this.Resources["GridInViewNormalStyle"] as Style;
+                }
+                else
+                {
+                    item.MenuLabel.Style = this.Resources["GridSelectNormalStyle"] as Style;
+                }
+            }
         }
     }
 }

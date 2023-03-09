@@ -83,13 +83,13 @@ namespace MapsInMyFolder.MapControl
 
             if (location != null && parentMap.MapProjection.IsNormalCylindrical)
             {
-                var pos = parentMap.LocationToView(location);
+                //var pos = parentMap.LocationToView(location);
 
-                if (pos.X < 0d || pos.X > parentMap.RenderSize.Width ||
-                    pos.Y < 0d || pos.Y > parentMap.RenderSize.Height)
-                {
-                    longitudeOffset = parentMap.ConstrainedLongitude(location.Longitude) - location.Longitude;
-                }
+                //if (pos.X < 0d || pos.X > parentMap.RenderSize.Width ||
+                //    pos.Y < 0d || pos.Y > parentMap.RenderSize.Height)
+                //{
+                //    longitudeOffset = parentMap.ConstrainedLongitude(location.Longitude) - location.Longitude;
+                //}
             }
 
             return longitudeOffset;

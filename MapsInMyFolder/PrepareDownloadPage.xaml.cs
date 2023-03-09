@@ -126,10 +126,11 @@ namespace MapsInMyFolder
             //ImageIsLoading.Visibility = Visibility.Visible;
             LastResquestZoom = ZoomSlider.Value;
             int LayerID = Layers.Curent.class_id;
+            if (MainPage.mapSelectable is null) { return; }
             var SelectionLocation = MainPage.mapSelectable.GetRectangleLocation();
-            List<Double> NO_PIN_Location = new List<Double>() { SelectionLocation.NO.Latitude, SelectionLocation.NO.Longitude };
-            List<Double> SE_PIN_Location = new List<Double>() { SelectionLocation.SE.Latitude, SelectionLocation.SE.Longitude };
-            List<Double> LocaMillieux = Collectif.GetCenterBetweenTwoPoints(NO_PIN_Location, SE_PIN_Location);
+            var NO_PIN_Location = (SelectionLocation.NO.Latitude, SelectionLocation.NO.Longitude);
+            var SE_PIN_Location = (SelectionLocation.SE.Latitude, SelectionLocation.SE.Longitude);
+            var LocaMillieux = Collectif.GetCenterBetweenTwoPoints(NO_PIN_Location, SE_PIN_Location);
 
             int zoom = Convert.ToInt32(ZoomSlider.Value);
             int maximum_zoom = Layers.Curent.class_max_zoom;
@@ -140,9 +141,9 @@ namespace MapsInMyFolder
             UpdateMigniatureParraleleTokenSource.Cancel();
             UpdateMigniatureParraleleTokenSource = new CancellationTokenSource();
             UpdateMigniatureParraleleToken = UpdateMigniatureParraleleTokenSource.Token;
-            List<int> CoordonneesTile = Collectif.CoordonneesToTile(LocaMillieux[0], LocaMillieux[1], zoom);
-            int TileX = CoordonneesTile[0] - 1;
-            int TileY = CoordonneesTile[1];
+            var CoordonneesTile = Collectif.CoordonneesToTile(LocaMillieux.Latitude, LocaMillieux.Longitude, zoom);
+            int TileX = CoordonneesTile.X - 1;
+            int TileY = CoordonneesTile.Y;
 
             byte[,][] BitmapImageArray = new byte[3, 2][];
             string[,] BitmapErrorsArray = new string[3, 2];
@@ -320,10 +321,10 @@ namespace MapsInMyFolder
         async void GetCenterViewCityName()
         {
             var SelectionLocation = MainPage.mapSelectable.GetRectangleLocation();
-            List<Double> NO_PIN_Location = new List<Double>() { SelectionLocation.NO.Latitude, SelectionLocation.NO.Longitude };
-            List<Double> SE_PIN_Location = new List<Double>() { SelectionLocation.SE.Latitude, SelectionLocation.SE.Longitude };
-            List<Double> LocaMillieux = Collectif.GetCenterBetweenTwoPoints(NO_PIN_Location, SE_PIN_Location);
-            MapControl.Location Mloc = new MapControl.Location(LocaMillieux[0], LocaMillieux[1]);
+            var NO_PIN_Location = (SelectionLocation.NO.Latitude, SelectionLocation.NO.Longitude);
+            var SE_PIN_Location = (SelectionLocation.SE.Latitude, SelectionLocation.SE.Longitude);
+            var LocaMillieux = Collectif.GetCenterBetweenTwoPoints(NO_PIN_Location, SE_PIN_Location);
+            MapControl.Location Mloc = new MapControl.Location(LocaMillieux.Latitude, LocaMillieux.Longitude);
             await Task.Run(() =>
             {
                 try
@@ -402,10 +403,10 @@ namespace MapsInMyFolder
             double SE_PIN_Latitude = SelectionLocation.SE.Latitude;
             double SE_PIN_Longitude = SelectionLocation.SE.Longitude;
             int Zoom = Convert.ToInt16(Math.Floor(ZoomSlider.Value));
-            List<int> NO_tile = Collectif.CoordonneesToTile(NO_PIN_Latitude, NO_PIN_Longitude, Zoom);
-            List<int> SE_tile = Collectif.CoordonneesToTile(SE_PIN_Latitude, SE_PIN_Longitude, Zoom);
-            int lat_tile_number = Math.Abs(SE_tile[0] - NO_tile[0]) + 1;
-            int long_tile_number = Math.Abs(SE_tile[1] - NO_tile[1]) + 1;
+            var NO_tile = Collectif.CoordonneesToTile(NO_PIN_Latitude, NO_PIN_Longitude, Zoom);
+            var SE_tile = Collectif.CoordonneesToTile(SE_PIN_Latitude, SE_PIN_Longitude, Zoom);
+            int lat_tile_number = Math.Abs(SE_tile.X - NO_tile.X) + 1;
+            int long_tile_number = Math.Abs(SE_tile.Y - NO_tile.Y) + 1;
 
             void Update_Label_TileSize()
             {

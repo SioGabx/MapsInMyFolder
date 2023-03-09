@@ -9,6 +9,7 @@
     xmlns:cef="clr-namespace:CefSharp;assembly=CefSharp.Core"
       xmlns:avalonEdit="clr-namespace:ICSharpCode.AvalonEdit;assembly=ICSharpCode.AvalonEdit" 
       xmlns:editing="clr-namespace:ICSharpCode.AvalonEdit.Editing;assembly=ICSharpCode.AvalonEdit"
+    xmlns:rendering="clr-namespace:ICSharpCode.AvalonEdit.Rendering;assembly=ICSharpCode.AvalonEdit"
     xmlns:map="clr-namespace:MapsInMyFolder.MapControl;assembly=MapsInMyFolder.MapControl" xmlns:sys="clr-namespace:System;assembly=netstandard"
 >
     <Style TargetType="avalonEdit:TextEditor">
@@ -17,7 +18,17 @@
         <Setter Property="LineNumbersForeground" Value="#626363"></Setter>
 
     </Style>
-    <Style TargetType="{x:Type editing:TextArea}">
+
+    <Style TargetType="{x:Type rendering:TextView}">
+
+        <Setter Property="NonPrintableCharacterBrush" Value="Transparent" />
+        <Setter Property="LinkTextForegroundBrush" Value="#FFD69D85" />
+        <!--  Style hyperlink displayed within text in text editor  -->
+        <Setter Property="LinkTextBackgroundBrush" Value="Transparent" />
+    </Style>
+
+
+        <Style TargetType="{x:Type editing:TextArea}">
         <Setter Property="SelectionBrush" Value="#6684470B"></Setter>
         <Setter Property="SelectionBorder">
             <Setter.Value>
@@ -60,8 +71,6 @@
         <StaticResourceExtension ResourceKey="ContextMenu_Coller" />
     </ContextMenu>
 
-    
-
     <Style x:Key="TextBoxCleanStyleDefault" TargetType="{x:Type TextBox}">
         <Setter Property="Foreground" Value="#5A5A5A"></Setter>
         <Setter Property="BorderBrush" Value="#5A5A5A"/>
@@ -80,6 +89,9 @@
                         <ScrollViewer x:Name="PART_ContentHost" Focusable="false" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden"/>
                     </Border>
                     <ControlTemplate.Triggers>
+                        <Trigger Property="BorderBrush" Value="#5A5A5A">
+                            <Setter Property="BorderBrush" TargetName="border" Value="#5A5A5A"/>
+                        </Trigger>
                         <Trigger Property="IsEnabled" Value="false">
                             <Setter Property="Opacity" TargetName="border" Value="0.56"/>
                         </Trigger>
@@ -121,6 +133,54 @@
         <Setter Property="ContextMenu" Value="{StaticResource CopyPasteContextMenu}"/>
     </Style>
 
+    <Style x:Key="TextBoxFormeStyle" TargetType="TextBox" BasedOn="{StaticResource TextBoxCleanStyle_13}">
+        <Setter Property="OverridesDefaultStyle" Value="False" />
+        <Setter Property="Margin" Value="0"/>
+        <Setter Property="CaretBrush" Value="#F18712"></Setter>
+        <Setter Property="Padding" Value="0,3,3,3"></Setter>
+        <Setter Property="Height" Value="25"/>
+        <Setter Property="HorizontalAlignment" Value="Stretch"/>
+        <Setter Property="SpellCheck.IsEnabled" Value="False"/>
+        <Setter Property="ContextMenu" Value="{StaticResource CopyPasteContextMenu}"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type TextBox}">
+                    <Border x:Name="border" BorderThickness="0,0,0,2" Background="#303031" SnapsToDevicePixels="True" BorderBrush="#5A5A5A">
+                        <ScrollViewer x:Name="PART_ContentHost" Focusable="false" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <MultiTrigger >
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsFocused" Value="False" />
+                                <Condition Property="IsMouseOver" Value="True" />
+                            </MultiTrigger.Conditions>
+                            <MultiTrigger.Setters>
+                                <Setter Property="BorderBrush" TargetName="border" Value="#FF646464"/>
+                            </MultiTrigger.Setters>
+                        </MultiTrigger>
+                        <Trigger Property="IsFocused" Value="true">
+                            <Setter Property="Foreground" Value="#BCBCBC"></Setter>
+                            <Trigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <ColorAnimation Duration="0:0:0.2" Storyboard.TargetProperty="(Border.BorderBrush).(SolidColorBrush.Color)" To="#F18712" FillBehavior="HoldEnd" Storyboard.TargetName="border" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.EnterActions>
+                            <Trigger.ExitActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <ColorAnimation Duration="0:0:0.2" Storyboard.TargetProperty="(Border.BorderBrush).(SolidColorBrush.Color)" To="#5A5A5A" FillBehavior="HoldEnd" Storyboard.TargetName="border" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.ExitActions>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    
     <Style x:Key="TextBoxCleanStyleNoBorder" TargetType="{x:Type TextBox}">
         <Setter Property="Foreground" Value="#5A5A5A"></Setter>
         <Setter Property="BorderBrush" Value="#5A5A5A"/>
@@ -135,6 +195,7 @@
         <Setter Property="VerticalContentAlignment" Value="Center"/>
         <Setter Property="Padding" Value="5,0,0,0"/>
         <Setter Property="Cursor" Value="IBeam"/>
+        <Setter Property="CaretBrush" Value="#F18712"></Setter>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type TextBox}">

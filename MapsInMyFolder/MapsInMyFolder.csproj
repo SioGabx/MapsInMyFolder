@@ -45,17 +45,19 @@
   <ItemGroup>
     <None Remove="closedhand.cur" />
     <None Remove="download_panel.html" />
+    <None Remove="editorTheme\Json.xshd" />
     <None Remove="layer_panel.html" />
     <None Remove="ScriptEditorTheme.xshd" />
   </ItemGroup>
 
   <ItemGroup>
     <Content Include="icone\icone_v2.ico" />
-    <EmbeddedResource Include="ScriptEditorTheme.xshd" />
+    <EmbeddedResource Include="editorTheme\Javascript.xshd" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="cursors\closedhand.cur" />
+    <EmbeddedResource Include="editorTheme\Json.xshd" />
     <EmbeddedResource Include="html\download_panel.html" />
   </ItemGroup>
 

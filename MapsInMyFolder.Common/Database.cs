@@ -62,7 +62,7 @@ namespace MapsInMyFolder.Commun
                 return false;
             }
             string NotificationMsg = $"Téléchargement en cours de la base de donnée depuis {new Uri(database_url).Host}...";
-            NProgress DatabaseDownloadNotification = new NProgress(NotificationMsg, "MapsInMyFolder", null, 0, false) { };
+            NProgress DatabaseDownloadNotification = new NProgress(NotificationMsg, "MapsInMyFolder", "MainPage", null, 0, false) { };
             DatabaseDownloadNotification.Register();
 
             Collectif.HttpClientDownloadWithProgress client = new Collectif.HttpClientDownloadWithProgress(database_url, database_pathname);
@@ -287,7 +287,7 @@ namespace MapsInMyFolder.Commun
                 return null;
             }
             SQLiteCommand sqlite_cmd = sqlite_conn.CreateCommand();
-            const string commande_arg = "('ID' INTEGER UNIQUE, 'NOM' TEXT DEFAULT '', 'DESCRIPTION' TEXT DEFAULT '', 'CATEGORIE' TEXT DEFAULT '', 'IDENTIFIANT' TEXT DEFAULT '', 'TILE_URL' TEXT DEFAULT '','TILE_FALLBACK_URL' TEXT DEFAULT '', 'MIN_ZOOM' INTEGER DEFAULT 0, 'MAX_ZOOM' INTEGER DEFAULT 0, 'FORMAT' TEXT DEFAULT 'jpeg', 'SITE' TEXT DEFAULT '', 'SITE_URL' TEXT DEFAULT '', 'TILE_SIZE' INTEGER DEFAULT 256, 'FAVORITE' INTEGER DEFAULT 0, 'TILECOMPUTATIONSCRIPT' TEXT DEFAULT '','VISIBILITY' TEXT DEFAULT 'Visible' ,'SPECIALSOPTIONS' TEXT DEFAULT '', 'VERSION' INTEGER DEFAULT 1 ";
+            const string commande_arg = "('ID' INTEGER UNIQUE, 'NOM' TEXT DEFAULT '', 'DESCRIPTION' TEXT DEFAULT '', 'CATEGORIE' TEXT DEFAULT '', 'IDENTIFIANT' TEXT DEFAULT '', 'TILE_URL' TEXT DEFAULT '','TILE_FALLBACK_URL' TEXT DEFAULT '', 'MIN_ZOOM' INTEGER DEFAULT 0, 'MAX_ZOOM' INTEGER DEFAULT 0, 'FORMAT' TEXT DEFAULT 'jpeg', 'SITE' TEXT DEFAULT '', 'SITE_URL' TEXT DEFAULT '', 'TILE_SIZE' INTEGER DEFAULT 256, 'FAVORITE' INTEGER DEFAULT 0, 'TILECOMPUTATIONSCRIPT' TEXT DEFAULT '','VISIBILITY' TEXT DEFAULT 'Visible' ,'SPECIALSOPTIONS' TEXT DEFAULT '','RECTANGLES' TEXT DEFAULT '', 'VERSION' INTEGER DEFAULT 1 ";
             sqlite_cmd.CommandText = $@"
             CREATE TABLE IF NOT EXISTS 'CUSTOMSLAYERS' {commande_arg});
             CREATE TABLE IF NOT EXISTS 'LAYERS' {commande_arg},PRIMARY KEY('ID' AUTOINCREMENT));
@@ -445,7 +445,7 @@ namespace MapsInMyFolder.Commun
                     XMLParser.Cache.Write("dbVersion", sqlite_cmd.ExecuteScalar().ToString());
                     XMLParser.Cache.WriteAttribute("dbVersion", "dbSha", githubAssets?.Sha);
                 }
-                Notification ApplicationUpdateNotification = new NText("La mise à jour de la base de donnée à été effectuée avec succès", "MapsInMyFolder")
+                Notification ApplicationUpdateNotification = new NText("La mise à jour de la base de donnée à été effectuée avec succès", "MapsInMyFolder", "MainPage")
                 {
                     NotificationId = "DatabaseUpdateNotification",
                     DisappearAfterAMoment = true,

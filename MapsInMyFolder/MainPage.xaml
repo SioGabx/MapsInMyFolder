@@ -3,7 +3,8 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-      xmlns:map="clr-namespace:MapsInMyFolder.MapControl;assembly=MapsInMyFolder.MapControl" xmlns:wpf="clr-namespace:CefSharp.Wpf;assembly=CefSharp.Wpf"
+      xmlns:map="clr-namespace:MapsInMyFolder.MapControl;assembly=MapsInMyFolder.MapControl" 
+      xmlns:wpf="clr-namespace:CefSharp.Wpf;assembly=CefSharp.Wpf"
       mc:Ignorable="d" d:DesignHeight="450" d:DesignWidth="800"
       Title="MainPage" Loaded="Page_Loaded">
     <Page.Resources>
@@ -99,8 +100,8 @@
                     <map:Pushpin Panel.ZIndex="999" x:Name="search_result" Style="{DynamicResource PushpinStyleOrange}"  map:MapPanel.Location="48.16,6.5" Visibility="Hidden" MouseDoubleClick="Search_result_MouseDoubleClick"/>
 
                     <map:MapTileLayer x:Name="MapTileLayer_Transparent"/>
-                    <!--<map:MapPolygon Panel.ZIndex="999" x:Name="Selection_Rectangle" Stroke="#F18712" Locations="53.447,65 -18,8.1114" StrokeThickness="3" MouseMove="Selection_Rectangle_MouseMove" MouseDown="Selection_Rectangle_MouseDown" Fill="#4CF18712" MouseUp="Selection_Rectangle_MouseUp"  StrokeDashCap="Square" MouseLeave="Selection_Rectangle_MouseLeave" />-->
-
+                    <!--<map:MapPolygon Panel.ZIndex="999" x:Name="Selection_Rectangle" Stroke="#F18712" Locations="53.447,65 -18,8.1114" StrokeThickness="3" Fill="#4CF18712" StrokeDashCap="Square" />-->
+                    <map:MapItemsControl x:Name="mapviewerRectangles"></map:MapItemsControl>
                 </map:Map>
                 <StackPanel x:Name="NotificationZone" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Grid.RowSpan="2" Margin="10,0,0,0" VerticalAlignment="Top">
                     

@@ -283,11 +283,11 @@ namespace MapsInMyFolder.Commun
         public static Dictionary<string, int> CoordonneesToTile(object latitude, object longitude, object zoom)
         {
             int Intzoom = Convert.ToInt32(zoom);
-            List<int> TilesNumber = Collectif.CoordonneesToTile((double)latitude, (double)longitude, Intzoom);
+            var TilesNumber = Collectif.CoordonneesToTile((double)latitude, (double)longitude, Intzoom);
             Dictionary<string, int> returnTileNumber = new Dictionary<string, int>()
             {
-                { "x",  TilesNumber[0] },
-                { "y",  TilesNumber[1] },
+                { "x",  TilesNumber.X },
+                { "y",  TilesNumber.Y },
                 { "z",  Intzoom }
             };
             return returnTileNumber;
@@ -296,11 +296,11 @@ namespace MapsInMyFolder.Commun
         public static Dictionary<string, double> TileToCoordonnees(object TileX, object TileY, object zoom)
         {
             int Intzoom = Convert.ToInt32(zoom);
-            List<double> LocationNumber = Collectif.TileToCoordonnees(Convert.ToInt32(TileX), Convert.ToInt32(TileY), Intzoom);
+            var LocationNumber = Collectif.TileToCoordonnees(Convert.ToInt32(TileX), Convert.ToInt32(TileY), Intzoom);
             Dictionary<string, double> returnLocationNumber = new Dictionary<string, double>()
             {
-                { "long",  LocationNumber[0] },
-                { "lat",  LocationNumber[1] },
+                { "long",  LocationNumber.Latitude },
+                { "lat",  LocationNumber.Longitude },
                 { "z",  Intzoom}
             };
             return returnLocationNumber;
@@ -404,7 +404,7 @@ namespace MapsInMyFolder.Commun
             {
                 Action callback = () => Javascript.ExecuteScript(Layers.GetLayerById(LayerId).class_tilecomputationscript, null, LayerId, javascriptCallback.ToString());
 
-                notification = new NText(texte.ToString(), caption.ToString(), callback);
+                notification = new NText(texte.ToString(), caption.ToString(), "MainPage", callback);
                 if (notifId != null && !string.IsNullOrWhiteSpace(notifId.ToString()))
                 {
                     notification.NotificationId = "LayerId_" + LayerId + "_" + notifId;

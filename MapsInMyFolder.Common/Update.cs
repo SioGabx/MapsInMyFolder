@@ -124,7 +124,7 @@ namespace MapsInMyFolder.Commun
             string UpdateFilePath = System.IO.Path.Combine(Settings.temp_folder, UpdateFileAsset.Id + UpdateFileAsset.Name);
 
             string NotificationMsg = $"Téléchargement en cours de '{UpdateFileAsset.Name}' depuis {downloadFileUrl.Host}...";
-            NProgress UpdateNotification = new NProgress(NotificationMsg, "MapsInMyFolder", null, 0, false) { };
+            NProgress UpdateNotification = new NProgress(NotificationMsg, "MapsInMyFolder", "MainPage",null, 0, false) { };
             UpdateNotification.Register();
 
             Collectif.HttpClientDownloadWithProgress client = new Collectif.HttpClientDownloadWithProgress(downloadFileUrl.ToString(), UpdateFilePath);

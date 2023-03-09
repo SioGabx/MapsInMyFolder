@@ -10,23 +10,26 @@ using System.Windows.Shapes;
 
 namespace MapsInMyFolder.Commun
 {
+  
     public abstract partial class Notification
     {
         public int InsertPosition = 0;
-        public static event EventHandler<string> UpdateNotification;
+        public static event EventHandler<(string NotificationId, string Destinateur)> UpdateNotification;
         public static List<Notification> ListOfNotificationsOnShow = new List<Notification>();
         public string NotificationId = "Notif" + DateTime.Now.Ticks.ToString();
+        public string Destinateur = null;
         public bool DisappearAfterAMoment = false;
         public bool IsPersistant = false;
         protected string Information = "";
         protected string Title = "";
         protected Action OnClickCallback = null;
 
-        public Notification(string Information, string Title, Action callback = null)
+        public Notification(string Information, string Title, string Destinateur, Action callback = null)
         {
             this.Information = Information;
             this.Title = Title;
             this.OnClickCallback = callback;
+            this.Destinateur = Destinateur;
         }
 
         public virtual void Text(string Information = null, string Title = null)
@@ -46,7 +49,7 @@ namespace MapsInMyFolder.Commun
         {
             if (ListOfNotificationsOnShow.Contains(this))
             {
-                UpdateNotification?.Invoke(this, NotificationId);
+                UpdateNotification?.Invoke(this, (NotificationId, Destinateur));
             }
         }
 
@@ -70,7 +73,7 @@ namespace MapsInMyFolder.Commun
             Application.Current.Dispatcher.Invoke(() =>
             {
                 ListOfNotificationsOnShow.Remove(this);
-                UpdateNotification?.Invoke(null, NotificationId);
+                UpdateNotification?.Invoke(null, (NotificationId, Destinateur));
             });
         }
 
@@ -248,7 +251,7 @@ namespace MapsInMyFolder.Commun
 
     public class NText : Notification
     {
-        public NText(string Information, string Title, Action callback = null) : base(Information, Title, callback)
+        public NText(string Information, string Title, string Destinateur, Action callback = null) : base(Information, Title, Destinateur, callback)
         {
         }
 
@@ -258,7 +261,7 @@ namespace MapsInMyFolder.Commun
     {
         double Progress = 0;
         bool CanBeClosed = true;
-        public NProgress(string Information, string Title, Action callback = null, double Progress = 0, bool CanBeClosed = true) : base(Information, Title, callback)
+        public NProgress(string Information, string Title,string Destinateur, Action callback = null, double Progress = 0, bool CanBeClosed = true) : base(Information, Title, Destinateur, callback)
         {
             this.Progress = Progress;
             this.CanBeClosed = CanBeClosed;

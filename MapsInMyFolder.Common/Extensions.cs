@@ -47,12 +47,16 @@ namespace MapsInMyFolder.Commun
             return sb.ToString();
         }
 
-
-        public static void ScrollToElement(this System.Windows.Controls.ScrollViewer scrollViewer, System.Windows.UIElement uIElement)
+        public static double ScrollToElementVerticalOffset(this System.Windows.Controls.ScrollViewer scrollViewer, System.Windows.UIElement uIElement)
         {
             GeneralTransform groupBoxTransform = uIElement.TransformToAncestor(scrollViewer);
             Rect rectangle = groupBoxTransform.TransformBounds(new Rect(new Point(0, 0), uIElement.RenderSize));
-            scrollViewer.ScrollToVerticalOffset(rectangle.Top + scrollViewer.VerticalOffset);
+            return rectangle.Top + scrollViewer.VerticalOffset;
+        }
+        public static void ScrollToElement(this System.Windows.Controls.ScrollViewer scrollViewer, System.Windows.UIElement uIElement)
+        {
+            
+            scrollViewer.ScrollToVerticalOffset(scrollViewer.ScrollToElementVerticalOffset(uIElement));
             uIElement.Focus();
         }
 
@@ -97,6 +101,8 @@ namespace MapsInMyFolder.Commun
             }
             return -1;
         }
+
+
 
     }
 

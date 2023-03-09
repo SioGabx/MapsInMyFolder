@@ -2,13 +2,10 @@
 using MapsInMyFolder.MapControl;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media.Animation;
-using System.Windows.Threading;
 
 namespace MapsInMyFolder
 {
@@ -33,7 +30,9 @@ namespace MapsInMyFolder
             {
                 Location NO_PIN_starting_location = new Location(Settings.NO_PIN_starting_location_latitude, Settings.NO_PIN_starting_location_longitude);
                 Location SE_PIN_starting_location = new Location(Settings.SE_PIN_starting_location_latitude, Settings.SE_PIN_starting_location_longitude);
+                
                 mapSelectable = new MapSelectable(mapviewer, NO_PIN_starting_location, SE_PIN_starting_location, null, this);
+                mapviewer.MouseWheel += (o, e) => MapFigures.UpdateFiguresFromZoomLevel(mapviewer.TargetZoomLevel);
                 Preload();
                 Init();
             }
@@ -49,13 +48,11 @@ namespace MapsInMyFolder
             Init_download_panel();
             Init_layer_panel();
             isInitialised = true;
-            Notification.UpdateNotification += (Notification, NotificationId) => UpdateNotification((Notification)Notification, NotificationId);
+            Notification.UpdateNotification += (Notification, NotificationArgs) => UpdateNotification((Notification)Notification, NotificationArgs);
         }
         private void Map_panel_open_location_panel_Click(object sender, RoutedEventArgs e)
         {
-            Message.NoReturnBoxAsync("Cette fonctionnalité fait l'objet d'une prochaine mise à jour, elle n'as pas encore été ajoutée à cette version !", "Erreur");
-            //FullscreenMap FullscreenMap = new FullscreenMap { };
-            //MainWindow._instance.MainContentFrame.Navigate(FullscreenMap);
+             Message.NoReturnBoxAsync("Cette fonctionnalité fait l'objet d'une prochaine mise à jour, elle n'as pas encore été ajoutée à cette version !", "Erreur");
         }
 
         private void Download_panel_close_button_Click(object sender, RoutedEventArgs e)
@@ -107,14 +104,18 @@ namespace MapsInMyFolder
             SearchLayerStart();
         }
 
-        public void UpdateNotification(Notification sender, string NotificationInternalId)
+        public void UpdateNotification(Notification sender,(string NotificationId, string Destinateur) NotificationInternalArgs)
         {
             if (sender is not null)
             {
-                Grid ContentGrid = sender.Get();
-                if (Collectif.FindChild<Grid>(NotificationZone, NotificationInternalId) != null)
+                if (NotificationInternalArgs.Destinateur != "MainPage")
                 {
-                    Grid NotificationZoneContentGrid = Collectif.FindChild<Grid>(NotificationZone, NotificationInternalId);
+                    return;
+                }
+                Grid ContentGrid = sender.Get();
+                if (Collectif.FindChild<Grid>(NotificationZone, NotificationInternalArgs.NotificationId) != null)
+                {
+                    Grid NotificationZoneContentGrid = Collectif.FindChild<Grid>(NotificationZone, NotificationInternalArgs.NotificationId);
                     NotificationZone.Children.Remove(NotificationZoneContentGrid);
                     NotificationZone.Children.Insert(Math.Min(sender.InsertPosition, NotificationZone.Children.Count), ContentGrid);
                     NotificationZoneContentGrid.Children.Clear();
@@ -128,9 +129,9 @@ namespace MapsInMyFolder
                     sender.InsertPosition = NotificationZone.Children.Add(ContentGrid);
                 }
             }
-            else if (Collectif.FindChild<Grid>(NotificationZone, NotificationInternalId) != null)
+            else if (Collectif.FindChild<Grid>(NotificationZone, NotificationInternalArgs.NotificationId) != null)
             {
-                Grid ContentGrid = Collectif.FindChild<Grid>(NotificationZone, NotificationInternalId);
+                Grid ContentGrid = Collectif.FindChild<Grid>(NotificationZone, NotificationInternalArgs.NotificationId);
                 var doubleAnimation = new DoubleAnimation(ContentGrid.ActualHeight, 0, new Duration(TimeSpan.FromSeconds(0.1)));
                 doubleAnimation.Completed += (sender, e) =>
                 {
@@ -156,8 +157,7 @@ namespace MapsInMyFolder
                 (byte)Settings.background_layer_color_G,
                 (byte)Settings.background_layer_color_B)
             );
-
-            mapSelectable.OnLocationUpdated = () =>
+            Action OnLocationUpdated = () =>
             {
                 var ActiveRectangleSelection = mapSelectable.GetRectangleLocation();
                 NO_PIN.Location = ActiveRectangleSelection.NO;
@@ -166,8 +166,14 @@ namespace MapsInMyFolder
                 Commun.Map.CurentSelection.NO_Longitude = ActiveRectangleSelection.NO.Longitude;
                 Commun.Map.CurentSelection.SE_Latitude = ActiveRectangleSelection.SE.Latitude;
                 Commun.Map.CurentSelection.SE_Longitude = ActiveRectangleSelection.SE.Longitude;
+                if (Settings.visibility_pins == Visibility.Visible)
+                {
+                    NO_PIN.Content = "Latitude = " + Math.Round(NO_PIN.Location.Latitude, 6).ToString() + "\nLongitude = " + Math.Round(NO_PIN.Location.Longitude, 6).ToString();
+                    SE_PIN.Content = "Latitude = " + Math.Round(SE_PIN.Location.Latitude, 6).ToString() + "\nLongitude = " + Math.Round(SE_PIN.Location.Longitude, 6).ToString();
+                }
             };
-
+            mapSelectable.OnLocationUpdated += (o,e) => OnLocationUpdated();
+            OnLocationUpdated();
         }
 
         public void MapViewerSetSelection(Dictionary<string, double> locations, bool ZoomToNewLocation = true)
@@ -197,4 +203,22 @@ namespace MapsInMyFolder
             }
         }
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }

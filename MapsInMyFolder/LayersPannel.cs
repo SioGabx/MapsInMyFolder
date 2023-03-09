@@ -11,7 +11,6 @@ using System.Windows.Threading;
 using System.Data.SQLite;
 using System.Threading.Tasks;
 using MapsInMyFolder.Commun;
-using System.Text.Json;
 using System.Reflection;
 using System.Text;
 using System.Windows.Controls;
@@ -98,7 +97,7 @@ namespace MapsInMyFolder
                     {
                         return Database.GetIntFromOrdinal(sqlite_datareaderCopy, name);
                     }
-                    
+
                     int DB_Layer_ID = GetIntFromOrdinal("ID");
                     string DB_Layer_NOM = GetStringFromOrdinal("NOM").RemoveNewLineChar();
                     bool DB_Layer_FAVORITE = Convert.ToBoolean(GetIntFromOrdinal("FAVORITE"));
@@ -117,6 +116,7 @@ namespace MapsInMyFolder
                     string DB_Layer_TILECOMPUTATIONSCRIPT = GetStringFromOrdinal("TILECOMPUTATIONSCRIPT");
                     string DB_Layer_VISIBILITY = GetStringFromOrdinal("VISIBILITY");
                     string DB_Layer_SPECIALSOPTIONS = GetStringFromOrdinal("SPECIALSOPTIONS");
+                    string DB_Layer_RECTANGLES = GetStringFromOrdinal("RECTANGLES");
                     int DB_Layer_VERSION = GetIntFromOrdinal("VERSION");
 
                     bool doCreateSpecialsOptionsClass = true;
@@ -125,7 +125,7 @@ namespace MapsInMyFolder
                     {
                         if (!string.IsNullOrEmpty(DB_Layer_SPECIALSOPTIONS))
                         {
-                            DeserializeSpecialsOptions = JsonSerializer.Deserialize<Layers.SpecialsOptions>(DB_Layer_SPECIALSOPTIONS);
+                            DeserializeSpecialsOptions = System.Text.Json.JsonSerializer.Deserialize<Layers.SpecialsOptions>(DB_Layer_SPECIALSOPTIONS);
                             doCreateSpecialsOptionsClass = false;
                         }
                     }
@@ -150,7 +150,7 @@ namespace MapsInMyFolder
                     }
 
                     DB_Layer_TILECOMPUTATIONSCRIPT = Collectif.HTMLEntities(DB_Layer_TILECOMPUTATIONSCRIPT, true);
-                    Layers calque = new Layers(DB_Layer_ID, DB_Layer_FAVORITE, DB_Layer_NOM, DB_Layer_DESCRIPTION, DB_Layer_CATEGORIE, DB_Layer_IDENTIFIANT, DB_Layer_TILE_URL, DB_Layer_TILE_FALLBACK_URL, DB_Layer_SITE, DB_Layer_SITE_URL, DB_Layer_MIN_ZOOM, DB_Layer_MAX_ZOOM, DB_Layer_FORMAT, DB_Layer_TILE_SIZE, DB_Layer_TILECOMPUTATIONSCRIPT, DB_Layer_VISIBILITY, DeserializeSpecialsOptions, DB_Layer_VERSION);
+                    Layers calque = new Layers(DB_Layer_ID, DB_Layer_FAVORITE, DB_Layer_NOM, DB_Layer_DESCRIPTION, DB_Layer_CATEGORIE, DB_Layer_IDENTIFIANT, DB_Layer_TILE_URL, DB_Layer_TILE_FALLBACK_URL, DB_Layer_SITE, DB_Layer_SITE_URL, DB_Layer_MIN_ZOOM, DB_Layer_MAX_ZOOM, DB_Layer_FORMAT, DB_Layer_TILE_SIZE, DB_Layer_TILECOMPUTATIONSCRIPT, DB_Layer_VISIBILITY, DeserializeSpecialsOptions, DB_Layer_RECTANGLES, DB_Layer_VERSION);
                     if (DB_Layer_FAVORITE && Settings.layerpanel_favorite_at_top)
                     {
                         layersFavorite.Add(calque);
@@ -363,401 +363,415 @@ namespace MapsInMyFolder
             }
             if (layer is not null)
             {
-                try
+                MapFigures.ClearFigures(mapviewerRectangles);
+                foreach (MapFigures.Figure Figure in MapFigures.GetFiguresFromJsonString(layer.class_rectangles))
                 {
-                    Layers.Convert.ToCurentLayer(layer);
-                    Debug.WriteLine("Set curent layer " + layer.class_name + " = " + layer.class_tiles_size);
-                    List<string> listoftransparentformat = new List<string> { "png" };
+                    MapPolygon polygon = Figure.polygon;
+                    polygon.Stroke = Collectif.HexValueToSolidColorBrush(Figure.Color, "#000");
+                    polygon.StrokeThickness = Figure.StrokeThickness;
+                    polygon.IsHitTestVisible = false;
+                    Figure.polygon = polygon;
+                    MapFigures.DrawFigure(mapviewerRectangles, Figure);
+                }
+            
 
-                    if (listoftransparentformat.Contains(layer.class_format))
+            try
+            {
+                Layers.Convert.ToCurentLayer(layer);
+
+                List<string> listoftransparentformat = new List<string> { "png" };
+                if (listoftransparentformat.Contains(layer.class_format))
+                {
+                    MapTileLayer_Transparent.TileSource = new TileSource { UriFormat = layer.class_tile_url, LayerID = layer.class_id };
+                    MapTileLayer_Transparent.Opacity = 1;
+
+                    if ((!listoftransparentformat.Contains(last_format)) && last_format.Trim() != "" && layer.class_identifiant is not null)
                     {
-                        MapTileLayer_Transparent.TileSource = new TileSource { UriFormat = layer.class_tile_url, LayerID = layer.class_id };
-                        MapTileLayer_Transparent.Opacity = 1;
-
-                        if ((!listoftransparentformat.Contains(last_format)) && last_format.Trim() != "" && layer.class_identifiant is not null)
+                        try
                         {
-                            try
+                            Layers StartupLayer = Layers.GetLayerById(layer_startup_id);
+                            if (StartupLayer != null)
                             {
                                 UIElement basemap = new MapTileLayer
                                 {
-                                    TileSource = new TileSource { UriFormat = Layers.GetLayerById(layer_startup_id).class_tile_url, LayerID = layer_startup_id },
-                                    SourceName = Layers.GetLayerById(layer_startup_id).class_identifiant + new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds(),
-                                    MaxZoomLevel = Layers.GetLayerById(layer_startup_id).class_max_zoom,
-                                    MinZoomLevel = Layers.GetLayerById(layer_startup_id).class_min_zoom,
+                                    TileSource = new TileSource { UriFormat = StartupLayer?.class_tile_url, LayerID = layer_startup_id },
+                                    SourceName = StartupLayer.class_identifiant + new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds(),
+                                    MaxZoomLevel = StartupLayer.class_max_zoom,
+                                    MinZoomLevel = StartupLayer.class_min_zoom,
                                     Description = ""
                                 };
 
                                 basemap.Opacity = Settings.background_layer_opacity;
                                 mapviewer.MapLayer = basemap;
                             }
-                            catch (Exception ex)
-                            {
-                                Debug.WriteLine("Erreur changement de calque : " + ex.Message);
-                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Debug.WriteLine("Erreur changement de calque : " + ex.Message);
                         }
                     }
-                    else
-                    {
-                        UIElement layer_uielement = new MapTileLayer
-                        {
-                            TileSource = new TileSource { UriFormat = layer.class_tile_url, LayerID = layer.class_id },
-                            SourceName = layer.class_identifiant + new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds(),
-                            MaxZoomLevel = layer.class_max_zoom,
-                            MinZoomLevel = layer.class_min_zoom,
-
-                            Description = layer.class_description
-                        };
-
-                        MapTileLayer_Transparent.TileSource = new TileSource();
-                        MapTileLayer_Transparent.Opacity = 0;
-                        mapviewer.MapLayer.Opacity = 1;
-                        mapviewer.MapLayer = layer_uielement;
-                    }
-
-                    if (Settings.zoom_limite_taille_carte)
-                    {
-                        if (layer.class_min_zoom < 3)
-                        {
-                            mapviewer.MinZoomLevel = 2;
-                        }
-                        else
-                        {
-                            mapviewer.MinZoomLevel = layer.class_min_zoom;
-                        }
-                        mapviewer.MaxZoomLevel = layer.class_max_zoom;
-                    }
-                    else
-                    {
-                        mapviewer.MinZoomLevel = 2;
-                        mapviewer.MaxZoomLevel = 25;
-                    }
-
-                    if (string.IsNullOrEmpty(layer?.class_specialsoptions?.BackgroundColor?.Trim()))
-                    {
-                        mapviewer.Background = Collectif.RgbValueToSolidColorBrush(Settings.background_layer_color_R, Settings.background_layer_color_G, Settings.background_layer_color_B); ;
-                    }
-                    else
-                    {
-                        mapviewer.Background = Collectif.HexValueToSolidColorBrush(layer.class_specialsoptions.BackgroundColor);
-                    }
-                    Collectif.setBackgroundOnUIElement(mapviewer, layer?.class_specialsoptions?.BackgroundColor);
-
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine("Erreur changement de calque" + ex.Message);
-                }
-            }
-        }
-
-        public static long ClearCache(int id, bool ShowMessageBox = true)
-        {
-            if (id == 0) { return 0; }
-
-            Layers layers = Layers.GetLayerById(id);
-            if (layers is null) { return 0; }
-            long DirectorySize = 0;
-            try
-            {
-                Javascript.EngineDeleteById(id);
-                string temp_dir = Collectif.GetSaveTempDirectory(layers.class_name, layers.class_identifiant);
-                Debug.WriteLine("Cache path : " + temp_dir);
-                if (Directory.Exists(temp_dir))
-                {
-                    DirectorySize = Collectif.GetDirectorySize(temp_dir);
-                    Directory.Delete(temp_dir, true);
-                }
-                if (ShowMessageBox)
-                {
-                    Message.NoReturnBoxAsync("Le cache du calque \"" + layers.class_name + "\" à été vidé. " + Collectif.FormatBytes(DirectorySize) + " libéré.", "Opération réussie");
-                }
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine("Erreur lors du nettoyage du cache : " + ex.Message);
-            }
-            return DirectorySize;
-        }
-
-        public static async void ShowLayerWarning(int id)
-        {
-            using SQLiteDataReader editedlayers_sqlite_datareader = Database.ExecuteExecuteReaderSQLCommand($"SELECT * FROM 'EDITEDLAYERS' WHERE ID = {id}");
-            if (!editedlayers_sqlite_datareader.Read())
-            {
-                return;
-            }
-
-            int EditedDB_VERSION = editedlayers_sqlite_datareader.GetIntFromOrdinal("VERSION");
-            string EditedDB_TILECOMPUTATIONSCRIPT = editedlayers_sqlite_datareader.GetStringFromOrdinal("TILECOMPUTATIONSCRIPT");
-            string EditedDB_TILE_URL = editedlayers_sqlite_datareader.GetStringFromOrdinal("TILE_URL");
-            editedlayers_sqlite_datareader.Close();
-            using SQLiteDataReader layers_sqlite_datareader = Database.ExecuteExecuteReaderSQLCommand($"SELECT * FROM 'LAYERS' WHERE ID = {id}");
-            layers_sqlite_datareader.Read();
-            int LastDB_VERSION = layers_sqlite_datareader.GetIntFromOrdinal("VERSION");
-            string LastDB_TILECOMPUTATIONSCRIPT = layers_sqlite_datareader.GetStringFromOrdinal("TILECOMPUTATIONSCRIPT");
-            string LastDB_TILE_URL = layers_sqlite_datareader.GetStringFromOrdinal("TILE_URL");
-            layers_sqlite_datareader.Close();
-            if (EditedDB_VERSION != LastDB_VERSION)
-            {
-                StackPanel AskMsg = new StackPanel();
-                string RemoveSQL = "";
-                if (EditedDB_TILECOMPUTATIONSCRIPT != LastDB_TILECOMPUTATIONSCRIPT && !string.IsNullOrWhiteSpace(EditedDB_TILECOMPUTATIONSCRIPT))
-                {
-                    TextBlock textBlock = new TextBlock();
-                    textBlock.Text = "Le script de chargement des tuiles de ce calque à été modifiée lors de la dernière mise à jour mais ce calque comporte des remplacements.";
-                    textBlock.TextWrapping = TextWrapping.Wrap;
-                    AskMsg.Children.Add(textBlock);
-                    AskMsg.Children.Add(Collectif.FormatDiffGetScrollViewer(EditedDB_TILECOMPUTATIONSCRIPT, LastDB_TILECOMPUTATIONSCRIPT));
-                    RemoveSQL += $",'TILECOMPUTATIONSCRIPT'=NULL";
-                }
-                if (EditedDB_TILE_URL != LastDB_TILE_URL && !string.IsNullOrWhiteSpace(EditedDB_TILE_URL))
-                {
-                    TextBlock textBlock = new TextBlock();
-                    textBlock.Text = "L'URL de chargement des tuiles à été modifiée lors de la dernière mise à jour mais ce calque comporte des remplacements.";
-                    textBlock.TextWrapping = TextWrapping.Wrap;
-                    AskMsg.Children.Add(textBlock);
-                    AskMsg.Children.Add(Collectif.FormatDiffGetScrollViewer(EditedDB_TILE_URL, LastDB_TILE_URL));
-                    RemoveSQL += $",'TILE_URL'=NULL";
-                }
-                TextBlock textBlockAsk = new TextBlock();
-                textBlockAsk.Text = "Voullez-vous mettre à jour les champs suivant la dernière mise à jour ?";
-                textBlockAsk.TextWrapping = TextWrapping.Wrap;
-                textBlockAsk.FontWeight = FontWeight.FromOpenTypeWeight(600);
-                AskMsg.Children.Add(textBlockAsk);
-                ContentDialog dialog = Message.SetContentDialog(AskMsg, "MapsInMyFolder", MessageDialogButton.YesNoCancel);
-                ContentDialogResult result = await dialog.ShowAsync();
-                if (result == ContentDialogResult.Primary)
-                {
-                    Database.ExecuteNonQuerySQLCommand($"UPDATE 'main'.'EDITEDLAYERS' SET 'VERSION'='{LastDB_VERSION}'{RemoveSQL}  WHERE ID = {id};");
-                }
-                else if (result == ContentDialogResult.Secondary)
-                {
-                    Database.ExecuteNonQuerySQLCommand($"UPDATE 'main'.'EDITEDLAYERS' SET 'VERSION'='{LastDB_VERSION}' WHERE ID = {id};");
                 }
                 else
                 {
-                    return;
-                }
-                MainPage._instance.ReloadPage();
-                MainPage._instance.Set_current_layer(Layers.Curent.class_id);
-            }
-        }
-
-      
-
-        public static void DBLayerFavorite(int id, bool favBooleanState)
-        {
-            if (id == 0) { return; }
-            int fav_state = favBooleanState ? 1 : 0;
-
-            Database.ExecuteNonQuerySQLCommand($"UPDATE LAYERS SET FAVORITE = {fav_state} WHERE ID={id}");
-            Database.ExecuteNonQuerySQLCommand($"UPDATE EDITEDLAYERS SET FAVORITE = {fav_state} WHERE ID={id}");
-            Database.ExecuteNonQuerySQLCommand($"UPDATE CUSTOMSLAYERS SET FAVORITE = {fav_state} WHERE ID={id}");
-
-            Layers.GetLayerById(id).class_favorite = Convert.ToBoolean(fav_state);
-        }
-
-        public static void DBLayerVisibility(int id, string visibility_state)
-        {
-            if (id == 0) { return; }
-
-            Database.ExecuteNonQuerySQLCommand($"UPDATE LAYERS SET VISIBILITY = '{visibility_state}' WHERE ID={id}");
-            Database.ExecuteNonQuerySQLCommand($"UPDATE EDITEDLAYERS SET VISIBILITY = '{visibility_state}' WHERE ID={id}");
-            Database.ExecuteNonQuerySQLCommand($"UPDATE CUSTOMSLAYERS SET VISIBILITY = '{visibility_state}' WHERE ID={id}");
-
-            Layers.GetLayerById(id).class_visibility = visibility_state;
-        }
-
-        public void LayerTilePreview_RequestUpdate()
-        {
-            layer_browser.ExecuteScriptAsyncWhenPageLoaded("UpdatePreview();");
-            return;
-        }
-
-
-        public string LayerTilePreview_ReturnUrl(int id)
-        {
-            Layers layer = Layers.GetLayerById(id);
-
-            if (layer is null)
-            {
-                return "";
-            }
-
-            try
-            {
-                int layer_startup_id = Settings.layer_startup_id;
-                Layers StartingLayer = Layers.GetLayerById(layer_startup_id);
-
-                int min_zoom = layer.class_min_zoom;
-                int max_zoom = layer.class_max_zoom;
-                int back_min_zoom = min_zoom;
-                int back_max_zoom = max_zoom;
-
-                if (StartingLayer is not null)
-                {
-                    back_min_zoom = StartingLayer.class_min_zoom;
-                    back_max_zoom = StartingLayer.class_max_zoom;
-                }
-                int Zoom = Convert.ToInt32(Math.Round(mapviewer.TargetZoomLevel));
-                if (Zoom < min_zoom) { Zoom = min_zoom; }
-                if (Zoom > max_zoom) { Zoom = max_zoom; }
-
-                if (Zoom < back_min_zoom) { Zoom = Math.Max(back_min_zoom, Zoom); }
-                if (Zoom > back_max_zoom) { Zoom = Math.Min(back_max_zoom, Zoom); }
-
-
-
-                double Latitude = mapviewer.Center.Latitude;
-                double Longitude = mapviewer.Center.Longitude;
-                List<int> TileNumber = Collectif.CoordonneesToTile(Latitude, Longitude, Zoom);
-
-                Collectif.GetUrl.InvokeFunction invokeFunction = Collectif.GetUrl.InvokeFunction.getTile;
-                if (Javascript.CheckIfFunctionExist(id, Collectif.GetUrl.InvokeFunction.getPreview.ToString(), null))
-                {
-                    invokeFunction = Collectif.GetUrl.InvokeFunction.getPreview;
-                }
-                string previewLayerImageUrl = Collectif.Replacements(layer.class_tile_url, TileNumber[0].ToString(), TileNumber[1].ToString(), Zoom.ToString(), id, invokeFunction);
-
-                if (string.IsNullOrEmpty(previewLayerImageUrl) && invokeFunction == Collectif.GetUrl.InvokeFunction.getPreview)
-                {
-                    Debug.WriteLine("Trahison" + previewLayerImageUrl);
-                    previewLayerImageUrl = Collectif.Replacements(layer.class_tile_url, TileNumber[0].ToString(), TileNumber[1].ToString(), Zoom.ToString(), id, Collectif.GetUrl.InvokeFunction.getTile);
-                }
-
-
-                string previewBackgroundImageUrl = Collectif.Replacements(StartingLayer?.class_tile_url, TileNumber[0].ToString(), TileNumber[1].ToString(), Zoom.ToString(), id, Collectif.GetUrl.InvokeFunction.getTile);
-                string previewFallbackLayerImageUrl = String.Empty;
-                if (Javascript.CheckIfFunctionExist(id, Collectif.GetUrl.InvokeFunction.getPreviewFallback.ToString(), null))
-                {
-                    previewFallbackLayerImageUrl = Collectif.Replacements(layer.class_tile_url, TileNumber[0].ToString(), TileNumber[1].ToString(), Zoom.ToString(), id, Collectif.GetUrl.InvokeFunction.getPreviewFallback);
-                    if (!string.IsNullOrEmpty(previewFallbackLayerImageUrl))
+                    UIElement layer_uielement = new MapTileLayer
                     {
-                        previewFallbackLayerImageUrl = " " + previewFallbackLayerImageUrl;
-                    }
+                        TileSource = new TileSource { UriFormat = layer.class_tile_url, LayerID = layer.class_id },
+                        SourceName = layer.class_identifiant + new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds(),
+                        MaxZoomLevel = layer.class_max_zoom,
+                        MinZoomLevel = layer.class_min_zoom,
+
+                        Description = layer.class_description
+                    };
+
+                    MapTileLayer_Transparent.TileSource = new TileSource();
+                    MapTileLayer_Transparent.Opacity = 0;
+                    mapviewer.MapLayer.Opacity = 1;
+                    mapviewer.MapLayer = layer_uielement;
                 }
-                return previewLayerImageUrl + " " + previewBackgroundImageUrl + previewFallbackLayerImageUrl;
+
+                if (Settings.zoom_limite_taille_carte)
+                {
+                    if (layer.class_min_zoom < 3)
+                    {
+                        mapviewer.MinZoomLevel = 2;
+                    }
+                    else
+                    {
+                        mapviewer.MinZoomLevel = layer.class_min_zoom;
+                    }
+                    mapviewer.MaxZoomLevel = layer.class_max_zoom;
+                }
+                else
+                {
+                    mapviewer.MinZoomLevel = 2;
+                    mapviewer.MaxZoomLevel = 24;
+                }
+
+                if (string.IsNullOrEmpty(layer?.class_specialsoptions?.BackgroundColor?.Trim()))
+                {
+                    mapviewer.Background = Collectif.RgbValueToSolidColorBrush(Settings.background_layer_color_R, Settings.background_layer_color_G, Settings.background_layer_color_B); ;
+                }
+                else
+                {
+                    mapviewer.Background = Collectif.HexValueToSolidColorBrush(layer.class_specialsoptions.BackgroundColor);
+                }
+                Collectif.setBackgroundOnUIElement(mapviewer, layer?.class_specialsoptions?.BackgroundColor);
+
             }
             catch (Exception ex)
             {
-                Debug.WriteLine("Error getPreview exception :" + ex.Message);
+                Debug.WriteLine("Erreur changement de calque" + ex.Message);
             }
-            return String.Empty;
-
         }
     }
 
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Marquer les membres comme étant static", Justification = "Used by CEFSHARP, static isnt a option here")]
-    public class Layer_Csharp_call_from_js
+    public static long ClearCache(int id, bool ShowMessageBox = true)
     {
+        if (id == 0) { return 0; }
 
-        public void Clear_cache(string listOfId = "0")
+        Layers layers = Layers.GetLayerById(id);
+        if (layers is null) { return 0; }
+        long DirectorySize = 0;
+        try
         {
-            long DirectorySize = 0;
-            string[] splittedListOfId = listOfId.Split(',', StringSplitOptions.RemoveEmptyEntries);
-            foreach (string str in splittedListOfId)
+            Javascript.EngineDeleteById(id);
+            string temp_dir = Collectif.GetSaveTempDirectory(layers.class_name, layers.class_identifiant);
+            Debug.WriteLine("Cache path : " + temp_dir);
+            if (Directory.Exists(temp_dir))
             {
-                int id_int = int.Parse(str.Trim());
-                Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
-                {
-                    DirectorySize += MainPage.ClearCache(id_int, false);
-
-                }, null);
-                DebugMode.WriteLine("Clear_cache layer " + id_int);
+                DirectorySize = Collectif.GetDirectorySize(temp_dir);
+                Directory.Delete(temp_dir, true);
             }
-            string layerName = "";
-            if (splittedListOfId.Count() == 1)
+            if (ShowMessageBox)
             {
-                layerName = "Le cache du calque \"" + Layers.GetLayerById(int.Parse(splittedListOfId[0])).class_name + "\" à été vidé";
+                Message.NoReturnBoxAsync("Le cache du calque \"" + layers.class_name + "\" à été vidé. " + Collectif.FormatBytes(DirectorySize) + " libéré.", "Opération réussie");
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine("Erreur lors du nettoyage du cache : " + ex.Message);
+        }
+        return DirectorySize;
+    }
+
+    public static async void ShowLayerWarning(int id)
+    {
+        using SQLiteDataReader editedlayers_sqlite_datareader = Database.ExecuteExecuteReaderSQLCommand($"SELECT * FROM 'EDITEDLAYERS' WHERE ID = {id}");
+        if (!editedlayers_sqlite_datareader.Read())
+        {
+            return;
+        }
+
+        int EditedDB_VERSION = editedlayers_sqlite_datareader.GetIntFromOrdinal("VERSION");
+        string EditedDB_TILECOMPUTATIONSCRIPT = editedlayers_sqlite_datareader.GetStringFromOrdinal("TILECOMPUTATIONSCRIPT");
+        string EditedDB_TILE_URL = editedlayers_sqlite_datareader.GetStringFromOrdinal("TILE_URL");
+        editedlayers_sqlite_datareader.Close();
+        using SQLiteDataReader layers_sqlite_datareader = Database.ExecuteExecuteReaderSQLCommand($"SELECT * FROM 'LAYERS' WHERE ID = {id}");
+        layers_sqlite_datareader.Read();
+        int LastDB_VERSION = layers_sqlite_datareader.GetIntFromOrdinal("VERSION");
+        string LastDB_TILECOMPUTATIONSCRIPT = layers_sqlite_datareader.GetStringFromOrdinal("TILECOMPUTATIONSCRIPT");
+        string LastDB_TILE_URL = layers_sqlite_datareader.GetStringFromOrdinal("TILE_URL");
+        layers_sqlite_datareader.Close();
+        if (EditedDB_VERSION != LastDB_VERSION)
+        {
+            StackPanel AskMsg = new StackPanel();
+            string RemoveSQL = "";
+            if (EditedDB_TILECOMPUTATIONSCRIPT != LastDB_TILECOMPUTATIONSCRIPT && !string.IsNullOrWhiteSpace(EditedDB_TILECOMPUTATIONSCRIPT))
+            {
+                TextBlock textBlock = new TextBlock();
+                textBlock.Text = "Le script de chargement des tuiles de ce calque à été modifiée lors de la dernière mise à jour mais ce calque comporte des remplacements.";
+                textBlock.TextWrapping = TextWrapping.Wrap;
+                AskMsg.Children.Add(textBlock);
+                AskMsg.Children.Add(Collectif.FormatDiffGetScrollViewer(EditedDB_TILECOMPUTATIONSCRIPT, LastDB_TILECOMPUTATIONSCRIPT));
+                RemoveSQL += $",'TILECOMPUTATIONSCRIPT'=NULL";
+            }
+            if (EditedDB_TILE_URL != LastDB_TILE_URL && !string.IsNullOrWhiteSpace(EditedDB_TILE_URL))
+            {
+                TextBlock textBlock = new TextBlock();
+                textBlock.Text = "L'URL de chargement des tuiles à été modifiée lors de la dernière mise à jour mais ce calque comporte des remplacements.";
+                textBlock.TextWrapping = TextWrapping.Wrap;
+                AskMsg.Children.Add(textBlock);
+                AskMsg.Children.Add(Collectif.FormatDiffGetScrollViewer(EditedDB_TILE_URL, LastDB_TILE_URL));
+                RemoveSQL += $",'TILE_URL'=NULL";
+            }
+            TextBlock textBlockAsk = new TextBlock();
+            textBlockAsk.Text = "Voullez-vous mettre à jour les champs suivant la dernière mise à jour ?";
+            textBlockAsk.TextWrapping = TextWrapping.Wrap;
+            textBlockAsk.FontWeight = FontWeight.FromOpenTypeWeight(600);
+            AskMsg.Children.Add(textBlockAsk);
+            ContentDialog dialog = Message.SetContentDialog(AskMsg, "MapsInMyFolder", MessageDialogButton.YesNoCancel);
+            ContentDialogResult result = await dialog.ShowAsync();
+            if (result == ContentDialogResult.Primary)
+            {
+                Database.ExecuteNonQuerySQLCommand($"UPDATE 'main'.'EDITEDLAYERS' SET 'VERSION'='{LastDB_VERSION}'{RemoveSQL}  WHERE ID = {id};");
+            }
+            else if (result == ContentDialogResult.Secondary)
+            {
+                Database.ExecuteNonQuerySQLCommand($"UPDATE 'main'.'EDITEDLAYERS' SET 'VERSION'='{LastDB_VERSION}' WHERE ID = {id};");
             }
             else
             {
-                layerName = "Le cache des calques séléctionné ont été vidés";
+                return;
             }
-            Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
-            {
-                Message.NoReturnBoxAsync(layerName + " (" + Collectif.FormatBytes(DirectorySize) + " libéré).", "Opération réussie");
-            }, null);
-        }
-
-
-        public void Layer_favorite(double id = 0, bool isAdding = true)
-        {
-            int id_int = Convert.ToInt32(id);
-            Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
-            {
-                MainPage.DBLayerFavorite(id_int, isAdding);
-            }, null);
-        }
-
-        public void Layer_visibility(double id = 0, bool isVisible = true)
-        {
-            //Debug.WriteLine($"Layer_visibility : id={id} & isVisible={isVisible}");
-            int id_int = Convert.ToInt32(id);
-            Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
-            {
-                MainPage.DBLayerVisibility(id_int, (isVisible ? "Visible" : "Hidden"));
-            }, null);
-        }
-
-
-        public void Layer_edit(double id = 0, double prefilid = -1)
-        {
-            int id_int = Convert.ToInt32(id);
-            int prefilid_int = Convert.ToInt32(prefilid);
-            Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
-            {
-                MainWindow._instance.FrameLoad_CustomOrEditLayers(id_int, prefilid_int);
-            }, null);
-        }
-
-        public void Layer_set_current(double id = 0)
-        {
-            int id_int = Convert.ToInt32(id);
-            Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
-            {
-                MainWindow._instance.MainPage.Set_current_layer(id_int);
-            }, null);
-        }
-        public void Layer_show_warning(double id = 0)
-        {
-            int id_int = Convert.ToInt32(id);
-            Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
-            {
-                MainPage.ShowLayerWarning(id_int);
-            }, null);
-        }
-        public void Request_search_update()
-        {
-            Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
-            {
-                MainWindow._instance.MainPage.SearchLayerStart(true);
-            }, null);
-        }
-
-        public void Refresh_panel()
-        {
-            Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
-            {
-                MainWindow._instance.MainPage.ReloadPage();
-                MainWindow._instance.MainPage.SearchLayerStart();
-            }, null);
-        }
-
-        public string Gettilepreviewurlfromid(double id = 0)
-        {
-            if (!Settings.layerpanel_livepreview)
-            {
-                return "";
-            }
-            async Task<string> Gettilepreviewurlfromid_interne(double id)
-            {
-                int id_int = Convert.ToInt32(id);
-                DispatcherOperation op = Application.Current.Dispatcher.BeginInvoke(new Func<string>(() => MainWindow._instance.MainPage.LayerTilePreview_ReturnUrl(id_int)));
-                await op;
-                return op.Result.ToString();
-            }
-            return Gettilepreviewurlfromid_interne(id).Result;
+            MainPage._instance.ReloadPage();
+            MainPage._instance.Set_current_layer(Layers.Curent.class_id);
         }
     }
+
+
+
+    public static void DBLayerFavorite(int id, bool favBooleanState)
+    {
+        if (id == 0) { return; }
+        int fav_state = favBooleanState ? 1 : 0;
+
+        Database.ExecuteNonQuerySQLCommand($"UPDATE LAYERS SET FAVORITE = {fav_state} WHERE ID={id}");
+        Database.ExecuteNonQuerySQLCommand($"UPDATE EDITEDLAYERS SET FAVORITE = {fav_state} WHERE ID={id}");
+        Database.ExecuteNonQuerySQLCommand($"UPDATE CUSTOMSLAYERS SET FAVORITE = {fav_state} WHERE ID={id}");
+
+        Layers.GetLayerById(id).class_favorite = Convert.ToBoolean(fav_state);
+    }
+
+    public static void DBLayerVisibility(int id, string visibility_state)
+    {
+        if (id == 0) { return; }
+
+        Database.ExecuteNonQuerySQLCommand($"UPDATE LAYERS SET VISIBILITY = '{visibility_state}' WHERE ID={id}");
+        Database.ExecuteNonQuerySQLCommand($"UPDATE EDITEDLAYERS SET VISIBILITY = '{visibility_state}' WHERE ID={id}");
+        Database.ExecuteNonQuerySQLCommand($"UPDATE CUSTOMSLAYERS SET VISIBILITY = '{visibility_state}' WHERE ID={id}");
+
+        Layers.GetLayerById(id).class_visibility = visibility_state;
+    }
+
+    public void LayerTilePreview_RequestUpdate()
+    {
+        layer_browser.ExecuteScriptAsyncWhenPageLoaded("UpdatePreview();");
+        return;
+    }
+
+
+    public string LayerTilePreview_ReturnUrl(int id)
+    {
+        Layers layer = Layers.GetLayerById(id);
+
+        if (layer is null)
+        {
+            return "";
+        }
+
+        try
+        {
+            int layer_startup_id = Settings.layer_startup_id;
+            Layers StartingLayer = Layers.GetLayerById(layer_startup_id);
+
+            int min_zoom = layer.class_min_zoom;
+            int max_zoom = layer.class_max_zoom;
+            int back_min_zoom = min_zoom;
+            int back_max_zoom = max_zoom;
+
+            if (StartingLayer is not null)
+            {
+                back_min_zoom = StartingLayer.class_min_zoom;
+                back_max_zoom = StartingLayer.class_max_zoom;
+            }
+            int Zoom = Convert.ToInt32(Math.Round(mapviewer.TargetZoomLevel));
+            if (Zoom < min_zoom) { Zoom = min_zoom; }
+            if (Zoom > max_zoom) { Zoom = max_zoom; }
+
+            if (Zoom < back_min_zoom) { Zoom = Math.Max(back_min_zoom, Zoom); }
+            if (Zoom > back_max_zoom) { Zoom = Math.Min(back_max_zoom, Zoom); }
+
+
+
+            double Latitude = mapviewer.Center.Latitude;
+            double Longitude = mapviewer.Center.Longitude;
+            var TileNumber = Collectif.CoordonneesToTile(Latitude, Longitude, Zoom);
+
+            Collectif.GetUrl.InvokeFunction invokeFunction = Collectif.GetUrl.InvokeFunction.getTile;
+            if (Javascript.CheckIfFunctionExist(id, Collectif.GetUrl.InvokeFunction.getPreview.ToString(), null))
+            {
+                invokeFunction = Collectif.GetUrl.InvokeFunction.getPreview;
+            }
+            string previewLayerImageUrl = Collectif.Replacements(layer.class_tile_url, TileNumber.X.ToString(), TileNumber.Y.ToString(), Zoom.ToString(), id, invokeFunction);
+
+            if (string.IsNullOrEmpty(previewLayerImageUrl) && invokeFunction == Collectif.GetUrl.InvokeFunction.getPreview)
+            {
+                previewLayerImageUrl = Collectif.Replacements(layer.class_tile_url, TileNumber.X.ToString(), TileNumber.Y.ToString(), Zoom.ToString(), id, Collectif.GetUrl.InvokeFunction.getTile);
+            }
+
+
+            string previewBackgroundImageUrl = Collectif.Replacements(StartingLayer?.class_tile_url, TileNumber.X.ToString(), TileNumber.Y.ToString(), Zoom.ToString(), id, Collectif.GetUrl.InvokeFunction.getTile);
+            string previewFallbackLayerImageUrl = String.Empty;
+            if (Javascript.CheckIfFunctionExist(id, Collectif.GetUrl.InvokeFunction.getPreviewFallback.ToString(), null))
+            {
+                previewFallbackLayerImageUrl = Collectif.Replacements(layer.class_tile_url, TileNumber.X.ToString(), TileNumber.Y.ToString(), Zoom.ToString(), id, Collectif.GetUrl.InvokeFunction.getPreviewFallback);
+                if (!string.IsNullOrEmpty(previewFallbackLayerImageUrl))
+                {
+                    previewFallbackLayerImageUrl = " " + previewFallbackLayerImageUrl;
+                }
+            }
+            return previewLayerImageUrl + " " + previewBackgroundImageUrl + previewFallbackLayerImageUrl;
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine("Error getPreview exception :" + ex.Message);
+        }
+        return String.Empty;
+
+    }
+}
+
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Marquer les membres comme étant static", Justification = "Used by CEFSHARP, static isnt a option here")]
+public class Layer_Csharp_call_from_js
+{
+
+    public void Clear_cache(string listOfId = "0")
+    {
+        long DirectorySize = 0;
+        string[] splittedListOfId = listOfId.Split(',', StringSplitOptions.RemoveEmptyEntries);
+        foreach (string str in splittedListOfId)
+        {
+            int id_int = int.Parse(str.Trim());
+            Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
+            {
+                DirectorySize += MainPage.ClearCache(id_int, false);
+
+            }, null);
+            DebugMode.WriteLine("Clear_cache layer " + id_int);
+        }
+        string layerName = "";
+        if (splittedListOfId.Count() == 1)
+        {
+            layerName = "Le cache du calque \"" + Layers.GetLayerById(int.Parse(splittedListOfId[0])).class_name + "\" à été vidé";
+        }
+        else
+        {
+            layerName = "Le cache des calques séléctionné ont été vidés";
+        }
+        Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
+        {
+            Message.NoReturnBoxAsync(layerName + " (" + Collectif.FormatBytes(DirectorySize) + " libéré).", "Opération réussie");
+        }, null);
+    }
+
+
+    public void Layer_favorite(double id = 0, bool isAdding = true)
+    {
+        int id_int = Convert.ToInt32(id);
+        Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
+        {
+            MainPage.DBLayerFavorite(id_int, isAdding);
+        }, null);
+    }
+
+    public void Layer_visibility(double id = 0, bool isVisible = true)
+    {
+        //Debug.WriteLine($"Layer_visibility : id={id} & isVisible={isVisible}");
+        int id_int = Convert.ToInt32(id);
+        Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
+        {
+            MainPage.DBLayerVisibility(id_int, (isVisible ? "Visible" : "Hidden"));
+        }, null);
+    }
+
+
+    public void Layer_edit(double id = 0, double prefilid = -1)
+    {
+        int id_int = Convert.ToInt32(id);
+        int prefilid_int = Convert.ToInt32(prefilid);
+        Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
+        {
+            MainWindow._instance.FrameLoad_CustomOrEditLayers(id_int, prefilid_int);
+        }, null);
+    }
+
+    public void Layer_set_current(double id = 0)
+    {
+        int id_int = Convert.ToInt32(id);
+        Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
+        {
+            MainWindow._instance.MainPage.Set_current_layer(id_int);
+        }, null);
+    }
+    public void Layer_show_warning(double id = 0)
+    {
+        int id_int = Convert.ToInt32(id);
+        Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
+        {
+            MainPage.ShowLayerWarning(id_int);
+        }, null);
+    }
+    public void Request_search_update()
+    {
+        Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
+        {
+            MainWindow._instance.MainPage.SearchLayerStart(true);
+        }, null);
+    }
+
+    public void Refresh_panel()
+    {
+        Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
+        {
+            MainWindow._instance.MainPage.ReloadPage();
+            MainWindow._instance.MainPage.SearchLayerStart();
+        }, null);
+    }
+
+    public string Gettilepreviewurlfromid(double id = 0)
+    {
+        if (!Settings.layerpanel_livepreview)
+        {
+            return "";
+        }
+        async Task<string> Gettilepreviewurlfromid_interne(double id)
+        {
+            int id_int = Convert.ToInt32(id);
+            DispatcherOperation op = Application.Current.Dispatcher.BeginInvoke(new Func<string>(() => MainWindow._instance.MainPage.LayerTilePreview_ReturnUrl(id_int)));
+            await op;
+            return op.Result.ToString();
+        }
+        return Gettilepreviewurlfromid_interne(id).Result;
+    }
+}
 }

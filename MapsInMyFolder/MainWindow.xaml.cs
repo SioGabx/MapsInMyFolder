@@ -11,6 +11,7 @@ using ModernWpf.Media.Animation;
 using ICSharpCode.AvalonEdit.Highlighting;
 using System.Xml;
 using System.IO;
+using System.Windows.Navigation;
 
 namespace MapsInMyFolder
 {
@@ -21,6 +22,7 @@ namespace MapsInMyFolder
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2211:Les champs non constants ne doivent pas être visibles", Justification = "for access everywhere")]
         public static MainWindow _instance;
+        private static bool FrameCanGoBack = false;
         public MainWindow()
         {
             _instance = this;
@@ -41,6 +43,7 @@ namespace MapsInMyFolder
                 CustomOrEditLayersPage = null;
             }
             if (!MainContentFrame.CanGoBack) { return; }
+            FrameCanGoBack = true;
             if (NoTransition)
             {
                 MainContentFrame.GoBack(new SuppressNavigationTransitionInfo());
@@ -93,18 +96,20 @@ namespace MapsInMyFolder
             Javascript.JavascriptActionEvent += JavascriptActionEvent;
             Update.NewUpdateFoundEvent += (o, e) =>
             {
-                try {
-                    Application.Current.Dispatcher.Invoke(ApplicationUpdateFoundEvent); 
+                try
+                {
+                    Application.Current.Dispatcher.Invoke(ApplicationUpdateFoundEvent);
                 }
                 catch (Exception ex)
                 {
                     Debug.WriteLine(ex.ToString());
                 }
-            };  
+            };
             Database.NewUpdateFoundEvent += (o, e) =>
             {
-                try { 
-                    Application.Current.Dispatcher.Invoke(DatabaseUpdateFoundEvent); 
+                try
+                {
+                    Application.Current.Dispatcher.Invoke(DatabaseUpdateFoundEvent);
                 }
                 catch (Exception ex)
                 {
@@ -129,7 +134,7 @@ namespace MapsInMyFolder
 
         public void ApplicationUpdateFoundEvent()
         {
-            Notification ApplicationUpdateNotification = new NText($"Une nouvelle version de l'application ({Update.UpdateRelease.Tag_name}) est disponible. Cliquez ici pour mettre à jour.", "MapsInMyFolder", Update.StartUpdating)
+            Notification ApplicationUpdateNotification = new NText($"Une nouvelle version de l'application ({Update.UpdateRelease.Tag_name}) est disponible. Cliquez ici pour mettre à jour.", "MapsInMyFolder", "MainPage", Update.StartUpdating)
             {
                 NotificationId = "ApplicationUpdateNotification",
                 DisappearAfterAMoment = false,
@@ -156,7 +161,7 @@ namespace MapsInMyFolder
                 Message = "Une nouvelle version de la base de donnée est disponible. Cliquez ici pour mettre à jour.";
             }
 
-            Notification DatabaseUpdateNotification = new NText(Message, "MapsInMyFolder", Database.StartUpdating)
+            Notification DatabaseUpdateNotification = new NText(Message, "MapsInMyFolder", "MainPage", Database.StartUpdating)
             {
                 NotificationId = "DatabaseUpdateNotification",
                 DisappearAfterAMoment = false,
@@ -168,23 +173,7 @@ namespace MapsInMyFolder
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
             Init();
-            IHighlightingDefinition customHighlighting;
-            using (Stream s = Collectif.ReadResourceStream("ScriptEditorTheme.xshd"))
-            {
-                if (s == null)
-                {
-                    Collectif.GetAllManifestResourceNames();
-                    throw new InvalidOperationException("Le theme de l'editeur de script n'as pas été trouvé");
-                }
-
-                using (XmlReader reader = new XmlTextReader(s))
-                {
-                    customHighlighting = ICSharpCode.AvalonEdit.Highlighting.Xshd.
-                        HighlightingLoader.Load(reader, HighlightingManager.Instance);
-                }
-            }
-            // and register it in the HighlightingManager
-            HighlightingManager.Instance.RegisterHighlighting("MIMF_JavaScript", new string[] { ".js" }, customHighlighting);
+            LoadAvalonEditThemes();
 
             if (Settings.search_application_update_on_startup && await Update.CheckIfNewerVersionAvailableOnGithub())
             {
@@ -195,6 +184,31 @@ namespace MapsInMyFolder
             {
                 Database.CheckIfNewerVersionAvailable();
             }
+        }
+
+        public void LoadAvalonEditThemes()
+        {
+            void LoadHighlighting(string Name, string FileName, string StyleExtension)
+            {
+                using (Stream s = Collectif.ReadResourceStream(@"editorTheme\" + FileName))
+                {
+                    if (s == null)
+                    {
+                        Collectif.GetAllManifestResourceNames();
+                        throw new InvalidOperationException("Le theme de l'editeur de script n'as pas été trouvé");
+                    }
+
+                    using (XmlReader reader = new XmlTextReader(s))
+                    {
+                        IHighlightingDefinition customHighlighting = ICSharpCode.AvalonEdit.Highlighting.Xshd.HighlightingLoader.Load(reader, HighlightingManager.Instance);
+                        HighlightingManager.Instance.RegisterHighlighting(Name, new string[] { StyleExtension }, customHighlighting);
+                    }
+                }
+            }
+            // and register it in the HighlightingManager
+
+            LoadHighlighting("MIMF_JavaScript", "Javascript.xshd", ".js");
+            LoadHighlighting("MIMF_Json", "Json.xshd", ".json");
         }
 
         public static void RefreshAllPanels()
@@ -271,6 +285,20 @@ namespace MapsInMyFolder
             };
             settingsModalWindow.ShowDialog();
             settingsModalWindow.Focus();
+        }
+
+        private void MainContentFrame_Navigating(object sender, NavigatingCancelEventArgs e)
+        {
+            if (e.NavigationMode == NavigationMode.Back && !FrameCanGoBack)
+            {
+                e.Cancel = true;
+            }
+            if (e.NavigationMode == NavigationMode.New && e?.Uri != null)
+            {
+                Process.Start(new ProcessStartInfo(e.Uri.ToString()) { UseShellExecute = true });
+                e.Cancel = true;
+            }
+            FrameCanGoBack = false;
         }
     }
 }

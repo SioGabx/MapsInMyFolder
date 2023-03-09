@@ -68,6 +68,6 @@
             </StackPanel>
         </Grid>
 
-        <ui:Frame x:Name="MainContentFrame" Grid.Row="1"></ui:Frame>
+        <ui:Frame x:Name="MainContentFrame" Grid.Row="1" Navigating="MainContentFrame_Navigating"/>
     </Grid>
 </Window>
