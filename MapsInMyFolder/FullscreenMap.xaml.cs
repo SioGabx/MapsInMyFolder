@@ -287,15 +287,16 @@ namespace MapsInMyFolder
             mapSelectable = new MapSelectable(MapViewer, new Location(0, 0), new Location(0, 0), null, this) { RectangleCanBeDeleted = true };
             mapSelectable.RectangleGotFocus += MapSelectable_RectangleGotFocus;
             mapSelectable.RectangleLostFocus += MapSelectable_RectangleLostFocus;
-            Notification.UpdateNotification += (Notification, NotificationArgs) => UpdateNotification((Notification)Notification, NotificationArgs);
-          
+            Notification.UpdateNotification += Notification_UpdateNotification;
         }
-       
+
+        private void Notification_UpdateNotification(object sender, (string NotificationId, string Destinateur) e)
+        {
+            UpdateNotification((Notification)sender, e);
+        }
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            //SetLayer();
-
             if (SelectionRectangle.Rectangles.Count == 0)
             {
                 AddNewSelection(null);
@@ -309,56 +310,67 @@ namespace MapsInMyFolder
                 }
 
             }
-            mapSelectable.OnLocationUpdated += (o, e) =>
-            {
-                void SetValue(TextBox textbElement, string value, System.Windows.Controls.TextChangedEventHandler action)
-                {
-                    if (textbElement.Text != value && !textbElement.IsKeyboardFocused)
-                    {
-                        textbElement.TextChanged -= action;
-                        textbElement.Text = value;
-                        textbElement.TextChanged += action;
-                    }
 
+            mapSelectable.OnLocationUpdated += MapSelectable_OnLocationUpdated;
+            mapSelectable.OnRectangleDeleted += MapSelectable_OnRectangleDeleted;
+        }
+
+        private void PageDispose()
+        {
+            mapSelectable.RectangleGotFocus -= MapSelectable_RectangleGotFocus;
+            mapSelectable.RectangleLostFocus -= MapSelectable_RectangleLostFocus;
+            Notification.UpdateNotification -= Notification_UpdateNotification;
+            mapSelectable.OnLocationUpdated -= MapSelectable_OnLocationUpdated;
+            mapSelectable.OnRectangleDeleted -= MapSelectable_OnRectangleDeleted;
+        }
+
+
+        private void MapSelectable_OnRectangleDeleted(object sender, MapPolygon e)
+        {
+            SelectionRectangle selectionRectangle = SelectionRectangle.GetSelectionRectangleFromRectangle(e);
+            if (selectionRectangle == null)
+            {
+                return;
+            }
+
+            RectanglesStackPanel.Children.Remove(selectionRectangle.PropertiesDisplayElement);
+            SelectionRectangle.Rectangles.Remove(selectionRectangle);
+        }
+
+        private void MapSelectable_OnLocationUpdated(object sender, MapPolygon e)
+        {
+            void SetValue(TextBox textbElement, string value, System.Windows.Controls.TextChangedEventHandler action)
+            {
+                if (textbElement.Text != value && !textbElement.IsKeyboardFocused)
+                {
+                    textbElement.TextChanged -= action;
+                    textbElement.Text = value;
+                    textbElement.TextChanged += action;
                 }
 
-                var Locations = mapSelectable.GetRectangleLocation(e);
-                SelectionRectangle selectionRectangle = SelectionRectangle.GetSelectionRectangleFromRectangle(e);
-                if (selectionRectangle == null)
-                {
-                    if (Locations.NO.Latitude != 0 && Locations.NO.Latitude != 0 && Locations.SE.Longitude != 0 && Locations.SE.Longitude != 0)
-                    {
-                        MessageBox.Show("Added");
-                        AddNewSelection(e);
-                        selectionRectangle = SelectionRectangle.GetSelectionRectangleFromRectangle(e);
-                    }
-                    else
-                    {
-                        return;
-                    }
-                }
+            }
 
-                SetValue(selectionRectangle.NOLatitudeTextBox, Math.Round(Locations.NO.Latitude, 6).ToString(), selectionRectangle.UpdateLocation_NO);
-                SetValue(selectionRectangle.NOLongitudeTextBox, Math.Round(Locations.NO.Longitude, 6).ToString(), selectionRectangle.UpdateLocation_NO);
-                SetValue(selectionRectangle.SELatitudeTextBox, Math.Round(Locations.SE.Latitude, 6).ToString(), selectionRectangle.UpdateLocation_SE);
-                SetValue(selectionRectangle.SELongitudeTextBox, Math.Round(Locations.SE.Longitude, 6).ToString(), selectionRectangle.UpdateLocation_SE);
-
-
-            };
-            mapSelectable.OnRectangleDeleted += (o, e) =>
+            var Locations = mapSelectable.GetRectangleLocation(e);
+            SelectionRectangle selectionRectangle = SelectionRectangle.GetSelectionRectangleFromRectangle(e);
+            if (selectionRectangle == null)
             {
-                SelectionRectangle selectionRectangle = SelectionRectangle.GetSelectionRectangleFromRectangle(e);
-                if (selectionRectangle == null)
+                if (Locations.NO.Latitude != 0 && Locations.NO.Latitude != 0 && Locations.SE.Longitude != 0 && Locations.SE.Longitude != 0)
+                {
+                    MessageBox.Show("Added");
+                    AddNewSelection(e);
+                    selectionRectangle = SelectionRectangle.GetSelectionRectangleFromRectangle(e);
+                }
+                else
                 {
                     return;
                 }
+            }
 
-                RectanglesStackPanel.Children.Remove(selectionRectangle.PropertiesDisplayElement);
-                SelectionRectangle.Rectangles.Remove(selectionRectangle);
-            };
-
+            SetValue(selectionRectangle.NOLatitudeTextBox, Math.Round(Locations.NO.Latitude, 6).ToString(), selectionRectangle.UpdateLocation_NO);
+            SetValue(selectionRectangle.NOLongitudeTextBox, Math.Round(Locations.NO.Longitude, 6).ToString(), selectionRectangle.UpdateLocation_NO);
+            SetValue(selectionRectangle.SELatitudeTextBox, Math.Round(Locations.SE.Latitude, 6).ToString(), selectionRectangle.UpdateLocation_SE);
+            SetValue(selectionRectangle.SELongitudeTextBox, Math.Round(Locations.SE.Longitude, 6).ToString(), selectionRectangle.UpdateLocation_SE);
         }
-
 
         public void UpdateNotification(Notification sender, (string NotificationId, string Destinateur) NotificationInternalArgs)
         {
@@ -429,8 +441,8 @@ namespace MapsInMyFolder
             {
                 TileSource = new TileSource { UriFormat = "https://tile.openstreetmap.org/{z}/{x}/{y}.png", LayerID = Layer.class_id },
                 SourceName = Layer.class_identifiant,
-                MaxZoomLevel = Layer.class_max_zoom,
-                MinZoomLevel = Layer.class_min_zoom,
+                MaxZoomLevel = Layer.class_max_zoom ?? 0,
+                MinZoomLevel = Layer.class_min_zoom ?? 0,
                 Description = ""
             };
         }
@@ -483,6 +495,7 @@ namespace MapsInMyFolder
 
         private void ClosePage_button_Click(object sender, RoutedEventArgs e)
         {
+            PageDispose();
             MainWindow._instance.FrameBack();
         }
     }

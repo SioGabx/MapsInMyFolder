@@ -1,9 +1,9 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media;
-
 
 namespace MapsInMyFolder.Commun
 {
@@ -32,8 +32,17 @@ namespace MapsInMyFolder.Commun
             char[] theChars = theString.ToCharArray();
             theChars[0] = char.ToUpper(theChars[0]);
             return new string(theChars);
-        }    
-        
+        }
+
+        public static void SetText(this TextBox textbox, string text)
+        {
+            textbox.GetType().GetProperty("Text").SetValue(textbox, text, null);
+        }
+        public static void SetSelectedIndex(this ComboBox combobox, int index)
+        {
+            combobox.GetType().GetProperty("SelectedIndex").SetValue(combobox, index, null);
+        }
+
         public static string RemoveNewLineChar(this string theString)
         {
             var sb = new System.Text.StringBuilder(theString.Length);
@@ -55,7 +64,7 @@ namespace MapsInMyFolder.Commun
         }
         public static void ScrollToElement(this System.Windows.Controls.ScrollViewer scrollViewer, System.Windows.UIElement uIElement)
         {
-            
+
             scrollViewer.ScrollToVerticalOffset(scrollViewer.ScrollToElementVerticalOffset(uIElement));
             uIElement.Focus();
         }
@@ -103,7 +112,44 @@ namespace MapsInMyFolder.Commun
         }
 
 
+        public static IEnumerable<string> SelectedValues(this BlackPearl.Controls.CoreLibrary.MultiSelectCombobox MultiSelectCombobox, string DisplayMemberPath = null)
+        {
+            if (string.IsNullOrEmpty(DisplayMemberPath))
+            {
+                DisplayMemberPath = MultiSelectCombobox.DisplayMemberPath;
+            }
+            if (MultiSelectCombobox?.SelectedItems != null)
+            {
+                foreach (object ele in MultiSelectCombobox.SelectedItems)
+                {
+                    if (ele.GetType() == typeof(string))
+                    {
+                        yield return ele.ToString();
+                    }
+                    else
+                    {
+                        yield return ele.GetType().GetProperty(DisplayMemberPath).GetValue(ele).ToString().Trim();
+                    }
+
+                }
+            }
+        }
+
+        public static bool ContainsOneOrMore(this IEnumerable<string> BaseArray, IEnumerable<string> SearchArray)
+        {
+            foreach (string SearchStr in SearchArray)
+            {
+                foreach (string BaseStr in BaseArray)
+                {
+                    if (BaseStr.Trim() == SearchStr.Trim())
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
 
     }
-
 }

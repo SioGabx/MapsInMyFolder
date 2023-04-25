@@ -6,8 +6,6 @@ using System.Windows;
 namespace MapsInMyFolder.Commun
 {
     public enum ListDisplayType { BIG, CONDENSED, SMALL, LIST, LIST_ALTERNAT }
-    public enum LayersSort { ID, NOM, DESCRIPTION, CATEGORIE, IDENTIFIANT, FORMAT, SITE }
-    public enum LayersOrder { ASC, DESC }
 
     public static class Settings
     {
@@ -37,6 +35,7 @@ namespace MapsInMyFolder.Commun
         public static bool layerpanel_livepreview = true;
         public static bool layerpanel_put_non_letter_layername_at_the_end = true;
         public static bool layerpanel_favorite_at_top = true;
+        public static string filter_layers_based_on_country = "*";
         public static ListDisplayType layerpanel_displaystyle = ListDisplayType.CONDENSED;
         public static double NO_PIN_starting_location_latitude = 48.175224;
         public static double NO_PIN_starting_location_longitude = 6.449794;
@@ -47,8 +46,7 @@ namespace MapsInMyFolder.Commun
         public static string tileloader_default_script = "//default script\nfunction getTile(args) {\n   return args;\n}";
         public static string tileloader_template_script = "function getTile(args) {\n   return args;\n}\n\nfunction getPreview(args){\n   return getTile(args);\n}\n\nfunction getPreviewFallback(args){\n   return getTile(args);\n}";
         public static string user_agent = "Mozilla/4.0 (Compatible; Windows NT 5.1; MSIE 6.0) (compatible; MSIE 6.0; Windows NT 5.1; .NET CLR 1.1.4322; .NET CLR 2.0.50727)";
-        public static LayersSort layers_Sort = LayersSort.NOM;
-        public static LayersOrder Layers_Order = LayersOrder.ASC;
+        public static string layers_Sort = "ID ASC";
         public static string database_pathname = "MapsInMyFolder_Database.db";
         public static Visibility visibility_pins = Visibility.Hidden;
         public static double selection_rectangle_resize_tblr_gap = 15;

@@ -40,6 +40,16 @@
             filter: brightness(0.6) grayscale(0.5)
         }
 
+        .layerFiltered {
+            display: none;
+        }
+
+        .showHiddenLayer .layerFiltered {
+            display: inherit;
+            opacity: 0.3;
+            filter: brightness(0.6) grayscale(0.8)
+        }
+
         .select .layer_main_div {
             border-left: 4px solid #F18712;
         }
@@ -879,8 +889,6 @@
                 event.preventDefault();
             }
             
-            
-            
             let isAddingAction;
             if (eye.classList.contains("orange")) {
                 isAddingAction = false;
@@ -899,6 +907,10 @@
 
         function internal_change_visibility(eye, id, isAddingAction) {
             let liElement = document.getElementById(id);
+            if (liElement.classList.contains("layerFiltered")){
+                return;
+            }
+
             if (isAddingAction) {
                 //C# ajouter au favoris
                 if (!eye.classList.contains("orange")) {
@@ -1515,6 +1527,12 @@
                             } else {
                                 get_context_menu_element().querySelector("#masquer_calque").style.display = "none";
                             }
+                            if (element_sctm.classList.contains("layerFiltered") && getSelectedElements().length <= 1) {
+                                get_context_menu_element().querySelector("#masquer_calque").style.display = "none";
+                                get_context_menu_element().querySelector("#afficher_calque").style.display = "none";
+                            }
+
+
                         } else {
                             get_context_menu_element().setAttribute("data-layer_binding", "0")
                             update_lock_state("*", true);

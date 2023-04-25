@@ -90,7 +90,7 @@
                     <RowDefinition Height="15"/>
                 </Grid.RowDefinitions>
 
-                <map:Map Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Grid.RowSpan="2" x:Name="mapviewer" ZoomLevel="18" Margin="10,0,0,0" MinHeight="30" MinWidth="30" Background="White" >
+                <map:Map Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Grid.RowSpan="2" x:Name="mapviewer" ZoomLevel="18" Margin="10,0,0,0" MinHeight="30" MinWidth="30" Background="White" MouseWheel="mapviewer_MouseWheel" >
 
                     <map:Map.Center>
                         <map:Location Longitude="6.429381" Latitude="48.198846"/>

@@ -735,7 +735,7 @@ namespace MapsInMyFolder.MapControl
         {
             base.OnViewportChanged(e);
 
-            ViewportChanged?.Invoke(this, e);
+           ViewportChanged?.Invoke(this, e);
         }
     }
 }

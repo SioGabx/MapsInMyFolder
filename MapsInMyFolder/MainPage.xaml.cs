@@ -18,9 +18,11 @@ namespace MapsInMyFolder
         public static MainPage _instance;
         bool isInitialised = false;
         public static MapSelectable mapSelectable;
+        public static MapFigures MapFigures;
         public MainPage()
         {
             _instance = this;
+            MapFigures = new MapFigures();
             InitializeComponent();
         }
 
@@ -32,7 +34,7 @@ namespace MapsInMyFolder
                 Location SE_PIN_starting_location = new Location(Settings.SE_PIN_starting_location_latitude, Settings.SE_PIN_starting_location_longitude);
                 
                 mapSelectable = new MapSelectable(mapviewer, NO_PIN_starting_location, SE_PIN_starting_location, null, this);
-                mapviewer.MouseWheel += (o, e) => MapFigures.UpdateFiguresFromZoomLevel(mapviewer.TargetZoomLevel);
+               
                 Preload();
                 Init();
             }
@@ -52,7 +54,7 @@ namespace MapsInMyFolder
         }
         private void Map_panel_open_location_panel_Click(object sender, RoutedEventArgs e)
         {
-             Message.NoReturnBoxAsync("Cette fonctionnalité fait l'objet d'une prochaine mise à jour, elle n'as pas encore été ajoutée à cette version !", "Erreur");
+            Message.NoReturnBoxAsync("Cette fonctionnalité fait l'objet d'une prochaine mise à jour, elle n'as pas encore été ajoutée à cette version !", "Erreur");
         }
 
         private void Download_panel_close_button_Click(object sender, RoutedEventArgs e)
@@ -201,6 +203,11 @@ namespace MapsInMyFolder
                 Location SE_Location_Bounds = new Location(pourcentage_Lat + ActiveRectangleSelection.SE.Latitude, pourcentage_Lng + ActiveRectangleSelection.SE.Longitude);
                 mapviewer.ZoomToBounds(new BoundingBox(NO_Location_Bounds.Latitude, NO_Location_Bounds.Longitude, SE_Location_Bounds.Latitude, SE_Location_Bounds.Longitude));
             }
+        }
+
+        private void mapviewer_MouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            MapFigures.UpdateFiguresFromZoomLevel(mapviewer.TargetZoomLevel);
         }
     }
 

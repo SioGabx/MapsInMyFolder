@@ -14,6 +14,61 @@ using MapsInMyFolder.Commun;
 
 namespace MapsInMyFolder
 {
+
+    public class RognageInfo
+    {
+        public (int X, int Y) NO_decalage;
+        public (int X, int Y) SE_decalage;
+        public int width;
+        public int height;
+        public RognageInfo((int X, int Y) NO_decalage, (int X, int Y) SE_decalage, int width, int height)
+        {
+            this.width = width;
+            this.height = height;
+            this.SE_decalage = SE_decalage;
+            this.NO_decalage = NO_decalage;
+        }
+
+        public static RognageInfo GetRognageValue(double NO_Latitude, double NO_Longitude, double SE_Latitude, double SE_Longitude, int zoom, int? tile_width)
+        {
+            int tile_width_NotNull = tile_width ?? 256;
+            (int X, int Y) GetRognageFromLocation(double Latitude, double Longitude)
+            {
+                var list_of_tile_number_from_given_lat_and_long = Collectif.CoordonneesToTile(Latitude, Longitude, zoom);
+
+                var CoinsHautGaucheLocationFromTile = Collectif.TileToCoordonnees(list_of_tile_number_from_given_lat_and_long.X, list_of_tile_number_from_given_lat_and_long.Y, zoom);
+                double longitude_coins_haut_gauche_curent_tileX = CoinsHautGaucheLocationFromTile.Longitude;
+                double latitude_coins_haut_gauche_curent_tileY = CoinsHautGaucheLocationFromTile.Latitude;
+
+                var NextCoinsHautGaucheLocationFromTile = Collectif.TileToCoordonnees(list_of_tile_number_from_given_lat_and_long.X + 1, list_of_tile_number_from_given_lat_and_long.Y + 1, zoom);
+                double longitude_coins_haut_gauche_next_tileX = NextCoinsHautGaucheLocationFromTile.Longitude;
+                double latitude_coins_haut_gauche_next_tileY = NextCoinsHautGaucheLocationFromTile.Latitude;
+
+                double longitude_decalage = Math.Abs(Longitude - longitude_coins_haut_gauche_curent_tileX) * 100 / Math.Abs(longitude_coins_haut_gauche_curent_tileX - longitude_coins_haut_gauche_next_tileX) / 100;
+                double latitude_decalage = Math.Abs(Latitude - latitude_coins_haut_gauche_curent_tileY) * 100 / Math.Abs(latitude_coins_haut_gauche_curent_tileY - latitude_coins_haut_gauche_next_tileY) / 100;
+                int decalage_x = Math.Abs(Convert.ToInt32(Math.Round(longitude_decalage * tile_width_NotNull, 0)));
+                int decalage_y = Math.Abs(Convert.ToInt32(Math.Round(latitude_decalage * tile_width_NotNull, 0)));
+                return (decalage_x, decalage_y);
+            }
+
+            var NO_decalage = GetRognageFromLocation(NO_Latitude, NO_Longitude);
+            var SE_decalage = GetRognageFromLocation(SE_Latitude, SE_Longitude);
+            int NbrtilesInCol = Collectif.CoordonneesToTile(SE_Latitude, SE_Longitude, zoom).X - Collectif.CoordonneesToTile(NO_Latitude, NO_Longitude, zoom).X + 1;
+            int NbrtilesInRow = Collectif.CoordonneesToTile(SE_Latitude, SE_Longitude, zoom).Y - Collectif.CoordonneesToTile(NO_Latitude, NO_Longitude, zoom).Y + 1;
+            int final_image_width = Math.Abs((NbrtilesInCol * tile_width_NotNull) - (NO_decalage.X + (tile_width_NotNull - SE_decalage.X)));
+            int final_image_height = Math.Abs((NbrtilesInRow * tile_width_NotNull) - (NO_decalage.Y + (tile_width_NotNull - SE_decalage.Y)));
+            if (final_image_width < 10 || final_image_height < 10)
+            {
+                final_image_width = 10;
+                final_image_height = 10;
+            }
+
+            return new RognageInfo(NO_decalage, SE_decalage, final_image_width, final_image_height);
+
+        }
+    }
+
+
     public class Download_Options
     {
         public int id_layer;
@@ -31,8 +86,9 @@ namespace MapsInMyFolder
         public int RedimWidth;
         public int RedimHeignt;
         public Enums.Interpretation interpretation;
+        public ScaleInfo scaleInfo;
 
-        public Download_Options(int id_layer, string save_path, string format, string filename, string identifiant, string name, int tile_size, int zoom, int quality, string urlbase, MapControl.Location NO_PIN_Location, MapControl.Location SE_PIN_Location, int RedimWidth, int RedimHeignt, Enums.Interpretation interpretation)
+        public Download_Options(int id_layer, string save_path, string format, string filename, string identifiant, string name, int tile_size, int zoom, int quality, string urlbase, MapControl.Location NO_PIN_Location, MapControl.Location SE_PIN_Location, int RedimWidth, int RedimHeignt, Enums.Interpretation interpretation, ScaleInfo scaleInfo)
         {
             this.id_layer = id_layer;
             this.save_path = save_path;
@@ -49,6 +105,7 @@ namespace MapsInMyFolder
             this.RedimWidth = RedimWidth;
             this.RedimHeignt = RedimHeignt;
             this.interpretation = interpretation;
+            this.scaleInfo = scaleInfo;
         }
     }
 
@@ -79,6 +136,7 @@ namespace MapsInMyFolder
         public int RedimHeignt;
         public TileGenerator TileLoaderGenerator;
         public Enums.Interpretation interpretation;
+        public ScaleInfo scaleInfo;
 
         public int SkippedPanelUpdate;
         public string last_command;
@@ -101,11 +159,12 @@ namespace MapsInMyFolder
                                           Dictionary<string, double> location,
                                           int RedimWidth, int RedimHeignt, TileGenerator TileLoaderGenerator,
                                           Enums.Interpretation interpretation,
+                                          ScaleInfo scaleInfo,
                                           int nbr_of_tiles = 0,
                                           string urlbase = "",
                                           string identifiant = "",
                                           Status state = Status.waitfordownloading,
-                                          int tile_size = 256,
+                                          int? tile_size = null,
                                           int nbr_of_tiles_waiting_for_downloading = 0,
                                           int quality = 100)
         {
@@ -130,12 +189,13 @@ namespace MapsInMyFolder
                 this.urlbase = urlbase;
                 this.identifiant = identifiant;
                 this.location = location;
-                this.tile_size = tile_size;
+                this.tile_size = tile_size ?? 256;
                 this.quality = quality;
                 this.RedimWidth = RedimWidth;
                 this.RedimHeignt = RedimHeignt;
                 this.TileLoaderGenerator = TileLoaderGenerator;
                 this.interpretation = interpretation;
+                this.scaleInfo = scaleInfo;
 
                 SkippedPanelUpdate = 0;
                 last_command = String.Empty;
@@ -322,7 +382,7 @@ namespace MapsInMyFolder
             download_Options_edited.id_layer = Layers.Curent.class_id;
             download_Options_edited.identifiant = Layers.Curent.class_identifiant;
             download_Options_edited.name = Layers.Curent.class_name;
-            download_Options_edited.tile_size = Layers.Curent.class_tiles_size;
+            download_Options_edited.tile_size = Layers.Curent.class_tiles_size ?? 256;
             download_Options_edited.urlbase = Layers.Curent.class_tile_url;
             StartDownload(download_Options_edited);
         }
@@ -374,8 +434,10 @@ namespace MapsInMyFolder
                 CancellationTokenSource tokenSource2 = new CancellationTokenSource();
                 CancellationToken ct = tokenSource2.Token;
                 string timestamp = Convert.ToString(new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds());
-                int dbid = Database.DB_Download_Write(Status.waitfordownloading, filename, nbr_of_tiles, z, download_Options.NO_PIN_Location.Latitude, download_Options.NO_PIN_Location.Longitude, download_Options.SE_PIN_Location.Latitude, download_Options.SE_PIN_Location.Longitude, download_Options.id_layer, save_temp_directory, save_directory, timestamp, download_Options.quality, download_Options.RedimWidth, download_Options.RedimHeignt, download_Options.interpretation.ToString());
-                DownloadClass engine = new DownloadClass(downloadid, dbid, Layers.Curent.class_id, urls, tokenSource2, ct, format, final_saveformat, z, save_temp_directory, save_directory, filename, filetempname, location, download_Options.RedimWidth, download_Options.RedimHeignt, new TileGenerator(), download_Options.interpretation, nbr_of_tiles, urlbase, identifiant, Status.waitfordownloading, tile_size, nbr_of_tiles, quality);
+
+                string JsonScaleInfo = Newtonsoft.Json.JsonConvert.SerializeObject(download_Options.scaleInfo);
+                int dbid = Database.DB_Download_Write(Status.waitfordownloading, filename, nbr_of_tiles, z, download_Options.NO_PIN_Location.Latitude, download_Options.NO_PIN_Location.Longitude, download_Options.SE_PIN_Location.Latitude, download_Options.SE_PIN_Location.Longitude, download_Options.id_layer, save_temp_directory, save_directory, timestamp, download_Options.quality, download_Options.RedimWidth, download_Options.RedimHeignt, download_Options.interpretation.ToString(), JsonScaleInfo);
+                DownloadClass engine = new DownloadClass(downloadid, dbid, Layers.Curent.class_id, urls, tokenSource2, ct, format, final_saveformat, z, save_temp_directory, save_directory, filename, filetempname, location, download_Options.RedimWidth, download_Options.RedimHeignt, new TileGenerator(), download_Options.interpretation, download_Options.scaleInfo, nbr_of_tiles, urlbase, identifiant, Status.waitfordownloading, tile_size, nbr_of_tiles, quality);
                 DownloadClass.Add(engine, downloadid);
 
                 Status status;
@@ -521,7 +583,9 @@ namespace MapsInMyFolder
 
             if (CheckDownloadIsComplete(download_main_engine_class_args) == 0 || Settings.generate_transparent_tiles_on_error)
             {
+               
                 await Assemblage(download_main_engine_class_args.id);
+                //await Assemblage(download_main_engine_class_args.id);
             }
             else if (nbr_pass == settings_max_retry_download)
             {
@@ -732,46 +796,81 @@ namespace MapsInMyFolder
             }
         }
 
+        NetVips.Image AddGraphicalScale(NetVips.Image image, ScaleInfo scaleInfo)
+        {
+            if (scaleInfo.doDrawScale)
+            {
+                int PixelLength = (int)Math.Round(scaleInfo.drawScalePixelLength);
+                var BackgroundColor = new double[] { 255d, 255d, 255d, 200d };
+                var LineFirstPart = new double[] { 0d, 0d, 0d };
+                var LineSecondPart = new double[] { 128d, 128d, 128d };
+                int height = 20;
+                int margin = 5;
+                string font = "Segoe UI";
+                int fontDPI = 80;
+                int LineHeight = 2;
+
+                using NetVips.Image Ltext = NetVips.Image.Text("0", font, 50, null, NetVips.Enums.Align.Centre, true, fontDPI, true, 0, null);
+                using NetVips.Image Rtext = NetVips.Image.Text(scaleInfo.drawScaleEchelle.ToString() + "m", font, 50, null, NetVips.Enums.Align.Centre, true, fontDPI, true, 0, null);
+                int width = PixelLength + Ltext.Width + Rtext.Width + margin * 4;
+
+                using NetVips.Image ScaleBackground = NetVips.Image.Black(width, height, 4).NewFromImage(BackgroundColor);
+                using NetVips.Image ScaleBackgroundSrgb = ScaleBackground.Copy(interpretation: Enums.Interpretation.Srgb);
+                using NetVips.Image ScaleBackgroundSrgbWithLtext = ScaleBackgroundSrgb.Composite2(Ltext, NetVips.Enums.BlendMode.Atop, margin, (int)Math.Round((double)height / 2 - (double)Ltext.Height / 2));
+                using Image ScaleBackgroundSrgbWithRtext = ScaleBackgroundSrgbWithLtext.Composite2(Rtext, NetVips.Enums.BlendMode.Atop, ScaleBackgroundSrgb.Width - Rtext.Width - margin, (int)Math.Round((double)height / 2 - (double)Rtext.Height / 2));
+                using Image LineBase = NetVips.Image.Black(PixelLength, LineHeight);
+                using Image Line = LineBase.NewFromImage(LineFirstPart);
+                using Image LineBase2 = NetVips.Image.Black((int)Math.Round((double)PixelLength / 2), LineHeight);
+                using Image Line2 = LineBase2.NewFromImage(LineSecondPart);
+
+                using Image FinalLine = Line.Insert(Line2, Line.Width - (int)Math.Round((double)PixelLength / 2), 0, false);
+
+                using Image ScaleBackgroundWidthAllElements = ScaleBackgroundSrgbWithRtext.Composite2(FinalLine, NetVips.Enums.BlendMode.Atop, 2 * margin + Ltext.Width, (int)Math.Round((double)height / 2 - (double)FinalLine.Height / 2));
+
+                NetVips.Image ImageWidthScale = image.Composite(ScaleBackgroundWidthAllElements, NetVips.Enums.BlendMode.Over, margin, image.Height - (height + margin), Enums.Interpretation.Srgb, false);
+                Debug.WriteLine("End Here");
+                return ImageWidthScale;
+            }
+            else
+            {
+                return image;
+            }
+        }
+
+
         async Task Assemblage(int id)
         {
             UpdateDownloadPanel(id, "Assemblage...  1/2", "0", true, Status.assemblage);
             DownloadClass curent_engine = DownloadClass.GetEngineById(id);
-            //int settings_tile_size = curent_engine.tile_size;
             string format = curent_engine.format;
             string save_directory = curent_engine.save_directory;
             string save_temp_filename = curent_engine.file_temp_name;
             string save_filename = curent_engine.file_name;
             int tile_size = curent_engine.tile_size;
 
-            Dictionary<string, int> rognage_info = GetRognageValue(curent_engine.location["NO_Latitude"], curent_engine.location["NO_Longitude"], curent_engine.location["SE_Latitude"], curent_engine.location["SE_Longitude"], curent_engine.zoom, tile_size);
+            var rognage_info = RognageInfo.GetRognageValue(curent_engine.location["NO_Latitude"], curent_engine.location["NO_Longitude"], curent_engine.location["SE_Latitude"], curent_engine.location["SE_Longitude"], curent_engine.zoom, tile_size);
 
             await Task.Run(() =>
             {
+                NetVips.Cache.MaxMem = 0;
+                NetVips.Cache.Trace = false;
                 if (curent_engine.state == Status.error) { return; }
 
                 using NetVips.Image image = GetImageFromTiles(curent_engine);
                 if (image == null) { return; }
                 UpdateDownloadPanel(id, "Rognage...", "0", true, Status.rognage);
                 Cache.MaxFiles = 0;
-                using NetVips.Image image_rogner = RedimImage(curent_engine,
-                                                    Image.Black(rognage_info["width"], rognage_info["height"])
-                                                    .Insert(image, -rognage_info["NO_decalage_x"], -rognage_info["NO_decalage_y"]),
-                                                    rognage_info);
 
-                image.Dispose();
-                image.Close();
-                //NetVips.Image image_rogner = NetVips.Image.Black(rognage_info["width"], rognage_info["height"]);
-                //image_rogner = image_rogner.Insert(image, -rognage_info["NO_decalage_x"], -rognage_info["NO_decalage_y"]);
-                //image.Dispose();
-                //image_rogner = RedimImage(curent_engine, image_rogner, rognage_info);
-
-
-                if (curent_engine.state == Status.error) { return; }
-                SaveImage(curent_engine, image_rogner);
-
-                UpdateDownloadPanel(id, "Libération des ressources..", "100", true, Status.cleanup);
-                image_rogner.Dispose();
-                image_rogner.Close();
+                using (NetVips.Image ImageRognerBase = Image.Black(rognage_info.width, rognage_info.height))
+                using (NetVips.Image ImageRogner = ImageRognerBase.Insert(image, -rognage_info.NO_decalage.X, -rognage_info.NO_decalage.Y))
+                using (NetVips.Image ImageRedime = RedimImage(curent_engine, ImageRogner, rognage_info.width, rognage_info.height))
+                using (NetVips.Image ImageWithScale = AddGraphicalScale(ImageRedime, curent_engine.scaleInfo))
+                {
+                    if (curent_engine.state == Status.error) { return; }
+                    SaveImage(curent_engine, ImageWithScale);
+                    UpdateDownloadPanel(id, "Libération des ressources..", "100", true, Status.cleanup);
+                }
+                
                 Debug.WriteLine(
                     "NetVips.Cache.Size" + " : " + Cache.Size + "\n" +
                     "NetVips.Cache.Max" + " : " + Cache.Max + "\n" +
@@ -780,9 +879,8 @@ namespace MapsInMyFolder
                     "NetVips.Stats.Mem" + " : " + Stats.Mem + "\n" +
                     "NetVips.Stats.Files" + " : " + Stats.Files + "\n");
 
-                GC.Collect(999999999, GCCollectionMode.Forced, true, true);
+                GC.Collect(9999, GCCollectionMode.Forced, true);
                 GC.WaitForPendingFinalizers();
-                GC.Collect();
             });
             UpdateDownloadPanel(id, "Finalisation...", "100", true, Status.cleanup);
             DownloadFinish(id);
@@ -795,17 +893,17 @@ namespace MapsInMyFolder
         }
 
 
-        static private NetVips.Image RedimImage(DownloadClass curent_engine, NetVips.Image image_rogner, Dictionary<string, int> rognage_info)
+        static private NetVips.Image RedimImage(DownloadClass curent_engine, NetVips.Image image_rogner, double width, double height)
         {
             try
             {
                 if (curent_engine.RedimWidth != -1 && curent_engine.RedimHeignt != -1)
                 {
                     UpdateDownloadPanel(curent_engine.id, "Redimensionnement...", "0", true, Status.rognage);
-                    double hrink = (double)curent_engine.RedimHeignt / (double)rognage_info["height"];
-                    double Vrink = (double)curent_engine.RedimWidth / (double)rognage_info["width"];
+                    double hrink = (double)curent_engine.RedimHeignt / height;
+                    double Vrink = (double)curent_engine.RedimWidth / width;
 
-                    if ((curent_engine.RedimHeignt == Math.Round((double)rognage_info["height"] * Vrink)) || (curent_engine.RedimWidth == Math.Round((double)rognage_info["width"] * hrink)))
+                    if ((curent_engine.RedimHeignt == Math.Round(height * Vrink)) || (curent_engine.RedimWidth == Math.Round(width * hrink)))
                     {
                         DebugMode.WriteLine("Uniform resizing");
                         return image_rogner.Resize(hrink);
@@ -852,8 +950,8 @@ namespace MapsInMyFolder
 
             try
             {
-                image_rogner.WriteToFile(image_temps_assemblage_path, Collectif.getSaveVOption(curent_engine.final_saveformat, curent_engine.quality, tile_size));
-
+                 image_rogner.WriteToFile(image_temps_assemblage_path, Collectif.getSaveVOption(curent_engine.final_saveformat, curent_engine.quality, tile_size));
+                //image_rogner.Jpegsave(image_temps_assemblage_path, 100, null, false, false, false, false, false, null, Enums.ForeignSubsample.Off, null, true, null, null);
             }
             catch (Exception ex)
             {
@@ -885,7 +983,16 @@ namespace MapsInMyFolder
                 {
                     Directory.CreateDirectory(save_directory);
                 }
-                assemblage_image_file_info.MoveTo(save_directory + save_filename);
+                string FinalFilePath = save_directory + save_filename;
+                if (Directory.Exists(save_directory))
+                {
+                    if (File.Exists(FinalFilePath))
+                    {
+                        File.Delete(FinalFilePath);
+                    }
+                    assemblage_image_file_info.MoveTo(FinalFilePath);
+                }
+                
             }
             else
             {
@@ -918,7 +1025,6 @@ namespace MapsInMyFolder
             Cache.Max = 0;
             Cache.MaxFiles = 0;
             Cache.MaxMem = 0;
-            NetVips.Image image = Image.Black((decalage_x * tile_size) + 1, 1);
             List<NetVips.Image> Vertical_Array = new List<NetVips.Image>();
             for (int decalage_boucle_for_y = 0; decalage_boucle_for_y <= decalage_y; decalage_boucle_for_y++)
             {
@@ -1021,6 +1127,8 @@ namespace MapsInMyFolder
 
             UpdateDownloadPanel(curent_engine.id, "Assemblage...  2/2", "0", true, Status.assemblage);
             Task.Factory.StartNew(() => Thread.Sleep(300));
+
+            NetVips.Image image = Image.Black((decalage_x * tile_size) + 1, 1);
             try
             {
                 #region fix_dpi_issue_if_vertical_array_is_completly_black
@@ -1042,18 +1150,22 @@ namespace MapsInMyFolder
                 }
                 #endregion
                 image = Image.Arrayjoin(Vertical_Array.ToArray(), across: 1);
+                //NetVips.Image image = Image.Arrayjoin(Vertical_Array.ToArray(), across: 1);
+
+                Vertical_Array.Clear();
+                //return image;
+
+
+
             }
             catch (Exception ex)
             {
                 UpdateDownloadPanel(curent_engine.id, "Erreur fatale lors de l'assemblage vertical", "", true, Status.error);
                 Debug.WriteLine(ex.Message);
             }
-            foreach (NetVips.Image imgtodispose in Vertical_Array)
-            {
-                imgtodispose.Dispose();
-            }
-            Vertical_Array.Clear();
+            //Vertical_Array.Clear();
             return image;
+            //return Image.Black((decalage_x * tile_size) + 1, 1);
         }
 
 
@@ -1123,13 +1235,8 @@ namespace MapsInMyFolder
 
             if (!do_download_this_tile)
             {
-
                 DebugMode.WriteLine("Existing tile");
                 url.status = Status.success;
-                //await Task.Run(() =>
-                //{
-                //    Thread.Sleep(10);
-                //});
 
                 await Task.Factory.StartNew(() => Thread.Sleep(20));
                 InternalUpdateProgressBar(download_engine);
@@ -1193,54 +1300,6 @@ namespace MapsInMyFolder
                 }
             }
 
-        }
-
-        /// <summary>
-        ///    Cette fonction permet de crée une list de string des urls à téléchargé pour le calque.
-        /// </summary>
-        public static Dictionary<string, int> GetRognageValue(double NO_Latitude, double NO_Longitude, double SE_Latitude, double SE_Longitude, int zoom, int tile_width)
-        {
-            List<int> GetRognageFromLocation(double Latitude, double Longitude)
-            {
-                var list_of_tile_number_from_given_lat_and_long = Collectif.CoordonneesToTile(Latitude, Longitude, zoom);
-
-                var CoinsHautGaucheLocationFromTile = Collectif.TileToCoordonnees(list_of_tile_number_from_given_lat_and_long.X, list_of_tile_number_from_given_lat_and_long.Y, zoom);
-                double longitude_coins_haut_gauche_curent_tileX = CoinsHautGaucheLocationFromTile.Longitude;
-                double latitude_coins_haut_gauche_curent_tileY = CoinsHautGaucheLocationFromTile.Latitude;
-
-                var NextCoinsHautGaucheLocationFromTile = Collectif.TileToCoordonnees(list_of_tile_number_from_given_lat_and_long.X + 1, list_of_tile_number_from_given_lat_and_long.Y + 1, zoom);
-                double longitude_coins_haut_gauche_next_tileX = NextCoinsHautGaucheLocationFromTile.Longitude;
-                double latitude_coins_haut_gauche_next_tileY = NextCoinsHautGaucheLocationFromTile.Latitude;
-
-                double longitude_decalage = Math.Abs(Longitude - longitude_coins_haut_gauche_curent_tileX) * 100 / Math.Abs(longitude_coins_haut_gauche_curent_tileX - longitude_coins_haut_gauche_next_tileX) / 100;
-                double latitude_decalage = Math.Abs(Latitude - latitude_coins_haut_gauche_curent_tileY) * 100 / Math.Abs(latitude_coins_haut_gauche_curent_tileY - latitude_coins_haut_gauche_next_tileY) / 100;
-                int decalage_x = Math.Abs(Convert.ToInt32(Math.Round(longitude_decalage * tile_width, 0)));
-                int decalage_y = Math.Abs(Convert.ToInt32(Math.Round(latitude_decalage * tile_width, 0)));
-                return new List<int>() { decalage_x, decalage_y };
-            }
-
-            List<int> NO_decalage = GetRognageFromLocation(NO_Latitude, NO_Longitude);
-            List<int> SE_decalage = GetRognageFromLocation(SE_Latitude, SE_Longitude);
-            int NbrtilesInCol = Collectif.CoordonneesToTile(SE_Latitude, SE_Longitude, zoom).X - Collectif.CoordonneesToTile(NO_Latitude, NO_Longitude, zoom).X + 1;
-            int NbrtilesInRow = Collectif.CoordonneesToTile(SE_Latitude, SE_Longitude, zoom).Y - Collectif.CoordonneesToTile(NO_Latitude, NO_Longitude, zoom).Y + 1;
-            int final_image_width = Math.Abs((NbrtilesInCol * tile_width) - (NO_decalage[0] + (tile_width - SE_decalage[0])));
-            int final_image_height = Math.Abs((NbrtilesInRow * tile_width) - (NO_decalage[1] + (tile_width - SE_decalage[1])));
-            if (final_image_width < 10 || final_image_height < 10)
-            {
-                final_image_width = 10;
-                final_image_height = 10;
-            }
-
-            Dictionary<string, int> return_dictionnary = new Dictionary<string, int>
-            {
-                {"NO_decalage_x", NO_decalage[0] },
-                {"NO_decalage_y", NO_decalage[1] },
-                {"SE_decalage_x", SE_decalage[0] },
-                {"SE_decalage_y", SE_decalage[1] },
-                {"width", final_image_width },
-                {"height", final_image_height }
-            };
-            return return_dictionnary;
         }
     }
 }

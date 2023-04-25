@@ -3,7 +3,8 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-      xmlns:avalonEdit="clr-namespace:ICSharpCode.AvalonEdit;assembly=ICSharpCode.AvalonEdit" 
+      xmlns:cbcontrols="clr-namespace:BlackPearl.Controls.CoreLibrary;assembly=BlackPearl.Controls.CoreLibrary"
+      xmlns:avalonEdit="clr-namespace:ICSharpCode.AvalonEdit;assembly=ICSharpCode.AvalonEdit"
       xmlns:editing="clr-namespace:ICSharpCode.AvalonEdit.Editing;assembly=ICSharpCode.AvalonEdit"
       xmlns:local="clr-namespace:MapsInMyFolder" xmlns:ui="http://schemas.modernwpf.com/2019" xmlns:map="clr-namespace:MapsInMyFolder.MapControl;assembly=MapsInMyFolder.MapControl" xmlns:sys="clr-namespace:System;assembly=netstandard"
       mc:Ignorable="d" 
@@ -101,6 +102,18 @@
                         </ComboBox>
                     </Grid>
 
+
+                    <Grid Margin="0,10,0,0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="20"/>
+                            <RowDefinition Height="*" />
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        <Label Content="Pays :" Foreground="#888989" Grid.Row="0"></Label>
+
+                        <cbcontrols:MultiSelectCombobox x:Name="PaysComboBox" DisplayMemberPath="DisplayName" ItemSeparator=";" Grid.Row="1" HorizontalAlignment="Stretch" MinHeight="16" Height="Auto" RequestBringIntoView="DisableAllRequestBringIntoView"/>
+                    </Grid>
+                    
                     <Grid Margin="0,10,0,0">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="20"/>
@@ -127,7 +140,7 @@
                             <RowDefinition Height="*" />
                             <RowDefinition/>
                         </Grid.RowDefinitions>
-                        <Label Content="Script :" Foreground="#888989" Grid.Row="0"></Label>
+                        <Label Content="Scripts :" Foreground="#888989" Grid.Row="0"></Label>
                         <avalonEdit:TextEditor x:Name="TextboxLayerScript" Grid.Row="1" KeyUp="TextboxLayerScript_KeyUp" HorizontalAlignment="Stretch" SyntaxHighlighting="MIMF_JavaScript" MinHeight="80" ShowLineNumbers="True" Height="Auto" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" RequestBringIntoView="DisableAllRequestBringIntoView" >
                             <avalonEdit:TextEditor.ContextMenu>
                                 <ContextMenu Foreground="#E2E2E1" Background="#171719" >
@@ -137,8 +150,8 @@
                                 </ContextMenu>
                             </avalonEdit:TextEditor.ContextMenu>
                         </avalonEdit:TextEditor>
-                    </Grid> 
-                    
+                    </Grid>
+
                     <Grid Margin="0,10,0,0">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="20"/>
@@ -146,7 +159,7 @@
                             <RowDefinition/>
                         </Grid.RowDefinitions>
                         <Label Content="Aire (rectangles qui seront affichés si définis sur la map) :" Foreground="#888989" Grid.Row="0"></Label>
-                        <avalonEdit:TextEditor x:Name="TextboxRectangles" Grid.Row="1" HorizontalAlignment="Stretch" SyntaxHighlighting="MIMF_Json" MinHeight="20" ShowLineNumbers="False" Height="Auto" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" RequestBringIntoView="DisableAllRequestBringIntoView" ContextMenu="{StaticResource CopyPasteContextMenu}" KeyUp="TextboxRectangles_KeyUp"/>
+                        <avalonEdit:TextEditor x:Name="TextboxRectangles" Grid.Row="1" HorizontalAlignment="Stretch" SyntaxHighlighting="MIMF_Json" MinHeight="20" ShowLineNumbers="False" Height="Auto" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" RequestBringIntoView="DisableAllRequestBringIntoView" ContextMenu="{StaticResource CopyPasteContextMenu}" KeyUp="TextboxRectangles_KeyUp" TextChanged="TextboxRectangles_TextChanged"/>
                         <Label x:Name="LabelOpenVisualRectanglesEditor" IsTabStop="True" VerticalAlignment="Center" Content="Cliquez ici pour ouvrir l'éditeur visuel" Foreground="#888989" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" MouseEnter="ClickableLabel_MouseEnter" MouseLeave="ClickableLabel_MouseLeave" MouseUp="LabelOpenVisualRectanglesEditor_MouseUp"></Label>
                     </Grid>
 
@@ -167,6 +180,14 @@
                         <Label Content="Max-Zoom :" Foreground="#888989" Grid.Row="0" Grid.Column="2"></Label>
                         <TextBox x:Name="TextBoxLayerMaxZoom" HorizontalAlignment="Stretch" Grid.Row="1" Grid.Column="2" Style="{DynamicResource TextBoxCleanStyle_13}" TextChanged="TextBoxLayerMaxZoom_TextChanged" LostFocus="TextBoxLayerMaxZoom_LostFocus"></TextBox>
                         <Label x:Name="LabelAutoDetectZoom" IsTabStop="True" VerticalAlignment="Center" Content="Cliquez ici pour detecter automatiquement l'interval de zooms" Foreground="#888989" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" MouseEnter="ClickableLabel_MouseEnter" MouseLeave="ClickableLabel_MouseLeave" MouseUp="LabelAutoDetectZoom_MouseUp"></Label>
+                    </Grid>
+
+                    <Grid Margin="0,10,0,0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="20"/>
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <CheckBox x:Name="has_scale" Foreground="#888989" Grid.Row="0" IsChecked="True">Les tuiles du calques sont à l'echelle</CheckBox>
                     </Grid>
 
                     <Grid Margin="0,10,0,0">
@@ -277,26 +298,29 @@
                 <RowDefinition Height="65"/>
                 <RowDefinition Height="*" />
                 <RowDefinition Height="10" />
-                <RowDefinition Height="20" />
+                <RowDefinition Height="30" />
                 <RowDefinition Height="15" />
             </Grid.RowDefinitions>
             <Button Grid.Row="0" Grid.Column="1" x:Name="ClosePage_button" Style="{DynamicResource IconButton}" Margin="0,15,0,0" VerticalAlignment="Top" HorizontalAlignment="Right" Click="ClosePage_button_Click" Height="30" Width="30" Foreground="#FFE2E2E1" Cursor="Hand" ToolTip="Fermer cette fenêtre">
                 <Path Panel.ZIndex="999" StrokeStartLineCap="round" StrokeEndLineCap="round" StrokeLineJoin="round" StrokeThickness="0.8" Data="{StaticResource CloseButton}" Stroke="{Binding Foreground, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Button}}" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center" RenderTransformOrigin="0,0" Height="20" Width="20"/>
             </Button>
+            
             <Grid Margin="10,0,0,0" Grid.Row="1" Grid.Column="0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="35" />
                     <RowDefinition Height="3*"/>
                     <RowDefinition Height="45"/>
                     <RowDefinition Height="2*" />
-                    <RowDefinition Height="50" />
+                    <RowDefinition Height="40" />
+                    <RowDefinition Height="5" />
                 </Grid.RowDefinitions>
                 <Label Grid.Row="0" Grid.Column="0" Content="Apperçu : " HorizontalAlignment="Left" Margin="0,-4,0,0" VerticalAlignment="Top" Width="Auto" FontSize="16.5" FontFamily="Segoe UI Semilight" Foreground="#FFE2E2E1"/>
-                <map:Map Grid.Row="1" Grid.Column="0" x:Name="mapviewerappercu" ZoomLevel="18" MinHeight="30" MinWidth="30" Background="White">
+                <map:Map Grid.Row="1" Grid.Column="0" x:Name="mapviewerappercu" ZoomLevel="18" MinHeight="30" MinWidth="30" Background="White" MouseWheel="mapviewerappercu_MouseWheel">
                     <map:Map.Center>
                         <map:Location Longitude="6.429381" Latitude="48.198846"/>
                     </map:Map.Center>
                     <map:MapTileLayer x:Name="MapTileLayer_Transparent"/>
+                    <map:MapItemsControl x:Name="mapviewerRectangles"></map:MapItemsControl>
                 </map:Map>
 
                 <StackPanel Grid.Row="1" Grid.Column="0"  HorizontalAlignment="Right" VerticalAlignment="Top" Orientation="Horizontal">
@@ -321,6 +345,7 @@
                             <ui:MenuFlyout Placement="BottomEdgeAlignedRight" >
                                 <MenuItem x:Name="AutoUpdateLayer" Foreground="#BCBCBC" Header="Mettre à jour la carte automatiquement" IsCheckable="True" IsChecked="False" Checked="AutoUpdateLayer_Checked"></MenuItem>
                                 <MenuItem x:Name="BackgroundSwitch" Foreground="#BCBCBC" Header="Afficher le calque de fond" IsCheckable="True" IsChecked="True" Unchecked="BackgroundSwitch_Toggle" Checked="BackgroundSwitch_Toggle"></MenuItem>
+                                <MenuItem x:Name="IsInDebugModeSwitch" Foreground="#BCBCBC" Header="Afficher les numéros de tuiles" IsCheckable="True" IsChecked="False" Unchecked="IsInDebugModeSwitch_Toggle" Checked="IsInDebugModeSwitch_Toggle"></MenuItem>
                             </ui:MenuFlyout>
                         </ui:DropDownButton.Flyout>
                     </ui:DropDownButton>
@@ -339,7 +364,7 @@
                     </TextBox.Resources>
                 </TextBox>
             </Grid>
-            <Button x:Name="SaveEditButton" Grid.Row="2" Grid.RowSpan="2" Grid.Column="1" Style="{DynamicResource RoundedButton}" Content="Enregistrer" Height="40" Width="180" Margin="0,-15,0,0" VerticalAlignment="Center" HorizontalAlignment="Right" Foreground="#fff" FontSize="18" Click="SaveEditButton_Click"/>
+            <Button x:Name="SaveEditButton" Grid.Row="2" Grid.RowSpan="3" Grid.Column="1" Style="{DynamicResource RoundedButton}" Content="Enregistrer" Height="40" Width="180" Margin="0,0,0,10" VerticalAlignment="Center" HorizontalAlignment="Right" Foreground="#fff" FontSize="18" Click="SaveEditButton_Click"/>
         </Grid>
     </Grid>
 </Page>

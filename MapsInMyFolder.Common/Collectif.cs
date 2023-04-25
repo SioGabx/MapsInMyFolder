@@ -1,6 +1,4 @@
-﻿using Jint;
-using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -17,9 +15,11 @@ using System.Windows;
 using System.Windows.Media;
 using System.Text.RegularExpressions;
 using System.Windows.Media.Animation;
-using MapsInMyFolder.Commun;
-using NetVips;
 using System.Windows.Input;
+using MapsInMyFolder.Commun;
+using Newtonsoft.Json;
+using NetVips;
+using Jint;
 
 namespace MapsInMyFolder.Commun
 {
@@ -211,6 +211,7 @@ namespace MapsInMyFolder.Commun
             }
         }
 
+
         public static DoubleAnimation GetOpacityAnimation(int toValue, double durationMultiplicator = 1)
         {
             return new DoubleAnimation(toValue, TimeSpan.FromMilliseconds((long)(Settings.animations_duration_millisecond * durationMultiplicator)))
@@ -297,7 +298,7 @@ namespace MapsInMyFolder.Commun
             {
                 return HexValueToSolidColorBrush(defaulthexvalue);
             }
-            
+
         }
 
         public static SolidColorBrush RgbValueToSolidColorBrush(int R, int G, int B)
@@ -463,7 +464,7 @@ namespace MapsInMyFolder.Commun
                     int offsetY = (int)Math.Floor((double)(border_tile_size - text.Height) / 2);
                     using (NetVips.Image image = NetVips.Image.Black(border_tile_size, border_tile_size).Linear(color, color).Composite2(text, NetVips.Enums.BlendMode.Atop, offsetX, offsetY))
                     {
-                       return image.Gravity(Enums.CompassDirection.Centre, tile_size, tile_size, Enums.Extend.Black).WriteToBuffer("." + format, saveVOption); ;
+                        return image.Gravity(Enums.CompassDirection.Centre, tile_size, tile_size, Enums.Extend.Black).WriteToBuffer("." + format, saveVOption); ;
                     }
                 }
             }
@@ -487,7 +488,7 @@ namespace MapsInMyFolder.Commun
             return String.Format("{0:0} {1}", dblSByte, Suffix[i]);
         }
 
-        public static VOption getSaveVOption(string final_saveformat, int quality, int tile_size)
+        public static VOption getSaveVOption(string final_saveformat, int quality, int? tile_size)
         {
             if (quality <= 0)
             {
@@ -793,7 +794,7 @@ namespace MapsInMyFolder.Commun
             {
                 int CaretIndex = TextBox.CaretOffset;
                 TextBox.TextArea.Document.Insert(CaretIndex, text);
-                
+
                 TextBox.CaretOffset = CaretIndex + text.Length;
             }
             else
@@ -802,32 +803,25 @@ namespace MapsInMyFolder.Commun
                 TextBox.CaretOffset += TextBox.SelectedText.Length;
                 TextBox.SelectionLength = 0;
             }
-            
-            //int lineIndex = TextBox.GetLineIndexFromCharacterIndex(TextBox.CaretIndex);
-            //TextBox.ScrollToLine(lineIndex);
         }
+
         public static void TextEditorCursorPositionChanged(ICSharpCode.AvalonEdit.TextEditor textEditor, Grid grid, ScrollViewer scrollViewer, int MarginTop = 25)
         {
             if (Mouse.LeftButton == MouseButtonState.Pressed) { return; }
-
-
-                double Margin = 40;
+            double Margin = 40;
 
             double TextboxLayerScriptTopPosition = textEditor.TranslatePoint(new Point(0, 0), grid).Y;
             double TextboxLayerScriptCaretTopPosition = textEditor.TextArea.Caret.CalculateCaretRectangle().Top + TextboxLayerScriptTopPosition;
             if (TextboxLayerScriptCaretTopPosition > (grid.ActualHeight - Margin))
             {
                 scrollViewer.ScrollToVerticalOffset(scrollViewer.VerticalOffset + (TextboxLayerScriptCaretTopPosition - (grid.ActualHeight - Margin)));
-                Debug.WriteLine("Scroll down");
-                return;
-            }else if (TextboxLayerScriptCaretTopPosition < MarginTop)
-            {
-                scrollViewer.ScrollToVerticalOffset(scrollViewer.VerticalOffset - Math.Abs((MarginTop) - TextboxLayerScriptCaretTopPosition));
-                Debug.WriteLine("Scroll up");
                 return;
             }
-           // e.
-            Debug.WriteLine($"-----\nEditeurScrollBar.VerticalOffset : {scrollViewer.VerticalOffset}\nTextboxLayerScript.TextArea.Caret :{textEditor.TextArea.Caret.CalculateCaretRectangle().Top}\nTextboxLayerScript.ActualHeight :{textEditor.ActualHeight}\nTextboxLayerScriptCaretTopPosition : {TextboxLayerScriptCaretTopPosition}\nEditeurGrid.ActualHeight : {grid.ActualHeight}\nTextboxLayerScriptTopPosition : {TextboxLayerScriptTopPosition}");
+            else if (TextboxLayerScriptCaretTopPosition < MarginTop)
+            {
+                scrollViewer.ScrollToVerticalOffset(scrollViewer.VerticalOffset - Math.Abs((MarginTop) - TextboxLayerScriptCaretTopPosition));
+                return;
+            }
         }
 
         public static void IndenterCode(object sender, EventArgs e, ICSharpCode.AvalonEdit.TextEditor textBox)
@@ -872,9 +866,11 @@ namespace MapsInMyFolder.Commun
                 for (int i = 0; i < VisualTreeHelper.GetChildrenCount(obj); i++)
                 {
                     UIElement objChild;
-                    try {
-                    objChild = (UIElement)VisualTreeHelper.GetChild(obj, i);
-                    }catch(InvalidCastException)
+                    try
+                    {
+                        objChild = (UIElement)VisualTreeHelper.GetChild(obj, i);
+                    }
+                    catch (InvalidCastException)
                     {
                         //Unable to cast object to type 'System.Windows.UIElement'
                         continue;
@@ -949,17 +945,17 @@ namespace MapsInMyFolder.Commun
 
         public static int CheckIfInputValueHaveChange(UIElement SourcePanel)
         {
-
             List<System.Type> TypeOfSearchElement = new List<System.Type>
             {
                 typeof(TextBox),
                 typeof(ComboBox),
                 typeof(CheckBox),
                 typeof(RadioButton),
-                typeof(ICSharpCode.AvalonEdit.TextEditor)
+                typeof(ICSharpCode.AvalonEdit.TextEditor),
+                typeof(BlackPearl.Controls.CoreLibrary.MultiSelectCombobox)
             };
 
-            var ListOfisualChildren = FindVisualChildren(SourcePanel, TypeOfSearchElement);
+            List<UIElement> ListOfisualChildren = FindVisualChildren(SourcePanel, TypeOfSearchElement);
 
             string strHachCode = String.Empty;
             ListOfisualChildren.ForEach(element =>
@@ -988,7 +984,8 @@ namespace MapsInMyFolder.Commun
                             {
                                 hachCode = value.GetHashCode();
                             }
-                        }else if (type == typeof(ComboBox))
+                        }
+                        else if (type == typeof(ComboBox))
                         {
                             ComboBox ComboBox = (ComboBox)element;
                             string value = ComboBox.Text;
@@ -1008,6 +1005,19 @@ namespace MapsInMyFolder.Commun
                             RadioButton RadioButton = (RadioButton)element;
                             hachCode = RadioButton.IsChecked.GetHashCode();
                         }
+                        else if (type == typeof(BlackPearl.Controls.CoreLibrary.MultiSelectCombobox))
+                        {
+                            BlackPearl.Controls.CoreLibrary.MultiSelectCombobox MultiSelectCombobox = (BlackPearl.Controls.CoreLibrary.MultiSelectCombobox)element;
+                            if (MultiSelectCombobox.SelectedItems != null && MultiSelectCombobox.SelectedItems.Count > 0)
+                            {
+                                
+                                hachCode = string.Join(";", MultiSelectCombobox.SelectedValues("EnglishName")).GetHashCode();
+                            }
+                            else
+                            {
+                                hachCode = 0;
+                            }
+                        }
                         else
                         {
                             throw new System.NotSupportedException("The type " + type.Name + " is not supported by the function");
@@ -1016,6 +1026,7 @@ namespace MapsInMyFolder.Commun
                     }
                 }
             });
+            ListOfisualChildren.Clear();
             return strHachCode.GetHashCode();
         }
 
@@ -1107,7 +1118,7 @@ namespace MapsInMyFolder.Commun
             string textboxtext = textbElement.Text;
             var cursor_position = textbElement.SelectionStart;
             string filtered_string = FilterDigitOnly(textboxtext, char_supplementaire);
-            textbElement.Text = filtered_string;
+            textbElement.SetText(filtered_string);
             if (textboxtext != filtered_string)
             {
                 if (cursor_position > 0) textbElement.SelectionStart = cursor_position - 1;
@@ -1120,20 +1131,20 @@ namespace MapsInMyFolder.Commun
             }
         }
 
-        public static bool FilterDigitOnlyWhileWritingInTextBox(TextBox textbElement, System.Windows.Controls.TextChangedEventHandler action, int MaxInt = -1, List<char> char_supplementaire = null)
+        public static bool FilterDigitOnlyWhileWritingInTextBoxWithMaxValue(TextBox textbElement, int MaxInt = -1, List<char> char_supplementaire = null)
         {
             if (textbElement is null)
             {
                 return false;
             }
             bool TextHasBeenFilteredAndChanged = false;
-            textbElement.TextChanged -= action;
             if (FilterDigitOnlyWhileWritingInTextBox(textbElement, char_supplementaire))
             {
-                if (MaxInt != -1 && Convert.ToUInt32(textbElement?.Text) > MaxInt)
+                if (!double.TryParse(textbElement?.Text, out double textbElementTextValue)) { return false; }
+                if (MaxInt != -1 && textbElementTextValue > MaxInt)
                 {
                     string MaxIntString = MaxInt.ToString();
-                    textbElement.Text = MaxIntString;
+                    textbElement.SetText(MaxIntString);
                     textbElement.SelectionStart = MaxIntString.Length;
                 }
                 else
@@ -1141,8 +1152,6 @@ namespace MapsInMyFolder.Commun
                     TextHasBeenFilteredAndChanged = true;
                 }
             }
-            textbElement.TextChanged += action;
-
             return TextHasBeenFilteredAndChanged;
         }
 

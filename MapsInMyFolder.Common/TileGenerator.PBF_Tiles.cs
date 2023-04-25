@@ -14,7 +14,7 @@ namespace MapsInMyFolder.Commun
     {
         public async Task<HttpResponse> GetTilePBF(int LayerID, string urlBase, int TileX, int TileY, int TileZoom, string save_temp_directory, int render_tile_size, int TextSizeMultiplicateur, double OverflowTextCorrectingValue, bool pbfdisableadjacent = false)
         {
-            System.Threading.Thread.CurrentThread.Priority = System.Threading.ThreadPriority.Highest;
+            //System.Threading.Thread.CurrentThread.Priority = System.Threading.ThreadPriority.Highest;
             HttpResponse returnReponse = HttpResponse.HttpResponseError;
             try
             {
@@ -58,7 +58,7 @@ namespace MapsInMyFolder.Commun
         static readonly object PBF_SetProviders_Locker = new object();
         public async Task<HttpResponse> PBFRenderingAsync(int tache, int LayerID, string urlBase, int TileX, int TileY, int zoom, string save_temp_directory, int render_tile_size, int TextSizeMultiplicateur, double OverflowTextCorrectingValue, bool pbfdisableadjacent = false)
         {
-            System.Threading.Thread.CurrentThread.Priority = System.Threading.ThreadPriority.Highest;
+            //System.Threading.Thread.CurrentThread.Priority = System.Threading.ThreadPriority.Highest;
             DebugMode.WriteLine("Function PBFrender LayerId:" + LayerID + " for tache " + tache);
             int settings_max_tiles_cache_days = Settings.tiles_cache_expire_after_x_days;
             if (LayerID <= 0)

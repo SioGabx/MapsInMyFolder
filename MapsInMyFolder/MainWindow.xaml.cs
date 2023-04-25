@@ -38,6 +38,7 @@ namespace MapsInMyFolder
         public void FrameBack(bool NoTransition = false)
         {
             AppTitleBar.Opacity = 1;
+            AppTitleBar.IsEnabled = true;
             if (CustomOrEditLayersPage is not null)
             {
                 CustomOrEditLayersPage = null;
@@ -219,12 +220,12 @@ namespace MapsInMyFolder
             _instance.MainPage.ReloadPage();
             _instance.MainPage.SearchLayerStart();
             _instance.MainPage.Init_download_panel();
-            _instance.MainPage.Set_current_layer(Settings.layer_startup_id);
+            _instance.MainPage.Set_current_layer(Layers.Curent.class_id);
         }
 
         private void Window_ContentRendered(object sender, EventArgs e)
         {
-            MainPage.Set_current_layer(Settings.layer_startup_id);
+           // MainPage.Set_current_layer(Settings.layer_startup_id);
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -237,20 +238,10 @@ namespace MapsInMyFolder
         }
 
 
-        public void Popup_closing()
-        {
-            AppTitleBar.Opacity = 1;
-            DoubleAnimation hide_anim = new DoubleAnimation(0d, TimeSpan.FromMilliseconds(Settings.animations_duration_millisecond / 1.3))
-            {
-                EasingFunction = new PowerEase { EasingMode = EasingMode.EaseInOut }
-            };
-            hide_anim.Completed += (s, e) => MainPage.popup_background.Visibility = Visibility.Hidden;
-            MainPage.popup_background.BeginAnimation(OpacityProperty, hide_anim);
-        }
-
         public void Popup_opening(bool ReduceOpacity = true)
         {
             AppTitleBar.Opacity = 0.5;
+            AppTitleBar.IsEnabled = false;
             MainPage.Download_panel_close();
             if (ReduceOpacity)
             {

@@ -137,7 +137,7 @@ namespace MapsInMyFolder.MapControl
             {
                 UpdateTiles();
 
-                return TileImageLoader.LoadTiles(Tiles, TileSource, SourceName);
+                return TileImageLoader.SortedLoadTiles(Tiles, TileSource, SourceName);
             }
 
             return Task.CompletedTask;

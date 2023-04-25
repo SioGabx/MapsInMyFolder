@@ -4,8 +4,10 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using Microsoft.Win32;
 
 namespace MapsInMyFolder
 {
@@ -112,18 +114,24 @@ namespace MapsInMyFolder
             }
 
             //layersSort
-            var LayersSortValues = (LayersSort[])Enum.GetValues(typeof(LayersSort));
-            for (int LayersSortValuesIndex = 0; LayersSortValuesIndex < LayersSortValues.Length; LayersSortValuesIndex++)
+            layersSort.ItemSource = new List<string>()
             {
-                layersSort.Items.Add(LayersSortValues[LayersSortValuesIndex].ToString().ToLowerInvariant().UcFirst());
-                if (LayersSortValues[LayersSortValuesIndex].ToString() == Settings.layers_Sort.ToString())
-                {
-                    layersSort.SelectedIndex = LayersSortValuesIndex;
-                }
-            }
-
-            //LayersOrder
-            LayersOrder.IsChecked = Settings.Layers_Order == Commun.LayersOrder.ASC;
+                "ID ASC",
+                "ID DESC",
+                "NOM ASC",
+                "NOM DESC",
+                "DESCRIPTION ASC",
+                "DESCRIPTION DESC",
+                "CATEGORIE ASC",
+                "CATEGORIE DESC",
+                "FORMAT ASC",
+                "FORMAT DESC",
+                "SITE ASC",
+                "SITE DESC",
+                "PAYS ASC",
+                "PAYS DESC"
+            };
+            layersSort.SelectedItems = Settings.layers_Sort.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList();
 
             //layerpanel_put_non_letter_layername_at_the_end
             layerpanel_put_non_letter_layername_at_the_end.IsChecked = Settings.layerpanel_put_non_letter_layername_at_the_end;
@@ -183,6 +191,8 @@ namespace MapsInMyFolder
             nettoyer_cache_layers_au_demarrage.IsChecked = Settings.nettoyer_cache_layers_au_demarrage;
             search_application_update_on_startup.IsChecked = Settings.search_application_update_on_startup;
             search_database_update_on_startup.IsChecked = Settings.search_database_update_on_startup;
+            PaysComboBox.ItemSource = Country.getList();
+            PaysComboBox.SelectedItems = Country.getListFromEnglishName(Settings.filter_layers_based_on_country.Split(';', StringSplitOptions.RemoveEmptyEntries));
 
             DefaultValuesHachCode = Collectif.CheckIfInputValueHaveChange(SettingsScrollViewer);
             SettingsVersionInformation.Content = Update.GetActualProductVersionFormatedString();
@@ -273,6 +283,8 @@ namespace MapsInMyFolder
             Settings.nettoyer_cache_layers_au_demarrage = nettoyer_cache_layers_au_demarrage.IsChecked ?? false;
             Settings.layerpanel_put_non_letter_layername_at_the_end = layerpanel_put_non_letter_layername_at_the_end.IsChecked ?? false;
             Settings.layerpanel_favorite_at_top = layerpanel_favorite_at_top.IsChecked ?? false;
+            Settings.filter_layers_based_on_country = string.Join(';', PaysComboBox.SelectedValues("EnglishName"));
+
             string layerpanel_displaystylevalue = layerpanel_displaystyle.SelectedValue.ToString().ToUpperInvariant();
             Settings.layerpanel_displaystyle = (ListDisplayType)Enum.Parse(typeof(ListDisplayType), layerpanel_displaystylevalue);
             Settings.NO_PIN_starting_location_latitude = Convert.ToDouble(NO_PIN_starting_location_latitude.Text);
@@ -288,16 +300,8 @@ namespace MapsInMyFolder
 
             Settings.search_application_update_on_startup = search_application_update_on_startup.IsChecked ?? false;
             Settings.search_database_update_on_startup = search_database_update_on_startup.IsChecked ?? false;
-            string layers_Sortvalue = layersSort.SelectedValue.ToString().ToUpperInvariant();
-            Settings.layers_Sort = (LayersSort)Enum.Parse(typeof(LayersSort), layers_Sortvalue);
-            if (LayersOrder.IsChecked == true)
-            {
-                Settings.Layers_Order = Commun.LayersOrder.ASC;
-            }
-            else
-            {
-                Settings.Layers_Order = Commun.LayersOrder.DESC;
-            }
+            Settings.layers_Sort = string.Join(',', layersSort.SelectedValues());
+
             if (visibility_pins.IsChecked ?? false)
             {
                 Settings.visibility_pins = Visibility.Visible;
@@ -372,7 +376,6 @@ namespace MapsInMyFolder
             }
             else if (result == ContentDialogResult.Secondary)
             {
-                Debug.WriteLine(result.ToString());
                 DefaultValuesHachCode = ValuesHachCode;
                 this.Close();
             }
@@ -387,7 +390,7 @@ namespace MapsInMyFolder
 
         private void FilterDigitTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            Collectif.FilterDigitOnlyWhileWritingInTextBox((TextBox)sender, FilterDigitTextBox_TextChanged);
+            Collectif.FilterDigitOnlyWhileWritingInTextBoxWithMaxValue((TextBox)sender, -1);
         }
 
         private void Window_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
@@ -418,7 +421,7 @@ namespace MapsInMyFolder
 
         private void SettingsScrollViewer_ScrollChanged(object sender, ScrollChangedEventArgs e)
         {
-            if (!IsInitialized) { return; } 
+            if (!IsInitialized) { return; }
             List<(StackPanel, Grid)> ListOfSubMenu = new List<(StackPanel, Grid)>()
             {
                 (CalqueSettings, MenuItem_Calque),
@@ -442,6 +445,41 @@ namespace MapsInMyFolder
                     item.MenuLabel.Style = this.Resources["GridSelectNormalStyle"] as Style;
                 }
             }
+        }
+
+        private void databaseExport_Click(object sender, RoutedEventArgs e)
+        {
+
+            SaveFileDialog DatabasesaveFileDialog = new SaveFileDialog();
+            DatabasesaveFileDialog.Filter = "SQL database |*.db|Text|*.txt";
+            DatabasesaveFileDialog.DefaultExt = "db";
+            DatabasesaveFileDialog.FileName = "exported_database.db";
+            DatabasesaveFileDialog.CheckPathExists = true;
+            DatabasesaveFileDialog.AddExtension = true;
+            DatabasesaveFileDialog.RestoreDirectory = true;
+            DatabasesaveFileDialog.ValidateNames = true;
+            DatabasesaveFileDialog.Title = "Export de la base de donnée";
+            if (DatabasesaveFileDialog.ShowDialog() == true)
+            {
+                try
+                {
+                    Database.Export(DatabasesaveFileDialog.FileName);
+                }
+                catch (Exception ex)
+                {
+                    Message.NoReturnBoxAsync("Une erreur s'est produite lors de l'export du fichier. " + ex.Message, "Erreur");
+                }
+
+            }
+            if (System.IO.File.Exists(DatabasesaveFileDialog.FileName))
+            {
+                Process.Start("explorer.exe", "/select,\"" + DatabasesaveFileDialog.FileName + "\"");
+            }
+            else
+            {
+                Message.NoReturnBoxAsync("Une erreur inconnue s'est produite lors de l'export du fichier", "Erreur");
+            }
+
         }
     }
 }
