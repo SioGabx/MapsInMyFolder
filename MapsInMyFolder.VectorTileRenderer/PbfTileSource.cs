@@ -35,16 +35,17 @@ namespace MapsInMyFolder.VectorTileRenderer.Sources
 
         public async Task<VectorTile> GetVectorTile(int x, int y, int zoom)
         {
-            if(Path != "")
+            if (Path != "")
             {
                 Debug.WriteLine("Download tile from pbf tile source");
                 using (var stream = await GetTile(x, y, zoom))
                 {
                     return await UnzipStream(stream);
                 }
-            } else if (Stream != null)
+            }
+            else if (Stream != null)
             {
-                return  await UnzipStream(Stream);
+                return await UnzipStream(Stream);
             }
 
             return null;
@@ -81,14 +82,16 @@ namespace MapsInMyFolder.VectorTileRenderer.Sources
             if (type == GeomType.LINESTRING)
             {
                 return "LineString";
-            } else if (type == GeomType.POINT)
+            }
+            else if (type == GeomType.POINT)
             {
                 return "Point";
             }
             else if (type == GeomType.POLYGON)
             {
                 return "Polygon";
-            } else
+            }
+            else
             {
                 return "Unknown";
             }
@@ -129,8 +132,8 @@ namespace MapsInMyFolder.VectorTileRenderer.Sources
 
                         foreach (var coordinate in points)
                         {
-                            var dX = (double)coordinate.X / (double)lyr.Extent;
-                            var dY = (double)coordinate.Y / (double)lyr.Extent;
+                            var dX = coordinate.X / (double)lyr.Extent;
+                            var dY = coordinate.Y / (double)lyr.Extent;
 
                             vectorPoints.Add(new Point(dX, dY));
 
@@ -167,18 +170,18 @@ namespace MapsInMyFolder.VectorTileRenderer.Sources
             }
         }
 
-       // bool IsGZipped(Stream stream)
-      //  {
-       //     return false;// IsZipped(stream, 3, "1F-8B-08");
+        // bool IsGZipped(Stream stream)
+        //  {
+        //     return false;// IsZipped(stream, 3, "1F-8B-08");
 
-            //A tester en cas de GZIP ?
-            //public static bool IsGZipHeader(byte[] arr)
-            //{
-            //    return arr.Length >= 2 &&
-            //        arr[0] == 31 &&
-            //        arr[1] == 139;
-            //}
-      //  }
+        //A tester en cas de GZIP ?
+        //public static bool IsGZipHeader(byte[] arr)
+        //{
+        //    return arr.Length >= 2 &&
+        //        arr[0] == 31 &&
+        //        arr[1] == 139;
+        //}
+        //  }
 
         //bool IsZipped(Stream stream, int signatureSize = 4, string expectedSignature = "50-4B-03-04")
         //{

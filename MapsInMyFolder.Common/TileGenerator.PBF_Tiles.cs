@@ -1,12 +1,11 @@
-﻿using System;
+﻿using MapsInMyFolder.VectorTileRenderer;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media.Imaging;
-using MapsInMyFolder.VectorTileRenderer;
-using System.IO;
-using System.Diagnostics;
-using System.Net.Http;
 
 namespace MapsInMyFolder.Commun
 {
@@ -14,7 +13,7 @@ namespace MapsInMyFolder.Commun
     {
         public async Task<HttpResponse> GetTilePBF(int LayerID, string urlBase, int TileX, int TileY, int TileZoom, string save_temp_directory, int render_tile_size, int TextSizeMultiplicateur, double OverflowTextCorrectingValue, bool pbfdisableadjacent = false)
         {
-            System.Threading.Thread.CurrentThread.Priority = System.Threading.ThreadPriority.Highest;
+            //System.Threading.Thread.CurrentThread.Priority = System.Threading.ThreadPriority.Highest;
             HttpResponse returnReponse = HttpResponse.HttpResponseError;
             try
             {
@@ -58,7 +57,7 @@ namespace MapsInMyFolder.Commun
         static readonly object PBF_SetProviders_Locker = new object();
         public async Task<HttpResponse> PBFRenderingAsync(int tache, int LayerID, string urlBase, int TileX, int TileY, int zoom, string save_temp_directory, int render_tile_size, int TextSizeMultiplicateur, double OverflowTextCorrectingValue, bool pbfdisableadjacent = false)
         {
-            System.Threading.Thread.CurrentThread.Priority = System.Threading.ThreadPriority.Highest;
+            //System.Threading.Thread.CurrentThread.Priority = System.Threading.ThreadPriority.Highest;
             DebugMode.WriteLine("Function PBFrender LayerId:" + LayerID + " for tache " + tache);
             int settings_max_tiles_cache_days = Settings.tiles_cache_expire_after_x_days;
             if (LayerID <= 0)
@@ -458,31 +457,31 @@ namespace MapsInMyFolder.Commun
                         }
                         int tentatives = 0;
                         do if (File.Exists(prov_save_filename))
-                        {
-                            Stream StreamPBFFile = null;
-                            bool success = false;
-                            try
                             {
-                                DebugMode.WriteLine("Trying to read file");
-                                StreamPBFFile = File.OpenRead(prov_save_filename);
-                                success = true;
-                                DebugMode.WriteLine("End read file");
-                            }
-                            catch (Exception ex)
-                            {
-                                Debug.WriteLine("TileGenerator : Failed to load " + prov_save_filename + " - " + tentatives + "/" + Settings.max_retry_download + "\n Reason : " + ex.Message);
-                                tentatives++;
-                                success = false;
-                                System.Threading.Thread.SpinWait(500);
-                            }
-                            if (success)
-                            {
-                                return new VectorTileRenderer.Sources.PbfTileSource(StreamPBFFile);
-                            }
-                            StreamPBFFile.Dispose();
-                            StreamPBFFile.Close();
+                                Stream StreamPBFFile = null;
+                                bool success = false;
+                                try
+                                {
+                                    DebugMode.WriteLine("Trying to read file");
+                                    StreamPBFFile = File.OpenRead(prov_save_filename);
+                                    success = true;
+                                    DebugMode.WriteLine("End read file");
+                                }
+                                catch (Exception ex)
+                                {
+                                    Debug.WriteLine("TileGenerator : Failed to load " + prov_save_filename + " - " + tentatives + "/" + Settings.max_retry_download + "\n Reason : " + ex.Message);
+                                    tentatives++;
+                                    success = false;
+                                    System.Threading.Thread.SpinWait(500);
+                                }
+                                if (success)
+                                {
+                                    return new VectorTileRenderer.Sources.PbfTileSource(StreamPBFFile);
+                                }
+                                StreamPBFFile.Dispose();
+                                StreamPBFFile.Close();
 
-                        } while (tentatives < Settings.max_retry_download);
+                            } while (tentatives < Settings.max_retry_download);
                     }
                 }
             }

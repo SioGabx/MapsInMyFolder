@@ -127,7 +127,7 @@ namespace MapsInMyFolder.VectorTileRenderer.Sources
             var extent = new Rect(0, 0, 1, 1);
             bool overZoomed = false;
 
-            if(zoom > MaxZoom)
+            if (zoom > MaxZoom)
             {
                 var bounds = gmt.TileLatLonBounds(x, y, zoom);
 
@@ -192,7 +192,8 @@ namespace MapsInMyFolder.VectorTileRenderer.Sources
                 }
 
                 return actualTile;
-            } catch(Exception)
+            }
+            catch (Exception)
             {
                 return null;
             }

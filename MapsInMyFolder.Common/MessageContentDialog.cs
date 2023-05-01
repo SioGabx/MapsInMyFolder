@@ -92,11 +92,11 @@ namespace MapsInMyFolder.Commun
                      DefaultButton = ContentDialogButton.Primary,
                      Background = Collectif.HexValueToSolidColorBrush("#171719")
                  };
- 
+
                  if (showTextbox)
                  {
-                    //alert("Veuillez indiquer l'adresse URL du panorama à télécharger :","Google Maps")
-                    StackPanel stackPanel = new StackPanel();
+                     //alert("Veuillez indiquer l'adresse URL du panorama à télécharger :","Google Maps")
+                     StackPanel stackPanel = new StackPanel();
                      TextBlock textBlock = new TextBlock();
                      if (!string.IsNullOrEmpty(text?.ToString()))
                      {

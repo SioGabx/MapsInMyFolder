@@ -1,10 +1,13 @@
-﻿using Jint;
+﻿using Esprima;
+using Esprima.Ast;
+using Jint;
 using Jint.Native;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
@@ -71,22 +74,25 @@ namespace MapsInMyFolder.Commun
 
         private static Engine SetupEngine(int LayerId)
         {
+            CancellationTokenSource JsCancelToken = new CancellationTokenSource();
+            if (JsListCancelTocken.ContainsKey(LayerId))
+            {
+                JsListCancelTocken.Remove(LayerId);
+            }
+            try
+            {
+                JsListCancelTocken.Add(LayerId, JsCancelToken);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("Error JsListCancelTocken " + ex.Message);
+            }
+
+
             Engine add = new Engine(options =>
             {
-                options.TimeoutInterval(TimeSpan.FromSeconds(15));
+                options.TimeoutInterval(TimeSpan.FromSeconds(10));
                 options.MaxStatements(5000);
-                CancellationTokenSource JsCancelToken = new CancellationTokenSource();
-                if (!JsListCancelTocken.ContainsKey(LayerId))
-                {
-                    try
-                    {
-                        JsListCancelTocken.Add(LayerId, JsCancelToken);
-                    }
-                    catch (Exception ex)
-                    {
-                        Debug.WriteLine("Error JsListCancelTocken " + ex.Message);
-                    }
-                }
                 options.CancellationToken(JsCancelToken.Token);
             });
 
@@ -415,7 +421,7 @@ namespace MapsInMyFolder.Commun
             {
                 SetupNotification();
             }
-          
+
             return notification?.NotificationId;
         }
 
@@ -545,6 +551,34 @@ namespace MapsInMyFolder.Commun
         }
         #endregion
 
+        public static string AddOrReplaceFunction(string script, string functionName, string functionInstance)
+        {
+            var JavaScriptParser = new JavaScriptParser();
+            Script ParsedScript = JavaScriptParser.ParseScript(script);
+            string JoinStatements = string.Empty;
+            bool FunctionFound = false;
+            foreach (Statement IndividualStatement in ParsedScript.Body)
+            {
+                if (IndividualStatement is FunctionDeclaration functionDeclaration)
+                {
+                    if (functionDeclaration?.Id?.Name == functionName)
+                    {
+                        FunctionFound = true;
+                        JoinStatements += functionInstance;
+                    }
+                    else
+                    {
+                        JoinStatements += IndividualStatement;
+                    }
+                }
+            }
+            if (!FunctionFound)
+            {
+                JoinStatements += functionInstance;
+            }
+
+            return JoinStatements;
+        }
 
         public static bool CheckIfFunctionExist(Engine add, string functionName)
         {
@@ -566,54 +600,80 @@ namespace MapsInMyFolder.Commun
             {
                 script = Layers.GetLayerById(LayerId).class_tilecomputationscript;
             }
-
+            Engine add;
             lock (locker)
             {
-                Engine add = EngineGetById(LayerId, script);
-                if (add is null)
-                {
-                    return false;
-                }
-                JsValue evaluateValue = add.Evaluate("typeof " + functionName + " === 'function'");
-
-                return evaluateValue.AsBoolean();
+                add = EngineGetById(LayerId, script);
             }
+            if (add is null)
+            {
+                return false;
+            }
+            JsValue evaluateValue = add.Evaluate("typeof " + functionName + " === 'function'");
+
+            return evaluateValue.AsBoolean();
+
         }
 
         public static Jint.Native.JsValue ExecuteScript(string script, Dictionary<string, object> arguments, int LayerId, Collectif.GetUrl.InvokeFunction InvokeFunction)
         {
             return ExecuteScript(script, arguments, LayerId, InvokeFunction.ToString());
         }
+
+
         public static Jint.Native.JsValue ExecuteScript(string script, Dictionary<string, object> arguments, int LayerId, string InvokeFunctionString)
         {
+            Jint.Native.JsValue jsValue = null;
+            Engine add = null;
+
             lock (locker)
             {
-                Engine add = EngineGetById(LayerId, script);
-                if (add is null)
+                CancellationTokenSource cts = new CancellationTokenSource();
+                Task<Jint.Native.JsValue> task = Task.Run(() =>
                 {
-                    return null;
-                }
-                Jint.Native.JsValue jsValue = null;
-                try
-                {
-                    jsValue = add.Invoke(InvokeFunctionString, arguments);
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine(ex.Message);
-                    if (ex.Message == "Can only invoke functions")
+                    add = EngineGetById(LayerId, script);
+                    if (add is null)
                     {
-                        //PrintError("No main function fund. Use \"function getT(args) {}\"");
-                        PrintError("La fontion " + InvokeFunctionString + " n'as pas été trouvé dans le script. Faite help() pour obtenir de l'aide sur cette commande.");
+                        return null;
                     }
-                    else
+                    try
                     {
-                        PrintError(ex.Message);
+                        return add.Invoke(InvokeFunctionString, arguments);
                     }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine(ex.Message);
+                        if (ex.Message == "Can only invoke functions")
+                        {
+                            //PrintError("No main function fund. Use \"function getT(args) {}\"");
+                            PrintError("La fontion " + InvokeFunctionString + " n'as pas été trouvé dans le script. Faite help() pour obtenir de l'aide sur cette commande.");
+                        }
+                        else
+                        {
+                            PrintError(ex.Message);
+                        }
+                        return null;
+                    }
+                    finally
+                    {
+                        EngineUpdate(add, LayerId);
+                    }
+                }, cts.Token);
+
+
+                int TimeoutInSeconds = 4;
+
+                if (task.Wait(TimeSpan.FromSeconds(TimeoutInSeconds)))
+                {
+                    jsValue = task.Result;
                 }
-                EngineUpdate(add, LayerId);
-                return jsValue;
+                else
+                {
+                    PrintError($"Script execution timed out ({TimeoutInSeconds} seconds).");
+                    cts.Cancel();
+                }
             }
+            return jsValue;
         }
 
         public static void ExecuteCommand(string command, int LayerId)

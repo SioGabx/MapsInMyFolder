@@ -1,4 +1,6 @@
 ﻿using Jint;
+using MapsInMyFolder.Commun;
+using NetVips;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -7,19 +9,17 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
-using System.Windows.Media.Imaging;
-using System.Reflection;
-using System.Windows;
-using System.Windows.Media;
-using System.Text.RegularExpressions;
-using System.Windows.Media.Animation;
-using MapsInMyFolder.Commun;
-using NetVips;
 using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Animation;
+using System.Windows.Media.Imaging;
 
 namespace MapsInMyFolder.Commun
 {
@@ -57,27 +57,14 @@ namespace MapsInMyFolder.Commun
         public static class GetUrl
         {
             public enum InvokeFunction { getTile, getPreview, getPreviewFallback }
-            public static string FromTileXYZ(string urlbase, int Tilex, int Tiley, int z, int LayerID, InvokeFunction InvokeFunction)
+
+            public static (Dictionary<string, object> DefaultCallValue, Dictionary<string, string> ResultCallValue) CallFunctionAndGetResult(string urlbase, string TileComputationScript, int Tilex, int Tiley, int z, int LayerID, InvokeFunction InvokeFunction)
             {
                 if (LayerID == -1)
                 {
-                    return urlbase;
+                    return (null, null);
                 }
 
-                Layers calque = Layers.GetLayerById(LayerID);
-                if (calque is null)
-                {
-                    return string.Empty;
-                }
-                string finalurl;
-                if (string.IsNullOrEmpty(urlbase))
-                {
-                    finalurl = calque.class_tile_url;
-                }
-                else
-                {
-                    finalurl = urlbase;
-                }
                 var location_topleft = TileToCoordonnees(Tilex, Tiley, z);
                 var location_bottomright = TileToCoordonnees(Tilex + 1, Tiley + 1, z);
                 var location = GetCenterBetweenTwoPoints(location_topleft, location_bottomright);
@@ -99,16 +86,14 @@ namespace MapsInMyFolder.Commun
                       { "layerid",  LayerID.ToString() },
                       { "url",  urlbase },
                 };
-                //Jint.Native.JsValue JavascriptMainResult = Commun.Javascript.ExecuteScript("function main() { var js = new TheType(); log(js.TestDoubleReturn(0,0)); return args; }", argument);
 
-                string TileComputationScript = calque.class_tilecomputationscript;
 
                 if (!string.IsNullOrEmpty(TileComputationScript))
                 {
                     Jint.Native.JsValue JavascriptMainResult = null;
                     try
                     {
-                        JavascriptMainResult = Javascript.ExecuteScript(TileComputationScript, argument, LayerID, InvokeFunction);
+                        JavascriptMainResult = Javascript.ExecuteScript(TileComputationScript, new Dictionary<string, object>(argument), LayerID, InvokeFunction);
                     }
                     catch (Exception ex)
                     {
@@ -119,39 +104,72 @@ namespace MapsInMyFolder.Commun
                         object JavascriptMainResultObject = JavascriptMainResult.ToObject();
                         var JavascriptMainResultJson = JsonConvert.SerializeObject(JavascriptMainResultObject);
                         var JavascriptMainResultDictionary = JsonConvert.DeserializeObject<Dictionary<string, string>>(JavascriptMainResultJson);
+                        return (argument, JavascriptMainResultDictionary);
+                    }
+                }
+                return (null, null);
 
-                        if (JavascriptMainResultDictionary.TryGetValue("url", out string urlResult))
-                        {
-                            if (!string.IsNullOrEmpty(urlResult))
-                            {
-                                finalurl = urlResult;
-                            }
-                        }
+            }
 
-                        foreach (var JavascriptReplacementVar in JavascriptMainResultDictionary)
+
+            public static string FromTileXYZ(string urlbase, int Tilex, int Tiley, int z, int LayerID, InvokeFunction InvokeFunction)
+            {
+                if (LayerID == -1)
+                {
+                    return urlbase;
+                }
+
+                Layers calque = Layers.GetLayerById(LayerID);
+                if (calque is null)
+                {
+                    return string.Empty;
+                }
+                string TileComputationScript = calque.class_tilecomputationscript;
+                var ValuesDictionnary = CallFunctionAndGetResult(urlbase, TileComputationScript, Tilex, Tiley, z, LayerID, InvokeFunction);
+                if (ValuesDictionnary.ResultCallValue is null)
+                {
+                    return string.Empty;
+                }
+
+                string finalurl;
+                if (string.IsNullOrEmpty(urlbase))
+                {
+                    finalurl = calque.class_tile_url;
+                }
+                else
+                {
+                    finalurl = urlbase;
+                }
+                if (ValuesDictionnary.ResultCallValue.TryGetValue("url", out string urlResult))
+                {
+                    if (!string.IsNullOrEmpty(urlResult))
+                    {
+                        finalurl = urlResult;
+                    }
+                }
+
+                foreach (var JavascriptReplacementVar in ValuesDictionnary.ResultCallValue)
+                {
+                    string replacementValue = string.Empty;
+                    try
+                    {
+                        if (JavascriptReplacementVar.Value is null)
                         {
-                            string replacementValue = string.Empty;
-                            try
-                            {
-                                if (JavascriptReplacementVar.Value is null)
-                                {
-                                    replacementValue = "null";
-                                }
-                                else
-                                {
-                                    replacementValue = JavascriptReplacementVar.Value;
-                                }
-                            }
-                            catch (Exception ex)
-                            {
-                                Debug.WriteLine(ex.Message);
-                                replacementValue = "null";
-                            }
-                            finally
-                            {
-                                finalurl = finalurl.Replace("{" + JavascriptReplacementVar.Key + "}", replacementValue);
-                            }
+                            replacementValue = "null";
                         }
+                        else
+                        {
+                            replacementValue = JavascriptReplacementVar.Value;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine(ex.Message);
+                        replacementValue = "null";
+                    }
+                    finally
+                    {
+                        finalurl = finalurl.Replace("{" + JavascriptReplacementVar.Key + "}", replacementValue);
                     }
                 }
                 return finalurl;
@@ -211,6 +229,7 @@ namespace MapsInMyFolder.Commun
             }
         }
 
+
         public static DoubleAnimation GetOpacityAnimation(int toValue, double durationMultiplicator = 1)
         {
             return new DoubleAnimation(toValue, TimeSpan.FromMilliseconds((long)(Settings.animations_duration_millisecond * durationMultiplicator)))
@@ -233,13 +252,15 @@ namespace MapsInMyFolder.Commun
 
         public static string ReadResourceString(string pathWithSlash)
         {
-            Stream stream = ReadResourceStream(pathWithSlash);
-            string return_rsx = String.Empty;
-            using (StreamReader reader = new StreamReader(stream, Encoding.UTF8, true))
+            using (Stream stream = ReadResourceStream(pathWithSlash))
             {
-                return_rsx = reader.ReadToEnd();
+                string return_rsx = String.Empty;
+                using (StreamReader reader = new StreamReader(stream, Encoding.UTF8, true))
+                {
+                    return_rsx = reader.ReadToEnd();
+                }
+                return return_rsx;
             }
-            return return_rsx;
         }
 
         public static Stream ReadResourceStream(string pathWithSlash)
@@ -297,7 +318,7 @@ namespace MapsInMyFolder.Commun
             {
                 return HexValueToSolidColorBrush(defaulthexvalue);
             }
-            
+
         }
 
         public static SolidColorBrush RgbValueToSolidColorBrush(int R, int G, int B)
@@ -457,13 +478,13 @@ namespace MapsInMyFolder.Commun
             }
             lock (Locker)
             {
-                using (NetVips.Image text = NetVips.Image.Text(WordWrap(BitmapErrorsMessage, 20), null, null, null, NetVips.Enums.Align.Centre, null, 100, true, 5, null))
+                using (NetVips.Image text = NetVips.Image.Text(WordWrap(BitmapErrorsMessage, 20), null, null, null, NetVips.Enums.Align.Centre, null, 100, 5, null))
                 {
                     int offsetX = (int)Math.Floor((double)(border_tile_size - text.Width) / 2);
                     int offsetY = (int)Math.Floor((double)(border_tile_size - text.Height) / 2);
                     using (NetVips.Image image = NetVips.Image.Black(border_tile_size, border_tile_size).Linear(color, color).Composite2(text, NetVips.Enums.BlendMode.Atop, offsetX, offsetY))
                     {
-                       return image.Gravity(Enums.CompassDirection.Centre, tile_size, tile_size, Enums.Extend.Black).WriteToBuffer("." + format, saveVOption); ;
+                        return image.Gravity(Enums.CompassDirection.Centre, tile_size, tile_size, Enums.Extend.Black).WriteToBuffer("." + format, saveVOption); ;
                     }
                 }
             }
@@ -487,7 +508,7 @@ namespace MapsInMyFolder.Commun
             return String.Format("{0:0} {1}", dblSByte, Suffix[i]);
         }
 
-        public static VOption getSaveVOption(string final_saveformat, int quality, int tile_size)
+        public static VOption getSaveVOption(string final_saveformat, int quality, int? tile_size)
         {
             if (quality <= 0)
             {
@@ -789,45 +810,37 @@ namespace MapsInMyFolder.Commun
 
         public static void InsertTextAtCaretPosition(ICSharpCode.AvalonEdit.TextEditor TextBox, string text)
         {
+            int CaretIndex = TextBox.CaretOffset;
             if (TextBox.SelectionLength == 0)
             {
-                int CaretIndex = TextBox.CaretOffset;
                 TextBox.TextArea.Document.Insert(CaretIndex, text);
-                
-                TextBox.CaretOffset = CaretIndex + text.Length;
             }
             else
             {
                 TextBox.SelectedText = text;
-                TextBox.CaretOffset += TextBox.SelectedText.Length;
                 TextBox.SelectionLength = 0;
             }
-            
-            //int lineIndex = TextBox.GetLineIndexFromCharacterIndex(TextBox.CaretIndex);
-            //TextBox.ScrollToLine(lineIndex);
+
+            TextBox.CaretOffset = Math.Min(TextBox.Text.Length, CaretIndex + text.Length);
         }
+
         public static void TextEditorCursorPositionChanged(ICSharpCode.AvalonEdit.TextEditor textEditor, Grid grid, ScrollViewer scrollViewer, int MarginTop = 25)
         {
             if (Mouse.LeftButton == MouseButtonState.Pressed) { return; }
-
-
-                double Margin = 40;
+            double Margin = 40;
 
             double TextboxLayerScriptTopPosition = textEditor.TranslatePoint(new Point(0, 0), grid).Y;
             double TextboxLayerScriptCaretTopPosition = textEditor.TextArea.Caret.CalculateCaretRectangle().Top + TextboxLayerScriptTopPosition;
             if (TextboxLayerScriptCaretTopPosition > (grid.ActualHeight - Margin))
             {
                 scrollViewer.ScrollToVerticalOffset(scrollViewer.VerticalOffset + (TextboxLayerScriptCaretTopPosition - (grid.ActualHeight - Margin)));
-                Debug.WriteLine("Scroll down");
-                return;
-            }else if (TextboxLayerScriptCaretTopPosition < MarginTop)
-            {
-                scrollViewer.ScrollToVerticalOffset(scrollViewer.VerticalOffset - Math.Abs((MarginTop) - TextboxLayerScriptCaretTopPosition));
-                Debug.WriteLine("Scroll up");
                 return;
             }
-           // e.
-            Debug.WriteLine($"-----\nEditeurScrollBar.VerticalOffset : {scrollViewer.VerticalOffset}\nTextboxLayerScript.TextArea.Caret :{textEditor.TextArea.Caret.CalculateCaretRectangle().Top}\nTextboxLayerScript.ActualHeight :{textEditor.ActualHeight}\nTextboxLayerScriptCaretTopPosition : {TextboxLayerScriptCaretTopPosition}\nEditeurGrid.ActualHeight : {grid.ActualHeight}\nTextboxLayerScriptTopPosition : {TextboxLayerScriptTopPosition}");
+            else if (TextboxLayerScriptCaretTopPosition < MarginTop)
+            {
+                scrollViewer.ScrollToVerticalOffset(scrollViewer.VerticalOffset - Math.Abs((MarginTop) - TextboxLayerScriptCaretTopPosition));
+                return;
+            }
         }
 
         public static void IndenterCode(object sender, EventArgs e, ICSharpCode.AvalonEdit.TextEditor textBox)
@@ -872,9 +885,11 @@ namespace MapsInMyFolder.Commun
                 for (int i = 0; i < VisualTreeHelper.GetChildrenCount(obj); i++)
                 {
                     UIElement objChild;
-                    try {
-                    objChild = (UIElement)VisualTreeHelper.GetChild(obj, i);
-                    }catch(InvalidCastException)
+                    try
+                    {
+                        objChild = (UIElement)VisualTreeHelper.GetChild(obj, i);
+                    }
+                    catch (InvalidCastException)
                     {
                         //Unable to cast object to type 'System.Windows.UIElement'
                         continue;
@@ -902,7 +917,7 @@ namespace MapsInMyFolder.Commun
         /// <returns>The first parent item that matches the submitted type parameter. 
         /// If not matching item can be found, 
         /// a null parent is being returned.</returns>
-        public static T FindChild<T>(DependencyObject parent, string childName)
+        public static T FindChildByName<T>(DependencyObject parent, string childName)
            where T : DependencyObject
         {
             // Confirm parent and childName are valid. 
@@ -919,7 +934,7 @@ namespace MapsInMyFolder.Commun
                 if (childType == null)
                 {
                     // recursively drill down the tree
-                    foundChild = FindChild<T>(child, childName);
+                    foundChild = FindChildByName<T>(child, childName);
 
                     // If the child is found, break so we do not overwrite the found child. 
                     if (foundChild != null) break;
@@ -946,20 +961,37 @@ namespace MapsInMyFolder.Commun
             return foundChild;
         }
 
+        public static T FindChild<T>(DependencyObject parent) where T : DependencyObject
+        {
+            if (parent == null)
+            {
+                return null;
+            }
+            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++)
+            {
+                var child = VisualTreeHelper.GetChild(parent, i);
+                var result = (child as T) ?? FindChild<T>(child);
+                if (result != null)
+                {
+                    return result;
+                }
+            }
+            return null;
+        }
 
         public static int CheckIfInputValueHaveChange(UIElement SourcePanel)
         {
-
             List<System.Type> TypeOfSearchElement = new List<System.Type>
             {
                 typeof(TextBox),
                 typeof(ComboBox),
                 typeof(CheckBox),
                 typeof(RadioButton),
-                typeof(ICSharpCode.AvalonEdit.TextEditor)
+                typeof(ICSharpCode.AvalonEdit.TextEditor),
+                typeof(BlackPearl.Controls.CoreLibrary.MultiSelectCombobox)
             };
 
-            var ListOfisualChildren = FindVisualChildren(SourcePanel, TypeOfSearchElement);
+            List<UIElement> ListOfisualChildren = FindVisualChildren(SourcePanel, TypeOfSearchElement);
 
             string strHachCode = String.Empty;
             ListOfisualChildren.ForEach(element =>
@@ -988,7 +1020,8 @@ namespace MapsInMyFolder.Commun
                             {
                                 hachCode = value.GetHashCode();
                             }
-                        }else if (type == typeof(ComboBox))
+                        }
+                        else if (type == typeof(ComboBox))
                         {
                             ComboBox ComboBox = (ComboBox)element;
                             string value = ComboBox.Text;
@@ -1008,6 +1041,19 @@ namespace MapsInMyFolder.Commun
                             RadioButton RadioButton = (RadioButton)element;
                             hachCode = RadioButton.IsChecked.GetHashCode();
                         }
+                        else if (type == typeof(BlackPearl.Controls.CoreLibrary.MultiSelectCombobox))
+                        {
+                            BlackPearl.Controls.CoreLibrary.MultiSelectCombobox MultiSelectCombobox = (BlackPearl.Controls.CoreLibrary.MultiSelectCombobox)element;
+                            if (MultiSelectCombobox.SelectedItems != null && MultiSelectCombobox.SelectedItems.Count > 0)
+                            {
+
+                                hachCode = string.Join(";", MultiSelectCombobox.SelectedValues("EnglishName")).GetHashCode();
+                            }
+                            else
+                            {
+                                hachCode = 0;
+                            }
+                        }
                         else
                         {
                             throw new System.NotSupportedException("The type " + type.Name + " is not supported by the function");
@@ -1016,6 +1062,7 @@ namespace MapsInMyFolder.Commun
                     }
                 }
             });
+            ListOfisualChildren.Clear();
             return strHachCode.GetHashCode();
         }
 
@@ -1107,7 +1154,7 @@ namespace MapsInMyFolder.Commun
             string textboxtext = textbElement.Text;
             var cursor_position = textbElement.SelectionStart;
             string filtered_string = FilterDigitOnly(textboxtext, char_supplementaire);
-            textbElement.Text = filtered_string;
+            textbElement.SetText(filtered_string);
             if (textboxtext != filtered_string)
             {
                 if (cursor_position > 0) textbElement.SelectionStart = cursor_position - 1;
@@ -1120,20 +1167,20 @@ namespace MapsInMyFolder.Commun
             }
         }
 
-        public static bool FilterDigitOnlyWhileWritingInTextBox(TextBox textbElement, System.Windows.Controls.TextChangedEventHandler action, int MaxInt = -1, List<char> char_supplementaire = null)
+        public static bool FilterDigitOnlyWhileWritingInTextBoxWithMaxValue(TextBox textbElement, int MaxInt = -1, List<char> char_supplementaire = null)
         {
             if (textbElement is null)
             {
                 return false;
             }
             bool TextHasBeenFilteredAndChanged = false;
-            textbElement.TextChanged -= action;
             if (FilterDigitOnlyWhileWritingInTextBox(textbElement, char_supplementaire))
             {
-                if (MaxInt != -1 && Convert.ToUInt32(textbElement?.Text) > MaxInt)
+                if (!double.TryParse(textbElement?.Text, out double textbElementTextValue)) { return false; }
+                if (MaxInt != -1 && textbElementTextValue > MaxInt)
                 {
                     string MaxIntString = MaxInt.ToString();
-                    textbElement.Text = MaxIntString;
+                    textbElement.SetText(MaxIntString);
                     textbElement.SelectionStart = MaxIntString.Length;
                 }
                 else
@@ -1141,8 +1188,6 @@ namespace MapsInMyFolder.Commun
                     TextHasBeenFilteredAndChanged = true;
                 }
             }
-            textbElement.TextChanged += action;
-
             return TextHasBeenFilteredAndChanged;
         }
 

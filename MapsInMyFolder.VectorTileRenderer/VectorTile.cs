@@ -13,7 +13,7 @@ namespace MapsInMyFolder.VectorTileRenderer
             VectorTile newTile = new VectorTile();
             newTile.IsOverZoomed = this.IsOverZoomed;
 
-            foreach(var layer in Layers)
+            foreach (var layer in Layers)
             {
                 var vectorLayer = new VectorTileLayer();
                 vectorLayer.Name = layer.Name;

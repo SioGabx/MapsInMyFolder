@@ -30,7 +30,8 @@
     <ApplicationIcon>icone\icone_v2.ico</ApplicationIcon>
     <RepositoryUrl>https://github.com/SioGabx/MapsInMyFolder</RepositoryUrl>
     <Copyright>SioGabx</Copyright>
-    <Version>0.4.0-alpha</Version>
+    <Version>0.4.3-alpha</Version>
+    <AllowUnsafeBlocks>False</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -62,18 +63,21 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="AvalonEdit" Version="6.2.0.78" />
+    <PackageReference Include="AvalonEdit" Version="6.3.0.90" />
+    <PackageReference Include="BlackPearl.Controls.CoreLibrary" Version="2.1.1" />
+      <!--https://github.com/SioGabx/BlackPearl-->
     <PackageReference Include="cef.redist.x64" Version="107.1.12" />
     <PackageReference Include="CefSharp.Common" Version="107.1.120" />
     <PackageReference Include="CefSharp.Common.NETCore" Version="107.1.120" />
     <PackageReference Include="CefSharp.Wpf" Version="107.1.120" />
     <PackageReference Include="Jint" Version="3.0.0-beta-2043" />
     <PackageReference Include="ModernWpfUis" Version="1.4.0" />
-    <PackageReference Include="NetVips" Version="2.2.0" />
-    <PackageReference Include="NetVips.Native" Version="8.13.2" />
-    <PackageReference Include="NetVips.Native.win-x64" Version="8.13.2" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
+    <PackageReference Include="NetVips" Version="2.3.0" />
+    <PackageReference Include="NetVips.Native" Version="8.14.2" />
+    <PackageReference Include="NetVips.Native.win-x64" Version="8.14.2" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="System.Data.SQLite" Version="1.0.117" />
+    <PackageReference Include="System.Text.Json" Version="7.0.0" />
     <PackageReference Include="wix" Version="3.11.2" />
   </ItemGroup>
 

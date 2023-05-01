@@ -10,11 +10,10 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Xml;
-
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Xml;
 
 namespace MapsInMyFolder.MapControl
 {

@@ -10,7 +10,7 @@ namespace MapsInMyFolder.VectorTileRenderer
 {
     public class Renderer
     {
-       // private static Object cacheLock = new Object();
+        // private static Object cacheLock = new Object();
 
         enum VisualLayerType
         {
@@ -40,7 +40,7 @@ namespace MapsInMyFolder.VectorTileRenderer
             public Rect rectangle;
             public bool doDraw;
 
-            public TextElements(Point geometry, Brush style,int hatchCode,Rect rectangle, bool doDraw = true)
+            public TextElements(Point geometry, Brush style, int hatchCode, Rect rectangle, bool doDraw = true)
             {
                 this.geometry = geometry;
                 this.style = style;
@@ -68,7 +68,7 @@ namespace MapsInMyFolder.VectorTileRenderer
             public int ImgCenterPositionX;
             public int ImgCenterPositionY;
 
-            public ROptions(int ImgPositionX = 0, int ImgPositionY = 0,int ImgCenterPositionX = 0, int ImgCenterPositionY = 0,int NbrTileHeightWidth = 1, int TileSize = 256, bool GenerateCanvas = true, double OverflowTextCorrectingValue = 0.2, double TextSizeMultiplicateur = 1)
+            public ROptions(int ImgPositionX = 0, int ImgPositionY = 0, int ImgCenterPositionX = 0, int ImgCenterPositionY = 0, int NbrTileHeightWidth = 1, int TileSize = 256, bool GenerateCanvas = true, double OverflowTextCorrectingValue = 0.2, double TextSizeMultiplicateur = 1)
             {
                 this.OverflowTextCorrectingValue = OverflowTextCorrectingValue;
                 this.ImgPositionX = ImgPositionX;
@@ -183,10 +183,11 @@ namespace MapsInMyFolder.VectorTileRenderer
 
         public async static Task<MapsInMyFolder.VectorTileRenderer.Renderer.ICanvasCollisions> Render(Style style, ICanvas canvas, int x, int y, double zoom, double scale = 1, List<string> whiteListLayers = null, ROptions options = null, Collisions collisions = null)
         {
-           Dictionary<Source, Stream> rasterTileCache = new Dictionary<Source, Stream>();
+            Dictionary<Source, Stream> rasterTileCache = new Dictionary<Source, Stream>();
             Dictionary<Source, VectorTile> vectorTileCache = new Dictionary<Source, VectorTile>();
             Dictionary<string, List<VectorTileLayer>> categorizedVectorLayers = new Dictionary<string, List<VectorTileLayer>>();
-            if (options == null) {
+            if (options == null)
+            {
                 options = new ROptions
                 {
                     NbrTileHeightWidth = 1
@@ -213,10 +214,11 @@ namespace MapsInMyFolder.VectorTileRenderer
             //Debug.WriteLine("Zoom ini :" + zoom + "   Zoom act : " + actualZoom);
             double sizeX = options.TileSize;
             double sizeY = options.TileSize;
-            if (options is null || options.GenerateCanvas) {
-            canvas.StartDrawing(options.TileSize * options.NbrTileHeightWidth, options.TileSize * options.NbrTileHeightWidth);
-            sizeX *= scale;
-            sizeY *= scale;
+            if (options is null || options.GenerateCanvas)
+            {
+                canvas.StartDrawing(options.TileSize * options.NbrTileHeightWidth, options.TileSize * options.NbrTileHeightWidth);
+                sizeX *= scale;
+                sizeY *= scale;
             }
 
             var visualLayers = new List<VisualLayer>();
@@ -394,12 +396,13 @@ namespace MapsInMyFolder.VectorTileRenderer
                 }
                 else if (layer.Type == "background")
                 {
-                    if (options.GenerateCanvas) {
-                        var brushes = style.GetStyleByType("background", actualZoom, scale);
-                    foreach (var brush in brushes)
+                    if (options.GenerateCanvas)
                     {
-                        canvas.DrawBackground(brush);
-                    }
+                        var brushes = style.GetStyleByType("background", actualZoom, scale);
+                        foreach (var brush in brushes)
+                        {
+                            canvas.DrawBackground(brush);
+                        }
                     }
                 }
             }
@@ -425,10 +428,10 @@ namespace MapsInMyFolder.VectorTileRenderer
                     {
                         if (feature.GeometryType == "Point")
                         {
-                                foreach (var point in geometry)
-                                {
-                                    canvas.DrawPoint(point[0], brush);
-                                }
+                            foreach (var point in geometry)
+                            {
+                                canvas.DrawPoint(point[0], brush);
+                            }
                         }
                         else if (feature.GeometryType == "LineString")
                         {
@@ -526,7 +529,7 @@ namespace MapsInMyFolder.VectorTileRenderer
                 }
             }
 
-            return new Renderer.ICanvasCollisions(collisions,canvas, options);
+            return new Renderer.ICanvasCollisions(collisions, canvas, options);
         }
 
         //private static List<List<Point>> LocalizeGeometry(List<List<Point>> coordinates, double sizeX, double sizeY, double extent)

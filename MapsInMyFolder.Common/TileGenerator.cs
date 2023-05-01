@@ -87,7 +87,7 @@ namespace MapsInMyFolder.Commun
             {
                 case "pbf":
                     const int TileSize = 1;
-                    return await GetTilePBF(layerID, urlBase, TileX, TileY, TileZoom, save_temp_directory, Layer.class_tiles_size * TileSize, TileSize, 0.5, pbfdisableadjacent).ConfigureAwait(false);
+                    return await GetTilePBF(layerID, urlBase, TileX, TileY, TileZoom, save_temp_directory, (Layer.class_tiles_size ?? 0) * TileSize, TileSize, 0.5, pbfdisableadjacent).ConfigureAwait(false);
 
                 default:
                     return await GetTile(layerID, urlBase, TileX, TileY, TileZoom).ConfigureAwait(false);

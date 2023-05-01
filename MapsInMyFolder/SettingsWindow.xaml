@@ -7,7 +7,8 @@
         xmlns:local="clr-namespace:MapsInMyFolder"
         xmlns:avalonEdit="clr-namespace:ICSharpCode.AvalonEdit;assembly=ICSharpCode.AvalonEdit" 
         xmlns:editing="clr-namespace:ICSharpCode.AvalonEdit.Editing;assembly=ICSharpCode.AvalonEdit"
-        xmlns:sc="clr-namespace:MapsInMyFolder;assembly=MapsInMyFolder"
+        xmlns:sc="clr-namespace:MapsInMyFolder;assembly=MapsInMyFolder" xmlns:cbcontrols="clr-namespace:BlackPearl.Controls.CoreLibrary;assembly=BlackPearl.Controls.CoreLibrary"
+        xmlns:sys="clr-namespace:System;assembly=mscorlib"
         mc:Ignorable="d"
         ui:WindowHelper.UseModernWindowStyle="True" ResizeMode="CanMinimize" Title="Paramêtres" Height="450" Width="800"
             Background="#FF0A0C0C"
@@ -27,17 +28,14 @@
                     <Style x:Key="GridSelectNormalStyle" TargetType="{x:Type Grid}">
                         <Style.Triggers>
                             <Trigger Property="IsMouseOver" Value="true">
-                                <Setter Property="Background" Value="#444444"></Setter>
+                                <Setter Property="Background" Value="#444444"/>
                             </Trigger>
                         </Style.Triggers>
-                    </Style>  
-                    
-                    <Style x:Key="GridInViewNormalStyle" TargetType="{x:Type Grid}" BasedOn="{StaticResource GridSelectNormalStyle}">
-                        <Setter Property="Background" Value="#303031"></Setter>
                     </Style>
 
-
-
+                    <Style x:Key="GridInViewNormalStyle" TargetType="{x:Type Grid}" BasedOn="{StaticResource GridSelectNormalStyle}">
+                        <Setter Property="Background" Value="#303031"/>
+                    </Style>
                 </ResourceDictionary>
 
 
@@ -55,7 +53,7 @@
             Background="Black"
             ui:ThemeManager.RequestedTheme="Dark">
             <Grid.Style>
-                <Style TargetType="Grid">
+                <Style TargetType="{x:Type Grid}">
                     <Setter Property="TextElement.Foreground" Value="WhiteSmoke" />
                 </Style>
             </Grid.Style>
@@ -73,11 +71,10 @@
                  Padding="0,7"
                 HorizontalAlignment="Left"
                 VerticalAlignment="Center"
-                Text="{Binding ElementName=Window, Path=Title}" />
+                Text="{Binding Title, ElementName=Window}" />
             <StackPanel
                 Grid.Column="2"
-                Orientation="Horizontal" HorizontalAlignment="Right">
-            </StackPanel>
+                Orientation="Horizontal" HorizontalAlignment="Right"/>
         </Grid>
 
 
@@ -99,37 +96,27 @@
                 <StackPanel  Grid.Row="1" Margin="10,-5,5,0" VerticalAlignment="Stretch" Height="Auto">
 
                     <Grid x:Name="MenuItem_Calque"  Height="35" Style="{StaticResource GridSelectNormalStyle}" Margin="0,5,0,0"  MouseUp="ScrollMenuItem_Calque" >
-                        <TextBlock Margin="10,0,0,0" Grid.Column="1" VerticalAlignment="Center" FontSize="15">Calques</TextBlock>
+                        <TextBlock Margin="10,0,0,0" Grid.Column="1" VerticalAlignment="Center" FontSize="15"><Run Text="Calques"/></TextBlock>
                     </Grid>
                     <Grid x:Name="MenuItem_Telechargement" Height="35" Style="{StaticResource GridSelectNormalStyle}" Margin="0,5,0,0" MouseUp="ScrollMenuItem_Telechargement" >
-                        <TextBlock Margin="10,0,0,0" Grid.Column="1" VerticalAlignment="Center" FontSize="15">Téléchargement</TextBlock>
+                        <TextBlock Margin="10,0,0,0" Grid.Column="1" VerticalAlignment="Center" FontSize="15"><Run Text="Téléchargement"/></TextBlock>
                     </Grid>
 
                     <Grid x:Name="MenuItem_Carte"  Height="35" Style="{StaticResource GridSelectNormalStyle}" Margin="0,5,0,0" MouseUp="ScrollMenuItem_Carte" >
-                        <TextBlock Margin="10,0,0,0" Grid.Column="1" VerticalAlignment="Center" FontSize="15">Carte</TextBlock>
+                        <TextBlock Margin="10,0,0,0" Grid.Column="1" VerticalAlignment="Center" FontSize="15"><Run Text="Carte"/></TextBlock>
                     </Grid>
                     <Grid x:Name="MenuItem_Avance" Height="35" Style="{StaticResource GridSelectNormalStyle}" Margin="0,5,0,0" MouseUp="ScrollMenuItem_Avance" >
-                        <TextBlock Margin="10,0,0,0" Grid.Column="1" VerticalAlignment="Center" FontSize="15">Option avancée</TextBlock>
+                        <TextBlock Margin="10,0,0,0" Grid.Column="1" VerticalAlignment="Center" FontSize="15"><Run Text="Option avancée"/></TextBlock>
                     </Grid>
 
                     <Grid x:Name="MenuItem_Update"  Height="35" Style="{StaticResource GridSelectNormalStyle}" Margin="0,5,0,0" MouseUp="ScrollMenuItem_Update" >
-                        <TextBlock Margin="10,0,0,0" Grid.Column="1" VerticalAlignment="Center" FontSize="15">Mises à jour</TextBlock>
+                        <TextBlock Margin="10,0,0,0" Grid.Column="1" VerticalAlignment="Center" FontSize="15"><Run Text="Mises à jour"/></TextBlock>
                     </Grid>
 
                     <Grid x:Name="MenuItem_APropos"  Height="35" Style="{StaticResource GridSelectNormalStyle}" Margin="0,5,0,0" MouseUp="ScrollMenuItem_APropos"  >
-                        <TextBlock Margin="10,0,0,0" Grid.Column="1" VerticalAlignment="Center" FontSize="15">A propos</TextBlock>
+                        <TextBlock Margin="10,0,0,0" Grid.Column="1" VerticalAlignment="Center" FontSize="15"><Run Text="A propos"/></TextBlock>
                     </Grid>
-
-
-
                 </StackPanel>
-
-
-
-
-
-
-
             </Grid>
 
             <Grid Grid.Column="1">
@@ -172,11 +159,11 @@
                                         <RowDefinition Height="20"/>
                                         <RowDefinition Height="*" />
                                     </Grid.RowDefinitions>
-                                    <Label Content="Calque de démarage (seul les calques au format JPEG sont accepté) :" Foreground="#888989" Grid.Row="0"></Label>
+                                    <Label Content="Calque de démarage (seul les calques au format JPEG sont accepté) :" Foreground="#888989" Grid.Row="0"/>
                                     <ComboBox x:Name="layer_startup_id" Grid.Row="1" Width="Auto" HorizontalAlignment="Stretch" VerticalContentAlignment="Stretch" Height="21" SelectedIndex="4" Cursor="Arrow" Padding="5,0,0,1" Foreground="#BCBCBC" >
                                         <ComboBox.Resources>
-                                            <Style TargetType="ScrollBar" BasedOn="{StaticResource {x:Type ScrollBar}}">
-                                                <Setter Property="Margin" Value="0,0,-5,0"></Setter>
+                                            <Style TargetType="{x:Type ScrollBar}" BasedOn="{StaticResource {x:Type ScrollBar}}">
+                                                <Setter Property="Margin" Value="0,0,-5,0"/>
                                             </Style>
                                         </ComboBox.Resources>
                                     </ComboBox>
@@ -188,22 +175,34 @@
                                         <RowDefinition Height="20"/>
                                         <RowDefinition Height="*" />
                                     </Grid.RowDefinitions>
-                                    <Label Content="Critère de trie des calques :" Foreground="#888989" Grid.Row="0"></Label>
-                                    <ComboBox x:Name="layersSort" Grid.Row="1" Width="Auto" HorizontalAlignment="Stretch" VerticalContentAlignment="Stretch" Height="21" SelectedIndex="4" Cursor="Arrow" Padding="5,0,0,1" Foreground="#BCBCBC" >
-                                        <ComboBox.Resources>
-                                            <Style TargetType="ScrollBar" BasedOn="{StaticResource {x:Type ScrollBar}}">
-                                                <Setter Property="Margin" Value="0,0,-5,0"></Setter>
-                                            </Style>
-                                        </ComboBox.Resources>
-                                    </ComboBox>
+                                    <Grid.Resources>
+                                        <!--/Don't forget to add « xmlns:sys="clr-namespace:System;assembly=mscorlib" » /-->
+                                        <x:Array Type="sys:Char" x:Key="AdditionalCharArray">
+                                            <sys:Char>,</sys:Char>
+                                            <sys:Char>/</sys:Char>
+                                            <sys:Char>-</sys:Char>
+                                        </x:Array>
+                                    </Grid.Resources>
+                                    <Label Content="Critère de trie des calques :" Foreground="#888989" Grid.Row="0"/>
+                                    <cbcontrols:MultiSelectCombobox x:Name="layersSort" ItemSeparator="," AdditionalItemSeparators="{StaticResource ResourceKey=AdditionalCharArray}" Grid.Row="1" HorizontalAlignment="Stretch" MinHeight="16" Height="Auto" RequestBringIntoView="DisableRequestBringIntoView"/>
+
+
                                 </Grid>
 
-                                <Grid Margin="0,10,0,0">
+                                <!--<Grid Margin="0,10,0,0">
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="20"/>
                                         <RowDefinition Height="*" />
                                     </Grid.RowDefinitions>
                                     <CheckBox x:Name="LayersOrder" Foreground="#888989" Grid.Row="0">Trie des calques croissant</CheckBox>
+                                </Grid>-->
+
+                                <Grid Margin="0,10,0,0">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="20"/>
+                                        <RowDefinition Height="*" />
+                                    </Grid.RowDefinitions>
+                                    <CheckBox x:Name="layerpanel_put_non_letter_layername_at_the_end" Foreground="#888989" Grid.Row="0" Content="Afficher les calques commençant par des caractères spéciaux à la fin (ex : %, -, #)"/>
                                 </Grid>
 
                                 <Grid Margin="0,10,0,0">
@@ -211,7 +210,19 @@
                                         <RowDefinition Height="20"/>
                                         <RowDefinition Height="*" />
                                     </Grid.RowDefinitions>
-                                    <CheckBox x:Name="layerpanel_put_non_letter_layername_at_the_end" Foreground="#888989" Grid.Row="0">Afficher les calques commençant par des caractères spéciaux à la fin (ex : %, -, #)</CheckBox>
+                                    <CheckBox x:Name="layerpanel_favorite_at_top" Foreground="#888989" Grid.Row="0" Content="Afficher les calques favoris en haut"/>
+                                </Grid>
+
+
+                                <Grid Margin="0,10,0,0">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="20"/>
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+                                    <Label Content="Masquer les calques qui ne correspondent pas au pays suivants :" Foreground="#888989" Grid.Row="0"/>
+
+                                    <cbcontrols:MultiSelectCombobox x:Name="PaysComboBox" DisplayMemberPath="DisplayName" ItemSeparator=";" Grid.Row="1" HorizontalAlignment="Stretch" MinHeight="16" Height="Auto" RequestBringIntoView="DisableRequestBringIntoView"/>
                                 </Grid>
 
                                 <Grid Margin="0,10,0,0">
@@ -219,19 +230,11 @@
                                         <RowDefinition Height="20"/>
                                         <RowDefinition Height="*" />
                                     </Grid.RowDefinitions>
-                                    <CheckBox x:Name="layerpanel_favorite_at_top" Foreground="#888989" Grid.Row="0">Afficher les calques favoris en haut</CheckBox>
-                                </Grid>
-
-                                <Grid Margin="0,10,0,0">
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="20"/>
-                                        <RowDefinition Height="*" />
-                                    </Grid.RowDefinitions>
-                                    <Label Content="Type d'affichage des calques :" Foreground="#888989" Grid.Row="0"></Label>
+                                    <Label Content="Type d'affichage des calques :" Foreground="#888989" Grid.Row="0"/>
                                     <ComboBox x:Name="layerpanel_displaystyle" Grid.Row="1" Width="Auto" HorizontalAlignment="Stretch" VerticalContentAlignment="Stretch" Height="21" SelectedIndex="4" Cursor="Arrow" Padding="5,0,0,1" Foreground="#BCBCBC" >
                                         <ComboBox.Resources>
-                                            <Style TargetType="ScrollBar" BasedOn="{StaticResource {x:Type ScrollBar}}">
-                                                <Setter Property="Margin" Value="0,0,-5,0"></Setter>
+                                            <Style TargetType="{x:Type ScrollBar}" BasedOn="{StaticResource {x:Type ScrollBar}}">
+                                                <Setter Property="Margin" Value="0,0,-5,0"/>
                                             </Style>
                                         </ComboBox.Resources>
                                     </ComboBox>
@@ -242,14 +245,14 @@
                                         <RowDefinition Height="20"/>
                                         <RowDefinition Height="*" />
                                     </Grid.RowDefinitions>
-                                    <Label Content="Script par défault pour le calcul des tuiles :" Foreground="#888989" Grid.Row="0"></Label>
+                                    <Label Content="Script par défault pour le calcul des tuiles :" Foreground="#888989" Grid.Row="0"/>
                                     <!--<TextBox x:Name="tileloader_default_script" Height="Auto"  HorizontalAlignment="Stretch" TextWrapping="NoWrap" Grid.Row="1" Style="{DynamicResource TextBoxCleanStyle_13}" Cursor="IBeam" AcceptsReturn="True" AcceptsTab="True" AutoWordSelection="False" HorizontalScrollBarVisibility="Auto" MinHeight="80" SpellCheck.IsEnabled="False"  VerticalContentAlignment="Top"></TextBox>-->
                                     <avalonEdit:TextEditor x:Name="tileloader_default_script" Grid.Row="1" RequestBringIntoView="DisableRequestBringIntoView" HorizontalAlignment="Stretch" SyntaxHighlighting="MIMF_JavaScript" MinHeight="80" ShowLineNumbers="True" Height="Auto" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
                                         <avalonEdit:TextEditor.ContextMenu>
                                             <ContextMenu Foreground="#E2E2E1" Background="#171719" >
-                                                <StaticResourceExtension ResourceKey="ContextMenu_Copier" />
-                                                <StaticResourceExtension ResourceKey="ContextMenu_Couper" />
-                                                <StaticResourceExtension ResourceKey="ContextMenu_Coller" />
+                                                <StaticResource ResourceKey="ContextMenu_Copier" />
+                                                <StaticResource ResourceKey="ContextMenu_Couper" />
+                                                <StaticResource ResourceKey="ContextMenu_Coller" />
                                             </ContextMenu>
                                         </avalonEdit:TextEditor.ContextMenu>
                                     </avalonEdit:TextEditor>
@@ -262,21 +265,22 @@
                                         <RowDefinition Height="20"/>
                                         <RowDefinition Height="*" />
                                     </Grid.RowDefinitions>
-                                    <Label Content="Script template pour le calcul des tuiles (clic droit lors de l'edition du script) :" Foreground="#888989" Grid.Row="0"></Label>
+                                    <Label Content="Script template pour le calcul des tuiles (clic droit lors de l'edition du script) :" Foreground="#888989" Grid.Row="0"/>
                                     <!--<TextBox x:Name="tileloader_template_script" Height="Auto"  HorizontalAlignment="Stretch" TextWrapping="NoWrap" Grid.Row="1" Style="{DynamicResource TextBoxCleanStyle_13}" Cursor="IBeam" AcceptsReturn="True" AcceptsTab="True" AutoWordSelection="False" HorizontalScrollBarVisibility="Auto" MinHeight="80" SpellCheck.IsEnabled="False"  VerticalContentAlignment="Top"></TextBox>-->
                                     <avalonEdit:TextEditor x:Name="tileloader_template_script" Grid.Row="1" RequestBringIntoView="DisableRequestBringIntoView" HorizontalAlignment="Stretch" SyntaxHighlighting="MIMF_JavaScript" MinHeight="80" ShowLineNumbers="True" Height="Auto" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
                                         <avalonEdit:TextEditor.ContextMenu>
                                             <ContextMenu Foreground="#E2E2E1" Background="#171719" >
-                                                <StaticResourceExtension ResourceKey="ContextMenu_Copier" />
-                                                <StaticResourceExtension ResourceKey="ContextMenu_Couper" />
-                                                <StaticResourceExtension ResourceKey="ContextMenu_Coller" />
+                                                <StaticResource ResourceKey="ContextMenu_Copier" />
+                                                <StaticResource ResourceKey="ContextMenu_Couper" />
+                                                <StaticResource ResourceKey="ContextMenu_Coller" />
                                             </ContextMenu>
                                         </avalonEdit:TextEditor.ContextMenu>
                                     </avalonEdit:TextEditor>
                                 </Grid>
 
+                                <Button x:Name="openAvancedEditor" Content="Ouvrir l'éditeur de base de donnée avancée (beta)" Margin="0,10,0,0" Foreground="#BCBCBC" Click="openAvancedEditor_Click"/>
                             </StackPanel>
-                            
+
                             <StackPanel x:Name="TelechargementSettings">
                                 <!--
                                 working_folder
@@ -298,8 +302,8 @@
                                         <RowDefinition Height="*" />
                                         <RowDefinition/>
                                     </Grid.RowDefinitions>
-                                    <Label Content="Chemin de travail" Foreground="#888989" Grid.Row="0"></Label>
-                                    <TextBox x:Name="working_folder" HorizontalAlignment="Stretch" Grid.Row="1" Style="{DynamicResource TextBoxCleanStyle_13}" Cursor="IBeam" Height="21"></TextBox>
+                                    <Label Content="Chemin de travail" Foreground="#888989" Grid.Row="0"/>
+                                    <TextBox x:Name="working_folder" HorizontalAlignment="Stretch" Grid.Row="1" Style="{DynamicResource TextBoxCleanStyle_13}" Cursor="IBeam" Height="21"/>
                                 </Grid>
 
                                 <Grid Margin="0,10,0,0">
@@ -308,8 +312,8 @@
                                         <RowDefinition Height="*" />
                                         <RowDefinition/>
                                     </Grid.RowDefinitions>
-                                    <Label Content="Chemin temporaire" Foreground="#888989" Grid.Row="0"></Label>
-                                    <TextBox x:Name="temp_folder" HorizontalAlignment="Stretch" Grid.Row="1" Style="{DynamicResource TextBoxCleanStyle_13}" Cursor="IBeam" Height="21"></TextBox>
+                                    <Label Content="Chemin temporaire" Foreground="#888989" Grid.Row="0"/>
+                                    <TextBox x:Name="temp_folder" HorizontalAlignment="Stretch" Grid.Row="1" Style="{DynamicResource TextBoxCleanStyle_13}" Cursor="IBeam" Height="21"/>
                                 </Grid>
 
                                 <Grid Margin="0,10,0,0">
@@ -318,8 +322,8 @@
                                         <RowDefinition Height="*" />
                                         <RowDefinition/>
                                     </Grid.RowDefinitions>
-                                    <Label Content="Nombre de réessai maximum après échec" Foreground="#888989" Grid.Row="0"></Label>
-                                    <TextBox x:Name="max_retry_download" TextChanged="FilterDigitTextBox_TextChanged" HorizontalAlignment="Stretch" Grid.Row="1" Style="{DynamicResource TextBoxCleanStyle_13}" Cursor="IBeam" Height="21"></TextBox>
+                                    <Label Content="Nombre de réessai maximum après échec" Foreground="#888989" Grid.Row="0"/>
+                                    <TextBox x:Name="max_retry_download" TextChanged="FilterDigitTextBox_TextChanged" HorizontalAlignment="Stretch" Grid.Row="1" Style="{DynamicResource TextBoxCleanStyle_13}" Cursor="IBeam" Height="21"/>
                                 </Grid>
 
                                 <Grid Margin="0,10,0,0">
@@ -328,8 +332,8 @@
                                         <RowDefinition Height="*" />
                                         <RowDefinition/>
                                     </Grid.RowDefinitions>
-                                    <Label Content="Nombre maximum de redirection" Foreground="#888989" Grid.Row="0"></Label>
-                                    <TextBox x:Name="max_redirection_download_tile" TextChanged="FilterDigitTextBox_TextChanged" HorizontalAlignment="Stretch" Grid.Row="1" Style="{DynamicResource TextBoxCleanStyle_13}" Cursor="IBeam" Height="21"></TextBox>
+                                    <Label Content="Nombre maximum de redirection" Foreground="#888989" Grid.Row="0"/>
+                                    <TextBox x:Name="max_redirection_download_tile" TextChanged="FilterDigitTextBox_TextChanged" HorizontalAlignment="Stretch" Grid.Row="1" Style="{DynamicResource TextBoxCleanStyle_13}" Cursor="IBeam" Height="21"/>
                                 </Grid>
 
                                 <Grid Margin="0,10,0,0">
@@ -338,8 +342,8 @@
                                         <RowDefinition Height="*" />
                                         <RowDefinition/>
                                     </Grid.RowDefinitions>
-                                    <Label Content="Secondes d'attente jusqu'à l'expiration des demandes (timeout) - Redémarrage requis" Foreground="#888989" Grid.Row="0"></Label>
-                                    <TextBox x:Name="http_client_timeout_in_seconds" TextChanged="FilterDigitTextBox_TextChanged" HorizontalAlignment="Stretch" Grid.Row="1" Style="{DynamicResource TextBoxCleanStyle_13}" Cursor="IBeam" Height="21"></TextBox>
+                                    <Label Content="Secondes d'attente jusqu'à l'expiration des demandes (timeout) - Redémarrage requis" Foreground="#888989" Grid.Row="0"/>
+                                    <TextBox x:Name="http_client_timeout_in_seconds" TextChanged="FilterDigitTextBox_TextChanged" HorizontalAlignment="Stretch" Grid.Row="1" Style="{DynamicResource TextBoxCleanStyle_13}" Cursor="IBeam" Height="21"/>
                                 </Grid>
 
                                 <Grid Margin="0,10,0,0">
@@ -348,8 +352,8 @@
                                         <RowDefinition Height="*" />
                                         <RowDefinition/>
                                     </Grid.RowDefinitions>
-                                    <Label Content="Durée du cache (en jours)" Foreground="#888989" Grid.Row="0"></Label>
-                                    <TextBox x:Name="tiles_cache_expire_after_x_days" TextChanged="FilterDigitTextBox_TextChanged" HorizontalAlignment="Stretch" Grid.Row="1" Style="{DynamicResource TextBoxCleanStyle_13}" Cursor="IBeam" Height="21"></TextBox>
+                                    <Label Content="Durée du cache (en jours)" Foreground="#888989" Grid.Row="0"/>
+                                    <TextBox x:Name="tiles_cache_expire_after_x_days" TextChanged="FilterDigitTextBox_TextChanged" HorizontalAlignment="Stretch" Grid.Row="1" Style="{DynamicResource TextBoxCleanStyle_13}" Cursor="IBeam" Height="21"/>
                                 </Grid>
 
                                 <Grid Margin="0,10,0,0">
@@ -358,8 +362,8 @@
                                         <RowDefinition Height="*" />
                                         <RowDefinition/>
                                     </Grid.RowDefinitions>
-                                    <Label Content="Nombre maximum de téléchargelent en paralele" Foreground="#888989" Grid.Row="0"></Label>
-                                    <TextBox x:Name="max_download_project_in_parralele" TextChanged="FilterDigitTextBox_TextChanged" HorizontalAlignment="Stretch" Grid.Row="1" Style="{DynamicResource TextBoxCleanStyle_13}" Cursor="IBeam" Height="21"></TextBox>
+                                    <Label Content="Nombre maximum de téléchargelent en paralele" Foreground="#888989" Grid.Row="0"/>
+                                    <TextBox x:Name="max_download_project_in_parralele" TextChanged="FilterDigitTextBox_TextChanged" HorizontalAlignment="Stretch" Grid.Row="1" Style="{DynamicResource TextBoxCleanStyle_13}" Cursor="IBeam" Height="21"/>
                                 </Grid>
 
                                 <Grid Margin="0,10,0,0">
@@ -368,8 +372,8 @@
                                         <RowDefinition Height="*" />
                                         <RowDefinition/>
                                     </Grid.RowDefinitions>
-                                    <Label Content="Nombre maximum en paralele de requêtes (par téléchargement)" Foreground="#888989" Grid.Row="0"></Label>
-                                    <TextBox x:Name="max_download_tiles_in_parralele" TextChanged="FilterDigitTextBox_TextChanged" HorizontalAlignment="Stretch" Grid.Row="1" Style="{DynamicResource TextBoxCleanStyle_13}" Cursor="IBeam" Height="21"></TextBox>
+                                    <Label Content="Nombre maximum en paralele de requêtes (par téléchargement)" Foreground="#888989" Grid.Row="0"/>
+                                    <TextBox x:Name="max_download_tiles_in_parralele" TextChanged="FilterDigitTextBox_TextChanged" HorizontalAlignment="Stretch" Grid.Row="1" Style="{DynamicResource TextBoxCleanStyle_13}" Cursor="IBeam" Height="21"/>
                                 </Grid>
 
                                 <Grid Margin="0,10,0,0">
@@ -378,8 +382,8 @@
                                         <RowDefinition Height="*" />
                                         <RowDefinition/>
                                     </Grid.RowDefinitions>
-                                    <Label Content="Temps d'attente entre chaque nouvelle requête (en milisecondes)" Foreground="#888989" Grid.Row="0"></Label>
-                                    <TextBox x:Name="waiting_before_start_another_tile_download" TextChanged="FilterDigitTextBox_TextChanged" HorizontalAlignment="Stretch" Grid.Row="1" Style="{DynamicResource TextBoxCleanStyle_13}" Cursor="IBeam" Height="21"></TextBox>
+                                    <Label Content="Temps d'attente entre chaque nouvelle requête (en milisecondes)" Foreground="#888989" Grid.Row="0"/>
+                                    <TextBox x:Name="waiting_before_start_another_tile_download" TextChanged="FilterDigitTextBox_TextChanged" HorizontalAlignment="Stretch" Grid.Row="1" Style="{DynamicResource TextBoxCleanStyle_13}" Cursor="IBeam" Height="21"/>
                                 </Grid>
 
                                 <Grid Margin="0,10,0,0">
@@ -388,8 +392,8 @@
                                         <RowDefinition Height="*" />
                                         <RowDefinition/>
                                     </Grid.RowDefinitions>
-                                    <Label Content="User-Agent" Foreground="#888989" Grid.Row="0"></Label>
-                                    <TextBox x:Name="user_agent" HorizontalAlignment="Stretch" Grid.Row="1" Style="{DynamicResource TextBoxCleanStyle_13}" Cursor="IBeam" Height="21"></TextBox>
+                                    <Label Content="User-Agent" Foreground="#888989" Grid.Row="0"/>
+                                    <TextBox x:Name="user_agent" HorizontalAlignment="Stretch" Grid.Row="1" Style="{DynamicResource TextBoxCleanStyle_13}" Cursor="IBeam" Height="21"/>
                                 </Grid>
 
                                 <Grid Margin="0,15,0,0">
@@ -398,7 +402,7 @@
                                         <RowDefinition Height="*" />
                                         <RowDefinition/>
                                     </Grid.RowDefinitions>
-                                    <Label Content="Générer des tuiles transparentes en cas d'erreurs" Foreground="#888989" Grid.Row="0"></Label>
+                                    <Label Content="Générer des tuiles transparentes en cas d'erreurs" Foreground="#888989" Grid.Row="0"/>
                                     <ui:RadioButtons Grid.Row="1" x:Name="Options" Width="Auto">
                                         <RadioButton x:Name="generate_transparent_tiles_on_error" Content="Toutes les erreurs (400, 403, 404, 429, ...)" />
                                         <RadioButton x:Name="generate_transparent_tiles_on_404" Content="En cas d'erreur 404 (recommandée)"/>
@@ -429,18 +433,8 @@
                                         <RowDefinition Height="*" />
                                         <RowDefinition/>
                                     </Grid.RowDefinitions>
-                                    <Label Content="Couleur d'arrière plan (valeur HEX)" Foreground="#888989" Grid.Row="0"></Label>
-                                    <TextBox x:Name="background_layer_color" HorizontalAlignment="Stretch" Grid.Row="1" Style="{DynamicResource TextBoxCleanStyle_13}" Cursor="IBeam" Height="21"></TextBox>
-                                </Grid>
-                                
-                                <Grid Margin="0,10,0,0">
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="20"/>
-                                        <RowDefinition Height="*" />
-                                        <RowDefinition/>
-                                    </Grid.RowDefinitions>
-                                    <Label Content="Opacitée du calque d'arrière plan (en pourcentage)" Foreground="#888989" Grid.Row="0"></Label>
-                                    <TextBox x:Name="background_layer_opacity" HorizontalAlignment="Stretch" Grid.Row="1" Style="{DynamicResource TextBoxCleanStyle_13}" Cursor="IBeam" Height="21"></TextBox>
+                                    <Label Content="Couleur d'arrière plan (valeur HEX)" Foreground="#888989" Grid.Row="0"/>
+                                    <TextBox x:Name="background_layer_color" HorizontalAlignment="Stretch" Grid.Row="1" Style="{DynamicResource TextBoxCleanStyle_13}" Cursor="IBeam" Height="21"/>
                                 </Grid>
 
                                 <Grid Margin="0,10,0,0">
@@ -449,14 +443,8 @@
                                         <RowDefinition Height="*" />
                                         <RowDefinition/>
                                     </Grid.RowDefinitions>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition/>
-                                        <ColumnDefinition Width="10"/>
-                                        <ColumnDefinition/>
-                                    </Grid.ColumnDefinitions>
-                                    <Label Content="Coordonnées Nord-Ouest du cadre de séléction au démarage (latitude / longitude)" Foreground="#888989" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3"></Label>
-                                    <TextBox x:Name="NO_PIN_starting_location_latitude" HorizontalAlignment="Stretch" Grid.Row="1" Grid.Column="0" Style="{DynamicResource TextBoxCleanStyle_13}" Cursor="IBeam" Height="21"></TextBox>
-                                    <TextBox x:Name="NO_PIN_starting_location_longitude" HorizontalAlignment="Stretch" Grid.Row="1" Grid.Column="2" Style="{DynamicResource TextBoxCleanStyle_13}" Cursor="IBeam" Height="21"></TextBox>
+                                    <Label Content="Opacitée du calque d'arrière plan (en pourcentage)" Foreground="#888989" Grid.Row="0"/>
+                                    <TextBox x:Name="background_layer_opacity" HorizontalAlignment="Stretch" Grid.Row="1" Style="{DynamicResource TextBoxCleanStyle_13}" Cursor="IBeam" Height="21"/>
                                 </Grid>
 
                                 <Grid Margin="0,10,0,0">
@@ -470,17 +458,9 @@
                                         <ColumnDefinition Width="10"/>
                                         <ColumnDefinition/>
                                     </Grid.ColumnDefinitions>
-                                    <Label Content="Coordonnées Sud-Est du cadre de séléction au démarage (latitude / longitude)" Foreground="#888989" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3"></Label>
-                                    <TextBox x:Name="SE_PIN_starting_location_latitude" HorizontalAlignment="Stretch" Grid.Row="1" Grid.Column="0" Style="{DynamicResource TextBoxCleanStyle_13}" Cursor="IBeam" Height="21"></TextBox>
-                                    <TextBox x:Name="SE_PIN_starting_location_longitude" HorizontalAlignment="Stretch" Grid.Row="1" Grid.Column="2" Style="{DynamicResource TextBoxCleanStyle_13}" Cursor="IBeam" Height="21"></TextBox>
-                                </Grid>
-
-                                <Grid Margin="0,15,0,0">
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="20"/>
-                                        <RowDefinition Height="*" />
-                                    </Grid.RowDefinitions>
-                                    <CheckBox x:Name="visibility_pins" Foreground="#888989" Grid.Row="0">Afficher les coordonnées des coins du cadre de séléction</CheckBox>
+                                    <Label Content="Coordonnées Nord-Ouest du cadre de séléction au démarage (latitude / longitude)" Foreground="#888989" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3"/>
+                                    <TextBox x:Name="NO_PIN_starting_location_latitude" HorizontalAlignment="Stretch" Grid.Row="1" Grid.Column="0" Style="{DynamicResource TextBoxCleanStyle_13}" Cursor="IBeam" Height="21"/>
+                                    <TextBox x:Name="NO_PIN_starting_location_longitude" HorizontalAlignment="Stretch" Grid.Row="1" Grid.Column="2" Style="{DynamicResource TextBoxCleanStyle_13}" Cursor="IBeam" Height="21"/>
                                 </Grid>
 
                                 <Grid Margin="0,10,0,0">
@@ -489,8 +469,14 @@
                                         <RowDefinition Height="*" />
                                         <RowDefinition/>
                                     </Grid.RowDefinitions>
-                                    <Label Content="Zoom par défaut au démarage" Foreground="#888989" Grid.Row="0"></Label>
-                                    <TextBox x:Name="map_defaut_zoom_level" TextChanged="FilterDigitTextBox_TextChanged" HorizontalAlignment="Stretch" Grid.Row="1" Style="{DynamicResource TextBoxCleanStyle_13}" Cursor="IBeam" Height="21"></TextBox>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition Width="10"/>
+                                        <ColumnDefinition/>
+                                    </Grid.ColumnDefinitions>
+                                    <Label Content="Coordonnées Sud-Est du cadre de séléction au démarage (latitude / longitude)" Foreground="#888989" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3"/>
+                                    <TextBox x:Name="SE_PIN_starting_location_latitude" HorizontalAlignment="Stretch" Grid.Row="1" Grid.Column="0" Style="{DynamicResource TextBoxCleanStyle_13}" Cursor="IBeam" Height="21"/>
+                                    <TextBox x:Name="SE_PIN_starting_location_longitude" HorizontalAlignment="Stretch" Grid.Row="1" Grid.Column="2" Style="{DynamicResource TextBoxCleanStyle_13}" Cursor="IBeam" Height="21"/>
                                 </Grid>
 
                                 <Grid Margin="0,15,0,0">
@@ -498,15 +484,33 @@
                                         <RowDefinition Height="20"/>
                                         <RowDefinition Height="*" />
                                     </Grid.RowDefinitions>
-                                    <CheckBox x:Name="zoom_limite_taille_carte" Foreground="#888989" Grid.Row="0">Limiter le zoom de la carte au zoom minimum du calque</CheckBox>
+                                    <CheckBox x:Name="visibility_pins" Foreground="#888989" Grid.Row="0" Content="Afficher les coordonnées des coins du cadre de séléction"/>
                                 </Grid>
-                                
+
+                                <Grid Margin="0,10,0,0">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="20"/>
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+                                    <Label Content="Zoom par défaut au démarage" Foreground="#888989" Grid.Row="0"/>
+                                    <TextBox x:Name="map_defaut_zoom_level" TextChanged="FilterDigitTextBox_TextChanged" HorizontalAlignment="Stretch" Grid.Row="1" Style="{DynamicResource TextBoxCleanStyle_13}" Cursor="IBeam" Height="21"/>
+                                </Grid>
+
+                                <Grid Margin="0,15,0,0">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="20"/>
+                                        <RowDefinition Height="*" />
+                                    </Grid.RowDefinitions>
+                                    <CheckBox x:Name="zoom_limite_taille_carte" Foreground="#888989" Grid.Row="0" Content="Limiter le zoom de la carte au zoom minimum du calque"/>
+                                </Grid>
+
                                 <Grid Margin="0,10,0,0">
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="20"/>
                                         <RowDefinition Height="*" />
                                     </Grid.RowDefinitions>
-                                    <CheckBox x:Name="map_show_tile_border" Foreground="#888989" Grid.Row="0">Afficher les bordures de tuiles</CheckBox>
+                                    <CheckBox x:Name="map_show_tile_border" Foreground="#888989" Grid.Row="0" Content="Afficher les bordures de tuiles"/>
                                 </Grid>
 
                             </StackPanel>
@@ -526,8 +530,8 @@
                                         <RowDefinition Height="*" />
                                         <RowDefinition/>
                                     </Grid.RowDefinitions>
-                                    <Label Content="Nom du fichier de base de donnée" Foreground="#888989" Grid.Row="0"></Label>
-                                    <TextBox x:Name="database_pathname" HorizontalAlignment="Stretch" Grid.Row="1" Style="{DynamicResource TextBoxCleanStyle_13}" Cursor="IBeam" Height="21"></TextBox>
+                                    <Label Content="Nom du fichier de base de donnée" Foreground="#888989" Grid.Row="0"/>
+                                    <TextBox x:Name="database_pathname" HorizontalAlignment="Stretch" Grid.Row="1" Style="{DynamicResource TextBoxCleanStyle_13}" Cursor="IBeam" Height="21"/>
                                 </Grid>
                                 <Grid Margin="0,10,0,0">
                                     <Grid.RowDefinitions>
@@ -535,26 +539,18 @@
                                         <RowDefinition Height="*" />
                                         <RowDefinition/>
                                     </Grid.RowDefinitions>
-                                    <Label Content="selection_rectangle_resize_tblr_gap" Foreground="#888989" Grid.Row="0"></Label>
-                                    <TextBox x:Name="selection_rectangle_resize_tblr_gap" TextChanged="FilterDigitTextBox_TextChanged" HorizontalAlignment="Stretch" Grid.Row="1" Style="{DynamicResource TextBoxCleanStyle_13}" Cursor="IBeam" Height="21"></TextBox>
+                                    <Label Content="selection_rectangle_resize_tblr_gap" Foreground="#888989" Grid.Row="0"/>
+                                    <TextBox x:Name="selection_rectangle_resize_tblr_gap" TextChanged="FilterDigitTextBox_TextChanged" HorizontalAlignment="Stretch" Grid.Row="1" Style="{DynamicResource TextBoxCleanStyle_13}" Cursor="IBeam" Height="21"/>
                                 </Grid>
-                                
+
                                 <Grid Margin="0,10,0,0">
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="20"/>
                                         <RowDefinition Height="*" />
                                         <RowDefinition/>
                                     </Grid.RowDefinitions>
-                                    <Label Content="selection_rectangle_resize_angle_gap" Foreground="#888989" Grid.Row="0"></Label>
-                                    <TextBox x:Name="selection_rectangle_resize_angle_gap" TextChanged="FilterDigitTextBox_TextChanged" HorizontalAlignment="Stretch" Grid.Row="1" Style="{DynamicResource TextBoxCleanStyle_13}" Cursor="IBeam" Height="21"></TextBox>
-                                </Grid>
-                                                                
-                                <Grid Margin="0,10,0,0">
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="20"/>
-                                        <RowDefinition Height="*" />
-                                    </Grid.RowDefinitions>
-                                    <CheckBox x:Name="is_in_debug_mode" Foreground="#888989" Grid.Row="0">Activer le débuggage</CheckBox>
+                                    <Label Content="selection_rectangle_resize_angle_gap" Foreground="#888989" Grid.Row="0"/>
+                                    <TextBox x:Name="selection_rectangle_resize_angle_gap" TextChanged="FilterDigitTextBox_TextChanged" HorizontalAlignment="Stretch" Grid.Row="1" Style="{DynamicResource TextBoxCleanStyle_13}" Cursor="IBeam" Height="21"/>
                                 </Grid>
 
                                 <Grid Margin="0,10,0,0">
@@ -562,7 +558,7 @@
                                         <RowDefinition Height="20"/>
                                         <RowDefinition Height="*" />
                                     </Grid.RowDefinitions>
-                                    <CheckBox x:Name="show_layer_devtool" Foreground="#888989" Grid.Row="0">Afficher les devtool pour le panneau "Calques"</CheckBox>
+                                    <CheckBox x:Name="is_in_debug_mode" Foreground="#888989" Grid.Row="0" Content="Activer le débuggage"/>
                                 </Grid>
 
                                 <Grid Margin="0,10,0,0">
@@ -570,116 +566,122 @@
                                         <RowDefinition Height="20"/>
                                         <RowDefinition Height="*" />
                                     </Grid.RowDefinitions>
-                                    <CheckBox x:Name="show_download_devtool" Foreground="#888989" Grid.Row="0">Afficher les devtool pour le panneau "Téléchargements"</CheckBox>
+                                    <CheckBox x:Name="show_layer_devtool" Foreground="#888989" Grid.Row="0" Content="Afficher les devtool pour le panneau &quot;Calques&quot;"/>
                                 </Grid>
-                                
-                                
+
                                 <Grid Margin="0,10,0,0">
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="20"/>
                                         <RowDefinition Height="*" />
                                     </Grid.RowDefinitions>
-                                    <CheckBox x:Name="nettoyer_cache_browser_au_demarrage" Foreground="#888989" Grid.Row="0">Supprimer le cache des panneaux au démarrage</CheckBox>
+                                    <CheckBox x:Name="show_download_devtool" Foreground="#888989" Grid.Row="0" Content="Afficher les devtool pour le panneau &quot;Téléchargements&quot;"/>
                                 </Grid>
-                                
+
+
                                 <Grid Margin="0,10,0,0">
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="20"/>
                                         <RowDefinition Height="*" />
                                     </Grid.RowDefinitions>
-                                    <CheckBox x:Name="nettoyer_cache_layers_au_demarrage" Foreground="#888989" Grid.Row="0">Supprimer le cache des tuiles au démarrage</CheckBox>
+                                    <CheckBox x:Name="nettoyer_cache_browser_au_demarrage" Foreground="#888989" Grid.Row="0" Content="Supprimer le cache des panneaux au démarrage"/>
                                 </Grid>
 
-
-                                <Button x:Name="resetSettings" Content="Restaurer les paramètres par défaut" Margin="0,10,0,0" Foreground="#BCBCBC" Click="ResetSettings_Click"></Button>
+                                <Grid Margin="0,10,0,0">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="20"/>
+                                        <RowDefinition Height="*" />
+                                    </Grid.RowDefinitions>
+                                    <CheckBox x:Name="nettoyer_cache_layers_au_demarrage" Foreground="#888989" Grid.Row="0" Content="Supprimer le cache des tuiles au démarrage"/>
+                                </Grid>
+                                <Button x:Name="resetSettings" Content="Restaurer les paramètres par défaut" Margin="0,10,0,0" Foreground="#BCBCBC" Click="ResetSettings_Click"/>
                             </StackPanel>
 
                             <StackPanel x:Name="UpdateSettings">
-                                <Label x:Name="UpdateSettingsLabel"  Content="Mises à jour : " HorizontalAlignment="Left" Margin="0,20,0,0" VerticalAlignment="Top" Width="Auto" Height="25" FontSize="16.5" FontFamily="Segoe UI Semilight" Foreground="#FFE2E2E1"/>
+                                <Label x:Name="UpdateSettingsLabel" Content="Mises à jour : " HorizontalAlignment="Left" Margin="0,20,0,0" VerticalAlignment="Top" Width="Auto" Height="25" FontSize="16.5" FontFamily="Segoe UI Semilight" Foreground="#FFE2E2E1"/>
+
+
+                                <Grid Margin="0,10,0,0">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="20"/>
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+                                    <Label Content="Github repository URL" Foreground="#888989" Grid.Row="0"/>
+                                    <TextBox x:Name="github_repository_url" HorizontalAlignment="Stretch" Grid.Row="1" Style="{DynamicResource TextBoxCleanStyle_13}" Cursor="IBeam" Height="21"/>
+                                </Grid>
+                                <Grid Margin="0,10,0,0">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="20"/>
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+                                    <Label Content="Nom du fichier database sur github" Foreground="#888989" Grid.Row="0"/>
+                                    <TextBox x:Name="github_database_name" HorizontalAlignment="Stretch" Grid.Row="1" Style="{DynamicResource TextBoxCleanStyle_13}" Cursor="IBeam" Height="21"/>
+                                </Grid>
+
+                                <Grid Margin="0,10,0,0">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="20"/>
+                                        <RowDefinition Height="*" />
+                                    </Grid.RowDefinitions>
+                                    <CheckBox x:Name="search_application_update_on_startup" Foreground="#888989" Grid.Row="0" Content="Rechercher les mises à jour de l'application au démarage du logiciel"/>
+                                </Grid>
+                                <Grid Margin="0,10,0,0">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="20"/>
+                                        <RowDefinition Height="*" />
+                                    </Grid.RowDefinitions>
+                                    <CheckBox x:Name="search_database_update_on_startup" Foreground="#888989" Grid.Row="0" Content="Rechercher les mises à jour de la base de donnée au démarage du logiciel"/>
+                                </Grid>
+
+                                <Button x:Name="databaseExport" Content="Exporter la base de donnée" Margin="0,10,0,0" Foreground="#BCBCBC" Click="databaseExport_Click"/>
                                 
-
-                                <Grid Margin="0,10,0,0">
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="20"/>
-                                        <RowDefinition Height="*" />
-                                        <RowDefinition/>
-                                    </Grid.RowDefinitions>
-                                    <Label Content="Github repository URL" Foreground="#888989" Grid.Row="0"></Label>
-                                    <TextBox x:Name="github_repository_url" HorizontalAlignment="Stretch" Grid.Row="1" Style="{DynamicResource TextBoxCleanStyle_13}" Cursor="IBeam" Height="21"></TextBox>
-                                </Grid>
-                                <Grid Margin="0,10,0,0">
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="20"/>
-                                        <RowDefinition Height="*" />
-                                        <RowDefinition/>
-                                    </Grid.RowDefinitions>
-                                    <Label Content="Nom du fichier database sur github (release panel)" Foreground="#888989" Grid.Row="0"></Label>
-                                    <TextBox x:Name="github_database_name" HorizontalAlignment="Stretch" Grid.Row="1" Style="{DynamicResource TextBoxCleanStyle_13}" Cursor="IBeam" Height="21"></TextBox>
-                                </Grid>
-
-                                <Grid Margin="0,10,0,0">
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="20"/>
-                                        <RowDefinition Height="*" />
-                                    </Grid.RowDefinitions>
-                                    <CheckBox x:Name="search_application_update_on_startup" Foreground="#888989" Grid.Row="0">Rechercher les mises à jour de l'application au démarage du logiciel</CheckBox>
-                                </Grid>
-                                <Grid Margin="0,10,0,0">
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="20"/>
-                                        <RowDefinition Height="*" />
-                                    </Grid.RowDefinitions>
-                                    <CheckBox x:Name="search_database_update_on_startup" Foreground="#888989" Grid.Row="0">Rechercher les mises à jour de la base de donnée au démarage du logiciel</CheckBox>
-                                </Grid>
-
-                                <Button x:Name="searchForUpdates" Content="Rechercher des mises à jours" Margin="0,10,0,0" Foreground="#BCBCBC" Click="searchForUpdates_Click"></Button>
-                                <Label x:Name="searchForUpdatesLastUpdateCheck" ContentStringFormat="Dernière verification : {0}" Content=" 01/01/1970" Foreground="#888989"></Label>
+                                <Button x:Name="searchForUpdates" Content="Rechercher des mises à jours" Margin="0,10,0,0" Foreground="#BCBCBC" Click="searchForUpdates_Click"/>
+                                <Label x:Name="searchForUpdatesLastUpdateCheck" ContentStringFormat="Dernière verification : {0}" Content="01/01/1970" Foreground="#888989"/>
                             </StackPanel>
 
                             <StackPanel x:Name="AProposSettings">
                                 <Label x:Name="AProposSettingsLabel"  Content="A propos : " HorizontalAlignment="Left" Margin="0,20,0,0" VerticalAlignment="Top" Width="Auto" Height="25" FontSize="16.5" FontFamily="Segoe UI Semilight" Foreground="#FFE2E2E1"/>
-                                <Label Content="MapsInMyFolder" Foreground="#888989"></Label>
-                                <Label x:Name="SettingsVersionInformation" Content="/" ContentStringFormat="Version : {0}" Foreground="#888989"></Label>
+                                <Label Content="MapsInMyFolder" Foreground="#888989"/>
+                                <Label x:Name="SettingsVersionInformation" Content="/" ContentStringFormat="Version : {0}" Foreground="#888989"/>
                                 <WrapPanel VerticalAlignment="Center">
-                                    <Label Content="Github : " Foreground="#888989"></Label>
+                                    <Label Content="Github : " Foreground="#888989"/>
                                     <ui:HyperlinkButton Content="https://github.com/SioGabx/MapsInMyFolder" NavigateUri="https://github.com/SioGabx/MapsInMyFolder"/>
                                 </WrapPanel>
-                                <Label Content="Copyright © SioGabx - François HOFFMANN" Foreground="#888989"></Label>
+                                <Label Content="Copyright © SioGabx - François HOFFMANN" Foreground="#888989"/>
                                 <ui:HyperlinkButton Content="https://siogabx.fr/" NavigateUri="https://siogabx.fr/"/>
                                 <StackPanel Margin="0,10,0,0">
                                     <WrapPanel>
-                                        <Label Content="Credits (merci à eux " Foreground="#888989"></Label>
-                                        <Label Content="♥" Foreground="#F18712"></Label>
-                                        <Label Content="):" Foreground="#888989"></Label>
+                                        <Label Content="Credits (merci à eux " Foreground="#888989"/>
+                                        <Label Content="♥" Foreground="#F18712"/>
+                                        <Label Content="):" Foreground="#888989"/>
                                     </WrapPanel>
                                     <StackPanel Margin="10,0,0,0">
                                         <WrapPanel VerticalAlignment="Center">
-                                            <Label Content="- Kinnara : " Foreground="#888989"></Label>
+                                            <Label Content="- Kinnara : " Foreground="#888989"/>
                                             <ui:HyperlinkButton Content="ModernWpf" NavigateUri="https://github.com/Kinnara/ModernWpf"/>
                                         </WrapPanel>
                                         <WrapPanel VerticalAlignment="Center">
-                                            <Label Content="- Clemens Fischer : " Foreground="#888989"></Label>
+                                            <Label Content="- Clemens Fischer : " Foreground="#888989"/>
                                             <ui:HyperlinkButton Content="XAML-Map-Control" NavigateUri="https://github.com/ClemensFischer/XAML-Map-Control"/>
                                         </WrapPanel>
                                         <WrapPanel VerticalAlignment="Center">
-                                            <Label Content="- AliFlux : " Foreground="#888989"></Label>
+                                            <Label Content="- AliFlux : " Foreground="#888989"/>
                                             <ui:HyperlinkButton Content="VectorTileRenderer" NavigateUri="https://github.com/AliFlux/VectorTileRenderer"/>
                                         </WrapPanel>
                                         <WrapPanel VerticalAlignment="Center">
-                                            <Label Content="- CefSharp community : " Foreground="#888989"></Label>
+                                            <Label Content="- CefSharp community : " Foreground="#888989"/>
                                             <ui:HyperlinkButton Content="CefSharp" NavigateUri="https://github.com/cefsharp/CefSharp"/>
                                         </WrapPanel>
                                         <WrapPanel VerticalAlignment="Center">
-                                            <Label Content="- Libvips community &amp; kleisauke : " Foreground="#888989"></Label>
+                                            <Label Content="- Libvips community &amp; kleisauke : " Foreground="#888989"/>
                                             <ui:HyperlinkButton Content="libvips" NavigateUri="https://github.com/libvips/libvips"/>
-                                            <Label Foreground="#888989" Content=" / "></Label>
+                                            <Label Foreground="#888989" Content=" / "/>
                                             <ui:HyperlinkButton Content="net-vips" NavigateUri="https://github.com/kleisauke/net-vips"/>
                                         </WrapPanel>
 
 
-                                        <StackPanel Height="125">
-                                            
-                                        </StackPanel>
+                                        <StackPanel Height="125"/>
 
                                     </StackPanel>
                                 </StackPanel>
@@ -699,6 +701,6 @@
     CloseButtonText="Cancel"
     DefaultButton="Primary" d:IsHidden="True" Background="#171719">
         </ui:ContentDialog>-->
-        
+
     </Grid>
 </Window>

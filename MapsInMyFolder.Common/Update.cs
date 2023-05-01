@@ -38,11 +38,6 @@ namespace MapsInMyFolder.Commun
                     return false;
                 }
                 string GithubVersion = Collectif.FilterDigitOnly(Release.Tag_name, new System.Collections.Generic.List<char>() { '.' }, false, false);
-
-                //Debug.WriteLine("LatestGithubRelease : " + FileAsset);
-                //Debug.WriteLine("Download URL : " + FileAsset.Browser_download_url);
-                //Debug.WriteLine("tag_name " + Release.Tag_name);
-                //Debug.WriteLine("GetActualProductVersionFormatedString " + GetActualProductVersionFormatedString());
                 bool IsNewerVersionAvailable = CompareVersion(GithubVersion);
                 if (IsNewerVersionAvailable)
                 {
@@ -124,7 +119,7 @@ namespace MapsInMyFolder.Commun
             string UpdateFilePath = System.IO.Path.Combine(Settings.temp_folder, UpdateFileAsset.Id + UpdateFileAsset.Name);
 
             string NotificationMsg = $"Téléchargement en cours de '{UpdateFileAsset.Name}' depuis {downloadFileUrl.Host}...";
-            NProgress UpdateNotification = new NProgress(NotificationMsg, "MapsInMyFolder", "MainPage",null, 0, false) { };
+            NProgress UpdateNotification = new NProgress(NotificationMsg, "MapsInMyFolder", "MainPage", null, 0, false) { };
             UpdateNotification.Register();
 
             Collectif.HttpClientDownloadWithProgress client = new Collectif.HttpClientDownloadWithProgress(downloadFileUrl.ToString(), UpdateFilePath);
@@ -137,7 +132,7 @@ namespace MapsInMyFolder.Commun
                 });
             };
             await client.StartDownload();
-            
+
             UpdateNotification.Text("Installation...");
             UpdateNotification.SendUpdate();
             Application.Current.Shutdown();

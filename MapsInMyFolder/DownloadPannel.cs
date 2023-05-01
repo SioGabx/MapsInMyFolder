@@ -1,15 +1,15 @@
 ﻿using CefSharp;
+using MapsInMyFolder.Commun;
 using ModernWpf.Controls;
 using System;
 using System.Collections.Generic;
+using System.Data.SQLite;
 using System.Diagnostics;
 using System.Threading;
 using System.Windows;
-using System.Windows.Threading;
-using MapsInMyFolder.Commun;
-using System.Data.SQLite;
 using System.Windows.Input;
 using System.Windows.Media.Animation;
+using System.Windows.Threading;
 
 namespace MapsInMyFolder
 {
@@ -45,6 +45,7 @@ namespace MapsInMyFolder
                     string DB_Download_TEMP_DIRECTORY = sqlite_datareader.GetString(sqlite_datareader.GetOrdinal("TEMP_DIRECTORY"));
                     string DB_Download_SAVE_DIRECTORY = sqlite_datareader.GetString(sqlite_datareader.GetOrdinal("SAVE_DIRECTORY"));
                     string DB_Download_COLORINTERPRETATION = sqlite_datareader.GetString(sqlite_datareader.GetOrdinal("COLORINTERPRETATION"));
+                    string DB_Download_SCALEINFO = sqlite_datareader.GetString(sqlite_datareader.GetOrdinal("SCALEINFO"));
                     string DB_Download_FILE_NAME = sqlite_datareader.GetString(sqlite_datareader.GetOrdinal("FILE_NAME"));
                     string DB_Download_STATE = sqlite_datareader.GetString(sqlite_datareader.GetOrdinal("STATE"));
                     string DB_Download_INFOS = sqlite_datareader.GetString(sqlite_datareader.GetOrdinal("INFOS")).Trim();
@@ -65,6 +66,9 @@ namespace MapsInMyFolder
                     };
 
                     NetVips.Enums.Interpretation COLORINTERPRETATION = (NetVips.Enums.Interpretation)Enum.Parse(typeof(NetVips.Enums.Interpretation), DB_Download_COLORINTERPRETATION);
+
+
+                    ScaleInfo SCALEINFO = System.Text.Json.JsonSerializer.Deserialize<ScaleInfo>(DB_Download_SCALEINFO, new System.Text.Json.JsonSerializerOptions() { IncludeFields = true });
 
                     //List<Url_class> urls = Collectif.GetUrl.GetListOfUrlFromLocation(location, DB_Download_ZOOM, layers.class_tile_url, DB_Download_LAYER_ID, downloadid);
                     List<Url_class> urls = null;
@@ -119,7 +123,7 @@ namespace MapsInMyFolder
                             Download_INFOS = "Introuvable.";
                         }
                     }
-                    DownloadClass engine = new DownloadClass(downloadid, DB_Download_ID, DB_Download_LAYER_ID, urls, tokenSource2, ct, format, final_saveformat, DB_Download_ZOOM, DB_Download_TEMP_DIRECTORY, DB_Download_SAVE_DIRECTORY, DB_Download_FILE_NAME, filetempname, location, REDIMWIDTH, REDIMHEIGHT, new TileGenerator(), COLORINTERPRETATION, DB_Download_NBR_TILES, layers.class_tile_url, layers.class_identifiant, engine_status, layers.class_tiles_size, quality: DB_Download_QUALITY);
+                    DownloadClass engine = new DownloadClass(downloadid, DB_Download_ID, DB_Download_LAYER_ID, urls, tokenSource2, ct, format, final_saveformat, DB_Download_ZOOM, DB_Download_TEMP_DIRECTORY, DB_Download_SAVE_DIRECTORY, DB_Download_FILE_NAME, filetempname, location, REDIMWIDTH, REDIMHEIGHT, new TileGenerator(), COLORINTERPRETATION, SCALEINFO, DB_Download_NBR_TILES, layers.class_tile_url, layers.class_identifiant, engine_status, layers.class_tiles_size, quality: DB_Download_QUALITY);
                     DownloadClass.Add(engine, downloadid);
                     string commande_add = "add_download(" + downloadid + @",""" + engine_status.ToString() + @""",""" + DB_Download_FILE_NAME + @""",0," + DB_Download_NBR_TILES + @",""" + Download_INFOS + @""",""" + DB_Download_TIMESTAMP + @""");";
                     if (engine_status == Status.error)
@@ -200,7 +204,6 @@ namespace MapsInMyFolder
         }
     }
 
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Marquer les membres comme étant static", Justification = "Used by CEFSHARP, static isnt a option here")]
     public class Download_Csharp_call_from_js
     {
         public bool IsFileOk(int id)

@@ -28,7 +28,7 @@
     </ItemGroup>
 
     <ItemGroup Condition="'$(TargetFramework)'=='net6.0-windows'">
-        <PackageReference Include="System.Runtime.Caching" Version="6.0.0" />
+        <PackageReference Include="System.Runtime.Caching" Version="7.0.0" />
     </ItemGroup>
 
     <ItemGroup>

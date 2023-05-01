@@ -104,7 +104,7 @@ namespace MapsInMyFolder.Commun
 
             // If parameter cannot be cast to Diff return false.
             Diff p = obj as Diff;
-            if ((System.Object)p == null)
+            if (p == null)
             {
                 return false;
             }
@@ -718,7 +718,7 @@ namespace MapsInMyFolder.Commun
 
                 if (lineHash.ContainsKey(line))
                 {
-                    chars.Append(((char)(int)lineHash[line]));
+                    chars.Append(((char)lineHash[line]));
                 }
                 else
                 {

@@ -1,12 +1,13 @@
-﻿using MapsInMyFolder.MapControl;
+﻿using MapsInMyFolder.Commun;
+using MapsInMyFolder.MapControl;
 using System.Collections.Generic;
 
 namespace MapsInMyFolder
 {
 
-    public static class MapFigures
+    public class MapFigures
     {
-        private static List<Figure> mapPolygons = new List<Figure>();
+        private List<Figure> mapPolygons = new List<Figure>();
 
         public class Figure
         {
@@ -31,19 +32,19 @@ namespace MapsInMyFolder
             }
         }
 
-        public static void DrawFigure(MapItemsControl map, Figure figure)
+        public void DrawFigure(MapItemsControl map, Figure figure)
         {
             mapPolygons.Add(figure);
             map.Items.Add(figure.polygon);
         }
 
-        public static void RemoveFigure(MapItemsControl map, Figure figure)
+        public void RemoveFigure(MapItemsControl map, Figure figure)
         {
             mapPolygons.Remove(figure);
             map.Items.Remove(figure.polygon);
         }
 
-        public static void ClearFigures(MapItemsControl map)
+        public void ClearFigures(MapItemsControl map)
         {
             Figure[] mapPolygonsCopy = mapPolygons.ToArray();
             mapPolygons.Clear();
@@ -53,30 +54,27 @@ namespace MapsInMyFolder
             }
         }
 
-        public static void UpdateFiguresFromZoomLevel(double ZoomLevel)
+        public void UpdateFiguresFromZoomLevel(double ZoomLevel)
         {
-            foreach(Figure figure in mapPolygons)
+            foreach (Figure figure in mapPolygons)
             {
                 if (figure.MinZoom != -1 && figure.MinZoom > ZoomLevel)
                 {
                     figure.polygon.Visibility = System.Windows.Visibility.Collapsed;
                     continue;
                 }
-                
+
                 if (figure.MaxZoom != -1 && figure.MaxZoom < ZoomLevel)
                 {
                     figure.polygon.Visibility = System.Windows.Visibility.Collapsed;
                     continue;
                 }
                 figure.polygon.Visibility = System.Windows.Visibility.Visible;
-
-
             }
         }
 
-        public static List<Figure> GetFiguresFromJsonString(string json)
+        public static IEnumerable<Figure> GetFiguresFromJsonString(string json)
         {
-            List<Figure> figureList = new List<Figure>();
             foreach (Dictionary<string, string> ElementsForRectangleSelection in Newtonsoft.Json.JsonConvert.DeserializeObject<List<Dictionary<string, string>>>(json) ?? new List<Dictionary<string, string>>())
             {
                 MapPolygon Rectangle = new MapPolygon();
@@ -91,7 +89,7 @@ namespace MapsInMyFolder
                 ElementsForRectangleSelection.TryGetValue("MaxZoom", out string MaxZoomStr);
                 ElementsForRectangleSelection.TryGetValue("StrokeThickness", out string StrokeThicknessStr);
                 ElementsForRectangleSelection.TryGetValue("Color", out string Color);
-               
+
                 if (!double.TryParse(NO_Lat_str, out double NO_Lat)) continue;
                 if (!double.TryParse(NO_Long_str, out double NO_Long)) continue;
                 if (!double.TryParse(SE_Lat_str, out double SE_Lat)) continue;
@@ -101,7 +99,7 @@ namespace MapsInMyFolder
                 {
                     MinZoom = -1;
                 }
-                
+
                 if (!double.TryParse(StrokeThicknessStr, out double StrokeThickness))
                 {
                     StrokeThickness = 1;
@@ -115,11 +113,24 @@ namespace MapsInMyFolder
                 Location SE = new Location(SE_Lat, SE_Long);
                 Rectangle.Locations = new List<Location>() { NO, new Location(SE.Latitude, NO.Longitude), SE, new Location(NO.Latitude, SE.Longitude) };
 
-                figureList.Add(new Figure(Rectangle, Name, NO, SE, MinZoom, MaxZoom, StrokeThickness, Color));
+                yield return new Figure(Rectangle, Name, NO, SE, MinZoom, MaxZoom, StrokeThickness, Color);
             }
-            return figureList;
         }
 
+
+        public void DrawFigureOnMapItemsControlFromJsonString(MapItemsControl mapviewerRectangles, string FiguresJsonString)
+        {
+            ClearFigures(mapviewerRectangles);
+            foreach (MapFigures.Figure Figure in MapFigures.GetFiguresFromJsonString(FiguresJsonString))
+            {
+                MapPolygon polygon = Figure.polygon;
+                polygon.Stroke = Collectif.HexValueToSolidColorBrush(Figure.Color, "#000");
+                polygon.StrokeThickness = Figure.StrokeThickness;
+                polygon.IsHitTestVisible = false;
+                Figure.polygon = polygon;
+                DrawFigure(mapviewerRectangles, Figure);
+            }
+        }
 
 
 

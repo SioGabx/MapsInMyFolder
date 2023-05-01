@@ -19,6 +19,7 @@ namespace MapsInMyFolder.MapControl
         TileSource TileSource { get; }
 
         Task LoadTiles(IEnumerable<Tile> tiles, TileSource tileSource, string cacheName);
+        Task SortedLoadTiles(IEnumerable<Tile> tiles, TileSource tileSource, string cacheName);
     }
 
     public abstract class MapTileLayerBase : Panel, IMapLayer

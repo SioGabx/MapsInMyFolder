@@ -20,7 +20,7 @@ namespace MapsInMyFolder.MapControl
                     projection = new WebMercatorProjection();
                     break;
 
-              
+
                 default:
                     break;
             }

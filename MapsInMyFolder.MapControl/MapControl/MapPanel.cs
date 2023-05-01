@@ -233,8 +233,7 @@ namespace MapsInMyFolder.MapControl
         private bool IsOutsideViewport(Point point)
         {
             return false;
-            return point.X < 0d || point.X > parentMap.RenderSize.Width
-                || point.Y < 0d || point.Y > parentMap.RenderSize.Height;
+            //return point.X < 0d || point.X > parentMap.RenderSize.Width || point.Y < 0d || point.Y > parentMap.RenderSize.Height;
         }
 
         private static void ArrangeElement(FrameworkElement element, ViewRect rect)

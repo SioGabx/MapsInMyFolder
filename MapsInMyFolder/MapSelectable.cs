@@ -1,11 +1,11 @@
-﻿using System;
+﻿using MapsInMyFolder.Commun;
+using MapsInMyFolder.MapControl;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
-using MapsInMyFolder.Commun;
-using MapsInMyFolder.MapControl;
 
 namespace MapsInMyFolder
 {
@@ -219,13 +219,18 @@ namespace MapsInMyFolder
         {
             this.map = map;
             map.Focusable = true;
-            foreach (UIElement element in map.Children)
+            System.Windows.Controls.UIElementCollection uIElementCollection = map.Children;
+            try
             {
-                if (element.GetType() == typeof(MapPolygon))
+                foreach (UIElement element in uIElementCollection)
                 {
-                    map.Children.Remove(element);
+                    if (element.GetType() == typeof(MapPolygon))
+                    {
+                        map.Children.Remove(element);
+                    }
                 }
             }
+            catch (Exception) { }
             SavedNo_Placement = StartingNO;
             SavedSe_Placement = StartingSE;
             AddRectangle(StartingNO, StartingSE);
@@ -593,6 +598,34 @@ namespace MapsInMyFolder
                 return (false, TargetLocation);
             }
 
+            (Location NOFix, Location SEFix) FixLocation(Location NO, Location SE)
+            {
+                if (Math.Abs(NO.Longitude) >= 180 || Math.Abs(SE.Longitude) >= 180)
+                {
+                    Point MAX_No_PlacementPoint = map.LocationToView(new Location(0, -180));
+                    Point Target_No_PlacementPoint = map.LocationToView(NO);
+                    Point Target_Se_PlacementPoint = map.LocationToView(SE);
+                    Location NOFix;
+                    Location SEFix;
+                    NOFix = map.ViewToLocation(new Point(map.LocationToView(CurentLocation.NO).X, Target_No_PlacementPoint.Y));
+                    SEFix = map.ViewToLocation(new Point(map.LocationToView(CurentLocation.SE).X, Target_Se_PlacementPoint.Y));
+                    return (NOFix, SEFix);
+                }
+                return (NO, SE);
+            }
+
+            if (DoUpdateNo && DoUpdateSe && MouseHitType == HitType.Body)
+            {
+                var NoIsIllegal = IllegalLocation(NO, CurentLocation.NO);
+                var SeIsIllegal = IllegalLocation(SE, CurentLocation.SE);
+                if (NoIsIllegal.isIllegal || SeIsIllegal.isIllegal)
+                {
+                    var FixLoc = FixLocation(NO, SE);
+                    NO = FixLoc.NOFix;
+                    SE = FixLoc.SEFix;
+                }
+            }
+
             if (DoUpdateNo)
             {
                 var NoIsIllegal = IllegalLocation(NO, CurentLocation.NO);
@@ -618,9 +651,6 @@ namespace MapsInMyFolder
                     SE = SeIsIllegal.result;
                 }
             }
-
-
-
 
             if (IsSnapToGrid)
             {
@@ -1023,15 +1053,6 @@ namespace MapsInMyFolder
                     }
                     Location TargetNOloc = map.ViewToLocation(new Point(SavedNo_PlacementPoint.X + deplacement_X, SavedNo_PlacementPoint.Y + deplacement_Y));
                     Location TargetSEloc = map.ViewToLocation(new Point(SavedSe_PlacementPoint.X + deplacement_X, SavedSe_PlacementPoint.Y + deplacement_Y));
-                    if (Math.Abs(TargetNOloc.Longitude) == 180 || Math.Abs(TargetSEloc.Longitude) == 180)
-                    {
-                        break;
-                        //if (Math.Abs(SavedNo_Placement.Longitude) == 180 || Math.Abs(SavedSe_Placement.Longitude) == 180)
-                        //{
-
-                        //    break;
-                        //}
-                    }
 
                     SetRectangleLocation(TargetNOloc, TargetSEloc);
                     SavedLeftClickPreviousActions = e.GetPosition(map);
@@ -1119,4 +1140,6 @@ namespace MapsInMyFolder
         }
 
     }
+
+
 }

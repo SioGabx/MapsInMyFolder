@@ -42,6 +42,32 @@ namespace MapsInMyFolder.MapControl
 
         private ConcurrentStack<Tile> pendingTiles;
 
+
+        public Task SortedLoadTiles(IEnumerable<Tile> tiles, TileSource tileSource, string cacheName)
+        {
+            if (tiles.Any())
+            {
+                var centers = tiles
+                    .GroupBy(x => x.ZoomLevel, (key, tiles) => new
+                    {
+                        key,
+                        midX = tiles.Average(x => x.X),
+                        midY = tiles.Average(x => x.Y)
+                    })
+                    .ToDictionary(x => x.key);
+                static double sq(double x) => x * x;
+                var sortedTiles = tiles
+                    .OrderBy(x => x.ZoomLevel)
+                    .ThenBy(x => sq(centers[x.ZoomLevel].midX - x.X) + sq(centers[x.ZoomLevel].midY - x.Y));
+                return LoadTiles(sortedTiles, tileSource, cacheName);
+            }
+            else
+            {
+                return LoadTiles(tiles, tileSource, cacheName);
+            }
+        }
+
+
         /// <summary>
         /// Loads all pending tiles from the tiles collection.
         /// If tileSource.UriFormat starts with "http" and cacheName is a non-empty string,
@@ -112,7 +138,7 @@ namespace MapsInMyFolder.MapControl
                 var cacheKey = string.Format(CultureInfo.InvariantCulture,
                     "{0}/{1}/{2}/{3}{4}", cacheName, tile.ZoomLevel, tile.XIndex, tile.Y, extension);
 
-               
+
                 return LoadCachedTile(tile, tileSource.UriFormat, cacheKey, tileSource.LayerID);
             }
 

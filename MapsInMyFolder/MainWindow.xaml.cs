@@ -1,17 +1,17 @@
-﻿using System;
-using System.Windows;
-using CefSharp;
+﻿using CefSharp;
+using ICSharpCode.AvalonEdit.Highlighting;
+using MapsInMyFolder.Commun;
 using MapsInMyFolder.MapControl;
-using System.Diagnostics;
 using ModernWpf;
+using ModernWpf.Media.Animation;
+using System;
+using System.Diagnostics;
+using System.IO;
+using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media.Animation;
-using MapsInMyFolder.Commun;
-using ModernWpf.Media.Animation;
-using ICSharpCode.AvalonEdit.Highlighting;
-using System.Xml;
-using System.IO;
 using System.Windows.Navigation;
+using System.Xml;
 
 namespace MapsInMyFolder
 {
@@ -32,16 +32,11 @@ namespace MapsInMyFolder
         }
 
         public MainPage MainPage = new MainPage();
-        public PrepareDownloadPage PrepareDownloadPage = new PrepareDownloadPage();
-        public CustomOrEditLayersPage CustomOrEditLayersPage;
 
         public void FrameBack(bool NoTransition = false)
         {
             AppTitleBar.Opacity = 1;
-            if (CustomOrEditLayersPage is not null)
-            {
-                CustomOrEditLayersPage = null;
-            }
+            AppTitleBar.IsEnabled = true;
             if (!MainContentFrame.CanGoBack) { return; }
             FrameCanGoBack = true;
             if (NoTransition)
@@ -62,6 +57,7 @@ namespace MapsInMyFolder
                 return;
             }
             Popup_opening(false);
+            PrepareDownloadPage PrepareDownloadPage = new PrepareDownloadPage();
             PrepareDownloadPage.default_filename = Layers.Curent.class_name.Trim().Replace(" ", "_").ToLowerInvariant();
             PrepareDownloadPage.Init();
             MainContentFrame.Navigate(PrepareDownloadPage);
@@ -82,8 +78,7 @@ namespace MapsInMyFolder
         //SQLiteConnection global_conn;
         public void Init()
         {
-            this.Title = "MapsInMyFolder";
-            TitleTextBox.Text = "MapsInMyFolder";
+            TitleTextBox.Text = this.Title = "MapsInMyFolder";
             ThemeManager.Current.ApplicationTheme = ApplicationTheme.Dark;
             ImageLoader.HttpClient.DefaultRequestHeaders.Add("User-Agent", Settings.user_agent);
             TileGeneratorSettings.HttpClient.DefaultRequestHeaders.Add("User-Agent", Settings.user_agent);
@@ -182,7 +177,7 @@ namespace MapsInMyFolder
 
             if (Settings.search_database_update_on_startup)
             {
-                Database.CheckIfNewerVersionAvailable();
+                await Database.CheckIfNewerVersionAvailable();
             }
         }
 
@@ -219,12 +214,12 @@ namespace MapsInMyFolder
             _instance.MainPage.ReloadPage();
             _instance.MainPage.SearchLayerStart();
             _instance.MainPage.Init_download_panel();
-            _instance.MainPage.Set_current_layer(Settings.layer_startup_id);
+            _instance.MainPage.Set_current_layer(Layers.Curent.class_id);
         }
 
         private void Window_ContentRendered(object sender, EventArgs e)
         {
-            MainPage.Set_current_layer(Settings.layer_startup_id);
+            // MainPage.Set_current_layer(Settings.layer_startup_id);
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -237,20 +232,10 @@ namespace MapsInMyFolder
         }
 
 
-        public void Popup_closing()
-        {
-            AppTitleBar.Opacity = 1;
-            DoubleAnimation hide_anim = new DoubleAnimation(0d, TimeSpan.FromMilliseconds(Settings.animations_duration_millisecond / 1.3))
-            {
-                EasingFunction = new PowerEase { EasingMode = EasingMode.EaseInOut }
-            };
-            hide_anim.Completed += (s, e) => MainPage.popup_background.Visibility = Visibility.Hidden;
-            MainPage.popup_background.BeginAnimation(OpacityProperty, hide_anim);
-        }
-
         public void Popup_opening(bool ReduceOpacity = true)
         {
             AppTitleBar.Opacity = 0.5;
+            AppTitleBar.IsEnabled = false;
             MainPage.Download_panel_close();
             if (ReduceOpacity)
             {
