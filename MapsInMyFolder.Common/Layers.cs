@@ -6,27 +6,27 @@ namespace MapsInMyFolder.Commun
 {
     public class Layers
     {
-        public int class_id;
-        public bool class_favorite;
-        public string class_name;
-        public string class_description;
-        public string class_categorie;
-        public string class_pays;
-        public string class_identifiant;
-        public string class_tile_url;
-        public string class_tile_fallback_url;
-        public string class_site;
-        public string class_site_url;
-        public int? class_min_zoom;
-        public int? class_max_zoom;
-        public string class_format;
-        public int? class_tiles_size;
-        public string class_tilecomputationscript;
-        public string class_visibility;
-        public SpecialsOptions class_specialsoptions;
-        public string class_rectangles;
-        public int class_version;
-        public bool class_hasscale;
+        public int class_id { get; set; }
+        public bool class_favorite { get; set; }
+        public string class_name { get; set; }
+        public string class_description { get; set; }
+        public string class_categorie { get; set; }
+        public string class_pays { get; set; }
+        public string class_identifiant { get; set; }
+        public string class_tile_url { get; set; }
+        public string class_tile_fallback_url { get; set; }
+        public string class_site { get; set; }
+        public string class_site_url { get; set; }
+        public int? class_min_zoom { get; set; }
+        public int? class_max_zoom { get; set; }
+        public string class_format { get; set; }
+        public int? class_tiles_size { get; set; }
+        public string class_tilecomputationscript { get; set; }
+        public string class_visibility { get; set; }
+        public SpecialsOptions class_specialsoptions { get; set; }
+        public string class_rectangles { get; set; }
+        public int class_version { get; set; }
+        public bool class_hasscale { get; set; }
 
 
         public Layers(int class_id, bool class_favorite, string class_name, string class_description, string class_categorie, string class_pays, string class_identifiant, string class_tile_url, string class_tile_fallback_url, string class_site, string class_site_url, int? class_min_zoom, int? class_max_zoom, string class_format, int? class_tiles_size, string class_tilecomputationscript, string class_visibility, SpecialsOptions class_specialsoptions, string class_rectangles, int class_version, bool class_hasscale)
@@ -78,11 +78,33 @@ namespace MapsInMyFolder.Commun
                 }
             }
             public string PBFJsonStyle { get; set; }
+
+            public override string ToString()
+            {
+                if (string.IsNullOrWhiteSpace(BackgroundColor) && string.IsNullOrWhiteSpace(PBFJsonStyle))
+                {
+                    return string.Empty;
+                }
+                else if (!string.IsNullOrWhiteSpace(BackgroundColor))
+                {
+                    return "{\"BackgroundColor\":\"" + BackgroundColor + "\"}";
+                }
+                else if (!string.IsNullOrWhiteSpace(PBFJsonStyle))
+                {
+                    return "{\"PBFJsonStyle\":\"" + System.Text.Json.JsonSerializer.Serialize<string>(PBFJsonStyle) + "\"}";
+                }
+                else
+                {
+                    return System.Text.Json.JsonSerializer.Serialize<Layers.SpecialsOptions>(this);
+                }
+
+
+            }
         }
 
         public static Layers Empty(int LayerId = -1)
         {
-            return new Layers(LayerId, false, "", "Une erreur s'est produite dans la lecture des données. \n Données de secours fournie par OpenStreetMap.", "","", "", "http://tile.openstreetmap.org/{z}/{x}/{y}.png", "FALLBACK_URL", "", "", 0, 19, "jpeg", 256, "function getTile(args){return args;}", "Visible", new SpecialsOptions(),"", 0, true);
+            return new Layers(LayerId, false, "", "Une erreur s'est produite dans la lecture des données. \n Données de secours fournie par OpenStreetMap.", "", "", "", "http://tile.openstreetmap.org/{z}/{x}/{y}.png", "FALLBACK_URL", "", "", null, null, "jpeg", 256, "function getTile(args){return args;}", "Visible", new SpecialsOptions(), "", 0, true);
         }
 
         public static class Convert
@@ -95,20 +117,6 @@ namespace MapsInMyFolder.Commun
             public static void ToCurentLayer(Layers layer)
             {
                 Curent = (Layers)layer.MemberwiseClone();
-                //Curent.class_id = layer.class_id;
-                //Curent.class_tiles_size = layer.class_tiles_size;
-                //Curent.class_name = layer.class_name;
-                //Curent.class_description = layer.class_description;
-                //Curent.Layer.class_categorie = layer.class_categorie;
-                //Curent.Layer.class_identifiant = layer.class_identifiant;
-                //Curent.Layer.class_tile_url = layer.class_tile_url;
-                //Curent.Layer.class_site = layer.class_site;
-                //Curent.Layer.class_site_url = layer.class_site_url;
-                //Curent.Layer.class_min_zoom = layer.class_min_zoom;
-                //Curent.Layer.class_max_zoom = layer.class_max_zoom;
-                //Curent.Layer.class_format = layer.class_format;
-                //Curent.Layer.class_tilecomputationscript = layer.class_tilecomputationscript;
-                //Curent.Layer.class_specialsoptions = layer.class_specialsoptions;
             }
         }
 
@@ -154,14 +162,12 @@ namespace MapsInMyFolder.Commun
             return false;
         }
 
-        public static List<Layers> GetLayersList()
+        public static IEnumerable<Layers> GetLayersList()
         {
-            List<Layers> layers = new List<Layers>();
             foreach (Dictionary<int, Layers> individualdictionnary in Layers_Dictionary_List)
             {
-                layers.Add(individualdictionnary.Values.First());
+                yield return individualdictionnary.Values.First();
             }
-            return layers;
         }
     }
 }

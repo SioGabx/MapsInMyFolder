@@ -1,17 +1,17 @@
-﻿using System;
-using System.Windows;
-using CefSharp;
+﻿using CefSharp;
+using ICSharpCode.AvalonEdit.Highlighting;
+using MapsInMyFolder.Commun;
 using MapsInMyFolder.MapControl;
-using System.Diagnostics;
 using ModernWpf;
+using ModernWpf.Media.Animation;
+using System;
+using System.Diagnostics;
+using System.IO;
+using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media.Animation;
-using MapsInMyFolder.Commun;
-using ModernWpf.Media.Animation;
-using ICSharpCode.AvalonEdit.Highlighting;
-using System.Xml;
-using System.IO;
 using System.Windows.Navigation;
+using System.Xml;
 
 namespace MapsInMyFolder
 {
@@ -32,17 +32,11 @@ namespace MapsInMyFolder
         }
 
         public MainPage MainPage = new MainPage();
-        public PrepareDownloadPage PrepareDownloadPage = new PrepareDownloadPage();
-        public CustomOrEditLayersPage CustomOrEditLayersPage;
 
         public void FrameBack(bool NoTransition = false)
         {
             AppTitleBar.Opacity = 1;
             AppTitleBar.IsEnabled = true;
-            if (CustomOrEditLayersPage is not null)
-            {
-                CustomOrEditLayersPage = null;
-            }
             if (!MainContentFrame.CanGoBack) { return; }
             FrameCanGoBack = true;
             if (NoTransition)
@@ -63,6 +57,7 @@ namespace MapsInMyFolder
                 return;
             }
             Popup_opening(false);
+            PrepareDownloadPage PrepareDownloadPage = new PrepareDownloadPage();
             PrepareDownloadPage.default_filename = Layers.Curent.class_name.Trim().Replace(" ", "_").ToLowerInvariant();
             PrepareDownloadPage.Init();
             MainContentFrame.Navigate(PrepareDownloadPage);
@@ -83,8 +78,7 @@ namespace MapsInMyFolder
         //SQLiteConnection global_conn;
         public void Init()
         {
-            this.Title = "MapsInMyFolder";
-            TitleTextBox.Text = "MapsInMyFolder";
+            TitleTextBox.Text = this.Title = "MapsInMyFolder";
             ThemeManager.Current.ApplicationTheme = ApplicationTheme.Dark;
             ImageLoader.HttpClient.DefaultRequestHeaders.Add("User-Agent", Settings.user_agent);
             TileGeneratorSettings.HttpClient.DefaultRequestHeaders.Add("User-Agent", Settings.user_agent);
@@ -183,7 +177,7 @@ namespace MapsInMyFolder
 
             if (Settings.search_database_update_on_startup)
             {
-                Database.CheckIfNewerVersionAvailable();
+                await Database.CheckIfNewerVersionAvailable();
             }
         }
 
@@ -225,7 +219,7 @@ namespace MapsInMyFolder
 
         private void Window_ContentRendered(object sender, EventArgs e)
         {
-           // MainPage.Set_current_layer(Settings.layer_startup_id);
+            // MainPage.Set_current_layer(Settings.layer_startup_id);
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)

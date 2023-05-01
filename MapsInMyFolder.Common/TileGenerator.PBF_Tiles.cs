@@ -1,12 +1,11 @@
-﻿using System;
+﻿using MapsInMyFolder.VectorTileRenderer;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media.Imaging;
-using MapsInMyFolder.VectorTileRenderer;
-using System.IO;
-using System.Diagnostics;
-using System.Net.Http;
 
 namespace MapsInMyFolder.Commun
 {
@@ -458,31 +457,31 @@ namespace MapsInMyFolder.Commun
                         }
                         int tentatives = 0;
                         do if (File.Exists(prov_save_filename))
-                        {
-                            Stream StreamPBFFile = null;
-                            bool success = false;
-                            try
                             {
-                                DebugMode.WriteLine("Trying to read file");
-                                StreamPBFFile = File.OpenRead(prov_save_filename);
-                                success = true;
-                                DebugMode.WriteLine("End read file");
-                            }
-                            catch (Exception ex)
-                            {
-                                Debug.WriteLine("TileGenerator : Failed to load " + prov_save_filename + " - " + tentatives + "/" + Settings.max_retry_download + "\n Reason : " + ex.Message);
-                                tentatives++;
-                                success = false;
-                                System.Threading.Thread.SpinWait(500);
-                            }
-                            if (success)
-                            {
-                                return new VectorTileRenderer.Sources.PbfTileSource(StreamPBFFile);
-                            }
-                            StreamPBFFile.Dispose();
-                            StreamPBFFile.Close();
+                                Stream StreamPBFFile = null;
+                                bool success = false;
+                                try
+                                {
+                                    DebugMode.WriteLine("Trying to read file");
+                                    StreamPBFFile = File.OpenRead(prov_save_filename);
+                                    success = true;
+                                    DebugMode.WriteLine("End read file");
+                                }
+                                catch (Exception ex)
+                                {
+                                    Debug.WriteLine("TileGenerator : Failed to load " + prov_save_filename + " - " + tentatives + "/" + Settings.max_retry_download + "\n Reason : " + ex.Message);
+                                    tentatives++;
+                                    success = false;
+                                    System.Threading.Thread.SpinWait(500);
+                                }
+                                if (success)
+                                {
+                                    return new VectorTileRenderer.Sources.PbfTileSource(StreamPBFFile);
+                                }
+                                StreamPBFFile.Dispose();
+                                StreamPBFFile.Close();
 
-                        } while (tentatives < Settings.max_retry_download);
+                            } while (tentatives < Settings.max_retry_download);
                     }
                 }
             }

@@ -1,4 +1,6 @@
-﻿using System;
+﻿using MapsInMyFolder.Commun;
+using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -13,8 +15,6 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
-using MapsInMyFolder.Commun;
-using Microsoft.Win32;
 
 namespace MapsInMyFolder
 {
@@ -118,7 +118,7 @@ namespace MapsInMyFolder
             GetCenterViewCityName();
             Label_SliderMinMax.Content = "Niveau de zoom (min=" + Layers.Curent.class_min_zoom + ", max=" + Layers.Curent.class_max_zoom + ")";
             //RedimSwitch.IsOn = false;
-            ZoomSlider.Value = MainWindow._instance.MainPage.mapviewer.ZoomLevel;
+            ZoomSlider.Value = Math.Round(MainWindow._instance.MainPage.mapviewer.ZoomLevel);
             TextBox_quality_number.Text = "100";
 
             const int largeur = 128;
@@ -711,7 +711,7 @@ namespace MapsInMyFolder
             }
             else if (TextBox_Redim_HUnit.SelectedIndex == 1)
             {
-                RedimHeight = (int)Math.Round((double)rognage_info.height * (Convert.ToDouble(TextBox_Redim_Height.Text) / 100));
+                RedimHeight = (int)Math.Round(rognage_info.height * (Convert.ToDouble(TextBox_Redim_Height.Text) / 100));
             }
 
             if (TextBox_Redim_WUnit.SelectedIndex == 0)
@@ -720,7 +720,7 @@ namespace MapsInMyFolder
             }
             else if (TextBox_Redim_WUnit.SelectedIndex == 1)
             {
-                RedimWidth = (int)Math.Round((double)rognage_info.width * (Convert.ToDouble(TextBox_Redim_Width.Text) / 100));
+                RedimWidth = (int)Math.Round(rognage_info.width * (Convert.ToDouble(TextBox_Redim_Width.Text) / 100));
             }
 
             return (RedimWidth, RedimHeight);
@@ -1087,7 +1087,7 @@ namespace MapsInMyFolder
             }
             else if (TextBox_Redim_WUnit.SelectedIndex == 1)
             {
-                RedimWidth = Math.Max(10, (int)Math.Round((double)rognage_info.width * (Convert.ToDouble(TextBox_Redim_Width.Text) / 100)));
+                RedimWidth = Math.Max(10, (int)Math.Round(rognage_info.width * (Convert.ToDouble(TextBox_Redim_Width.Text) / 100)));
             }
 
             if (TextBox_Redim_HUnit.SelectedIndex == 0)
@@ -1096,7 +1096,7 @@ namespace MapsInMyFolder
             }
             else if (TextBox_Redim_HUnit.SelectedIndex == 1)
             {
-                RedimHeight = Math.Max(10, (int)Math.Round((double)rognage_info.height * (Convert.ToDouble(TextBox_Redim_Height.Text) / 100)));
+                RedimHeight = Math.Max(10, (int)Math.Round(rognage_info.height * (Convert.ToDouble(TextBox_Redim_Height.Text) / 100)));
             }
 
             return (RedimWidth, RedimHeight);
@@ -1119,11 +1119,9 @@ namespace MapsInMyFolder
             if (string.Equals(Layers.Curent.class_format, "pbf", StringComparison.OrdinalIgnoreCase)) filter = filterconcat(jpgfilter, pngfilter);
 
             string str_name = default_filename + center_view_city + "_" + zoom;
-            foreach (char c in Path.GetInvalidFileNameChars())
-            {
-                str_name = str_name.Replace(c.ToString(), string.Empty);
-            }
-
+            str_name = str_name.Replace(Path.GetInvalidFileNameChars(), string.Empty);
+            str_name = str_name.ReplaceLoop(" ", "_");
+            str_name = str_name.ReplaceLoop("__", "_");
             SaveFileDialog saveFileDialog1 = new SaveFileDialog()
             {
                 Filter = filterconcat(filter, tifffilter),
@@ -1153,8 +1151,8 @@ namespace MapsInMyFolder
             };
 
             int quality = Convert.ToInt32(TextBox_quality_number.Text);
-            int RedimWidth = -1;
-            int RedimHeight = -1;
+            int RedimWidth;
+            int RedimHeight;
             if (!(TextBox_Redim_WUnit.SelectedIndex == 1 && TextBox_Redim_Width.Text == "100") && !(TextBox_Redim_HUnit.SelectedIndex == 1 && TextBox_Redim_Height.Text == "100"))//***************************************************
             {
                 var Redim = GetSizeAfterRedim();
@@ -1170,14 +1168,15 @@ namespace MapsInMyFolder
             NetVips.Enums.Interpretation interpretation = (NetVips.Enums.Interpretation)Enum.Parse(typeof(NetVips.Enums.Interpretation), (Combobox_color_conversion.SelectedItem as ComboBoxItem).Tag as string);
 
             double initialScale = GetScale().Scale;
-            if (!double.TryParse(TextBox_Scale.Text, out double targetScale)) {
+            if (!double.TryParse(TextBox_Scale.Text, out double targetScale))
+            {
                 throw new FormatException("Impossible de convertir la valeur d'echelle en numéro (double)");
             };
             double DistanceInMeterPerPixels = ScaleInfo.GetDistanceInMeterPerPixels(targetScale);
             var DrawScaleInfo = ScaleInfo.SearchOptimalScale(DistanceInMeterPerPixels, RedimWidth);
             bool DrawScale = (CheckBoxAddScaleToImage.IsChecked ?? false) && IsEnoughPlaceForScale(RedimWidth, RedimHeight, DrawScaleInfo.Scale) && Layers.Curent.class_hasscale;
 
-            ScaleInfo scaleInfo = new ScaleInfo(initialScale, targetScale, DistanceInMeterPerPixels, DrawScale, DrawScaleInfo.Scale, DrawScaleInfo.PixelLenght );
+            ScaleInfo scaleInfo = new ScaleInfo(initialScale, targetScale, DistanceInMeterPerPixels, DrawScale, DrawScaleInfo.Scale, DrawScaleInfo.PixelLenght);
 
             var SelectionLocation = MainPage.mapSelectable.GetRectangleLocation();
             Download_Options download_Options = new Download_Options(0, save_directory, format, filename, "", "", 0, zoom, quality, "", SelectionLocation.NO, SelectionLocation.SE, RedimWidth, RedimHeight, interpretation, scaleInfo);

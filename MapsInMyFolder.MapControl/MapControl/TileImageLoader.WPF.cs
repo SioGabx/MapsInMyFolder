@@ -2,12 +2,12 @@
 // © 2022 Clemens Fischer
 // Licensed under the Microsoft Public License (Ms-PL)
 
+using MapsInMyFolder.Commun;
 using System;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.Caching;
 using System.Threading.Tasks;
-using MapsInMyFolder.Commun;
 
 namespace MapsInMyFolder.MapControl
 {
@@ -83,7 +83,7 @@ namespace MapsInMyFolder.MapControl
                     Debug.WriteLine("on top " + ex.Message);
                 }
 
-                
+
             }
 
             if (buffer?.Length > 0)
@@ -97,7 +97,7 @@ namespace MapsInMyFolder.MapControl
         private static async Task LoadTile(Tile tile, TileSource tileSource)
         {
             var image = await tileSource.LoadImageAsync(tile.XIndex, tile.Y, tile.ZoomLevel, tileSource).ConfigureAwait(false);
-            
+
             await tile.Image.Dispatcher.InvokeAsync(() => tile.SetImage(image));
         }
     }

@@ -2,11 +2,11 @@
 // © 2022 Clemens Fischer
 // Licensed under the Microsoft Public License (Ms-PL)
 
+using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Diagnostics;
 
 namespace MapsInMyFolder.MapControl
 {

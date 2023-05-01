@@ -1,20 +1,20 @@
-﻿using System;
+﻿using CefSharp;
+using MapsInMyFolder.Commun;
+using MapsInMyFolder.MapControl;
+using ModernWpf.Controls;
+using System;
 using System.Collections.Generic;
+using System.Data.SQLite;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Threading;
-using System.Windows;
-using CefSharp;
-using MapsInMyFolder.MapControl;
-using System.Diagnostics;
-using System.Windows.Threading;
-using System.Data.SQLite;
-using System.Threading.Tasks;
-using MapsInMyFolder.Commun;
 using System.Reflection;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
-using ModernWpf.Controls;
+using System.Windows.Threading;
 
 namespace MapsInMyFolder
 {
@@ -85,7 +85,7 @@ namespace MapsInMyFolder
             }
         }
 
-        public static List<Layers> DB_Layer_Read(SQLiteConnection conn, string query_command)
+        public static List<Layers> DB_Layer_Read(string query_command)
         {
             List<Layers> layersFavorite = new List<Layers>();
             List<Layers> layersClassicSort = new List<Layers>();
@@ -126,7 +126,7 @@ namespace MapsInMyFolder
                     string DB_Layer_SPECIALSOPTIONS = GetStringFromOrdinal("SPECIALSOPTIONS");
                     string DB_Layer_RECTANGLES = GetStringFromOrdinal("RECTANGLES");
                     int DB_Layer_VERSION = GetIntFromOrdinal("VERSION") ?? 0;
-                    bool DB_Layer_HAS_SCALE = Convert.ToBoolean(GetIntFromOrdinal("HAS_SCALE") ?? 0);
+                    bool DB_Layer_HAS_SCALE = Convert.ToBoolean(GetIntFromOrdinal("HAS_SCALE"));
 
                     bool doCreateSpecialsOptionsClass = true;
                     Layers.SpecialsOptions DeserializeSpecialsOptions = null;
@@ -181,14 +181,15 @@ namespace MapsInMyFolder
         {
             string OriginalLayersGetQuery = $"SELECT *,'LAYERS' AS TYPE FROM LAYERS UNION SELECT *,'CUSTOMSLAYERS' FROM CUSTOMSLAYERS ORDER BY {Settings.layers_Sort} NULLS LAST";
             string EditedLayersGetQuery = $"SELECT * FROM EDITEDLAYERS ORDER BY {Settings.layers_Sort} NULLS LAST";
-            SQLiteConnection conn = Database.DB_Connection();
-            if (conn is null)
+            using (SQLiteConnection conn = Database.DB_Connection())
             {
-                return "<style>p{font-family: \"Segoe UI\";color:#888989;font-size:14px;}</style><p>Aucune base de données trouvée. Veuillez relancer l'application.</p><p>Si le problème persiste, veuillez réessayer ultérieurement</p>";
+                if (conn is null)
+                {
+                    return "<style>p{font-family: \"Segoe UI\";color:#888989;font-size:14px;}</style><p>Aucune base de données trouvée. Veuillez relancer l'application.</p><p>Si le problème persiste, veuillez réessayer ultérieurement</p>";
+                }
             }
 
-            string baseHTML = DB_Layer_CreateHTML(DB_Layer_Read(conn, OriginalLayersGetQuery), DB_Layer_Read(conn, EditedLayersGetQuery));
-            conn.Close();
+            string baseHTML = DB_Layer_CreateHTML(DB_Layer_Read(OriginalLayersGetQuery), DB_Layer_Read(EditedLayersGetQuery));
 
             if (Settings.show_layer_devtool)
             {
@@ -206,6 +207,7 @@ namespace MapsInMyFolder
             baseHTML += PropertyBuilder.ToString();
 
             return baseHTML;
+
         }
 
         static string DB_Layer_CreateHTML(List<Layers> layers, List<Layers> editedlayers)
@@ -304,7 +306,7 @@ namespace MapsInMyFolder
                             CountryFilterThisLayer = false;
                         }
                     }
-                    
+
 
 
                     if (CountryFilterThisLayer)
@@ -662,21 +664,29 @@ namespace MapsInMyFolder
                 double Latitude = mapviewer.Center.Latitude;
                 double Longitude = mapviewer.Center.Longitude;
                 var TileNumber = Collectif.CoordonneesToTile(Latitude, Longitude, Zoom);
-
+                string previewBackgroundImageUrl = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
+                bool DoShowBackgroundImage = true;
                 Collectif.GetUrl.InvokeFunction invokeFunction = Collectif.GetUrl.InvokeFunction.getTile;
+
                 if (Javascript.CheckIfFunctionExist(id, Collectif.GetUrl.InvokeFunction.getPreview.ToString(), null))
                 {
                     invokeFunction = Collectif.GetUrl.InvokeFunction.getPreview;
+                    DoShowBackgroundImage = false;
                 }
                 string previewLayerImageUrl = Collectif.Replacements(layer.class_tile_url, TileNumber.X.ToString(), TileNumber.Y.ToString(), Zoom.ToString(), id, invokeFunction);
 
                 if (string.IsNullOrEmpty(previewLayerImageUrl) && invokeFunction == Collectif.GetUrl.InvokeFunction.getPreview)
                 {
                     previewLayerImageUrl = Collectif.Replacements(layer.class_tile_url, TileNumber.X.ToString(), TileNumber.Y.ToString(), Zoom.ToString(), id, Collectif.GetUrl.InvokeFunction.getTile);
+                    DoShowBackgroundImage = true;
+                }
+                if (DoShowBackgroundImage)
+                {
+                    previewBackgroundImageUrl = Collectif.Replacements(StartingLayer?.class_tile_url, TileNumber.X.ToString(), TileNumber.Y.ToString(), Zoom.ToString(), id, Collectif.GetUrl.InvokeFunction.getTile);
+
                 }
 
 
-                string previewBackgroundImageUrl = Collectif.Replacements(StartingLayer?.class_tile_url, TileNumber.X.ToString(), TileNumber.Y.ToString(), Zoom.ToString(), id, Collectif.GetUrl.InvokeFunction.getTile);
                 string previewFallbackLayerImageUrl = String.Empty;
                 if (Javascript.CheckIfFunctionExist(id, Collectif.GetUrl.InvokeFunction.getPreviewFallback.ToString(), null))
                 {

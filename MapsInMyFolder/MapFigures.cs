@@ -56,14 +56,14 @@ namespace MapsInMyFolder
 
         public void UpdateFiguresFromZoomLevel(double ZoomLevel)
         {
-            foreach(Figure figure in mapPolygons)
+            foreach (Figure figure in mapPolygons)
             {
                 if (figure.MinZoom != -1 && figure.MinZoom > ZoomLevel)
                 {
                     figure.polygon.Visibility = System.Windows.Visibility.Collapsed;
                     continue;
                 }
-                
+
                 if (figure.MaxZoom != -1 && figure.MaxZoom < ZoomLevel)
                 {
                     figure.polygon.Visibility = System.Windows.Visibility.Collapsed;
@@ -89,7 +89,7 @@ namespace MapsInMyFolder
                 ElementsForRectangleSelection.TryGetValue("MaxZoom", out string MaxZoomStr);
                 ElementsForRectangleSelection.TryGetValue("StrokeThickness", out string StrokeThicknessStr);
                 ElementsForRectangleSelection.TryGetValue("Color", out string Color);
-               
+
                 if (!double.TryParse(NO_Lat_str, out double NO_Lat)) continue;
                 if (!double.TryParse(NO_Long_str, out double NO_Long)) continue;
                 if (!double.TryParse(SE_Lat_str, out double SE_Lat)) continue;
@@ -99,7 +99,7 @@ namespace MapsInMyFolder
                 {
                     MinZoom = -1;
                 }
-                
+
                 if (!double.TryParse(StrokeThicknessStr, out double StrokeThickness))
                 {
                     StrokeThickness = 1;

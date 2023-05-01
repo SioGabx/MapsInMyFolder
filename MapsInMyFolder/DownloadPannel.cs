@@ -1,15 +1,15 @@
 ﻿using CefSharp;
+using MapsInMyFolder.Commun;
 using ModernWpf.Controls;
 using System;
 using System.Collections.Generic;
+using System.Data.SQLite;
 using System.Diagnostics;
 using System.Threading;
 using System.Windows;
-using System.Windows.Threading;
-using MapsInMyFolder.Commun;
-using System.Data.SQLite;
 using System.Windows.Input;
 using System.Windows.Media.Animation;
+using System.Windows.Threading;
 
 namespace MapsInMyFolder
 {
@@ -68,7 +68,7 @@ namespace MapsInMyFolder
                     NetVips.Enums.Interpretation COLORINTERPRETATION = (NetVips.Enums.Interpretation)Enum.Parse(typeof(NetVips.Enums.Interpretation), DB_Download_COLORINTERPRETATION);
 
 
-                    ScaleInfo SCALEINFO = System.Text.Json.JsonSerializer.Deserialize<ScaleInfo>(DB_Download_SCALEINFO, new System.Text.Json.JsonSerializerOptions() {IncludeFields=true});
+                    ScaleInfo SCALEINFO = System.Text.Json.JsonSerializer.Deserialize<ScaleInfo>(DB_Download_SCALEINFO, new System.Text.Json.JsonSerializerOptions() { IncludeFields = true });
 
                     //List<Url_class> urls = Collectif.GetUrl.GetListOfUrlFromLocation(location, DB_Download_ZOOM, layers.class_tile_url, DB_Download_LAYER_ID, downloadid);
                     List<Url_class> urls = null;
@@ -204,7 +204,6 @@ namespace MapsInMyFolder
         }
     }
 
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Marquer les membres comme étant static", Justification = "Used by CEFSHARP, static isnt a option here")]
     public class Download_Csharp_call_from_js
     {
         public bool IsFileOk(int id)

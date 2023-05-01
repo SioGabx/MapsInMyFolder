@@ -23,7 +23,7 @@ namespace MapsInMyFolder
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return (double)value - (double)151;
+            return (double)value - 151;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
@@ -32,6 +32,6 @@ namespace MapsInMyFolder
         }
     }
 
-   
+
 
 }

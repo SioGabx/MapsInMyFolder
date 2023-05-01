@@ -116,17 +116,7 @@
                     <Grid x:Name="MenuItem_APropos"  Height="35" Style="{StaticResource GridSelectNormalStyle}" Margin="0,5,0,0" MouseUp="ScrollMenuItem_APropos"  >
                         <TextBlock Margin="10,0,0,0" Grid.Column="1" VerticalAlignment="Center" FontSize="15"><Run Text="A propos"/></TextBlock>
                     </Grid>
-
-
-
                 </StackPanel>
-
-
-
-
-
-
-
             </Grid>
 
             <Grid Grid.Column="1">
@@ -288,6 +278,7 @@
                                     </avalonEdit:TextEditor>
                                 </Grid>
 
+                                <Button x:Name="openAvancedEditor" Content="Ouvrir l'éditeur de base de donnée avancée (beta)" Margin="0,10,0,0" Foreground="#BCBCBC" Click="openAvancedEditor_Click"/>
                             </StackPanel>
 
                             <StackPanel x:Name="TelechargementSettings">
@@ -602,13 +593,11 @@
                                     </Grid.RowDefinitions>
                                     <CheckBox x:Name="nettoyer_cache_layers_au_demarrage" Foreground="#888989" Grid.Row="0" Content="Supprimer le cache des tuiles au démarrage"/>
                                 </Grid>
-
-
                                 <Button x:Name="resetSettings" Content="Restaurer les paramètres par défaut" Margin="0,10,0,0" Foreground="#BCBCBC" Click="ResetSettings_Click"/>
                             </StackPanel>
 
                             <StackPanel x:Name="UpdateSettings">
-                                <Label x:Name="UpdateSettingsLabel"  Content="Mises à jour : " HorizontalAlignment="Left" Margin="0,20,0,0" VerticalAlignment="Top" Width="Auto" Height="25" FontSize="16.5" FontFamily="Segoe UI Semilight" Foreground="#FFE2E2E1"/>
+                                <Label x:Name="UpdateSettingsLabel" Content="Mises à jour : " HorizontalAlignment="Left" Margin="0,20,0,0" VerticalAlignment="Top" Width="Auto" Height="25" FontSize="16.5" FontFamily="Segoe UI Semilight" Foreground="#FFE2E2E1"/>
 
 
                                 <Grid Margin="0,10,0,0">
@@ -626,7 +615,7 @@
                                         <RowDefinition Height="*" />
                                         <RowDefinition/>
                                     </Grid.RowDefinitions>
-                                    <Label Content="Nom du fichier database sur github (release panel)" Foreground="#888989" Grid.Row="0"/>
+                                    <Label Content="Nom du fichier database sur github" Foreground="#888989" Grid.Row="0"/>
                                     <TextBox x:Name="github_database_name" HorizontalAlignment="Stretch" Grid.Row="1" Style="{DynamicResource TextBoxCleanStyle_13}" Cursor="IBeam" Height="21"/>
                                 </Grid>
 
@@ -648,7 +637,7 @@
                                 <Button x:Name="databaseExport" Content="Exporter la base de donnée" Margin="0,10,0,0" Foreground="#BCBCBC" Click="databaseExport_Click"/>
                                 
                                 <Button x:Name="searchForUpdates" Content="Rechercher des mises à jours" Margin="0,10,0,0" Foreground="#BCBCBC" Click="searchForUpdates_Click"/>
-                                <Label x:Name="searchForUpdatesLastUpdateCheck" ContentStringFormat="Dernière verification : {0}" Content=" 01/01/1970" Foreground="#888989"/>
+                                <Label x:Name="searchForUpdatesLastUpdateCheck" ContentStringFormat="Dernière verification : {0}" Content="01/01/1970" Foreground="#888989"/>
                             </StackPanel>
 
                             <StackPanel x:Name="AProposSettings">

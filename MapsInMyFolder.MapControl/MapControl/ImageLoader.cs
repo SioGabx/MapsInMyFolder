@@ -2,13 +2,13 @@
 // © 2022 Clemens Fischer
 // Licensed under the Microsoft Public License (Ms-PL)
 
+using MapsInMyFolder.Commun;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-using MapsInMyFolder.Commun;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 

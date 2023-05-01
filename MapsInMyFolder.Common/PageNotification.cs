@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -10,7 +9,7 @@ using System.Windows.Shapes;
 
 namespace MapsInMyFolder.Commun
 {
-  
+
     public abstract partial class Notification
     {
         public int InsertPosition = 0;
@@ -261,7 +260,7 @@ namespace MapsInMyFolder.Commun
     {
         double Progress = 0;
         bool CanBeClosed = true;
-        public NProgress(string Information, string Title,string Destinateur, Action callback = null, double Progress = 0, bool CanBeClosed = true) : base(Information, Title, Destinateur, callback)
+        public NProgress(string Information, string Title, string Destinateur, Action callback = null, double Progress = 0, bool CanBeClosed = true) : base(Information, Title, Destinateur, callback)
         {
             this.Progress = Progress;
             this.CanBeClosed = CanBeClosed;

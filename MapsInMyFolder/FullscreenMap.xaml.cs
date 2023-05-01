@@ -86,7 +86,7 @@ namespace MapsInMyFolder
                 }
                 return ContentGrid;
             }
-            
+
             TextBox setSimpleColumTextBox(Grid grid, string LabelText, string TextBoxValue, string DefaultTextBoxValue)
             {
                 Label label = new Label()
@@ -98,7 +98,7 @@ namespace MapsInMyFolder
                 TextBox textbox = new TextBox();
                 if (string.IsNullOrWhiteSpace(TextBoxValue))
                 {
-                    textbox.Text = DefaultTextBoxValue; 
+                    textbox.Text = DefaultTextBoxValue;
                 }
                 else
                 {
@@ -110,7 +110,7 @@ namespace MapsInMyFolder
                 grid.Children.Add(textbox);
                 return textbox;
             }
-            
+
             (TextBox LeftTextBox, TextBox RightTextBox) setDoubleColumnTextBox(Grid Grid, string LeftLabelText, string RightLabelText)
             {
                 Grid.Margin = new Thickness(0, 20, 0, 0);
@@ -165,7 +165,7 @@ namespace MapsInMyFolder
             };
 
             Grid ZoneNameGrid = getGrid(false);
-            NameTextBox = setSimpleColumTextBox(ZoneNameGrid,"Nom :", Nom, "Selection sans nom");
+            NameTextBox = setSimpleColumTextBox(ZoneNameGrid, "Nom :", Nom, "Selection sans nom");
             stackPanel.Children.Add(ZoneNameGrid);
 
             Grid ColorGrid = getGrid(false);
@@ -381,9 +381,9 @@ namespace MapsInMyFolder
                     return;
                 }
                 Grid ContentGrid = sender.Get();
-                if (Collectif.FindChild<Grid>(NotificationZone, NotificationInternalArgs.NotificationId) != null)
+                if (Collectif.FindChildByName<Grid>(NotificationZone, NotificationInternalArgs.NotificationId) != null)
                 {
-                    Grid NotificationZoneContentGrid = Collectif.FindChild<Grid>(NotificationZone, NotificationInternalArgs.NotificationId);
+                    Grid NotificationZoneContentGrid = Collectif.FindChildByName<Grid>(NotificationZone, NotificationInternalArgs.NotificationId);
                     NotificationZone.Children.Remove(NotificationZoneContentGrid);
                     NotificationZone.Children.Insert(Math.Min(sender.InsertPosition, NotificationZone.Children.Count), ContentGrid);
                     NotificationZoneContentGrid.Children.Clear();
@@ -397,9 +397,9 @@ namespace MapsInMyFolder
                     sender.InsertPosition = NotificationZone.Children.Add(ContentGrid);
                 }
             }
-            else if (Collectif.FindChild<Grid>(NotificationZone, NotificationInternalArgs.NotificationId) != null)
+            else if (Collectif.FindChildByName<Grid>(NotificationZone, NotificationInternalArgs.NotificationId) != null)
             {
-                Grid ContentGrid = Collectif.FindChild<Grid>(NotificationZone, NotificationInternalArgs.NotificationId);
+                Grid ContentGrid = Collectif.FindChildByName<Grid>(NotificationZone, NotificationInternalArgs.NotificationId);
                 var doubleAnimation = new DoubleAnimation(ContentGrid.ActualHeight, 0, new Duration(TimeSpan.FromSeconds(0.1)));
                 doubleAnimation.Completed += (sender, e) =>
                 {
@@ -488,7 +488,7 @@ namespace MapsInMyFolder
             selectionRectangle.Focus(true);
             RectanglesStackPanel.Children.Add(selectionRectangle.PropertiesDisplayElement);
 
-           
+
             MapViewer.Focus();
             SelectionScrollViewer.ScrollToEnd();
         }

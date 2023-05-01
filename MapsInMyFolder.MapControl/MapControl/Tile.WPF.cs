@@ -3,10 +3,10 @@
 // Licensed under the Microsoft Public License (Ms-PL)
 
 using System;
+using System.Diagnostics;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Diagnostics;
 
 namespace MapsInMyFolder.MapControl
 {

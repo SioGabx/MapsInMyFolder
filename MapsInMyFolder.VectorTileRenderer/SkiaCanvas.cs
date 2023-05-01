@@ -279,9 +279,9 @@ namespace MapsInMyFolder.VectorTileRenderer
                 }
 
                 int multiplieur = Math.Max(1, Convert.ToInt32(Math.Round(options.TextSizeMultiplicateur)));
-                brokenText += restOfText.Substring(0, (int)lastSpaceIndex).Trim() + string.Concat(Enumerable.Repeat("\n", multiplieur));
+                brokenText += restOfText.Substring(0, lastSpaceIndex).Trim() + string.Concat(Enumerable.Repeat("\n", multiplieur));
 
-                restOfText = restOfText.Substring((int)lastSpaceIndex, restOfText.Length - (int)lastSpaceIndex);
+                restOfText = restOfText.Substring(lastSpaceIndex, restOfText.Length - lastSpaceIndex);
             } while (restOfText.Length > 0);
 
             return brokenText.Trim();
@@ -429,7 +429,7 @@ namespace MapsInMyFolder.VectorTileRenderer
                     foreach (var line in allLines)
                     {
                         var bytes = Encoding.UTF32.GetBytes(line);
-                        float lineOffset = (float)(i * style.Paint.TextSize) - ((float)allLines.Length * (float)style.Paint.TextSize / 2) + (float)style.Paint.TextSize;
+                        float lineOffset = (float)(i * style.Paint.TextSize) - (allLines.Length * (float)style.Paint.TextSize / 2) + (float)style.Paint.TextSize;
                         var position = new SKPoint((float)geometry.X + (float)(style.Paint.TextOffset.X * style.Paint.TextSize), (float)geometry.Y + (float)(style.Paint.TextOffset.Y * style.Paint.TextSize) + lineOffset);
 
                         if (style.Paint.TextStrokeWidth != 0)
@@ -580,7 +580,7 @@ namespace MapsInMyFolder.VectorTileRenderer
 #endif
         public Renderer.Collisions DrawTextOnPath(List<Point> geometry, Brush style, Renderer.ROptions options, Renderer.Collisions collisions, int hatchCode)
         {
-           // return collisions;
+            // return collisions;
             if (options.ImgPositionX == options.ImgCenterPositionX && options.ImgPositionY == options.ImgCenterPositionY)
             {
                 style.Paint.TextSize = style.Paint.TextSize * options.TextSizeMultiplicateur * 1;
@@ -607,7 +607,7 @@ namespace MapsInMyFolder.VectorTileRenderer
 
                 if (pathSqueezed)
                 {
-                   return collisions;
+                    return collisions;
                 }
 
                 //text += " : " + bending.ToString("F");
@@ -736,7 +736,7 @@ namespace MapsInMyFolder.VectorTileRenderer
                     {
                         //Debug.WriteLine("Ajout dans collisions la ligne " + hatchCode);
                         collisions.CollisionEntity.Add(hatchCode);
-                       return collisions;
+                        return collisions;
                     }
                 }
                 textRectangles.Add(rectangle);
@@ -749,8 +749,8 @@ namespace MapsInMyFolder.VectorTileRenderer
                     if (options.ImgPositionX == options.ImgCenterPositionX && options.ImgPositionY == options.ImgCenterPositionY)
                     {
                         //Debug.WriteLine("Ajout dans collisions la ligne (execd estim) " + hatchCode);
-                       collisions.CollisionEntity.Add(hatchCode);
-                       // return collisions;
+                        collisions.CollisionEntity.Add(hatchCode);
+                        // return collisions;
                     }
                     return collisions;
                 }

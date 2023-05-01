@@ -49,12 +49,12 @@ namespace MapsInMyFolder.Commun
             }
 
         }
-        private static void CreateEmptyDatabase(string database_pathname)
+        private static async void CreateEmptyDatabase(string database_pathname)
         {
             SQLiteConnection.CreateFile(database_pathname);
             DB_CreateTables(database_pathname);
             RefreshPanels.Invoke(null, EventArgs.Empty);
-            Database.CheckIfNewerVersionAvailable();
+            await Database.CheckIfNewerVersionAvailable();
         }
 
         private static async Task<bool> DB_DownloadFile(string database_url, string database_pathname)
@@ -333,7 +333,7 @@ namespace MapsInMyFolder.Commun
                 return null;
             }
             SQLiteCommand sqlite_cmd = sqlite_conn.CreateCommand();
-            const string commande_arg = "'ID' INTEGER UNIQUE, 'NOM' TEXT DEFAULT '', 'DESCRIPTION' TEXT DEFAULT '', 'CATEGORIE' TEXT DEFAULT '','PAYS' TEXT DEFAULT '', 'IDENTIFIANT' TEXT DEFAULT '', 'TILE_URL' TEXT DEFAULT '','TILE_FALLBACK_URL' TEXT DEFAULT '', 'MIN_ZOOM' INTEGER DEFAULT 0, 'MAX_ZOOM' INTEGER DEFAULT 0, 'FORMAT' TEXT DEFAULT 'jpeg', 'SITE' TEXT DEFAULT '', 'SITE_URL' TEXT DEFAULT '', 'TILE_SIZE' INTEGER DEFAULT 256, 'FAVORITE' INTEGER DEFAULT 0, 'TILECOMPUTATIONSCRIPT' TEXT DEFAULT '','VISIBILITY' TEXT DEFAULT 'Visible' ,'SPECIALSOPTIONS' TEXT DEFAULT '','RECTANGLES' TEXT DEFAULT '', 'VERSION' INTEGER DEFAULT 1, 'HAS_SCALE' INTEGER DEFAULT 0";
+            const string commande_arg = "'ID' INTEGER UNIQUE, 'NOM' TEXT DEFAULT '', 'DESCRIPTION' TEXT DEFAULT '', 'CATEGORIE' TEXT DEFAULT '','PAYS' TEXT DEFAULT '', 'IDENTIFIANT' TEXT DEFAULT '', 'TILE_URL' TEXT DEFAULT '','TILE_FALLBACK_URL' TEXT DEFAULT '', 'MIN_ZOOM' INTEGER DEFAULT '', 'MAX_ZOOM' INTEGER DEFAULT '', 'FORMAT' TEXT DEFAULT '', 'SITE' TEXT DEFAULT '', 'SITE_URL' TEXT DEFAULT '', 'TILE_SIZE' INTEGER DEFAULT '', 'FAVORITE' INTEGER DEFAULT 0, 'TILECOMPUTATIONSCRIPT' TEXT DEFAULT '','VISIBILITY' TEXT DEFAULT '' ,'SPECIALSOPTIONS' TEXT DEFAULT '','RECTANGLES' TEXT DEFAULT '', 'VERSION' INTEGER DEFAULT 1, 'HAS_SCALE' INTEGER DEFAULT 1";
             sqlite_cmd.CommandText = $@"
             CREATE TABLE IF NOT EXISTS 'CUSTOMSLAYERS' ({commande_arg});
             CREATE TABLE IF NOT EXISTS 'LAYERS' ({commande_arg},PRIMARY KEY('ID' AUTOINCREMENT));
@@ -418,13 +418,15 @@ namespace MapsInMyFolder.Commun
             }
         }
 
-        public static async void CheckIfNewerVersionAvailable()
+        public static async Task<bool> CheckIfNewerVersionAvailable()
         {
             (bool IsNewVersionAvailable, int NewVersionNumber) NewVersion = await CompareVersion();
             if (NewVersion.IsNewVersionAvailable)
             {
                 NewUpdateFoundEvent(null, NewVersion.NewVersionNumber);
+                return true;
             }
+            return false;
         }
 
         private static async Task<(bool IsNewVersionAvailable, int NewVersionNumber)> CompareVersion()

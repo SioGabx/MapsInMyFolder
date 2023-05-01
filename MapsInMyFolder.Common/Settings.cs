@@ -60,6 +60,11 @@ namespace MapsInMyFolder.Commun
         public static bool search_application_update_on_startup = true;
         public static bool search_database_update_on_startup = true;
 
+
+
+
+        public static bool editor_autoupdatelayer = true;
+
         public static (Type, FieldInfo[]) SettingsGetFields()
         {
             Type type = typeof(Settings);
@@ -162,6 +167,11 @@ namespace MapsInMyFolder.Commun
                 var fieldName = field.Name;
                 XMLParser.Settings.Write(fieldName, fieldValue.ToString());
             }
+        }
+
+        public static void SaveIndividualSettings(string fieldName, object fieldValue)
+        {
+            XMLParser.Settings.Write(fieldName, fieldValue.ToString());
         }
     }
 }

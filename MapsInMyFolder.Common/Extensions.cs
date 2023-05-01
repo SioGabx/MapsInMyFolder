@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
@@ -149,6 +148,25 @@ namespace MapsInMyFolder.Commun
             }
             return false;
         }
+
+        public static string Replace(this string Texte, IEnumerable<char> oldCharArray, string newString)
+        {
+            foreach (char SearchStr in oldCharArray)
+            {
+                Texte = Texte.Replace(SearchStr.ToString(), newString);
+            }
+            return Texte;
+        }
+
+        public static string ReplaceLoop(this string Texte, string oldString, string newString)
+        {
+            while (Texte.Contains(oldString))
+            {
+                Texte = Texte.Replace(oldString, newString);
+            }
+            return Texte;
+        }
+
 
 
     }

@@ -1,25 +1,25 @@
-﻿using System;
+﻿using Jint;
+using MapsInMyFolder.Commun;
+using NetVips;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
-using System.Windows.Media.Imaging;
-using System.Reflection;
-using System.Windows;
-using System.Windows.Media;
-using System.Text.RegularExpressions;
-using System.Windows.Media.Animation;
 using System.Windows.Input;
-using MapsInMyFolder.Commun;
-using Newtonsoft.Json;
-using NetVips;
-using Jint;
+using System.Windows.Media;
+using System.Windows.Media.Animation;
+using System.Windows.Media.Imaging;
 
 namespace MapsInMyFolder.Commun
 {
@@ -57,27 +57,14 @@ namespace MapsInMyFolder.Commun
         public static class GetUrl
         {
             public enum InvokeFunction { getTile, getPreview, getPreviewFallback }
-            public static string FromTileXYZ(string urlbase, int Tilex, int Tiley, int z, int LayerID, InvokeFunction InvokeFunction)
+
+            public static (Dictionary<string, object> DefaultCallValue, Dictionary<string, string> ResultCallValue) CallFunctionAndGetResult(string urlbase, string TileComputationScript, int Tilex, int Tiley, int z, int LayerID, InvokeFunction InvokeFunction)
             {
                 if (LayerID == -1)
                 {
-                    return urlbase;
+                    return (null, null);
                 }
 
-                Layers calque = Layers.GetLayerById(LayerID);
-                if (calque is null)
-                {
-                    return string.Empty;
-                }
-                string finalurl;
-                if (string.IsNullOrEmpty(urlbase))
-                {
-                    finalurl = calque.class_tile_url;
-                }
-                else
-                {
-                    finalurl = urlbase;
-                }
                 var location_topleft = TileToCoordonnees(Tilex, Tiley, z);
                 var location_bottomright = TileToCoordonnees(Tilex + 1, Tiley + 1, z);
                 var location = GetCenterBetweenTwoPoints(location_topleft, location_bottomright);
@@ -99,16 +86,14 @@ namespace MapsInMyFolder.Commun
                       { "layerid",  LayerID.ToString() },
                       { "url",  urlbase },
                 };
-                //Jint.Native.JsValue JavascriptMainResult = Commun.Javascript.ExecuteScript("function main() { var js = new TheType(); log(js.TestDoubleReturn(0,0)); return args; }", argument);
 
-                string TileComputationScript = calque.class_tilecomputationscript;
 
                 if (!string.IsNullOrEmpty(TileComputationScript))
                 {
                     Jint.Native.JsValue JavascriptMainResult = null;
                     try
                     {
-                        JavascriptMainResult = Javascript.ExecuteScript(TileComputationScript, argument, LayerID, InvokeFunction);
+                        JavascriptMainResult = Javascript.ExecuteScript(TileComputationScript, new Dictionary<string, object>(argument), LayerID, InvokeFunction);
                     }
                     catch (Exception ex)
                     {
@@ -119,39 +104,72 @@ namespace MapsInMyFolder.Commun
                         object JavascriptMainResultObject = JavascriptMainResult.ToObject();
                         var JavascriptMainResultJson = JsonConvert.SerializeObject(JavascriptMainResultObject);
                         var JavascriptMainResultDictionary = JsonConvert.DeserializeObject<Dictionary<string, string>>(JavascriptMainResultJson);
+                        return (argument, JavascriptMainResultDictionary);
+                    }
+                }
+                return (null, null);
 
-                        if (JavascriptMainResultDictionary.TryGetValue("url", out string urlResult))
-                        {
-                            if (!string.IsNullOrEmpty(urlResult))
-                            {
-                                finalurl = urlResult;
-                            }
-                        }
+            }
 
-                        foreach (var JavascriptReplacementVar in JavascriptMainResultDictionary)
+
+            public static string FromTileXYZ(string urlbase, int Tilex, int Tiley, int z, int LayerID, InvokeFunction InvokeFunction)
+            {
+                if (LayerID == -1)
+                {
+                    return urlbase;
+                }
+
+                Layers calque = Layers.GetLayerById(LayerID);
+                if (calque is null)
+                {
+                    return string.Empty;
+                }
+                string TileComputationScript = calque.class_tilecomputationscript;
+                var ValuesDictionnary = CallFunctionAndGetResult(urlbase, TileComputationScript, Tilex, Tiley, z, LayerID, InvokeFunction);
+                if (ValuesDictionnary.ResultCallValue is null)
+                {
+                    return string.Empty;
+                }
+
+                string finalurl;
+                if (string.IsNullOrEmpty(urlbase))
+                {
+                    finalurl = calque.class_tile_url;
+                }
+                else
+                {
+                    finalurl = urlbase;
+                }
+                if (ValuesDictionnary.ResultCallValue.TryGetValue("url", out string urlResult))
+                {
+                    if (!string.IsNullOrEmpty(urlResult))
+                    {
+                        finalurl = urlResult;
+                    }
+                }
+
+                foreach (var JavascriptReplacementVar in ValuesDictionnary.ResultCallValue)
+                {
+                    string replacementValue = string.Empty;
+                    try
+                    {
+                        if (JavascriptReplacementVar.Value is null)
                         {
-                            string replacementValue = string.Empty;
-                            try
-                            {
-                                if (JavascriptReplacementVar.Value is null)
-                                {
-                                    replacementValue = "null";
-                                }
-                                else
-                                {
-                                    replacementValue = JavascriptReplacementVar.Value;
-                                }
-                            }
-                            catch (Exception ex)
-                            {
-                                Debug.WriteLine(ex.Message);
-                                replacementValue = "null";
-                            }
-                            finally
-                            {
-                                finalurl = finalurl.Replace("{" + JavascriptReplacementVar.Key + "}", replacementValue);
-                            }
+                            replacementValue = "null";
                         }
+                        else
+                        {
+                            replacementValue = JavascriptReplacementVar.Value;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine(ex.Message);
+                        replacementValue = "null";
+                    }
+                    finally
+                    {
+                        finalurl = finalurl.Replace("{" + JavascriptReplacementVar.Key + "}", replacementValue);
                     }
                 }
                 return finalurl;
@@ -234,13 +252,15 @@ namespace MapsInMyFolder.Commun
 
         public static string ReadResourceString(string pathWithSlash)
         {
-            Stream stream = ReadResourceStream(pathWithSlash);
-            string return_rsx = String.Empty;
-            using (StreamReader reader = new StreamReader(stream, Encoding.UTF8, true))
+            using (Stream stream = ReadResourceStream(pathWithSlash))
             {
-                return_rsx = reader.ReadToEnd();
+                string return_rsx = String.Empty;
+                using (StreamReader reader = new StreamReader(stream, Encoding.UTF8, true))
+                {
+                    return_rsx = reader.ReadToEnd();
+                }
+                return return_rsx;
             }
-            return return_rsx;
         }
 
         public static Stream ReadResourceStream(string pathWithSlash)
@@ -458,7 +478,7 @@ namespace MapsInMyFolder.Commun
             }
             lock (Locker)
             {
-                using (NetVips.Image text = NetVips.Image.Text(WordWrap(BitmapErrorsMessage, 20), null, null, null, NetVips.Enums.Align.Centre, null, 100, true, 5, null))
+                using (NetVips.Image text = NetVips.Image.Text(WordWrap(BitmapErrorsMessage, 20), null, null, null, NetVips.Enums.Align.Centre, null, 100, 5, null))
                 {
                     int offsetX = (int)Math.Floor((double)(border_tile_size - text.Width) / 2);
                     int offsetY = (int)Math.Floor((double)(border_tile_size - text.Height) / 2);
@@ -790,19 +810,18 @@ namespace MapsInMyFolder.Commun
 
         public static void InsertTextAtCaretPosition(ICSharpCode.AvalonEdit.TextEditor TextBox, string text)
         {
+            int CaretIndex = TextBox.CaretOffset;
             if (TextBox.SelectionLength == 0)
             {
-                int CaretIndex = TextBox.CaretOffset;
                 TextBox.TextArea.Document.Insert(CaretIndex, text);
-
-                TextBox.CaretOffset = CaretIndex + text.Length;
             }
             else
             {
                 TextBox.SelectedText = text;
-                TextBox.CaretOffset += TextBox.SelectedText.Length;
                 TextBox.SelectionLength = 0;
             }
+
+            TextBox.CaretOffset = Math.Min(TextBox.Text.Length, CaretIndex + text.Length);
         }
 
         public static void TextEditorCursorPositionChanged(ICSharpCode.AvalonEdit.TextEditor textEditor, Grid grid, ScrollViewer scrollViewer, int MarginTop = 25)
@@ -898,7 +917,7 @@ namespace MapsInMyFolder.Commun
         /// <returns>The first parent item that matches the submitted type parameter. 
         /// If not matching item can be found, 
         /// a null parent is being returned.</returns>
-        public static T FindChild<T>(DependencyObject parent, string childName)
+        public static T FindChildByName<T>(DependencyObject parent, string childName)
            where T : DependencyObject
         {
             // Confirm parent and childName are valid. 
@@ -915,7 +934,7 @@ namespace MapsInMyFolder.Commun
                 if (childType == null)
                 {
                     // recursively drill down the tree
-                    foundChild = FindChild<T>(child, childName);
+                    foundChild = FindChildByName<T>(child, childName);
 
                     // If the child is found, break so we do not overwrite the found child. 
                     if (foundChild != null) break;
@@ -942,6 +961,23 @@ namespace MapsInMyFolder.Commun
             return foundChild;
         }
 
+        public static T FindChild<T>(DependencyObject parent) where T : DependencyObject
+        {
+            if (parent == null)
+            {
+                return null;
+            }
+            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++)
+            {
+                var child = VisualTreeHelper.GetChild(parent, i);
+                var result = (child as T) ?? FindChild<T>(child);
+                if (result != null)
+                {
+                    return result;
+                }
+            }
+            return null;
+        }
 
         public static int CheckIfInputValueHaveChange(UIElement SourcePanel)
         {
@@ -1010,7 +1046,7 @@ namespace MapsInMyFolder.Commun
                             BlackPearl.Controls.CoreLibrary.MultiSelectCombobox MultiSelectCombobox = (BlackPearl.Controls.CoreLibrary.MultiSelectCombobox)element;
                             if (MultiSelectCombobox.SelectedItems != null && MultiSelectCombobox.SelectedItems.Count > 0)
                             {
-                                
+
                                 hachCode = string.Join(";", MultiSelectCombobox.SelectedValues("EnglishName")).GetHashCode();
                             }
                             else

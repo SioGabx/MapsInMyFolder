@@ -160,7 +160,7 @@ namespace MapsInMyFolder.VectorTileRenderer
         {
             var lineRect = getLineRect(polyLine);
 
-            if(!bounds.IntersectsWith(lineRect))
+            if (!bounds.IntersectsWith(lineRect))
             {
                 return null;
             }
@@ -174,9 +174,9 @@ namespace MapsInMyFolder.VectorTileRenderer
 
                 var newSegment = ClipSegment(bounds, p1, p2);
 
-                if(newSegment != null)
+                if (newSegment != null)
                 {
-                    if(newLine == null)
+                    if (newLine == null)
                     {
                         newLine = new List<Point>();
                         newLine.Add(newSegment.Item1);
@@ -184,16 +184,18 @@ namespace MapsInMyFolder.VectorTileRenderer
                     }
                     else
                     {
-                        if(newLine.Last() == newSegment.Item1)
+                        if (newLine.Last() == newSegment.Item1)
                         {
                             newLine.Add(newSegment.Item2);
-                        } else
+                        }
+                        else
                         {
                             newLine.Add(newSegment.Item1);
                             newLine.Add(newSegment.Item2);
                         }
                     }
-                } else
+                }
+                else
                 {
                 }
             }

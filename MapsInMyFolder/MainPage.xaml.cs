@@ -32,9 +32,9 @@ namespace MapsInMyFolder
             {
                 Location NO_PIN_starting_location = new Location(Settings.NO_PIN_starting_location_latitude, Settings.NO_PIN_starting_location_longitude);
                 Location SE_PIN_starting_location = new Location(Settings.SE_PIN_starting_location_latitude, Settings.SE_PIN_starting_location_longitude);
-                
+
                 mapSelectable = new MapSelectable(mapviewer, NO_PIN_starting_location, SE_PIN_starting_location, null, this);
-               
+
                 Preload();
                 Init();
             }
@@ -106,7 +106,7 @@ namespace MapsInMyFolder
             SearchLayerStart();
         }
 
-        public void UpdateNotification(Notification sender,(string NotificationId, string Destinateur) NotificationInternalArgs)
+        public void UpdateNotification(Notification sender, (string NotificationId, string Destinateur) NotificationInternalArgs)
         {
             if (sender is not null)
             {
@@ -115,9 +115,9 @@ namespace MapsInMyFolder
                     return;
                 }
                 Grid ContentGrid = sender.Get();
-                if (Collectif.FindChild<Grid>(NotificationZone, NotificationInternalArgs.NotificationId) != null)
+                if (Collectif.FindChildByName<Grid>(NotificationZone, NotificationInternalArgs.NotificationId) != null)
                 {
-                    Grid NotificationZoneContentGrid = Collectif.FindChild<Grid>(NotificationZone, NotificationInternalArgs.NotificationId);
+                    Grid NotificationZoneContentGrid = Collectif.FindChildByName<Grid>(NotificationZone, NotificationInternalArgs.NotificationId);
                     NotificationZone.Children.Remove(NotificationZoneContentGrid);
                     NotificationZone.Children.Insert(Math.Min(sender.InsertPosition, NotificationZone.Children.Count), ContentGrid);
                     NotificationZoneContentGrid.Children.Clear();
@@ -131,9 +131,9 @@ namespace MapsInMyFolder
                     sender.InsertPosition = NotificationZone.Children.Add(ContentGrid);
                 }
             }
-            else if (Collectif.FindChild<Grid>(NotificationZone, NotificationInternalArgs.NotificationId) != null)
+            else if (Collectif.FindChildByName<Grid>(NotificationZone, NotificationInternalArgs.NotificationId) != null)
             {
-                Grid ContentGrid = Collectif.FindChild<Grid>(NotificationZone, NotificationInternalArgs.NotificationId);
+                Grid ContentGrid = Collectif.FindChildByName<Grid>(NotificationZone, NotificationInternalArgs.NotificationId);
                 var doubleAnimation = new DoubleAnimation(ContentGrid.ActualHeight, 0, new Duration(TimeSpan.FromSeconds(0.1)));
                 doubleAnimation.Completed += (sender, e) =>
                 {
@@ -145,20 +145,25 @@ namespace MapsInMyFolder
             }
         }
 
+
         public void MapLoad()
         {
             mapviewer.MapLayer = new MapTileLayer();
             NO_PIN.Visibility = Settings.visibility_pins;
             SE_PIN.Visibility = Settings.visibility_pins;
 
-            mapviewer.Center = new Location((Settings.NO_PIN_starting_location_latitude + Settings.SE_PIN_starting_location_latitude) / 2, (Settings.NO_PIN_starting_location_longitude + Settings.SE_PIN_starting_location_longitude) / 2);
-            mapviewer.ZoomLevel = Settings.map_defaut_zoom_level;
+            if (mapviewer.Center.Latitude == 0 && mapviewer.Center.Longitude == 0)
+            {
+                mapviewer.Center = new Location((Settings.NO_PIN_starting_location_latitude + Settings.SE_PIN_starting_location_latitude) / 2, (Settings.NO_PIN_starting_location_longitude + Settings.SE_PIN_starting_location_longitude) / 2);
+                mapviewer.ZoomLevel = Settings.map_defaut_zoom_level;
+            }
             mapviewer.Background = new System.Windows.Media.SolidColorBrush(
                 System.Windows.Media.Color.FromArgb(255,
                 (byte)Settings.background_layer_color_R,
                 (byte)Settings.background_layer_color_G,
                 (byte)Settings.background_layer_color_B)
             );
+
             Action OnLocationUpdated = () =>
             {
                 var ActiveRectangleSelection = mapSelectable.GetRectangleLocation();
@@ -174,7 +179,7 @@ namespace MapsInMyFolder
                     SE_PIN.Content = "Latitude = " + Math.Round(SE_PIN.Location.Latitude, 6).ToString() + "\nLongitude = " + Math.Round(SE_PIN.Location.Longitude, 6).ToString();
                 }
             };
-            mapSelectable.OnLocationUpdated += (o,e) => OnLocationUpdated();
+            mapSelectable.OnLocationUpdated += (o, e) => OnLocationUpdated();
             OnLocationUpdated();
         }
 
@@ -208,7 +213,57 @@ namespace MapsInMyFolder
         private void mapviewer_MouseWheel(object sender, MouseWheelEventArgs e)
         {
             MapFigures.UpdateFiguresFromZoomLevel(mapviewer.TargetZoomLevel);
+            AnimateLabel(ZoomLevelIndicator);
+
         }
+
+        private bool isAnimating = false; // Indique si l'animation est en cours d'exécution
+
+        private void AnimateLabel(Label label)
+        {
+            label.Visibility = Visibility.Visible;
+            // Si l'animation est déjà en cours d'exécution, annule l'animation de disparition en cours et recommence l'animation d'apparition à la valeur d'opacité actuelle
+            DoubleAnimation fadeInAnimation = new DoubleAnimation();
+
+            if (isAnimating)
+            {
+                label.BeginAnimation(UIElement.OpacityProperty, null);
+                fadeInAnimation.From = label.Opacity;
+                fadeInAnimation.To = 1.0;
+            }
+            else
+            {
+                fadeInAnimation.From = 0.0;
+                fadeInAnimation.To = 1.0;
+            }
+
+            TimeSpan fadeInDuration = TimeSpan.FromSeconds(0.2);
+            TimeSpan fadeOutDuration = TimeSpan.FromSeconds(0.5);
+
+            fadeInAnimation.Duration = fadeInDuration;
+            Storyboard storyboard = new Storyboard();
+            DoubleAnimation fadeOutAnimation = new DoubleAnimation();
+            fadeOutAnimation.From = 1.0;
+            fadeOutAnimation.To = 0.0;
+            fadeOutAnimation.Duration = fadeOutDuration;
+
+            // Démarre après l'animation d'apparition + 1 seconde
+            fadeOutAnimation.BeginTime = fadeInDuration + TimeSpan.FromSeconds(0.5);
+
+            storyboard.Children.Add(fadeInAnimation);
+            storyboard.Children.Add(fadeOutAnimation);
+            Storyboard.SetTarget(fadeInAnimation, label);
+            Storyboard.SetTargetProperty(fadeInAnimation, new PropertyPath(UIElement.OpacityProperty));
+            Storyboard.SetTarget(fadeOutAnimation, label);
+            Storyboard.SetTargetProperty(fadeOutAnimation, new PropertyPath(UIElement.OpacityProperty));
+
+            fadeOutAnimation.Completed += (s, e) => isAnimating = false;
+
+            storyboard.Begin();
+            isAnimating = true;
+        }
+
+
     }
 
 

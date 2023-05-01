@@ -554,7 +554,7 @@ namespace MapsInMyFolder.VectorTileRenderer
                         string valuefield = Convert.ToString(GetValue(layoutData["text-field"], attributes));
                         if (valuefield.ToString() != "System.Object[]")
                         {
-                            brush.TextField = (string)valuefield;
+                            brush.TextField = valuefield;
                             brush.Text = Regex.Replace(brush.TextField, @"\{([A-Za-z0-9\-\:_]+)\}", (Match m) =>
                             {
                                 var key = StripBraces(m.Value);

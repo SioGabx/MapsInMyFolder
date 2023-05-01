@@ -1,16 +1,16 @@
-﻿using System;
+﻿using CefSharp;
+using MapsInMyFolder.Commun;
+using NetVips;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Net;
-using System.Diagnostics;
-using System.Threading;
-using System.IO;
-using CefSharp;
 using System.Windows.Threading;
-using NetVips;
-using MapsInMyFolder.Commun;
 
 namespace MapsInMyFolder
 {
@@ -583,7 +583,7 @@ namespace MapsInMyFolder
 
             if (CheckDownloadIsComplete(download_main_engine_class_args) == 0 || Settings.generate_transparent_tiles_on_error)
             {
-               
+
                 await Assemblage(download_main_engine_class_args.id);
                 //await Assemblage(download_main_engine_class_args.id);
             }
@@ -810,14 +810,14 @@ namespace MapsInMyFolder
                 int fontDPI = 80;
                 int LineHeight = 2;
 
-                using NetVips.Image Ltext = NetVips.Image.Text("0", font, 50, null, NetVips.Enums.Align.Centre, true, fontDPI, true, 0, null);
-                using NetVips.Image Rtext = NetVips.Image.Text(scaleInfo.drawScaleEchelle.ToString() + "m", font, 50, null, NetVips.Enums.Align.Centre, true, fontDPI, true, 0, null);
+                using NetVips.Image Ltext = NetVips.Image.Text("0", font, 50, null, NetVips.Enums.Align.Centre, true, fontDPI, 0, null, true);
+                using NetVips.Image Rtext = NetVips.Image.Text(scaleInfo.drawScaleEchelle.ToString() + "m", font, 50, null, NetVips.Enums.Align.Centre, true, fontDPI, 0, null, true);
                 int width = PixelLength + Ltext.Width + Rtext.Width + margin * 4;
 
                 using NetVips.Image ScaleBackground = NetVips.Image.Black(width, height, 4).NewFromImage(BackgroundColor);
                 using NetVips.Image ScaleBackgroundSrgb = ScaleBackground.Copy(interpretation: Enums.Interpretation.Srgb);
-                using NetVips.Image ScaleBackgroundSrgbWithLtext = ScaleBackgroundSrgb.Composite2(Ltext, NetVips.Enums.BlendMode.Atop, margin, (int)Math.Round((double)height / 2 - (double)Ltext.Height / 2));
-                using Image ScaleBackgroundSrgbWithRtext = ScaleBackgroundSrgbWithLtext.Composite2(Rtext, NetVips.Enums.BlendMode.Atop, ScaleBackgroundSrgb.Width - Rtext.Width - margin, (int)Math.Round((double)height / 2 - (double)Rtext.Height / 2));
+                using NetVips.Image ScaleBackgroundSrgbWithLtext = ScaleBackgroundSrgb.Composite2(Ltext, NetVips.Enums.BlendMode.Over, margin, (int)Math.Round((double)height / 2 - (double)Ltext.Height / 2));
+                using Image ScaleBackgroundSrgbWithRtext = ScaleBackgroundSrgbWithLtext.Composite2(Rtext, NetVips.Enums.BlendMode.Over, ScaleBackgroundSrgb.Width - Rtext.Width - margin, (int)Math.Round((double)height / 2 - (double)Rtext.Height / 2));
                 using Image LineBase = NetVips.Image.Black(PixelLength, LineHeight);
                 using Image Line = LineBase.NewFromImage(LineFirstPart);
                 using Image LineBase2 = NetVips.Image.Black((int)Math.Round((double)PixelLength / 2), LineHeight);
@@ -870,7 +870,7 @@ namespace MapsInMyFolder
                     SaveImage(curent_engine, ImageWithScale);
                     UpdateDownloadPanel(id, "Libération des ressources..", "100", true, Status.cleanup);
                 }
-                
+
                 Debug.WriteLine(
                     "NetVips.Cache.Size" + " : " + Cache.Size + "\n" +
                     "NetVips.Cache.Max" + " : " + Cache.Max + "\n" +
@@ -900,8 +900,8 @@ namespace MapsInMyFolder
                 if (curent_engine.RedimWidth != -1 && curent_engine.RedimHeignt != -1)
                 {
                     UpdateDownloadPanel(curent_engine.id, "Redimensionnement...", "0", true, Status.rognage);
-                    double hrink = (double)curent_engine.RedimHeignt / height;
-                    double Vrink = (double)curent_engine.RedimWidth / width;
+                    double hrink = curent_engine.RedimHeignt / height;
+                    double Vrink = curent_engine.RedimWidth / width;
 
                     if ((curent_engine.RedimHeignt == Math.Round(height * Vrink)) || (curent_engine.RedimWidth == Math.Round(width * hrink)))
                     {
@@ -950,7 +950,7 @@ namespace MapsInMyFolder
 
             try
             {
-                 image_rogner.WriteToFile(image_temps_assemblage_path, Collectif.getSaveVOption(curent_engine.final_saveformat, curent_engine.quality, tile_size));
+                image_rogner.WriteToFile(image_temps_assemblage_path, Collectif.getSaveVOption(curent_engine.final_saveformat, curent_engine.quality, tile_size));
                 //image_rogner.Jpegsave(image_temps_assemblage_path, 100, null, false, false, false, false, false, null, Enums.ForeignSubsample.Off, null, true, null, null);
             }
             catch (Exception ex)
@@ -992,7 +992,7 @@ namespace MapsInMyFolder
                     }
                     assemblage_image_file_info.MoveTo(FinalFilePath);
                 }
-                
+
             }
             else
             {
@@ -1121,7 +1121,7 @@ namespace MapsInMyFolder
 
                 if (operation_pourcentage_denominateur != 0)
                 {
-                    progress_value = (double)(100 / decalage_y * decalage_boucle_for_y);
+                    progress_value = 100 / decalage_y * decalage_boucle_for_y;
                 }
             }
 
@@ -1180,7 +1180,7 @@ namespace MapsInMyFolder
                 }
             }
             download_engine.nbr_of_tiles_waiting_for_downloading = number_of_url_class_waiting_for_downloading;
-            double progress = (double)(download_engine.nbr_of_tiles - number_of_url_class_waiting_for_downloading) / (double)download_engine.nbr_of_tiles;
+            double progress = (download_engine.nbr_of_tiles - number_of_url_class_waiting_for_downloading) / (double)download_engine.nbr_of_tiles;
             if (number_of_url_class_waiting_for_downloading == 0)
             {
                 progress = 100;

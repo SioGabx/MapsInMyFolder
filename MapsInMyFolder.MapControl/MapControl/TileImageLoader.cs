@@ -138,7 +138,7 @@ namespace MapsInMyFolder.MapControl
                 var cacheKey = string.Format(CultureInfo.InvariantCulture,
                     "{0}/{1}/{2}/{3}{4}", cacheName, tile.ZoomLevel, tile.XIndex, tile.Y, extension);
 
-               
+
                 return LoadCachedTile(tile, tileSource.UriFormat, cacheKey, tileSource.LayerID);
             }
 

@@ -93,7 +93,7 @@
                 <map:Map Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Grid.RowSpan="2" x:Name="mapviewer" ZoomLevel="18" Margin="10,0,0,0" MinHeight="30" MinWidth="30" Background="White" MouseWheel="mapviewer_MouseWheel" >
 
                     <map:Map.Center>
-                        <map:Location Longitude="6.429381" Latitude="48.198846"/>
+                        <map:Location Longitude="0" Latitude="0"/>
                     </map:Map.Center>
                     <map:Pushpin Panel.ZIndex="999" x:Name="SE_PIN"  Background="#303031" Foreground="#FFE2E2E1" map:MapPanel.Location="48.198846,6.4" Content="Coin_Superieur" />
                     <map:Pushpin Panel.ZIndex="999" x:Name="NO_PIN" Background="#303031" Foreground="#FFE2E2E1" map:MapPanel.Location="48.16,6.5" Content="Coin_Inferieur" />
@@ -107,6 +107,7 @@
                     
                 </StackPanel>
                 <Button x:Name="StartDownloadButton" Grid.Row="1" Grid.Column="1" Style="{DynamicResource RoundedButton}" Content="Télécharger le calque" Height="45" Margin="0,0,15,15" VerticalAlignment="Top" Foreground="#fff" FontSize="18" Click="Start_Download_Click"/>
+                <Label x:Name="ZoomLevelIndicator" Grid.Row="1" Grid.Column="0" Margin="10,0,0,0" Padding="1,1,3,1" VerticalContentAlignment="Center" HorizontalContentAlignment="Left" Background="#6F000000" VerticalAlignment="Bottom"  ContentStringFormat="Niveau de zoom : {0:0.#}" Content="{Binding ElementName=mapviewer, Path=ZoomLevel}" Foreground="#e2e2e1" HorizontalAlignment="Left" Visibility="Hidden"></Label>
             </Grid>
         </Grid>
         <Grid x:Name="popup_background" Grid.Row="0" Grid.Column="0"  Grid.RowSpan="1" Grid.ColumnSpan="2" Visibility="Hidden" IsHitTestVisible="True">

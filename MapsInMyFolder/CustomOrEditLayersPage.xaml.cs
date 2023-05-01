@@ -1,5 +1,7 @@
-﻿using MapsInMyFolder.MapControl;
+﻿using MapsInMyFolder.Commun;
+using MapsInMyFolder.MapControl;
 using ModernWpf.Controls;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Data.SQLite;
@@ -10,8 +12,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Threading;
-using MapsInMyFolder.Commun;
-using Newtonsoft.Json;
 
 namespace MapsInMyFolder
 {
@@ -31,7 +31,7 @@ namespace MapsInMyFolder
             InitializeComponent();
             IsInDebugModeSwitch.IsChecked = IsInDebugModeArchive;
             LayerId = Settings.layer_startup_id;
-            
+
         }
 
         public static MapFigures MapFigures;
@@ -54,7 +54,7 @@ namespace MapsInMyFolder
             mapviewerappercu.ZoomLevel = MainPage._instance.mapviewer.ZoomLevel;
             TextBoxSetValueAndLock(TextboxLayerScript, Settings.tileloader_default_script);
             PaysComboBox.ItemSource = Country.getList();
-            
+
             MenuItem IndentermenuItem = new MenuItem();
             IndentermenuItem.Header = "Indenter";
             IndentermenuItem.Icon = new ModernWpf.Controls.FontIcon() { Glyph = "\uE12F", Foreground = Collectif.HexValueToSolidColorBrush("#888989") };
@@ -72,7 +72,7 @@ namespace MapsInMyFolder
 
             Init_LayerEditableTextbox(prefilLayerId);
             SetAppercuLayers(forceUpdate: true);
-
+            DoShowSpecialOptionPBFJsonStyle();
             if (Database.ExecuteScalarSQLCommand("SELECT COUNT(*) FROM 'main'.'EDITEDLAYERS' WHERE ID = " + LayerId) == 0)
             {
                 ResetInfoLayerClikableLabel.IsEnabled = false;
@@ -82,12 +82,29 @@ namespace MapsInMyFolder
             Javascript.JavascriptActionEvent += JavascriptActionEvent;
             var keyeventHandler = new KeyEventHandler(TextboxLayerScriptConsoleSender_KeyDown);
             TextboxLayerScriptConsoleSender.AddHandler(PreviewKeyDownEvent, keyeventHandler, handledEventsToo: true);
+
+
+            MenuItem clearConsoleMenuItem = new MenuItem();
+            clearConsoleMenuItem.Header = "Effacer";
+            clearConsoleMenuItem.Icon = new ModernWpf.Controls.FontIcon() { Glyph = "\uE127", Foreground = Collectif.HexValueToSolidColorBrush("#888989") };
+            clearConsoleMenuItem.Click += (sender, e) => Javascript.PrintClear();
+            TextboxLayerScriptConsole.ContextMenu.Items.Add(clearConsoleMenuItem);
+
+            MenuItem helpConsoleMenuItem = new MenuItem();
+            helpConsoleMenuItem.Header = "Aide";
+            helpConsoleMenuItem.Icon = new ModernWpf.Controls.FontIcon() { Glyph = "\uE11B", Foreground = Collectif.HexValueToSolidColorBrush("#888989") };
+            helpConsoleMenuItem.Click += (sender, e) => { Javascript.Help(-2); TextboxLayerScriptConsole.ScrollToEnd(); };
+            TextboxLayerScriptConsole.ContextMenu.Items.Add(helpConsoleMenuItem);
+
+
             TextboxLayerScript.TextArea.Caret.CaretBrush = Collectif.HexValueToSolidColorBrush("#f18712");//rgb(241 135 18)
             TextboxRectangles.TextArea.Caret.CaretBrush = Collectif.HexValueToSolidColorBrush("#f18712");//rgb(241 135 18)
             TextboxRectangles.TextArea.Caret.PositionChanged += TextboxRectangles_Caret_PositionChanged;
             TextboxLayerScript.TextArea.Caret.PositionChanged += TextboxLayerScript_Caret_PositionChanged;
             ScrollViewerHelper.SetFixMouseWheel(Collectif.GetDescendantByType(TextboxLayerScript, typeof(ScrollViewer)) as ScrollViewer, true);
             ScrollViewerHelper.SetFixMouseWheel(Collectif.GetDescendantByType(TextboxRectangles, typeof(ScrollViewer)) as ScrollViewer, true);
+
+            AutoUpdateLayer.IsChecked = Settings.editor_autoupdatelayer;
             DefaultValuesHachCode = Collectif.CheckIfInputValueHaveChange(EditeurStackPanel);
         }
 
@@ -147,20 +164,20 @@ namespace MapsInMyFolder
                     continue;
                 }
                 string class_categorie = layer.class_categorie.Trim();
-                if (!Categories.Contains(class_categorie))
+                if (!Categories.Contains(class_categorie) && !string.IsNullOrWhiteSpace(class_categorie))
                 {
                     Categories.Add(class_categorie);
                     TextboxLayerCategories.Items.Add(class_categorie);
                     //Debug.WriteLine("Adding " + class_categorie + " From " + layer.class_id);
                 }
                 string class_site = layer.class_site.Trim();
-                if (!Site.Contains(class_site))
+                if (!Site.Contains(class_site) && !string.IsNullOrWhiteSpace(class_site))
                 {
                     Site.Add(class_site);
                     TextboxLayerSite.Items.Add(class_site);
                 }
                 string class_site_url = layer.class_site_url.Trim();
-                if (!SiteUrl.Contains(class_site_url))
+                if (!SiteUrl.Contains(class_site_url) && !string.IsNullOrWhiteSpace(class_site_url))
                 {
                     SiteUrl.Add(class_site_url);
                     TextboxLayerSiteUrl.Items.Add(class_site_url);
@@ -182,6 +199,7 @@ namespace MapsInMyFolder
                 TextboxLayerCategories.Text = "";
                 TextboxLayerSite.Text = "";
                 TextboxLayerSiteUrl.Text = "";
+                TextBoxSetValueAndLock(TextboxLayerTileWidth, "256");
                 return;
             }
             TextboxLayerName.Text = LayerInEditMode.class_name;
@@ -195,6 +213,7 @@ namespace MapsInMyFolder
             }
             TextboxLayerCategories.Text = LayerInEditMode.class_categorie;
             TextboxLayerSiteUrl.Text = LayerInEditMode.class_site_url;
+            TextboxLayerSite.Text = LayerInEditMode.class_site;
             TextboxLayerFormat.Text = LayerInEditMode.class_format.ToUpperInvariant();
             if (LayerInEditMode.class_format.EndsWith("jpeg") || LayerInEditMode.class_format.EndsWith("jpg"))
             {
@@ -212,7 +231,7 @@ namespace MapsInMyFolder
             {
                 TextboxLayerFormat.SelectedIndex = TextboxLayerFormat.Items.Add(LayerInEditMode.class_format.ToUpperInvariant());
             }
-            DoShowSpecialOptionPBFJsonStyle();
+
 
             string tileSize = LayerInEditMode.class_tiles_size.ToString();
             if (string.IsNullOrEmpty(tileSize.Trim()))
@@ -231,11 +250,11 @@ namespace MapsInMyFolder
             TextBoxSetValueAndLock(TextboxLayerTileWidth, tileSize);
             TextBoxSetValueAndLock(TextboxSpecialOptionBackgroundColor, LayerInEditMode.class_specialsoptions.BackgroundColor?.TrimEnd('#'));
             TextBoxSetValueAndLock(TextboxSpecialOptionPBFJsonStyle, LayerInEditMode.class_specialsoptions.PBFJsonStyle);
-            
+
             PaysComboBox.SelectedItems = Country.getListFromEnglishName(LayerInEditMode.class_pays.Split(';', StringSplitOptions.RemoveEmptyEntries));
             has_scale.IsChecked = LayerInEditMode.class_hasscale;
             Collectif.setBackgroundOnUIElement(mapviewerappercu, LayerInEditMode?.class_specialsoptions?.BackgroundColor);
-                  
+
         }
 
         void putScriptTemplate(ICSharpCode.AvalonEdit.TextEditor textBox)
@@ -271,6 +290,8 @@ namespace MapsInMyFolder
             }
             try
             {
+
+                Javascript.JavascriptInstance.Logs = String.Empty;
                 if (string.IsNullOrEmpty(url) && !string.IsNullOrEmpty(TextboxLayerTileUrl.Text))
                 {
                     url = TextboxLayerTileUrl.Text;
@@ -506,15 +527,15 @@ namespace MapsInMyFolder
             string TILE_SIZE = layers.class_tiles_size.ToString();
             string TILECOMPUTATIONSCRIPT = Collectif.HTMLEntities(layers.class_tilecomputationscript);
             string RECTANGLES = Collectif.HTMLEntities(layers.class_rectangles);
-            string SPECIALSOPTIONS = System.Text.Json.JsonSerializer.Serialize<Layers.SpecialsOptions>(layers.class_specialsoptions);
+            string SPECIALSOPTIONS = layers.class_specialsoptions.ToString();
             string TILE_FALLBACK_URL = "";
             string HAS_SCALE = (layers.class_hasscale ? 1 : 0).ToString();
             SQLiteConnection conn = Database.DB_Connection();
 
             string getSavingStringOptimalValue(string formValue, string layerValue)
             {
-                formValue = formValue.Trim();
-                layerValue = layerValue.Trim();
+                formValue = formValue?.Trim();
+                layerValue = layerValue?.Trim();
                 if (formValue == layerValue || formValue == Collectif.HTMLEntities(layerValue))
                 {
                     return null;
@@ -545,13 +566,23 @@ namespace MapsInMyFolder
 
             try
             {
-                List<Layers> LayersRead = MainPage.DB_Layer_Read(conn, $"SELECT * FROM LAYERS WHERE ID='{LayerId}'");
+
                 Layers DB_Layer = Layers.Empty();
+
+                List<Layers> LayersRead = MainPage.DB_Layer_Read($"SELECT * FROM LAYERS WHERE ID='{LayerId}'");
                 if (LayersRead.Count > 0)
                 {
                     DB_Layer = LayersRead[0];
                 }
-                
+                else
+                {
+                    List<Layers> CustomLayersRead = MainPage.DB_Layer_Read($"SELECT * FROM CUSTOMSLAYERS WHERE ID='{LayerId}'");
+                    if (CustomLayersRead.Count > 0)
+                    {
+                        DB_Layer = CustomLayersRead[0];
+                    }
+                }
+
                 NOM = getSavingOptimalValueWithNULL(NOM, DB_Layer.class_name);
                 DESCRIPTION = getSavingOptimalValueWithNULL(DESCRIPTION, DB_Layer.class_description);
                 CATEGORIE = getSavingOptimalValueWithNULL(CATEGORIE, DB_Layer.class_categorie);
@@ -566,9 +597,9 @@ namespace MapsInMyFolder
                 TILECOMPUTATIONSCRIPT = getSavingOptimalValueWithNULL(TILECOMPUTATIONSCRIPT, DB_Layer.class_tilecomputationscript);
                 TILE_SIZE = getSavingOptimalValueWithNULL(TILE_SIZE, DB_Layer.class_tiles_size.ToString());
                 RECTANGLES = getSavingOptimalValueWithNULL(RECTANGLES, DB_Layer.class_rectangles);
-                SPECIALSOPTIONS = getSavingOptimalValueWithNULL(SPECIALSOPTIONS, System.Text.Json.JsonSerializer.Serialize<Layers.SpecialsOptions>(DB_Layer.class_specialsoptions));//(SPECIALSOPTIONS == System.Text.Json.JsonSerializer.Serialize<Layers.SpecialsOptions>(DB_Layer.class_specialsoptions)) ? null : SPECIALSOPTIONS;
+                SPECIALSOPTIONS = getSavingOptimalValueWithNULL(SPECIALSOPTIONS, DB_Layer.class_specialsoptions.ToString());//(SPECIALSOPTIONS == System.Text.Json.JsonSerializer.Serialize<Layers.SpecialsOptions>(DB_Layer.class_specialsoptions)) ? null : SPECIALSOPTIONS;
                 TILE_FALLBACK_URL = getSavingOptimalValueWithNULL(TILE_FALLBACK_URL, DB_Layer.class_tile_fallback_url);
-                HAS_SCALE = getSavingOptimalValueWithNULL(HAS_SCALE, (DB_Layer.class_hasscale ? 1 : 0).ToString());
+                HAS_SCALE = getSavingOptimalValueWithNULL(HAS_SCALE, null);
             }
             catch (Exception ex)
             {
@@ -585,7 +616,6 @@ namespace MapsInMyFolder
             {
                 int RowCount = Database.ExecuteScalarSQLCommand("SELECT COUNT(*) FROM 'main'.'CUSTOMSLAYERS'");
                 int ID = 1000000 + RowCount;
-                Debug.WriteLine(RowCount);
                 Database.ExecuteNonQuerySQLCommand("INSERT INTO 'main'.'CUSTOMSLAYERS'('ID','NOM', 'DESCRIPTION', 'CATEGORIE', 'PAYS', 'IDENTIFIANT', 'TILE_URL', 'TILE_FALLBACK_URL', 'MIN_ZOOM', 'MAX_ZOOM', 'FORMAT', 'SITE', 'SITE_URL', 'TILE_SIZE', 'FAVORITE', 'TILECOMPUTATIONSCRIPT', 'VISIBILITY', 'SPECIALSOPTIONS', 'RECTANGLES', 'VERSION', 'HAS_SCALE') " +
                 $"VALUES({ID}, {NOM}, {DESCRIPTION}, {CATEGORIE},{PAYS}, {IDENTIFIANT}, {TILE_URL}, {TILE_FALLBACK_URL}, {MIN_ZOOM}, {MAX_ZOOM}, {FORMAT}, {SITE}, {SITE_URL}, {TILE_SIZE}, {0} , {TILECOMPUTATIONSCRIPT},  '{Visibility.Visible}',  {SPECIALSOPTIONS}, {RECTANGLES}, {1}, {HAS_SCALE})");
             }
@@ -612,6 +642,7 @@ namespace MapsInMyFolder
             SaveLayer();
             MainPage.ClearCache(LayerId, false);
             Javascript.EngineStopAll();
+
             Javascript.EngineClearList();
             Settings.map_show_tile_border = ShowTileBorderArchive;
             Settings.is_in_debug_mode = IsInDebugModeArchive;
@@ -619,13 +650,13 @@ namespace MapsInMyFolder
             MainPage._instance.ReloadPage();
             if (Layers.Curent.class_id == LayerId)
             {
+
                 MainPage._instance.Set_current_layer(Layers.Curent.class_id);
             }
         }
 
         public void UpdateMoinsUnLayer()
         {
-            Javascript.JavascriptInstance.Logs = String.Empty;
             Javascript.EngineClearList();
             string NOM = TextboxLayerName.Text.Trim();
             string DESCRIPTION = TextboxLayerDescriptif.Text.Trim();
@@ -768,16 +799,22 @@ namespace MapsInMyFolder
             {
                 UpdateTimer.Elapsed -= UpdateTimerElapsed_StartUpdateMoinsUnLayer;
             }
-            Javascript.LogsChanged -= Javascript_LogsChanged; 
+            Javascript.LogsChanged -= Javascript_LogsChanged;
             Javascript.JavascriptActionEvent -= JavascriptActionEvent;
             TextboxRectangles.TextArea.Caret.PositionChanged -= TextboxRectangles_Caret_PositionChanged;
             TextboxLayerScript.TextArea.Caret.PositionChanged -= TextboxLayerScript_Caret_PositionChanged;
+            //make sure to reload base layer if curent layer is png
+            Layers.Curent.class_format = "jpeg";
         }
 
         System.Timers.Timer UpdateTimer;
         void DoWeNeedToUpdateMoinsUnLayer()
         {
-            UpdateTimer?.Dispose();
+            if (UpdateTimer != null)
+            {
+                UpdateTimer.Elapsed -= UpdateTimerElapsed_StartUpdateMoinsUnLayer;
+                UpdateTimer?.Dispose();
+            }
             UpdateTimer = new System.Timers.Timer(500);
             UpdateTimer.Elapsed += UpdateTimerElapsed_StartUpdateMoinsUnLayer;
             UpdateTimer.AutoReset = false;
@@ -838,7 +875,7 @@ namespace MapsInMyFolder
                 MainWindow.RefreshAllPanels();
                 DisposeElementOnLeave();
                 Javascript.EngineStopAll();
-                Javascript.EngineClearList(); 
+                Javascript.EngineClearList();
                 Settings.map_show_tile_border = ShowTileBorderArchive;
                 Settings.is_in_debug_mode = IsInDebugModeArchive;
                 MainWindow._instance.FrameBack();
@@ -1000,6 +1037,14 @@ namespace MapsInMyFolder
         private void AutoUpdateLayer_Checked(object sender, RoutedEventArgs e)
         {
             SetBackgroundMap(mapviewerappercu);// SetAppercuLayers();
+            Settings.editor_autoupdatelayer = true;
+            Settings.SaveIndividualSettings("editor_autoupdatelayer", true);
+        }
+
+        private void AutoUpdateLayer_Unchecked(object sender, RoutedEventArgs e)
+        {
+            Settings.editor_autoupdatelayer = false;
+            Settings.SaveIndividualSettings("editor_autoupdatelayer", false);
         }
 
         private void Page_KeyDown(object sender, KeyEventArgs e)
@@ -1018,13 +1063,13 @@ namespace MapsInMyFolder
             {
                 if (string.IsNullOrEmpty(TextboxLayerTileUrl.Text))
                 {
-Message.NoReturnBoxAsync("Le champ URL doit être remplis avant de lancer cette fonction", "Erreur");
+                    Message.NoReturnBoxAsync("Le champ URL doit être remplis avant de lancer cette fonction", "Erreur");
                     return;
                 }
                 else
                 {
                     SetAppercuLayers(forceUpdate: true);
-                }                
+                }
             }
             //JsonConvert.DeserializeObject<List<RootObject>>
             SelectionRectangle.Rectangles.Clear();
@@ -1138,6 +1183,86 @@ Message.NoReturnBoxAsync("Le champ URL doit être remplis avant de lancer cette 
             SetAppercuLayers(forceUpdate: true);
         }
 
+
+        private void PrintUrl_Click(object sender, RoutedEventArgs e)
+        {
+            PrintPreviewUrls(Collectif.GetUrl.InvokeFunction.getTile);
+        }
+
+        private void PrintPreviewUrl_Click(object sender, RoutedEventArgs e)
+        {
+            PrintPreviewUrls(Collectif.GetUrl.InvokeFunction.getPreview);
+        }
+        private void PrintPreviewFallbackUrl_Click(object sender, RoutedEventArgs e)
+        {
+            PrintPreviewUrls(Collectif.GetUrl.InvokeFunction.getPreviewFallback);
+        }
+
+        private void PrintPreviewUrls(Collectif.GetUrl.InvokeFunction invokeFunction)
+        {
+            string Url = GetUrl(invokeFunction);
+            Javascript.Print(invokeFunction.ToString() + " : " + Url, -2);
+            Clipboard.SetText(Url);
+        }
+
+        private string GetUrl(Collectif.GetUrl.InvokeFunction invokeFunction)
+        {
+            int ZoomLevel = Convert.ToInt32(Math.Floor(mapviewerappercu.ZoomLevel));
+            var TileNumber = Collectif.CoordonneesToTile(mapviewerappercu.Center.Latitude, mapviewerappercu.Center.Longitude, ZoomLevel);
+            string Url = Collectif.GetUrl.FromTileXYZ(TextboxLayerTileUrl.Text, TileNumber.X, TileNumber.Y, ZoomLevel, -2, invokeFunction);
+            return Url;
+        }
+
+        private void SetPreviewUrl_Click(object sender, RoutedEventArgs e)
+        {
+            Collectif.GetUrl.InvokeFunction invokeFunction = Collectif.GetUrl.InvokeFunction.getPreview;
+            TextboxLayerScript.Text = Javascript.AddOrReplaceFunction(TextboxLayerScript.Text, invokeFunction.ToString(), GetPreviewFunction(invokeFunction));
+            IndenterCode(sender, e, TextboxLayerScript);
+        }
+
+        private void SetPreviewFallbackUrl_Click(object sender, RoutedEventArgs e)
+        {
+            Collectif.GetUrl.InvokeFunction invokeFunction = Collectif.GetUrl.InvokeFunction.getPreviewFallback;
+            TextboxLayerScript.Text = Javascript.AddOrReplaceFunction(TextboxLayerScript.Text, invokeFunction.ToString(), GetPreviewFunction(invokeFunction));
+            IndenterCode(sender, e, TextboxLayerScript);
+        }
+
+        private string GetPreviewFunction(Collectif.GetUrl.InvokeFunction invokeFunction)
+        {
+            string TileUrl = TextboxLayerTileUrl.Text;
+            string TileComputationScript = TextboxLayerScript.Text;
+            int ZoomLevel = Convert.ToInt32(Math.Floor(mapviewerappercu.ZoomLevel));
+            var TileNumber = Collectif.CoordonneesToTile(mapviewerappercu.Center.Latitude, mapviewerappercu.Center.Longitude, ZoomLevel);
+            var ValuesDictionnary = Collectif.GetUrl.CallFunctionAndGetResult(TileUrl, TileComputationScript, TileNumber.X, TileNumber.Y, ZoomLevel, -2, Collectif.GetUrl.InvokeFunction.getTile);
+
+            string functionContent = "\nfunction " + invokeFunction + "(args){";
+            foreach (var Key in ValuesDictionnary.ResultCallValue.Keys)
+            {
+                var Value = ValuesDictionnary.ResultCallValue[Key];
+
+                bool stringUrlContainsKeyReplacement = TileUrl.Contains("{" + Key + "}");
+                bool IsInsidedefaultCallContainsKey = ValuesDictionnary.DefaultCallValue.ContainsKey(Key);
+                bool IsInsidedefaultCallButHaveChange = false;
+                if (IsInsidedefaultCallContainsKey)
+                {
+                    var DefaultValue = ValuesDictionnary.DefaultCallValue[Key];
+                    if (DefaultValue.ToString() != Value)
+                    {
+                        IsInsidedefaultCallButHaveChange = true;
+                    }
+                }
+
+                if (stringUrlContainsKeyReplacement || IsInsidedefaultCallButHaveChange || !IsInsidedefaultCallContainsKey)
+                {
+                    functionContent += $"\nargs.{Key} = \"{Value}\";";
+                }
+
+            }
+            functionContent += "\nreturn args;\n}";
+            return functionContent;
+        }
+
+
         private void TextboxRectangles_TextChanged(object sender, EventArgs e)
         {
             string FiguresJsonString = TextboxRectangles.Text;
@@ -1156,5 +1281,16 @@ Message.NoReturnBoxAsync("Le champ URL doit être remplis avant de lancer cette 
         {
             MapFigures.UpdateFiguresFromZoomLevel(mapviewerappercu.TargetZoomLevel);
         }
+
+        private void TextboxLayerName_LostFocus(object sender, RoutedEventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(TextboxLayerIdentifiant?.Text))
+            {
+                string saveIdentifiant = TextboxLayerName.Text.Replace(System.IO.Path.GetInvalidFileNameChars(), "_");
+                saveIdentifiant = saveIdentifiant.ReplaceLoop("__", "_");
+                TextboxLayerIdentifiant.Text = saveIdentifiant;
+            }
+        }
+
     }
 }

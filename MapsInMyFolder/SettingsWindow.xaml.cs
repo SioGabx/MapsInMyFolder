@@ -1,4 +1,5 @@
 ﻿using MapsInMyFolder.Commun;
+using Microsoft.Win32;
 using ModernWpf.Controls;
 using System;
 using System.Collections.Generic;
@@ -7,7 +8,6 @@ using System.Globalization;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using Microsoft.Win32;
 
 namespace MapsInMyFolder
 {
@@ -19,8 +19,7 @@ namespace MapsInMyFolder
         public SettingsWindow()
         {
             InitializeComponent();
-            this.Title = "MapsInMyFolder - Settings";
-            TitleTextBox.Text = "MapsInMyFolder - Settings";
+            TitleTextBox.Text = this.Title = "MapsInMyFolder - Settings";
 
             tileloader_default_script.TextArea.Caret.CaretBrush = Collectif.HexValueToSolidColorBrush("#f18712");//rgb(241 135 18)
             tileloader_template_script.TextArea.Caret.CaretBrush = Collectif.HexValueToSolidColorBrush("#f18712");//rgb(241 135 18)
@@ -408,10 +407,16 @@ namespace MapsInMyFolder
         {
             searchForUpdates.IsEnabled = false;
             searchForUpdatesLastUpdateCheck.Content = "Recherche en cours...";
-            Debug.WriteLine("Nouvelle mise à jour disponible ? : " + await Commun.Update.CheckIfNewerVersionAvailableOnGithub());
-            Database.CheckIfNewerVersionAvailable();
+            bool IsNewerDatabaseVersionAvailableOnGithub = await Database.CheckIfNewerVersionAvailable();
+            bool IsNewerApplicationVersionAvailableOnGithub = await Update.CheckIfNewerVersionAvailableOnGithub();
             searchForUpdates.IsEnabled = true;
             UpdateLastUpdateSearch();
+
+            if (IsNewerApplicationVersionAvailableOnGithub)
+            {
+                Notification.ListOfNotificationsOnShow.ToList().ForEach(notification => notification.Remove());
+                Update.StartUpdating();
+            }
         }
 
         private void DisableRequestBringIntoView(object sender, RequestBringIntoViewEventArgs e)
@@ -480,6 +485,12 @@ namespace MapsInMyFolder
                 Message.NoReturnBoxAsync("Une erreur inconnue s'est produite lors de l'export du fichier", "Erreur");
             }
 
+        }
+
+        private void openAvancedEditor_Click(object sender, RoutedEventArgs e)
+        {
+            var DataGridEditor = new DataGridEditor();
+            DataGridEditor.Show();
         }
     }
 }
