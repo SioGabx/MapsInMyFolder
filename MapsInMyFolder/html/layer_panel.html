@@ -1022,52 +1022,268 @@
 
         }
 
-        function cleantxt(source) {
-            let source_clean = source.toLowerCase();
-            source_clean = source_clean.replaceAll("é", "e");
-            source_clean = source_clean.replaceAll("è", "e");
-            source_clean = source_clean.replaceAll("ê", "e");
-            source_clean = source_clean.replaceAll("ô", "o");
-            source_clean = source_clean.replaceAll("î", "i");
-            source_clean = source_clean.replaceAll("à", "a");
-            source_clean = source_clean.replaceAll("â", "a");
-            source_clean = source_clean.replaceAll("æ", "ae");
-            source_clean = source_clean.replaceAll("ë", "e");
-            source_clean = source_clean.replaceAll("ï", "i");
-            source_clean = source_clean.replaceAll("œ", "oe");
-            source_clean = source_clean.replaceAll("ù", "u");
-            source_clean = source_clean.replaceAll("û", "u");
-            source_clean = source_clean.replaceAll("ü", "u");
-            source_clean = source_clean.replaceAll("ç", "c");
-            return source_clean;
+        //function cleantxt(source) {
+        //    let source_clean = source.toLowerCase();
+        //    source_clean = source_clean.replaceAll("é", "e");
+        //    source_clean = source_clean.replaceAll("è", "e");
+        //    source_clean = source_clean.replaceAll("ê", "e");
+        //    source_clean = source_clean.replaceAll("ô", "o");
+        //    source_clean = source_clean.replaceAll("î", "i");
+        //    source_clean = source_clean.replaceAll("à", "a");
+        //    source_clean = source_clean.replaceAll("â", "a");
+        //    source_clean = source_clean.replaceAll("æ", "ae");
+        //    source_clean = source_clean.replaceAll("ë", "e");
+        //    source_clean = source_clean.replaceAll("ï", "i");
+        //    source_clean = source_clean.replaceAll("œ", "oe");
+        //    source_clean = source_clean.replaceAll("ù", "u");
+        //    source_clean = source_clean.replaceAll("û", "u");
+        //    source_clean = source_clean.replaceAll("ü", "u");
+        //    source_clean = source_clean.replaceAll("ç", "c");
+        //    return source_clean;
+        //}
+
+        //function search(string) {
+        //    let input = cleantxt(string);
+        //    let filter = input.toLowerCase();
+        //    let li = document.getElementsByTagName('li');
+
+        //    // Loop through all list items, and hide those who don't match the search query
+        //    for (let i = 0; i < li.length; i++) {
+        //        //console.log('clear classList of id ' + i);
+        //        paragraphe = li[i].getElementsByTagName("p");
+        //        for (z = 0; z < paragraphe.length; z++) {
+        //            let a = li[i].getElementsByTagName("p")[z];
+        //            let txtValue = cleantxt(a.innerText).toLowerCase();
+        //            //console.log('Recherche de : "' + filter + '" dans "' + txtValue + '"')
+        //            if (txtValue.indexOf(filter) > -1) {
+        //                li[i].classList.add("visible");
+        //                li[i].classList.remove("hidden");
+        //                //console.log('found : ' + i); console.log(li[i]);
+        //            } else if (!li[i].classList.contains("visible")) {
+        //                li[i].classList.add("hidden");
+        //            }
+        //        }
+        //    }
+        //    CheckIfIntersectionObserverHasDetectedEachElements();
+        //}
+
+    </script>
+    <script>
+        function search(originalSearchedText) {
+            let searchedText = originalSearchedText;
+            console.log("originalSearchedText : " + originalSearchedText)
+            let quotedStrings = extractQuotedStrings(searchedText);
+            quotedStrings.forEach((quotedString) => {
+                searchedText = searchedText.replace(quotedString, encodeURI(quotedString.slice(1, quotedString.length - 1)));
+            });
+
+            const searchClasses = [
+                ["site", "layer_website"],
+                ["categorie", "layer_categorie"],
+                ["zoom", "zoom"],
+                ["nom", "display_name"]
+            ];
+
+            //specifier search
+            let searchArguments = searchedText.split(' ');
+            let filteredLayers = searchWithSpecifier(searchClasses, searchArguments);
+
+            //delete non query terms
+            searchArguments.slice().forEach(function (argument) {
+                searchClasses.forEach(function (item) {
+                    let specifier = item[0];
+                    let SpecifierIdentifier = specifier + ":";
+                    if (argument.startsWith(SpecifierIdentifier)) {
+                        let index = searchArguments.indexOf(argument);
+                        //console.log(argument + " " + index);
+                        if (index > -1) {
+                            searchArguments.splice(index, 1);
+                        }
+                    }
+                });
+            });
+
+            console.log(searchArguments);
+
+            //regular search
+            let li = document.getElementsByTagName('li');
+            Array.prototype.forEach.call(li, function (liElement) {
+                let isVisible = true;
+                if (filteredLayers.includes(liElement.id)) {
+                    paragraphe = liElement.getElementsByTagName("p");
+                    Array.prototype.forEach.call(searchArguments, function (searchArgument) {
+                        let decodedSearchArgument = decodeURI(searchArgument);
+                        let isFound = false;
+                        Array.prototype.forEach.call(paragraphe, function (pElement) {
+                            if (contains(pElement.innerText, removeStartAndEndQuotes(decodedSearchArgument))) {
+                                isFound = true;
+                            }
+                        });
+                        if (!isFound) {
+                            isVisible = false;
+                            return;
+                        }
+
+                    });
+                } else {
+                    isVisible = false;
+                }
+
+                if (isVisible) {
+                    showLi(liElement);
+                } else {
+                    hideLi(liElement);
+                }
+
+            });
+
+            return filteredLayers;
         }
 
-        function search(string) {
-            let input = cleantxt(string);
-            let filter = input.toLowerCase();
-           let li = document.getElementsByTagName('li');
 
-            // Loop through all list items, and hide those who don't match the search query
-            for (let i = 0; i < li.length; i++) {
-                li[i].classList.remove("visible");
-                //console.log('clear classList of id ' + i);
-                paragraphe = li[i].getElementsByTagName("p");
-                for (z = 0; z < paragraphe.length; z++) {
-                   let a = li[i].getElementsByTagName("p")[z];
-                    let txtValue = cleantxt(a.innerText).toLowerCase();
-                    //console.log('Recherche de : "' + filter + '" dans "' + txtValue + '"')
-                    if (txtValue.indexOf(filter) > -1) {
-                        li[i].classList.add("visible");
-                        li[i].classList.remove("hidden");
-                        //console.log('found : ' + i);
-                    } else {
-                        li[i].classList.add("hidden");
+
+        function searchWithSpecifier(searchClasses, searchArguments) {
+            let filteredLi = [];
+            let li = document.getElementsByTagName('li');
+            Array.prototype.forEach.call(li, function (liElement) {
+                // code pour manipuler chaque élément li ici
+
+                let HasFoundSomething = true;
+                Array.prototype.forEach.call(searchArguments, function (searchArgument) {
+                    searchClasses.forEach(function (item) {
+                        let specifier = item[0];
+                        let classToSearch = item[1];
+
+                        // faire la recherche en utilisant le spécifieur et la classe appropriée
+                        let SpecifierIdentifier = specifier + ":";
+                        if (searchArgument.startsWith(SpecifierIdentifier)) {
+                            searchArgument = searchArgument.replace(SpecifierIdentifier, "");
+                            // Sélectionnez tous les éléments li avec la classe
+                            let specifierSelector = liElement.getElementsByClassName(classToSearch);
+
+                            // Bouclez à travers tous les éléments sélectionnés
+                            Array.prototype.forEach.call(specifierSelector, function (specifierElement) {
+                                // Faites quelque chose avec chaque élément ici
+                                let decodedSearchArgument = decodeURI(searchArgument);
+                                if (!contains(specifierElement.innerHTML, removeStartAndEndQuotes(decodedSearchArgument))) {
+                                    HasFoundSomething = false;
+                                    //} else {
+                                    //console.log('Found "' + decodedSearchArgument + '" inside ' + specifier + " in layerid=" + liElement.id);
+                                }
+                            });
+                        }
+                    });
+                });
+                if (HasFoundSomething === true) {
+                    filteredLi.push(liElement.id);
+                }
+
+            });
+            return filteredLi;
+        }
+
+
+
+
+        function extractQuotedStrings(texte) {
+            let start = -1;
+            let end = -1;
+            let openedQuotes = 0;
+            const matches = [];
+
+            for (let i = 0; i < texte.length; i++) {
+                const currentChar = texte[i];
+                const previousChar = i > 0 ? texte[i - 1] : null;
+                const nextChar = i < texte.length - 1 ? texte[i + 1] : null;
+
+                if (currentChar === '"' && (previousChar === ' ' || previousChar === ':' || previousChar === null)) {
+                    if (openedQuotes === 0) {
+                        start = i;
+                    }
+                    openedQuotes++;
+                } else if (currentChar === '"' && (nextChar === ' ' || nextChar === null)) {
+                    openedQuotes--;
+                    if (openedQuotes === 0) {
+                        end = i;
+                        matches.push(texte.substring(start, end + 1));
+                        start = -1;
+                        end = -1;
                     }
                 }
             }
-            CheckIfIntersectionObserverHasDetectedEachElements();
+
+            console.log(matches);
+
+            return matches;
         }
 
+        function showLi(li) {
+            li.classList.add("visible");
+            li.classList.remove("hidden");
+        }
+
+        function hideLi(li) {
+            li.classList.remove("visible");
+            li.classList.add("hidden");
+        }
+
+        function contains(str, substring) {
+            return cleantxt(str).indexOf(cleantxt(substring)) !== -1;
+        }
+
+        function cleantxt(source) {
+            const replacements = {
+                "é": "e",
+                "è": "e",
+                "ê": "e",
+                "ô": "o",
+                "î": "i",
+                "à": "a",
+                "â": "a",
+                "æ": "ae",
+                "ë": "e",
+                "ï": "i",
+                "œ": "oe",
+                "ù": "u",
+                "û": "u",
+                "ü": "u",
+                "µ": "u",
+                "ç": "c",
+
+                "”": '"',
+                "“": '"',
+                "‟": '"',
+                "″": '"',
+                "〞": '"',
+                "«": '"',
+                "»": '"',
+                "❞": '"',
+                "„": '"',
+                "¨": '"',
+
+                "´": "'",
+                "`": "'",
+                "’": "'",
+                "‘": "'",
+            };
+            let source_clean = source.toLowerCase();
+            for (const [key, value] of Object.entries(replacements)) {
+                source_clean = source_clean.replaceAll(key, value);
+            }
+            return source_clean;
+        }
+
+        function StartAndEndQuotes(quotedString) {
+            return quotedString.startsWith('"') && quotedString.endsWith('"');
+        }
+
+        function removeStartAndEndQuotes(quotedString) {
+            if (StartAndEndQuotes(quotedString)) {
+                return quotedString.slice(1, quotedString.length - 1);
+            } else {
+                return quotedString;
+            }
+        }
     </script>
 
     <script>

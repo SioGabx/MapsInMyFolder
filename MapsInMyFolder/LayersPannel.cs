@@ -20,7 +20,7 @@ namespace MapsInMyFolder
 {
     public partial class MainPage : System.Windows.Controls.Page
     {
-        string last_input = "";
+        string last_input;
         public async void SearchLayerStart(bool IsIgnoringLastInput = false)
         {
             await Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)async delegate
@@ -31,8 +31,8 @@ namespace MapsInMyFolder
                     if (layer_browser.IsLoaded)
                     {
                         last_input = layer_searchbar.Text.Trim();
-                        await layer_browser.GetMainFrame().EvaluateScriptAsync("search(\"" + layer_searchbar.Text.Replace("\"", "") + "\")");
-                        DebugMode.WriteLine("Search");
+                        await layer_browser.GetMainFrame().EvaluateScriptAsync($"search('{layer_searchbar.Text.Replace("'", "’")}');", "about:blank", 1, null, true);
+                        Debug.WriteLine("Search : " + last_input);
                     }
                 }
             }, null);
