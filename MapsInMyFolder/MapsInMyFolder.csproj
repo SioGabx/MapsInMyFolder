@@ -30,7 +30,7 @@
     <ApplicationIcon>icone\icone_v2.ico</ApplicationIcon>
     <RepositoryUrl>https://github.com/SioGabx/MapsInMyFolder</RepositoryUrl>
     <Copyright>SioGabx</Copyright>
-    <Version>0.4.3-alpha</Version>
+    <Version>0.4.4-alpha</Version>
     <AllowUnsafeBlocks>False</AllowUnsafeBlocks>
   </PropertyGroup>
 

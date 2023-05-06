@@ -76,7 +76,7 @@ namespace MapsInMyFolder.Commun
 
     public static class CountryExtensions
     {
-        public static bool Contains(this IEnumerable<Country> countries ,string EnglishCountryName)
+        public static bool Contains(this IEnumerable<Country> countries, string EnglishCountryName)
         {
             foreach (Country country in countries)
             {
@@ -86,7 +86,7 @@ namespace MapsInMyFolder.Commun
                 }
             }
             return false;
-        } 
+        }
     }
 
 
