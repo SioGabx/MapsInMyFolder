@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.SQLite;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -251,7 +252,26 @@ namespace MapsInMyFolder
             TextBoxSetValueAndLock(TextboxSpecialOptionBackgroundColor, LayerInEditMode.class_specialsoptions.BackgroundColor?.TrimEnd('#'));
             TextBoxSetValueAndLock(TextboxSpecialOptionPBFJsonStyle, LayerInEditMode.class_specialsoptions.PBFJsonStyle);
 
-            PaysComboBox.SelectedItems = Country.getListFromEnglishName(LayerInEditMode.class_pays.Split(';', StringSplitOptions.RemoveEmptyEntries));
+            string[] class_pays = LayerInEditMode.class_pays.Split(';', StringSplitOptions.RemoveEmptyEntries);
+            List<Country> SelectedCountries = Country.getListFromEnglishName(class_pays);
+            if (SelectedCountries.Count != class_pays.Length && LayerInEditMode.class_pays != null)
+            {
+                List<Country> CountryList = PaysComboBox.ItemSource.Cast<Country>().ToList();
+                foreach (string country in class_pays)
+                {
+                    if (!SelectedCountries.Contains(country))
+                    {
+                        Country newCountryToAdd = new Country();
+                        newCountryToAdd.DisplayName = country;
+                        newCountryToAdd.EnglishName = country;
+                        CountryList.Add(newCountryToAdd);
+                        SelectedCountries.Add(newCountryToAdd);
+                    }
+                }
+                PaysComboBox.ItemSource = CountryList;
+            }
+
+            PaysComboBox.SelectedItems = SelectedCountries;
             has_scale.IsChecked = LayerInEditMode.class_hasscale;
             Collectif.setBackgroundOnUIElement(mapviewerappercu, LayerInEditMode?.class_specialsoptions?.BackgroundColor);
 
