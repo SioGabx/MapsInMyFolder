@@ -72,11 +72,22 @@ namespace MapsInMyFolder.Commun
 
             return resultString;
         }
-
-
     }
 
-
+    public static class CountryExtensions
+    {
+        public static bool Contains(this IEnumerable<Country> countries, string EnglishCountryName)
+        {
+            foreach (Country country in countries)
+            {
+                if (country.EnglishName == EnglishCountryName)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
 
 
 }

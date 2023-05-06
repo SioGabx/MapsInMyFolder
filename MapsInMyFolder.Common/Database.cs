@@ -648,9 +648,6 @@ namespace MapsInMyFolder.Commun
             ExecuteNonQuerySQLCommand(SQLExecute.ToString());
         }
 
-
-
-
         public static void Export(string FilePath)
         {
             StringBuilder SQLExecute = new StringBuilder();
@@ -748,7 +745,6 @@ namespace MapsInMyFolder.Commun
                                     }
                                     ValuesList["VERSION"] = IntLayerVersion++.ToString();
                                 }
-
                             }
                         }
                         string Values = '\'' + string.Join("','", ValuesList.Values) + '\'';
@@ -761,7 +757,7 @@ namespace MapsInMyFolder.Commun
             }
 
             int user_version = ExecuteDirectScalarSQLCommand("PRAGMA user_version;");
-            SQLExecute.AppendLine($"PRAGMA user_version={(user_version + 1)};");
+            SQLExecute.AppendLine($"PRAGMA user_version={user_version + 1};");
             SQLExecute.AppendLine("COMMIT;");
 
             if (FilePath.EndsWith(".txt"))
@@ -777,9 +773,9 @@ namespace MapsInMyFolder.Commun
             }
             else
             {
-                if (System.IO.File.Exists(FilePath))
+                if (File.Exists(FilePath))
                 {
-                    System.IO.File.Delete(FilePath);
+                    File.Delete(FilePath);
                 }
                 using (SQLiteConnection sqlite_conn = new SQLiteConnection("Data Source=" + FilePath + "; Version = 3; New = True; Compress = True;"))
                 {
@@ -790,18 +786,7 @@ namespace MapsInMyFolder.Commun
                         sqlite_cmd.ExecuteNonQuery();
                     }
                 }
-
             }
-
-
         }
-
-
-
-
-
-
-
-
     }
 }
