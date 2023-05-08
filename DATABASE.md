@@ -1,5 +1,7 @@
+# Feuille de note sur le parsing des sites de carthographie
+
 ----
-##Géoportail - France
+## Géoportail - France
 
 Script to parse Capabilities :
 ```
@@ -67,7 +69,7 @@ function parse(xmlString) {
 
 
 ----
-##World Imagery Wayback
+## World Imagery Wayback
 Add World Imagery Wayback from https://livingatlas.arcgis.com/wayback/
 
 Script to generate layers :
@@ -103,7 +105,7 @@ let SQL = SQLTemplate;
   .catch(error => console.error(error));
 ```
 ----
-##SwissTopo :
+## SwissTopo :
 Langue la plus parlée : 
 	- Allemand : environ 60% de la population
 	- Français : environ 20%
