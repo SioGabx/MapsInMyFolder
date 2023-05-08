@@ -454,7 +454,11 @@ namespace MapsInMyFolder.Commun
                 }
             }
             //Download database from github
-            string downloadedDatabasePath = Path.Combine(Settings.temp_folder, "Github" + Settings.github_database_name);
+            string databaseFileName = System.IO.Path.GetFileName(Settings.database_pathname);
+            if (string.IsNullOrWhiteSpace(databaseFileName)) { 
+                databaseFileName = "database"; 
+            }
+            string downloadedDatabasePath = Path.Combine(Settings.temp_folder, "Github" + databaseFileName);
             Collectif.HttpClientDownloadWithProgress client = new Collectif.HttpClientDownloadWithProgress(githubAssets.Download_url, downloadedDatabasePath);
             await client.StartDownload().ConfigureAwait(false);
             int GithubDatabaseVersion;
@@ -480,7 +484,12 @@ namespace MapsInMyFolder.Commun
         public static async void StartUpdating()
         {
             GitHubFile githubAssets = GetGithubAssets.GetContentAssetsFromGithub(new Uri(Settings.github_repository_url).PathAndQuery, String.Empty, Settings.github_database_name);
-            string downloadedDatabasePath = Path.Combine(Settings.temp_folder, "Github" + Settings.github_database_name);
+            string databaseFileName = System.IO.Path.GetFileName(Settings.database_pathname);
+            if (string.IsNullOrWhiteSpace(databaseFileName))
+            {
+                databaseFileName = "database";
+            }
+            string downloadedDatabasePath = Path.Combine(Settings.temp_folder, "Github" + databaseFileName);
             bool IsUpdateSuccessful = await DB_DownloadFile(githubAssets.Download_url, downloadedDatabasePath);
             if (IsUpdateSuccessful)
             {
