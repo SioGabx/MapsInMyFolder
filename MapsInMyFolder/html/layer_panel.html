@@ -99,7 +99,7 @@
             width: 100%;
             height: 100%;
             position: relative;
-			overflow-wrap: anywhere;
+            overflow-wrap: anywhere;
         }
 
         .layer_main_div_background_image {
@@ -503,9 +503,10 @@
 
         body:has(ul:empty) .nolayermessage {
             display: block;
-        } 
+        }
+
         body:has(ul:empty) {
-            overflow:hidden;
+            overflow: hidden;
         }
 
 
@@ -1124,27 +1125,34 @@
                             }
                         });
                         if (!isFound) {
-                            isVisible = false;
+                            //delete item from filteredLayers
+                            const index = filteredLayers.indexOf(liElement.id);
+                            if (index !== -1) {
+                                filteredLayers.splice(index, 1);
+                            }
                             return;
                         }
 
                     });
-                } else {
-                    isVisible = false;
-                }
-
-                if (isVisible) {
-                    showLi(liElement);
-                } else {
-                    hideLi(liElement);
                 }
 
             });
 
+            applySearch(filteredLayers);
             return filteredLayers;
         }
 
-
+        function applySearch(filteredLayers) {
+            let li = document.getElementsByTagName('li');
+            Array.prototype.forEach.call(li, function (liElement) {
+                let ID = liElement.id;
+                if (filteredLayers.includes(ID)) {
+                    showLi(liElement);
+                } else {
+                    hideLi(liElement);
+                }
+            });
+        }
 
         function searchWithSpecifier(searchClasses, searchArguments) {
             let filteredLi = [];
@@ -1222,13 +1230,15 @@
         }
 
         function showLi(li) {
-            li.classList.add("visible");
-            li.classList.remove("hidden");
+            if (li.classList.contains("hidden")) {
+                li.classList.add("visible");
+                li.classList.remove("hidden");
+            }
         }
 
         function hideLi(li) {
-            li.classList.remove("visible");
-            li.classList.add("hidden");
+                li.classList.remove("visible");
+                li.classList.add("hidden");
         }
 
         function contains(str, substring) {
@@ -1295,7 +1305,7 @@
         function StartObserving() {
             isObserving = true;
             let observer = new IntersectionObserver(function (observables) {
-               
+
                 observables.forEach(function (observable) {
                     try {
                         let item = observable.target;
@@ -1352,7 +1362,7 @@
         };
 
 
-       // window.addEventListener("scroll", CheckIfIntersectionObserverHasDetectedEachElements);
+        // window.addEventListener("scroll", CheckIfIntersectionObserverHasDetectedEachElements);
         function CheckIfIntersectionObserverHasDetectedEachElements() {
             // On observe nos éléments
             let items = document.querySelectorAll("li")
@@ -1360,15 +1370,15 @@
                 if (item.classList.contains("hidden") || item.classList.contains("displaynone")) {
                     item.classList.remove("inview");
                 } else {
-                if (visibleY(item)) {
-                    if (!item.classList.contains("inview")) {
+                    if (visibleY(item)) {
+                        if (!item.classList.contains("inview")) {
 
-                        item.classList.add("inview");
-                        UpdatePreview();
-                        //console.log("Elmenet was not update" + item.id);
-                    } else {
-                        item.classList.remove("inview");
-                    }
+                            item.classList.add("inview");
+                            UpdatePreview();
+                            //console.log("Elmenet was not update" + item.id);
+                        } else {
+                            item.classList.remove("inview");
+                        }
                     }
                 }
             });
@@ -1970,7 +1980,7 @@
             }
         }
 
-       
+
         layer_Csharp_call_from_js.request_search_string()
             .then(function (initSearchValue) {
                 console.log(initSearchValue);
