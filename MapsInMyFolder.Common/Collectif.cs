@@ -97,7 +97,7 @@ namespace MapsInMyFolder.Commun
                     }
                     catch (Exception ex)
                     {
-                        Javascript.PrintError(ex.Message);
+                        Javascript.Functions.PrintError(ex.Message);
                     }
                     if (!(JavascriptMainResult is null) && JavascriptMainResult.IsObject())
                     {
@@ -439,7 +439,6 @@ namespace MapsInMyFolder.Commun
             }
         }
 
-        static readonly object Locker = new object();
         public static byte[] GetEmptyImageBufferFromText(HttpResponse httpResponse)
         {
             string BitmapErrorsMessage;
@@ -476,17 +475,29 @@ namespace MapsInMyFolder.Commun
             {
                 return null;
             }
-            lock (Locker)
+            //using (NetVips.Image text = NetVips.Image.Text(WordWrap(BitmapErrorsMessage, 20), null, null, null, NetVips.Enums.Align.Centre, null, 100, 5, null))
+            //{
+            //    int offsetX = (int)Math.Floor((double)(border_tile_size - text.Width) / 2);
+            //    int offsetY = (int)Math.Floor((double)(border_tile_size - text.Height) / 2);
+            //    using (NetVips.Image image = NetVips.Image.Black(border_tile_size, border_tile_size).Linear(color, color).Composite2(text, NetVips.Enums.BlendMode.Atop, offsetX, offsetY))
+            //    {
+            //        return image.Gravity(Enums.CompassDirection.Centre, tile_size, tile_size, Enums.Extend.Black).WriteToBuffer("." + format, saveVOption); ;
+            //    }
+            //}
+
+            using (NetVips.Image text = NetVips.Image.Text(WordWrap(BitmapErrorsMessage, 20), null, null, null, NetVips.Enums.Align.Centre, null, 100, 5, null))
+            using (NetVips.Image background = NetVips.Image.Black(border_tile_size, border_tile_size))
             {
-                using (NetVips.Image text = NetVips.Image.Text(WordWrap(BitmapErrorsMessage, 20), null, null, null, NetVips.Enums.Align.Centre, null, 100, 5, null))
+                int offsetX = (int)Math.Floor((double)(border_tile_size - text.Width) / 2);
+                int offsetY = (int)Math.Floor((double)(border_tile_size - text.Height) / 2);
+
+                using (NetVips.Image image = background.Linear(color, color))
+                using (NetVips.Image finalImage = image.Composite2(text, NetVips.Enums.BlendMode.Atop, offsetX, offsetY))
+                using (NetVips.Image GravityFinalImage = finalImage.Gravity(Enums.CompassDirection.Centre, tile_size, tile_size, Enums.Extend.Black))
                 {
-                    int offsetX = (int)Math.Floor((double)(border_tile_size - text.Width) / 2);
-                    int offsetY = (int)Math.Floor((double)(border_tile_size - text.Height) / 2);
-                    using (NetVips.Image image = NetVips.Image.Black(border_tile_size, border_tile_size).Linear(color, color).Composite2(text, NetVips.Enums.BlendMode.Atop, offsetX, offsetY))
-                    {
-                        return image.Gravity(Enums.CompassDirection.Centre, tile_size, tile_size, Enums.Extend.Black).WriteToBuffer("." + format, saveVOption); ;
-                    }
+                    return GravityFinalImage.WriteToBuffer("." + format, saveVOption);
                 }
+
             }
         }
 
@@ -584,15 +595,21 @@ namespace MapsInMyFolder.Commun
 
         public static async Task<HttpResponse> ByteDownloadUri(Uri url, int LayerId, bool getRealRequestMessage = false)
         {
-            HttpResponse response = HttpResponse.HttpResponseError;
 
+            if (!Network.FastIsNetworkAvailable())
+            {
+                return new HttpResponse(null, new HttpResponseMessage(System.Net.HttpStatusCode.ServiceUnavailable)
+                {
+                    ReasonPhrase = "Aucune connexion : Vérifiez votre connexion Internet"
+                });
+
+            }
+
+            HttpResponse response = HttpResponse.HttpResponseError;
             int max_retry = Settings.max_redirection_download_tile;
             int retry = 0;
-
             bool do_need_retry;
-
             Uri parsing_url = url;
-
             do
             {
                 do_need_retry = false;
@@ -613,7 +630,7 @@ namespace MapsInMyFolder.Commun
                             byte[] buffer = await responseMessage.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
                             return new HttpResponse(buffer, responseMessage);
                         }
-                        else if (!(responseMessage is null) && !(responseMessage.Headers is null) && !(responseMessage.Headers.Location is null) && !string.IsNullOrEmpty(responseMessage.Headers.Location.ToString().Trim()))
+                        else if (!string.IsNullOrWhiteSpace(responseMessage?.Headers?.Location?.ToString()?.Trim()))
                         {
                             // Redirect found (autodetect)  System.Net.HttpStatusCode.Found
                             Uri new_location = responseMessage.Headers.Location;
@@ -626,7 +643,7 @@ namespace MapsInMyFolder.Commun
                             DebugMode.WriteLine($"DownloadByteUrl: {parsing_url}: {(int)responseMessage.StatusCode} {responseMessage.ReasonPhrase}");
                             if (LayerId == -2)
                             {
-                                Javascript.PrintError($"DownloadUrl - Error {(int)responseMessage.StatusCode} : {responseMessage.ReasonPhrase}. Url : {parsing_url}");
+                                Javascript.Functions.PrintError($"DownloadUrl - Error {(int)responseMessage.StatusCode} : {responseMessage.ReasonPhrase}. Url : {parsing_url}");
                             }
                             if (Settings.generate_transparent_tiles_on_error)
                             {
@@ -649,10 +666,17 @@ namespace MapsInMyFolder.Commun
                 }
                 catch (Exception ex)
                 {
+                    if (ex.InnerException is System.Net.Sockets.SocketException socketException && socketException.SocketErrorCode == System.Net.Sockets.SocketError.HostNotFound)
+                    {
+                        // Check si internet lorsque l'hôte est inconnu
+                        Network.IsNetworkAvailable();
+                    }
                     Debug.WriteLine($"DownloadByteUrl catch: {url}: {ex.Message}");
+
+
                     if (LayerId == -2)
                     {
-                        Javascript.PrintError($"DownloadUrl - Error {ex.Message}. Url : {url}");
+                        Javascript.Functions.PrintError($"DownloadUrl - Error {ex.Message}. Url : {url}");
                     }
                     response = new HttpResponse(null, null, ex.Message);
                 }
@@ -1227,43 +1251,48 @@ namespace MapsInMyFolder.Commun
             return GetUrl.FromTileXYZ(tileBaseUrl, Convert.ToInt32(x), Convert.ToInt32(y), Convert.ToInt32(z), LayerID, invokeFunction).Replace(" ", "%20");
         }
 
-        public static int CheckIfDownloadSuccess(string url)
+        public static async Task<int> CheckIfDownloadSuccess(string url)
         {
             async Task<HttpStatusCode> InternalCheckIfDownloadSuccess(string internalurl)
             {
                 try
                 {
-                    HttpResponse reponseHttpResponse = await ByteDownloadUri(new Uri(internalurl), 0, true);
-                    if (reponseHttpResponse is null || reponseHttpResponse.ResponseMessage is null)
+                    HttpResponse response = await ByteDownloadUri(new Uri(internalurl), 0, true);
+                    if (response is null || response.ResponseMessage is null)
                     {
                         return HttpStatusCode.SeeOther;
                     }
-                    HttpResponseMessage reponse = reponseHttpResponse.ResponseMessage;
-                    if (reponse.IsSuccessStatusCode)
+
+                    HttpResponseMessage httpResponse = response.ResponseMessage;
+
+                    if (httpResponse.IsSuccessStatusCode)
                     {
                         return HttpStatusCode.OK;
                     }
                     else
                     {
-                        return reponse.StatusCode;
+                        return httpResponse.StatusCode;
                     }
                 }
-                catch (Exception a)
+                catch (Exception ex)
                 {
-                    Debug.WriteLine("Exception CIDS : " + a.Message);
+                    Debug.WriteLine("Exception CIDS : " + ex.Message);
                 }
+
                 return HttpStatusCode.SeeOther;
             }
 
-            switch (InternalCheckIfDownloadSuccess(url).Result)
+            switch (await InternalCheckIfDownloadSuccess(url))
             {
                 case HttpStatusCode.NotFound:
                     return 404;
                 case HttpStatusCode.OK:
                     return 200;
-                default: return -1;
+                default:
+                    return -1;
             }
         }
+
 
         public static (double Latitude, double Longitude) GetCenterBetweenTwoPoints((double Latitude, double Longitude) PointA, (double Latitude, double Longitude) PointB)
         {

@@ -52,9 +52,9 @@
                     <ColumnDefinition Width="5" />
                 </Grid.ColumnDefinitions>
 
-                <TextBox Grid.Column="0" x:Name="map_searchbar" Style="{DynamicResource TextBoxCleanStyle_16}" Text="Rechercher un lieux..." HorizontalAlignment="Stretch" Margin="10,0,0,0" GotFocus="Map_searchbar_GotFocus" LostFocus="Map_searchbar_LostFocus" TextChanged="Map_searchbar_TextChanged" KeyDown="Map_searchbar_KeyDown" Cursor="IBeam"/>
+                <TextBox Grid.Column="0" x:Name="mapSearchbar" Style="{DynamicResource TextBoxCleanStyle_16}" Text="Rechercher un lieu..." HorizontalAlignment="Stretch" Margin="10,0,0,0" GotFocus="MapSearchbar_GotFocus" LostFocus="MapSearchbar_LostFocus" TextChanged="MapSearchbar_TextChanged" KeyDown="MapSearchbar_KeyDown" Cursor="IBeam"/>
 
-                <Rectangle Grid.Column="0" x:Name="map_searchbar_overflow" HorizontalAlignment="Right" IsHitTestVisible="False" Width="55" Margin="0,0,0,0" VerticalAlignment="Top" Height="34">
+                <Rectangle Grid.Column="0" x:Name="mapSearchbarOverflow" HorizontalAlignment="Right" IsHitTestVisible="False" Width="55" Margin="0,0,0,0" VerticalAlignment="Top" Height="34">
                     <Rectangle.Fill>
                         <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0" SpreadMethod="Pad">
                             <LinearGradientBrush.RelativeTransform>
@@ -76,7 +76,7 @@
                 </Button>
             </Grid>
 
-            <ListBox Panel.ZIndex="999" Grid.Row="1" Grid.Column="1" Grid.RowSpan="2" x:Name="map_searchbar_suggestion" Visibility="Hidden" Margin="10,35,50,0" SelectionChanged="Map_searchbar_suggestion_SelectionChanged" Height="100" MaxHeight="140" HorizontalAlignment="Stretch" VerticalAlignment="Top" Background="#2B2B2B" />
+            <ListBox Panel.ZIndex="999" Grid.Row="1" Grid.Column="1" Grid.RowSpan="2" x:Name="mapSearchbarSuggestion" Visibility="Hidden" Margin="10,35,50,0" SelectionChanged="MapSearchbarSuggestion_SelectionChanged" Height="100" MaxHeight="140" HorizontalAlignment="Stretch" VerticalAlignment="Top" Background="#2B2B2B" />
 
             <Grid Grid.Row="2">
                 <Grid.ColumnDefinitions>
@@ -90,14 +90,14 @@
                     <RowDefinition Height="15"/>
                 </Grid.RowDefinitions>
 
-                <map:Map Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Grid.RowSpan="2" x:Name="mapviewer" ZoomLevel="18" Margin="10,0,0,0" MinHeight="30" MinWidth="30" Background="White" MouseWheel="mapviewer_MouseWheel" >
+                <map:Map Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Grid.RowSpan="2" x:Name="mapviewer" ZoomLevel="18" Margin="10,0,0,0" MinHeight="30" MinWidth="30" Background="White" MouseWheel="mapviewer_MouseWheel">
 
                     <map:Map.Center>
                         <map:Location Longitude="0" Latitude="0"/>
                     </map:Map.Center>
                     <map:Pushpin Panel.ZIndex="999" x:Name="SE_PIN"  Background="#303031" Foreground="#FFE2E2E1" map:MapPanel.Location="48.198846,6.4" Content="Coin_Superieur" />
                     <map:Pushpin Panel.ZIndex="999" x:Name="NO_PIN" Background="#303031" Foreground="#FFE2E2E1" map:MapPanel.Location="48.16,6.5" Content="Coin_Inferieur" />
-                    <map:Pushpin Panel.ZIndex="999" x:Name="search_result" Style="{DynamicResource PushpinStyleOrange}"  map:MapPanel.Location="48.16,6.5" Visibility="Hidden" MouseDoubleClick="Search_result_MouseDoubleClick"/>
+                    <map:Pushpin Panel.ZIndex="999" x:Name="searchResult" Style="{DynamicResource PushpinStyleOrange}"  map:MapPanel.Location="48.16,6.5" Visibility="Hidden" MouseDoubleClick="SearchResult_MouseDoubleClick"/>
 
                     <map:MapTileLayer x:Name="MapTileLayer_Transparent"/>
                     <!--<map:MapPolygon Panel.ZIndex="999" x:Name="Selection_Rectangle" Stroke="#F18712" Locations="53.447,65 -18,8.1114" StrokeThickness="3" Fill="#4CF18712" StrokeDashCap="Square" />-->

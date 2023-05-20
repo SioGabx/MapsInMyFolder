@@ -139,7 +139,7 @@ namespace MapsInMyFolder.Commun
                 VectorTileRenderer.Style style = PBFGetStyle(LayerID);
                 if (style is null)
                 {
-                    Javascript.PrintError("Tile style est null", LayerID);
+                    Javascript.Functions.PrintError("Tile style est null", LayerID);
                     return HttpResponse.HttpResponseError;
                 }
 
@@ -324,12 +324,12 @@ namespace MapsInMyFolder.Commun
             }
             catch (Exception ex)
             {
-                Javascript.PrintError("Tile style load Layer : " + ex.Message, layerID);
+                Javascript.Functions.PrintError("Tile style load Layer : " + ex.Message, layerID);
                 return null;
             }
             if (string.IsNullOrEmpty(styleValueOrUrlOrPath))
             {
-                Javascript.PrintError("Tile style non défini", layerID);
+                Javascript.Functions.PrintError("Tile style non défini", layerID);
                 return null;
             }
 
@@ -400,7 +400,7 @@ namespace MapsInMyFolder.Commun
             }
             catch (Exception ex)
             {
-                Javascript.PrintError("Tile style : " + ex.Message, layerID);
+                Javascript.Functions.PrintError("Tile style : " + ex.Message, layerID);
             }
             return null;
         }

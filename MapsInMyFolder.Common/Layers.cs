@@ -54,7 +54,7 @@ namespace MapsInMyFolder.Commun
             this.class_hasscale = class_hasscale;
         }
 
-        public static Layers Curent = Layers.Empty();
+        public static Layers Current = Layers.Empty();
 
         public class SpecialsOptions
         {
@@ -111,12 +111,12 @@ namespace MapsInMyFolder.Commun
         {
             public static Layers CurentLayerToLayer()
             {
-                return GetLayerById(Curent.class_id);
+                return GetLayerById(Current.class_id);
             }
 
             public static void ToCurentLayer(Layers layer)
             {
-                Curent = (Layers)layer.MemberwiseClone();
+                Current = (Layers)layer.MemberwiseClone();
             }
         }
 
@@ -130,8 +130,7 @@ namespace MapsInMyFolder.Commun
                 {
                     if (layer_dic.Keys.First() == id)
                     {
-                        Layers layer_class = layer_dic[id];
-                        return layer_class;
+                        return layer_dic[id];
                     }
                 }
                 catch (KeyNotFoundException)

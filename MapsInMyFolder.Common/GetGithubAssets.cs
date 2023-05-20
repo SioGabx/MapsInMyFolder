@@ -214,20 +214,20 @@ namespace MapsInMyFolder.Commun
             {
                 TileGeneratorSettings.HttpClient.DefaultRequestHeaders.Add("If-None-Match", ETag);
             }
-            Commun.HttpResponse HttpResponse = Collectif.ByteDownloadUri(new Uri(url), 0, true).Result;
+            Commun.HttpResponse HttpResponse = Collectif.ByteDownloadUri(new Uri(url), 0, true)?.Result;
             if (TileGeneratorSettings.HttpClient.DefaultRequestHeaders.Contains("If-None-Match"))
             {
                 TileGeneratorSettings.HttpClient.DefaultRequestHeaders.Remove("If-None-Match");
             }
-
-            if (HttpResponse.ResponseMessage.IsSuccessStatusCode)
+          
+            if (HttpResponse?.ResponseMessage?.IsSuccessStatusCode == true)
             {
                 ETag = HttpResponse.ResponseMessage.Headers.TryGetValues("etag", out var values) ? values.FirstOrDefault() : null;
                 XMLParser.Cache.Write("ETag_" + filename, ETag);
             }
             else
             {
-                Debug.WriteLine(HttpResponse.ResponseMessage.StatusCode);
+                Debug.WriteLine(HttpResponse?.ResponseMessage?.StatusCode);
                 //if 301 not modified, then we have a cache version inside Settings.xml, else we try to fetch and give back null if not
                 return XMLParser.Cache.Read("GithubAsset_" + filename);
 

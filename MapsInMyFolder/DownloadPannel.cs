@@ -18,16 +18,14 @@ namespace MapsInMyFolder
         void DB_Download_Load()
         {
             DebugMode.WriteLine("Loading downloads");
-            SQLiteConnection conn = Database.DB_Connection();
-            if (conn is null)
+            if (Database.DB_Download_Init() == -1)
             {
                 return;
             }
-            Database.DB_Download_Init(conn);
-            SQLiteDataReader sqlite_datareader;
-            SQLiteCommand sqlite_cmd = conn.CreateCommand();
-            sqlite_cmd.CommandText = "SELECT * FROM 'DOWNLOADS' ORDER BY 'TIMESTAMP' ASC";
-            sqlite_datareader = sqlite_cmd.ExecuteReader();
+
+            DownloadClass.Clear();
+            string SelectCommandText = "SELECT * FROM 'DOWNLOADS' ORDER BY 'TIMESTAMP' ASC";
+            using var sqlite_datareader = Database.ExecuteExecuteReaderSQLCommand(SelectCommandText);
 
             while (sqlite_datareader.Read())
             {
@@ -70,7 +68,6 @@ namespace MapsInMyFolder
 
                     ScaleInfo SCALEINFO = System.Text.Json.JsonSerializer.Deserialize<ScaleInfo>(DB_Download_SCALEINFO, new System.Text.Json.JsonSerializerOptions() { IncludeFields = true });
 
-                    //List<Url_class> urls = Collectif.GetUrl.GetListOfUrlFromLocation(location, DB_Download_ZOOM, layers.class_tile_url, DB_Download_LAYER_ID, downloadid);
                     List<Url_class> urls = null;
                     CancellationTokenSource tokenSource2 = new CancellationTokenSource();
                     CancellationToken ct = tokenSource2.Token;
@@ -139,8 +136,6 @@ namespace MapsInMyFolder
                     Debug.WriteLine("fonction DB_Layer_Read : " + ex.Message);
                 }
             }
-
-            conn.Close();
         }
 
         public void Init_download_panel()
@@ -220,7 +215,7 @@ namespace MapsInMyFolder
                     }
                     else if (engine.state == Status.success)
                     {
-                        MainWindow.UpdateDownloadPanel(id, "Introuvable.", isimportant: true, state: Status.deleted);
+                        MainWindow.UpdateDownloadPanel(id, "Introuvable.", isImportant: true, state: Status.deleted);
                     }
                 }
                 else

@@ -57,7 +57,7 @@ namespace MapsInMyFolder.MapControl
             catch (System.NotSupportedException ex)
             {
                 Debug.WriteLine("Erreur, ce format d'image n'est pas supporté : " + ex.Message);
-                Commun.Javascript.PrintError("Erreur, ce format d'image n'est pas supporté - " + ex.Message);
+                Commun.Javascript.Functions.PrintError("Erreur, ce format d'image n'est pas supporté - " + ex.Message);
             }
             catch (System.Exception ex)
             {

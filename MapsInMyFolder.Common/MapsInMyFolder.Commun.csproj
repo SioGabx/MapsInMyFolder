@@ -177,6 +177,7 @@
     <Compile Include="Collectif.cs" />
     <Compile Include="Country.cs" />
     <Compile Include="DiffMatchPatch.cs" />
+    <Compile Include="JavascriptFunctions.cs" />
     <Compile Include="JSBeautify.cs" />
     <Compile Include="Map.cs" />
     <Compile Include="Database.cs" />

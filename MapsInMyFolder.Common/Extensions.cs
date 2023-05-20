@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net.Http.Headers;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -33,13 +34,50 @@ namespace MapsInMyFolder.Commun
             return new string(theChars);
         }
 
+        public static bool IsJson(this string source)
+        {
+            if (string.IsNullOrWhiteSpace(source))
+                return false;
+
+            source = source.Trim();
+
+            if ((source.StartsWith("{") && source.EndsWith("}")) || // Object
+                (source.StartsWith("[") && source.EndsWith("]")))   // Array
+            {
+                try
+                {
+                    Newtonsoft.Json.Linq.JToken.Parse(source);
+                    return true;
+                }
+                catch
+                {
+                    return false;
+                }
+            }
+
+            return false;
+        }
+
         public static void SetText(this TextBox textbox, string text)
         {
-            textbox.GetType().GetProperty("Text").SetValue(textbox, text, null);
+            textbox?.GetType().GetProperty("Text").SetValue(textbox, text, null);
         }
         public static void SetSelectedIndex(this ComboBox combobox, int index)
         {
             combobox.GetType().GetProperty("SelectedIndex").SetValue(combobox, index, null);
+        }
+
+        public static void AddChangeIfExist(this HttpRequestHeaders requestHeaders, string name, string value)
+        {
+            if (requestHeaders == null)
+            {
+                return;
+            }
+            if (requestHeaders.Contains(name))
+            {
+                requestHeaders.Remove(name);
+            }
+            requestHeaders.Add(name, value);
         }
 
         public static string RemoveNewLineChar(this string theString)

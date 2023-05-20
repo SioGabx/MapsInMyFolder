@@ -33,8 +33,9 @@ namespace MapsInMyFolder
                 Location NO_PIN_starting_location = new Location(Settings.NO_PIN_starting_location_latitude, Settings.NO_PIN_starting_location_longitude);
                 Location SE_PIN_starting_location = new Location(Settings.SE_PIN_starting_location_latitude, Settings.SE_PIN_starting_location_longitude);
 
-                mapSelectable = new MapSelectable(mapviewer, NO_PIN_starting_location, SE_PIN_starting_location, null, this);
-
+                mapSelectable = new MapSelectable(mapviewer, NO_PIN_starting_location, SE_PIN_starting_location, this);
+                //Disable event dispose on navigate beceause this is the main page
+                mapSelectable.DisposeElementsOnUnload = false;
                 Preload();
                 Init();
             }
@@ -76,7 +77,7 @@ namespace MapsInMyFolder
             {
                 try
                 {
-                    last_search = "";
+                    lastSearch = "";
                     SearchLayerStart();
                     layer_browser.Focus();
                 }
@@ -156,6 +157,7 @@ namespace MapsInMyFolder
             {
                 mapviewer.Center = new Location((Settings.NO_PIN_starting_location_latitude + Settings.SE_PIN_starting_location_latitude) / 2, (Settings.NO_PIN_starting_location_longitude + Settings.SE_PIN_starting_location_longitude) / 2);
                 mapviewer.ZoomLevel = Settings.map_defaut_zoom_level;
+                mapSelectable.OnLocationUpdated += OnLocationUpdated;
             }
             mapviewer.Background = new System.Windows.Media.SolidColorBrush(
                 System.Windows.Media.Color.FromArgb(255,
@@ -164,23 +166,23 @@ namespace MapsInMyFolder
                 (byte)Settings.background_layer_color_B)
             );
 
-            Action OnLocationUpdated = () =>
-            {
-                var ActiveRectangleSelection = mapSelectable.GetRectangleLocation();
-                NO_PIN.Location = ActiveRectangleSelection.NO;
-                SE_PIN.Location = ActiveRectangleSelection.SE;
-                Commun.Map.CurentSelection.NO_Latitude = ActiveRectangleSelection.NO.Latitude;
-                Commun.Map.CurentSelection.NO_Longitude = ActiveRectangleSelection.NO.Longitude;
-                Commun.Map.CurentSelection.SE_Latitude = ActiveRectangleSelection.SE.Latitude;
-                Commun.Map.CurentSelection.SE_Longitude = ActiveRectangleSelection.SE.Longitude;
-                if (Settings.visibility_pins == Visibility.Visible)
-                {
-                    NO_PIN.Content = "Latitude = " + Math.Round(NO_PIN.Location.Latitude, 6).ToString() + "\nLongitude = " + Math.Round(NO_PIN.Location.Longitude, 6).ToString();
-                    SE_PIN.Content = "Latitude = " + Math.Round(SE_PIN.Location.Latitude, 6).ToString() + "\nLongitude = " + Math.Round(SE_PIN.Location.Longitude, 6).ToString();
-                }
-            };
-            mapSelectable.OnLocationUpdated += (o, e) => OnLocationUpdated();
             OnLocationUpdated();
+        }
+
+        private void OnLocationUpdated(object sender = null, MapPolygon e = null)
+        {
+            var ActiveRectangleSelection = mapSelectable.GetRectangleLocation();
+            NO_PIN.Location = ActiveRectangleSelection.NO;
+            SE_PIN.Location = ActiveRectangleSelection.SE;
+            Commun.Map.CurentSelection.NO_Latitude = ActiveRectangleSelection.NO.Latitude;
+            Commun.Map.CurentSelection.NO_Longitude = ActiveRectangleSelection.NO.Longitude;
+            Commun.Map.CurentSelection.SE_Latitude = ActiveRectangleSelection.SE.Latitude;
+            Commun.Map.CurentSelection.SE_Longitude = ActiveRectangleSelection.SE.Longitude;
+            if (Settings.visibility_pins == Visibility.Visible)
+            {
+                NO_PIN.Content = "Latitude = " + Math.Round(NO_PIN.Location.Latitude, 6).ToString() + "\nLongitude = " + Math.Round(NO_PIN.Location.Longitude, 6).ToString();
+                SE_PIN.Content = "Latitude = " + Math.Round(SE_PIN.Location.Latitude, 6).ToString() + "\nLongitude = " + Math.Round(SE_PIN.Location.Longitude, 6).ToString();
+            }
         }
 
         public void MapViewerSetSelection(Dictionary<string, double> locations, bool ZoomToNewLocation = true)
@@ -262,7 +264,6 @@ namespace MapsInMyFolder
             storyboard.Begin();
             isAnimating = true;
         }
-
 
     }
 

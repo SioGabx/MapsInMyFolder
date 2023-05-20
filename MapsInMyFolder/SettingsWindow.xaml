@@ -16,7 +16,7 @@
     ui:TitleBar.IsBackButtonVisible="False"
     ui:TitleBar.Style="{DynamicResource AppTitleBarStyle}"
     ui:TitleBar.ButtonStyle="{DynamicResource AppTitleBarButtonStyle}"
-    ui:ThemeManager.RequestedTheme="Dark" Initialized="Window_Initialized" Loaded="Window_Loaded" Closing="Window_Closing" KeyDown="Window_KeyDown">
+    ui:ThemeManager.RequestedTheme="Dark" Loaded="Window_Loaded" Closing="Window_Closing" KeyDown="Window_KeyDown">
 
     <Window.Resources>
         <ResourceDictionary>

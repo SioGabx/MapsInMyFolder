@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -76,6 +77,11 @@ namespace MapsInMyFolder.Commun
             });
         }
 
+        public static Notification GetById(string NotificationId)
+        {
+            return ListOfNotificationsOnShow.FirstOrDefault(notif => notif.NotificationId == NotificationId);
+        }
+
         public static int Count()
         {
             return ListOfNotificationsOnShow.Count;
@@ -112,8 +118,9 @@ namespace MapsInMyFolder.Commun
 
                 if (OnClickCallback != null)
                 {
-                    ContentGrid.MouseLeftButtonUp += (_, __) =>
+                    ContentGrid.MouseLeftButtonUp += (s, o) =>
                     {
+                        o.Handled = true;
                         CloseCallback();
                         OnClickCallback();
                     };

@@ -22,7 +22,12 @@ namespace MapsInMyFolder.Commun
 
             try
             {
-                Uri uri = new Uri(Collectif.GetUrl.FromTileXYZ(urlBase, TileX, TileY, zoom, layerID, Collectif.GetUrl.InvokeFunction.getTile));
+                string url = Collectif.GetUrl.FromTileXYZ(urlBase, TileX, TileY, zoom, layerID, Collectif.GetUrl.InvokeFunction.getTile);
+                if (string.IsNullOrWhiteSpace(url))
+                {
+                    return HttpResponse.HttpResponseError;
+                }
+                Uri uri = new Uri(url);
                 return await Collectif.ByteDownloadUri(uri, layerID, true);
             }
             catch (Exception ex)

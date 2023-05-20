@@ -1,4 +1,5 @@
-﻿using MapsInMyFolder.Commun;
+﻿using ICSharpCode.AvalonEdit;
+using MapsInMyFolder.Commun;
 using Microsoft.Win32;
 using ModernWpf.Controls;
 using System;
@@ -21,36 +22,51 @@ namespace MapsInMyFolder
             InitializeComponent();
             TitleTextBox.Text = this.Title = "MapsInMyFolder - Settings";
 
-            tileloader_default_script.TextArea.Caret.CaretBrush = Collectif.HexValueToSolidColorBrush("#f18712");//rgb(241 135 18)
-            tileloader_template_script.TextArea.Caret.CaretBrush = Collectif.HexValueToSolidColorBrush("#f18712");//rgb(241 135 18)
-            tileloader_default_script.TextArea.Caret.PositionChanged += (_, _) => Collectif.TextEditorCursorPositionChanged(tileloader_default_script, SettingsGrid, SettingsScrollViewer, 100); ;
-            tileloader_template_script.TextArea.Caret.PositionChanged += (_, _) => Collectif.TextEditorCursorPositionChanged(tileloader_template_script, SettingsGrid, SettingsScrollViewer, 100); ;
-            ScrollViewerHelper.SetFixMouseWheel(Collectif.GetDescendantByType(tileloader_default_script, typeof(ScrollViewer)) as ScrollViewer, true);
-            ScrollViewerHelper.SetFixMouseWheel(Collectif.GetDescendantByType(tileloader_template_script, typeof(ScrollViewer)) as ScrollViewer, true);
+            SetCaretBrush(tileloader_default_script);
+            SetCaretBrush(tileloader_template_script);
+            SetTextEditorPositionChangedHandler(tileloader_default_script, 100);
+            SetTextEditorPositionChangedHandler(tileloader_template_script, 100);
+            SetFixMouseWheelBehavior(tileloader_default_script);
+            SetFixMouseWheelBehavior(tileloader_template_script);
 
-            MenuItem IndentermenuItem_tileloader_default_script = new MenuItem();
-            IndentermenuItem_tileloader_default_script.Header = "Indenter";
-            IndentermenuItem_tileloader_default_script.Icon = new ModernWpf.Controls.FontIcon() { Glyph = "\uE12F", Foreground = Collectif.HexValueToSolidColorBrush("#888989") };
-            IndentermenuItem_tileloader_default_script.Click += (sender, e) => Collectif.IndenterCode(sender, e, tileloader_default_script);
-            tileloader_default_script.ContextMenu.Items.Add(IndentermenuItem_tileloader_default_script);
+            AddContextMenuItems(tileloader_default_script, "Indenter");
+            AddContextMenuItems(tileloader_template_script, "Indenter");
 
-            MenuItem IndentermenuItem_tileloader_template_script = new MenuItem();
-            IndentermenuItem_tileloader_template_script.Header = "Indenter";
-            IndentermenuItem_tileloader_template_script.Icon = new ModernWpf.Controls.FontIcon() { Glyph = "\uE12F", Foreground = Collectif.HexValueToSolidColorBrush("#888989") };
-            IndentermenuItem_tileloader_template_script.Click += (sender, e) => Collectif.IndenterCode(sender, e, tileloader_template_script);
-            tileloader_template_script.ContextMenu.Items.Add(IndentermenuItem_tileloader_template_script);
-
-
-            tileloader_default_script.TextArea.Options.ConvertTabsToSpaces = true;
-            tileloader_default_script.TextArea.Options.IndentationSize = 4;
-            tileloader_template_script.TextArea.Options.ConvertTabsToSpaces = true;
-            tileloader_template_script.TextArea.Options.IndentationSize = 4;
+            SetTextAreaOptions(tileloader_default_script, true, 4);
+            SetTextAreaOptions(tileloader_template_script, true, 4);
         }
 
-        int DefaultValuesHachCode = 0;
-        private void Window_Initialized(object sender, EventArgs e) { }
+        private void SetCaretBrush(TextEditor textEditor)
+        {
+            textEditor.TextArea.Caret.CaretBrush = Collectif.HexValueToSolidColorBrush("#f18712");
+        }
 
+        private void SetTextEditorPositionChangedHandler(TextEditor textEditor, int scrollOffset)
+        {
+            textEditor.TextArea.Caret.PositionChanged += (_, _) => Collectif.TextEditorCursorPositionChanged(textEditor, SettingsGrid, SettingsScrollViewer, scrollOffset);
+        }
 
+        private void SetFixMouseWheelBehavior(TextEditor textEditor)
+        {
+            ScrollViewerHelper.SetFixMouseWheel(Collectif.GetDescendantByType(textEditor, typeof(ScrollViewer)) as ScrollViewer, true);
+        }
+
+        private void AddContextMenuItems(TextEditor textEditor, string header)
+        {
+            MenuItem indenterMenuItem = new MenuItem();
+            indenterMenuItem.Header = header;
+            indenterMenuItem.Icon = new ModernWpf.Controls.FontIcon() { Glyph = "\uE12F", Foreground = Collectif.HexValueToSolidColorBrush("#888989") };
+            indenterMenuItem.Click += (sender, e) => Collectif.IndenterCode(sender, e, textEditor);
+            textEditor.ContextMenu.Items.Add(indenterMenuItem);
+        }
+
+        private void SetTextAreaOptions(TextEditor textEditor, bool convertTabsToSpaces, int indentationSize)
+        {
+            textEditor.TextArea.Options.ConvertTabsToSpaces = convertTabsToSpaces;
+            textEditor.TextArea.Options.IndentationSize = indentationSize;
+        }
+
+        int DefaultValuesHachCode;
         void DoIScrollToElement(UIElement element, System.Windows.Input.MouseButtonEventArgs e)
         {
             if (e.LeftButton == System.Windows.Input.MouseButtonState.Released)
@@ -98,11 +114,7 @@ namespace MapsInMyFolder
         {
             foreach (Layers layer in Layers.GetLayersList())
             {
-                if (layer.class_id == -1)
-                {
-                    continue;
-                }
-                if (string.Equals(layer.class_format, "JPEG", StringComparison.InvariantCultureIgnoreCase))
+                if (layer.class_id != -1 && string.Equals(layer.class_format, "JPEG", StringComparison.InvariantCultureIgnoreCase))
                 {
                     int index = layer_startup_id.Items.Add(new NameHiddenIdValue(layer.class_id, layer.class_name));
                     if (layer.class_id == Settings.layer_startup_id)
@@ -139,13 +151,13 @@ namespace MapsInMyFolder
             layerpanel_favorite_at_top.IsChecked = Settings.layerpanel_favorite_at_top;
 
             //layerpanel_displaystyle
-            var ListDisplayTypeValues = (ListDisplayType[])Enum.GetValues(typeof(ListDisplayType));
-            for (int ListDisplayTypeValuesIndex = 0; ListDisplayTypeValuesIndex < ListDisplayTypeValues.Length; ListDisplayTypeValuesIndex++)
+            var listDisplayTypes = (ListDisplayType[])Enum.GetValues(typeof(ListDisplayType));
+            foreach (var displayType in listDisplayTypes)
             {
-                layerpanel_displaystyle.Items.Add(ListDisplayTypeValues[ListDisplayTypeValuesIndex].ToString().ToLowerInvariant().UcFirst());
-                if (ListDisplayTypeValues[ListDisplayTypeValuesIndex].ToString() == Settings.layerpanel_displaystyle.ToString())
+                layerpanel_displaystyle.Items.Add(displayType.ToString().ToLowerInvariant().UcFirst());
+                if (displayType.ToString() == Settings.layerpanel_displaystyle.ToString())
                 {
-                    layerpanel_displaystyle.SelectedIndex = ListDisplayTypeValuesIndex;
+                    layerpanel_displaystyle.SelectedIndex = Array.IndexOf(listDisplayTypes, displayType);
                 }
             }
 
@@ -202,67 +214,73 @@ namespace MapsInMyFolder
 
         public void UpdateLastUpdateSearch()
         {
-            string LastUpdateCheckDateTimeTick = Collectif.FilterDigitOnly(XMLParser.Cache.Read("LastUpdateCheck"), null, false, false);
-            string LastUpdateCheckDate = "/";
-            if (!string.IsNullOrEmpty(LastUpdateCheckDateTimeTick))
+            string lastUpdateCheckDateTimeTick = Collectif.FilterDigitOnly(XMLParser.Cache.Read("LastUpdateCheck"), null, false, false);
+            string lastUpdateCheckDate = "/";
+
+            if (!string.IsNullOrEmpty(lastUpdateCheckDateTimeTick))
             {
-                LastUpdateCheckDate = new DateTime(Convert.ToInt64(LastUpdateCheckDateTimeTick)).ToString("dd MMMM yyyy à H:mm:ss", CultureInfo.InstalledUICulture);
+                long tick = Convert.ToInt64(lastUpdateCheckDateTimeTick);
+                DateTime lastUpdateCheckDateTime = new DateTime(tick);
+                lastUpdateCheckDate = lastUpdateCheckDateTime.ToString("dd MMMM yyyy à H:mm:ss", CultureInfo.InstalledUICulture);
             }
-            Debug.WriteLine(LastUpdateCheckDateTimeTick);
-            searchForUpdatesLastUpdateCheck.Content = LastUpdateCheckDate;
+
+            Debug.WriteLine(lastUpdateCheckDateTimeTick);
+            searchForUpdatesLastUpdateCheck.Content = lastUpdateCheckDate;
         }
+
 
         private async void ResetSettings_Click(object sender, RoutedEventArgs e)
         {
-            var dialog = Message.SetContentDialog("Voullez-vous vraiment restaurer les paramètres par défaut ? Cette action est irréversible et entrainera un redémarrage de l'application!", "Confirmer", MessageDialogButton.YesCancel);
-            ContentDialogResult result = await dialog.ShowAsync();
+            var confirmDialog = Message.SetContentDialog("Voulez-vous vraiment restaurer les paramètres par défaut ? Cette action est irréversible et entraînera un redémarrage de l'application!", "Confirmer", MessageDialogButton.YesCancel);
+            ContentDialogResult result = await confirmDialog.ShowAsync();
+
             if (result == ContentDialogResult.Primary)
             {
                 try
                 {
-                    if (System.IO.File.Exists(Settings.SettingsPath()))
+                    string settingsPath = Settings.SettingsPath();
+
+                    if (System.IO.File.Exists(settingsPath))
                     {
-                        System.IO.File.Delete(Settings.SettingsPath());
+                        System.IO.File.Delete(settingsPath);
                     }
                 }
                 catch (Exception ex)
                 {
-                    dialog = Message.SetContentDialog("Echec de la suppression du fichier de paramètres. Erreur : " + ex.Message, "Erreur", MessageDialogButton.OK);
-                    await dialog.ShowAsync();
+                    var errorDialog = Message.SetContentDialog("Échec de la suppression du fichier de paramètres. Erreur : " + ex.Message, "Erreur", MessageDialogButton.OK);
+                    await errorDialog.ShowAsync();
                     return;
                 }
+
                 DefaultValuesHachCode = Collectif.CheckIfInputValueHaveChange(SettingsScrollViewer);
-                dialog = Message.SetContentDialog("MapsInMyFolder nécessite de redémarrer...\n Fermeture de l'application.", "Information", MessageDialogButton.OK);
-                await dialog.ShowAsync();
+
+                var infoDialog = Message.SetContentDialog("MapsInMyFolder nécessite de redémarrer...\nFermeture de l'application.", "Information", MessageDialogButton.OK);
+                await infoDialog.ShowAsync();
 
                 Collectif.RestartApplication();
             }
         }
+
         public void SaveSettings()
         {
-            //layer_startup_id = ;
-            NameHiddenIdValue layer_startup_idSelectedItem = (NameHiddenIdValue)layer_startup_id.SelectedItem;
-            if (layer_startup_idSelectedItem != null)
+            NameHiddenIdValue layerStartupIdSelectedItem = (NameHiddenIdValue)layer_startup_id.SelectedItem;
+            if (layerStartupIdSelectedItem != null)
             {
-                Settings.layer_startup_id = layer_startup_idSelectedItem.Id;
+                Settings.layer_startup_id = layerStartupIdSelectedItem.Id;
             }
 
-            //background_layer_opacity = ;
             Settings.background_layer_opacity = Convert.ToDouble(background_layer_opacity.Text.Replace("%", "").Trim()) / 100;
 
-            //background_layer_color_R = ;
-            //background_layer_color_G = ;
-            //background_layer_color_B =;
-            string hexvalue = background_layer_color.Text;
-            hexvalue = hexvalue.Replace("#", "");
-            int RGBint = Convert.ToInt32(hexvalue, 16);
-            byte Red = (byte)((RGBint >> 16) & 255);
-            byte Green = (byte)((RGBint >> 8) & 255);
-            byte Blue = (byte)(RGBint & 255);
+            string hexValue = background_layer_color.Text;
+            hexValue = hexValue.Replace("#", "");
+            int rgbInt = Convert.ToInt32(hexValue, 16);
+            byte red = (byte)((rgbInt >> 16) & 255);
+            byte green = (byte)((rgbInt >> 8) & 255);
+            byte blue = (byte)(rgbInt & 255);
 
-            Settings.background_layer_color_R = Red;
-            Settings.background_layer_color_G = Green;
-            Settings.background_layer_color_B = Blue;
+            Settings.background_layer_color_R = red;
+            Settings.background_layer_color_G = green;
+            Settings.background_layer_color_B = blue;
 
             Settings.working_folder = working_folder.Text;
             Settings.temp_folder = temp_folder.Text;
@@ -284,8 +302,8 @@ namespace MapsInMyFolder
             Settings.layerpanel_favorite_at_top = layerpanel_favorite_at_top.IsChecked ?? false;
             Settings.filter_layers_based_on_country = string.Join(';', PaysComboBox.SelectedValues("EnglishName"));
 
-            string layerpanel_displaystylevalue = layerpanel_displaystyle.SelectedValue.ToString().ToUpperInvariant();
-            Settings.layerpanel_displaystyle = (ListDisplayType)Enum.Parse(typeof(ListDisplayType), layerpanel_displaystylevalue);
+            string layerpanelDisplayStyleValue = layerpanel_displaystyle.SelectedValue.ToString().ToUpperInvariant();
+            Settings.layerpanel_displaystyle = (ListDisplayType)Enum.Parse(typeof(ListDisplayType), layerpanelDisplayStyleValue);
             Settings.NO_PIN_starting_location_latitude = Convert.ToDouble(NO_PIN_starting_location_latitude.Text);
             Settings.NO_PIN_starting_location_longitude = Convert.ToDouble(NO_PIN_starting_location_longitude.Text);
             Settings.SE_PIN_starting_location_latitude = Convert.ToDouble(SE_PIN_starting_location_latitude.Text);
@@ -301,14 +319,8 @@ namespace MapsInMyFolder
             Settings.search_database_update_on_startup = search_database_update_on_startup.IsChecked ?? false;
             Settings.layers_Sort = string.Join(',', layersSort.SelectedValues());
 
-            if (visibility_pins.IsChecked ?? false)
-            {
-                Settings.visibility_pins = Visibility.Visible;
-            }
-            else
-            {
-                Settings.visibility_pins = Visibility.Hidden;
-            }
+            Settings.visibility_pins = (visibility_pins.IsChecked ?? false) ? Visibility.Visible : Visibility.Hidden;
+
             Settings.selection_rectangle_resize_tblr_gap = Convert.ToInt32(selection_rectangle_resize_tblr_gap.Text);
             Settings.selection_rectangle_resize_angle_gap = Convert.ToInt32(selection_rectangle_resize_angle_gap.Text);
             Settings.map_show_tile_border = map_show_tile_border.IsChecked ?? false;
@@ -317,25 +329,25 @@ namespace MapsInMyFolder
 
             string actualSettingsPath = Settings.SettingsPath();
             string newSettingsPath = Settings.SettingsPath(true);
-            if (actualSettingsPath != newSettingsPath)
+            if (actualSettingsPath != newSettingsPath && System.IO.File.Exists(actualSettingsPath))
             {
-                if (System.IO.File.Exists(actualSettingsPath))
-                {
-                    System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(newSettingsPath));
-                    System.IO.File.Copy(actualSettingsPath, newSettingsPath);
-                }
+                System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(newSettingsPath));
+                System.IO.File.Copy(actualSettingsPath, newSettingsPath);
             }
 
             Settings.SaveSettings();
         }
+
         private async void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            int ValuesHachCode = Collectif.CheckIfInputValueHaveChange(SettingsScrollViewer);
+            int valuesHashCode = Collectif.CheckIfInputValueHaveChange(SettingsScrollViewer);
             ContentDialogResult result = ContentDialogResult.None;
-            if (DefaultValuesHachCode != ValuesHachCode)
+
+            if (DefaultValuesHachCode != valuesHashCode)
             {
                 e.Cancel = true;
-                var dialog = Message.SetContentDialog("Voullez-vous enregistrer vos modifications ? Les modifications non enregistrée seront perdues.", "Confirmer", MessageDialogButton.YesNo);
+                var dialog = Message.SetContentDialog("Voulez-vous enregistrer vos modifications ? Les modifications non enregistrées seront perdues.", "Confirmer", MessageDialogButton.YesNo);
+
                 try
                 {
                     result = await dialog.ShowAsync();
@@ -345,13 +357,14 @@ namespace MapsInMyFolder
                     Debug.WriteLine(ex.ToString());
                 }
             }
+
             if (result == ContentDialogResult.Primary)
             {
-                //enregistrement
+                // Enregistrement
                 SaveSettings();
 
-                //Want to restart ?
-                var dialog = Message.SetContentDialog("Un redémarrage de l'application est recommandé. Voullez-vous redemarrer MapsInMyFolder ?\nSans redémarrage, la redéfinition de certains parametres peut entrainer certaines instabilitées.", "Information", MessageDialogButton.YesNo);
+                // Redémarrer ?
+                var dialog = Message.SetContentDialog("Un redémarrage de l'application est recommandé. Voulez-vous redémarrer MapsInMyFolder ?\nSans redémarrage, la redéfinition de certains paramètres peut entraîner certaines instabilités.", "Information", MessageDialogButton.YesNo);
                 ContentDialogResult result2 = await dialog.ShowAsync();
 
                 if (result2 == ContentDialogResult.Primary)
@@ -360,31 +373,28 @@ namespace MapsInMyFolder
                 }
                 else if (result2 == ContentDialogResult.Secondary)
                 {
-                    //if user dont want to restart
-                    DefaultValuesHachCode = ValuesHachCode;
+                    // Si l'utilisateur ne souhaite pas redémarrer
+                    DefaultValuesHachCode = valuesHashCode;
                     MainWindow.RefreshAllPanels();
                     this.Close();
                     return;
                 }
                 else
                 {
-                    //if user ESCAPE
+                    // Si l'utilisateur appuie sur ÉCHAP
                     return;
                 }
-
             }
             else if (result == ContentDialogResult.Secondary)
             {
-                DefaultValuesHachCode = ValuesHachCode;
+                DefaultValuesHachCode = valuesHashCode;
                 this.Close();
             }
             else
             {
-                //if user ESCAPE
+                // Si l'utilisateur appuie sur ÉCHAP
                 return;
             }
-
-
         }
 
         private void FilterDigitTextBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -396,7 +406,7 @@ namespace MapsInMyFolder
         {
             if (e.Key == System.Windows.Input.Key.S && System.Windows.Input.Keyboard.Modifiers == System.Windows.Input.ModifierKeys.Control)
             {
-                //CTRL + S
+                // CTRL + S
                 SaveSettings();
                 MainWindow.RefreshAllPanels();
                 DefaultValuesHachCode = Collectif.CheckIfInputValueHaveChange(SettingsScrollViewer);
@@ -407,12 +417,12 @@ namespace MapsInMyFolder
         {
             searchForUpdates.IsEnabled = false;
             searchForUpdatesLastUpdateCheck.Content = "Recherche en cours...";
-            bool IsNewerDatabaseVersionAvailableOnGithub = await Database.CheckIfNewerVersionAvailable();
-            bool IsNewerApplicationVersionAvailableOnGithub = await Update.CheckIfNewerVersionAvailableOnGithub();
+            bool isNewerDatabaseVersionAvailableOnGithub = await Database.CheckIfNewerVersionAvailable();
+            bool isNewerApplicationVersionAvailableOnGithub = await Update.CheckIfNewerVersionAvailableOnGithub();
             searchForUpdates.IsEnabled = true;
             UpdateLastUpdateSearch();
 
-            if (IsNewerApplicationVersionAvailableOnGithub)
+            if (isNewerApplicationVersionAvailableOnGithub)
             {
                 Notification.ListOfNotificationsOnShow.ToList().ForEach(notification => notification.Remove());
                 Update.StartUpdating();
@@ -426,71 +436,68 @@ namespace MapsInMyFolder
 
         private void SettingsScrollViewer_ScrollChanged(object sender, ScrollChangedEventArgs e)
         {
-            if (!IsInitialized) { return; }
-            List<(StackPanel, Grid)> ListOfSubMenu = new List<(StackPanel, Grid)>()
-            {
-                (CalqueSettings, MenuItem_Calque),
-                (TelechargementSettings, MenuItem_Telechargement),
-                (CarteSettings, MenuItem_Carte),
-                (AvanceSettings, MenuItem_Avance),
-                (UpdateSettings, MenuItem_Update),
-                (AProposSettings, MenuItem_APropos)
-            };
-            ListOfSubMenu.Reverse();
+            if (!IsInitialized)
+                return;
+
+            List<(StackPanel SettingsPanel, Grid MenuLabel)> ListOfSubMenu = new List<(StackPanel, Grid)>()
+    {
+        (CalqueSettings, MenuItem_Calque),
+        (TelechargementSettings, MenuItem_Telechargement),
+        (CarteSettings, MenuItem_Carte),
+        (AvanceSettings, MenuItem_Avance),
+        (UpdateSettings, MenuItem_Update),
+        (AProposSettings, MenuItem_APropos)
+    };
+
             const int Margin = 100;
             foreach ((StackPanel SettingsPanel, Grid MenuLabel) item in ListOfSubMenu)
             {
                 var UIElementPosition = item.SettingsPanel.TranslatePoint(new Point(0, 0), SettingsScrollViewer).Y;
+
                 if (UIElementPosition - Margin <= 0 && UIElementPosition > -(item.SettingsPanel.ActualHeight - Margin))
-                {
-                    item.MenuLabel.Style = this.Resources["GridInViewNormalStyle"] as Style;
-                }
+                    item.MenuLabel.Style = (Style)this.Resources["GridInViewNormalStyle"];
                 else
-                {
-                    item.MenuLabel.Style = this.Resources["GridSelectNormalStyle"] as Style;
-                }
+                    item.MenuLabel.Style = (Style)this.Resources["GridSelectNormalStyle"];
             }
         }
 
         private void databaseExport_Click(object sender, RoutedEventArgs e)
         {
+            SaveFileDialog DatabasesaveFileDialog = new SaveFileDialog
+            {
+                Filter = "SQL database |*.db|Text|*.txt",
+                DefaultExt = "db",
+                FileName = "exported_database.db",
+                CheckPathExists = true,
+                AddExtension = true,
+                RestoreDirectory = true,
+                ValidateNames = true,
+                Title = "Export de la base de donnée"
+            };
 
-            SaveFileDialog DatabasesaveFileDialog = new SaveFileDialog();
-            DatabasesaveFileDialog.Filter = "SQL database |*.db|Text|*.txt";
-            DatabasesaveFileDialog.DefaultExt = "db";
-            DatabasesaveFileDialog.FileName = "exported_database.db";
-            DatabasesaveFileDialog.CheckPathExists = true;
-            DatabasesaveFileDialog.AddExtension = true;
-            DatabasesaveFileDialog.RestoreDirectory = true;
-            DatabasesaveFileDialog.ValidateNames = true;
-            DatabasesaveFileDialog.Title = "Export de la base de donnée";
             if (DatabasesaveFileDialog.ShowDialog() == true)
             {
                 try
                 {
                     Database.Export(DatabasesaveFileDialog.FileName);
+                    Process.Start("explorer.exe", "/select,\"" + DatabasesaveFileDialog.FileName + "\"");
                 }
                 catch (Exception ex)
                 {
                     Message.NoReturnBoxAsync("Une erreur s'est produite lors de l'export du fichier. " + ex.Message, "Erreur");
                 }
-
-            }
-            if (System.IO.File.Exists(DatabasesaveFileDialog.FileName))
-            {
-                Process.Start("explorer.exe", "/select,\"" + DatabasesaveFileDialog.FileName + "\"");
             }
             else
             {
                 Message.NoReturnBoxAsync("Une erreur inconnue s'est produite lors de l'export du fichier", "Erreur");
             }
-
         }
 
         private void openAvancedEditor_Click(object sender, RoutedEventArgs e)
         {
-            var DataGridEditor = new DataGridEditor();
+            DataGridEditor DataGridEditor = new DataGridEditor();
             DataGridEditor.Show();
         }
+
     }
 }

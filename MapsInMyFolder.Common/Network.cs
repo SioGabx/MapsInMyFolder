@@ -58,7 +58,8 @@ namespace MapsInMyFolder.Commun
         private static bool _FastIsNetworkAvailable = true;
         public static bool FastIsNetworkAvailable()
         {
-            return _FastIsNetworkAvailable;
+                return _FastIsNetworkAvailable;
+
         }
 
         private static readonly object NetworkWatcherLocker = new object();
@@ -78,7 +79,7 @@ namespace MapsInMyFolder.Commun
                             do
                             {
                                 Thread.Sleep(1000);
-                                //Debug.WriteLine("Waiting 100ms, NetworkNotAvailable");
+                                System.Diagnostics.Debug.WriteLine("Waiting 100ms, NetworkNotAvailable");
                             } while (!IsNetworkAvailable());
                             NetworkWatcherIsRunning = false;
                             IsNetworkNowAvailable(null, EventArgs.Empty);
