@@ -136,52 +136,46 @@ namespace MapsInMyFolder.Commun
 
             public static Dictionary<string, Dictionary<string, double>> GetSelection()
             {
-                var ReturnDic = new Dictionary<string, Dictionary<string, double>>
-            {
+                return new Dictionary<string, Dictionary<string, double>>
                 {
-                    "SE",
-                    new Dictionary<string, double>() {
-            {"lat",Map.CurentSelection.SE_Latitude },
-            {"long",Map.CurentSelection.SE_Longitude }
-            }
-                },
-
-                {
-                    "NO",
-                    new Dictionary<string, double>() {
-            {"lat",Map.CurentSelection.NO_Latitude },
-            {"long",Map.CurentSelection.NO_Longitude }
-            }
-                }
-            };
-
-                return ReturnDic;
+                    {
+                        "SE",
+                        new Dictionary<string, double>() {
+                            {"lat",Map.CurentSelection.SE_Latitude },
+                            {"long",Map.CurentSelection.SE_Longitude }
+                        }
+                    },
+                    {
+                        "NO",
+                        new Dictionary<string, double>() {
+                            {"lat",Map.CurentSelection.NO_Latitude },
+                            {"long",Map.CurentSelection.NO_Longitude }
+                        }
+                    }
+                };
             }
 
             public static Dictionary<string, int> CoordonneesToTile(object latitude, object longitude, object zoom)
             {
                 int Intzoom = Convert.ToInt32(zoom);
                 var TilesNumber = Collectif.CoordonneesToTile((double)latitude, (double)longitude, Intzoom);
-                Dictionary<string, int> returnTileNumber = new Dictionary<string, int>()
-            {
-                { "x",  TilesNumber.X },
-                { "y",  TilesNumber.Y },
-                { "z",  Intzoom }
-            };
-                return returnTileNumber;
-                //return returnTileNumber;
+                return new Dictionary<string, int>()
+                {
+                    { "x",  TilesNumber.X },
+                    { "y",  TilesNumber.Y },
+                    { "z",  Intzoom }
+                };
             }
             public static Dictionary<string, double> TileToCoordonnees(object TileX, object TileY, object zoom)
             {
                 int Intzoom = Convert.ToInt32(zoom);
                 var LocationNumber = Collectif.TileToCoordonnees(Convert.ToInt32(TileX), Convert.ToInt32(TileY), Intzoom);
-                Dictionary<string, double> returnLocationNumber = new Dictionary<string, double>()
-            {
-                { "long",  LocationNumber.Latitude },
-                { "lat",  LocationNumber.Longitude },
-                { "z",  Intzoom}
-            };
-                return returnLocationNumber;
+                return new Dictionary<string, double>()
+                {
+                    { "long",  LocationNumber.Latitude },
+                    { "lat",  LocationNumber.Longitude },
+                    { "z",  Intzoom}
+                };
             }
 
             private static string ConvertJSObjectToString(object supposedString)
@@ -238,8 +232,8 @@ namespace MapsInMyFolder.Commun
                         var (textBox, dialog) = Message.SetInputBoxDialog(texte, caption);
                         dialog.Closed += (_, __) =>
                         {
-                        // stops the frame
-                        frame.Continue = false;
+                            // stops the frame
+                            frame.Continue = false;
                         };
                         dialog.ShowAsync();
                         return textBox;
@@ -266,7 +260,7 @@ namespace MapsInMyFolder.Commun
                         dialog.Closed += (_, __) =>
                         {
                             frame.Continue = false; // stops the frame
-                    };
+                        };
                         dialog.ShowAsync();
                     }));
                     Dispatcher.PushFrame(frame);

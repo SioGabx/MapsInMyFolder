@@ -804,9 +804,7 @@ namespace MapsInMyFolder
         public int DeleteUnusedRectangles()
         {
             int numberOfUnusedRectangleDeleted = 0;
-            MapPolygon[] tempList = Rectangles.ToArray();
-
-            foreach (MapPolygon rectangle in tempList)
+            foreach (MapPolygon rectangle in Rectangles.ToArray())
             {
                 var locations = GetRectangleLocation(rectangle);
                 if (locations.NO.Latitude == 0 && locations.NO.Longitude == 0 && locations.SE.Latitude == 0 && locations.SE.Longitude == 0)
@@ -1198,9 +1196,5 @@ namespace MapsInMyFolder
             }
             UpdateVisualCursor(e);
         }
-
     }
-
-
-
 }

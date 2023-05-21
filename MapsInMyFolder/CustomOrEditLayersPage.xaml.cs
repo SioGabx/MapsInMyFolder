@@ -32,7 +32,6 @@ namespace MapsInMyFolder
             InitializeComponent();
             IsInDebugModeSwitch.IsChecked = IsInDebugModeArchive;
             LayerId = Settings.layer_startup_id;
-
         }
 
         public static MapFigures MapFigures;
@@ -82,7 +81,6 @@ namespace MapsInMyFolder
             var keyeventHandler = new KeyEventHandler(TextboxLayerScriptConsoleSender_KeyDown);
             TextboxLayerScriptConsoleSender.AddHandler(PreviewKeyDownEvent, keyeventHandler, handledEventsToo: true);
 
-
             MenuItem clearConsoleMenuItem = new MenuItem();
             clearConsoleMenuItem.Header = "Effacer";
             clearConsoleMenuItem.Icon = new ModernWpf.Controls.FontIcon() { Glyph = "\uE127", Foreground = Collectif.HexValueToSolidColorBrush("#888989") };
@@ -94,7 +92,6 @@ namespace MapsInMyFolder
             helpConsoleMenuItem.Icon = new ModernWpf.Controls.FontIcon() { Glyph = "\uE11B", Foreground = Collectif.HexValueToSolidColorBrush("#888989") };
             helpConsoleMenuItem.Click += (sender, e) => { Javascript.Functions.Help(-2); TextboxLayerScriptConsole.ScrollToEnd(); };
             TextboxLayerScriptConsole.ContextMenu.Items.Add(helpConsoleMenuItem);
-
 
             TextboxLayerScript.TextArea.Caret.CaretBrush = Collectif.HexValueToSolidColorBrush("#f18712");//rgb(241 135 18)
             TextboxRectangles.TextArea.Caret.CaretBrush = Collectif.HexValueToSolidColorBrush("#f18712");//rgb(241 135 18)
@@ -166,6 +163,7 @@ namespace MapsInMyFolder
             List<string> Categories = new List<string>();
             List<string> Site = new List<string>();
             List<string> SiteUrl = new List<string>();
+
             foreach (MapsInMyFolder.Commun.Layers layer in Layers.GetLayersList())
             {
                 if (layer.class_id < 0)
@@ -282,7 +280,6 @@ namespace MapsInMyFolder
             PaysComboBox.SelectedItems = SelectedCountries;
             has_scale.IsChecked = LayerInEditMode.class_hasscale;
             Collectif.setBackgroundOnUIElement(mapviewerappercu, LayerInEditMode?.class_specialsoptions?.BackgroundColor);
-
         }
 
         void putScriptTemplate(ICSharpCode.AvalonEdit.TextEditor textBox)
@@ -318,7 +315,6 @@ namespace MapsInMyFolder
             }
             try
             {
-
                 Javascript.JavascriptInstance.Logs = String.Empty;
                 if (string.IsNullOrEmpty(url) && !string.IsNullOrEmpty(TextboxLayerTileUrl.Text))
                 {
@@ -367,7 +363,7 @@ namespace MapsInMyFolder
             }
             catch (Exception ex)
             {
-                DebugMode.WriteLine(ex.Message);
+                Debug.WriteLine(ex.Message);
             }
         }
 
@@ -436,8 +432,8 @@ namespace MapsInMyFolder
             SetAppercuLayers(forceUpdate: true);
         }
 
-        Boolean HasErrorZoomLevelMinZoom = false;
-        Boolean HasErrorZoomLevelMaxZoom = false;
+        bool HasErrorZoomLevelMinZoom = false;
+        bool HasErrorZoomLevelMaxZoom = false;
         void DisableButtonOnError()
         {
             if (!string.IsNullOrEmpty(TextBoxLayerMaxZoom.Text) && !string.IsNullOrEmpty(TextBoxLayerMinZoom.Text))
@@ -518,7 +514,6 @@ namespace MapsInMyFolder
             try
             {
                 string text = textBox.Text;
-
                 if (!string.IsNullOrEmpty(text))
                 {
                     number = Convert.ToInt32(text);
@@ -889,23 +884,6 @@ namespace MapsInMyFolder
                 MainPage._instance.ReloadPage();
             }
         }
-        /*
-          DisposeElementOnLeave();
-            SaveLayer();
-            MainPage.ClearCache(LayerId, false);
-            Javascript.EngineStopAll();
-            Settings.map_show_tile_border = ShowTileBorderArchive;
-            Settings.is_in_debug_mode = IsInDebugModeArchive;
-            MainWindow._instance.FrameBack();
-            Javascript.EngineClearList();
-            MainPage._instance.ReloadPage();
-            if (Layers.Current.class_id == LayerId)
-            {
-
-                MainPage._instance.Set_current_layer(Layers.Current.class_id);
-            }
-        */
-
 
         private void ClickableLabel_MouseEnter(object sender, MouseEventArgs e)
         {
@@ -943,7 +921,6 @@ namespace MapsInMyFolder
                     Settings.is_in_debug_mode = IsInDebugModeArchive;
                     Settings.map_show_tile_border = ShowTileBorderArchive;
                     Javascript.EngineStopAll();
-                    
                     Database.ExecuteNonQuerySQLCommand("DELETE FROM EDITEDLAYERS WHERE ID=" + LayerId);
                     MainPage._instance.ReloadPage();
                     Javascript.EngineClearList();
@@ -1222,8 +1199,7 @@ namespace MapsInMyFolder
         {
             int ZoomLevel = Convert.ToInt32(Math.Floor(mapviewerappercu.ZoomLevel));
             var TileNumber = Collectif.CoordonneesToTile(mapviewerappercu.Center.Latitude, mapviewerappercu.Center.Longitude, ZoomLevel);
-            string Url = Collectif.GetUrl.FromTileXYZ(TextboxLayerTileUrl.Text, TileNumber.X, TileNumber.Y, ZoomLevel, -2, invokeFunction);
-            return Url;
+            return Collectif.GetUrl.FromTileXYZ(TextboxLayerTileUrl.Text, TileNumber.X, TileNumber.Y, ZoomLevel, -2, invokeFunction);
         }
 
         private void SetPreviewUrl_Click(object sender, RoutedEventArgs e)
@@ -1247,12 +1223,10 @@ namespace MapsInMyFolder
             int ZoomLevel = Convert.ToInt32(Math.Floor(mapviewerappercu.ZoomLevel));
             var TileNumber = Collectif.CoordonneesToTile(mapviewerappercu.Center.Latitude, mapviewerappercu.Center.Longitude, ZoomLevel);
             var ValuesDictionary = Collectif.GetUrl.CallFunctionAndGetResult(TileUrl, TileComputationScript, TileNumber.X, TileNumber.Y, ZoomLevel, -2, Collectif.GetUrl.InvokeFunction.getTile);
-
             string functionContent = $"\nfunction {invokeFunction}(args){{";
             foreach (var Key in ValuesDictionary.ResultCallValue.Keys)
             {
                 var Value = ValuesDictionary.ResultCallValue[Key];
-
                 bool stringUrlContainsKeyReplacement = TileUrl.Contains("{" + Key + "}");
                 bool IsInsideDefaultCallContainsKey = ValuesDictionary.DefaultCallValue.ContainsKey(Key);
                 bool IsInsideDefaultCallButHaveChange = false;

@@ -50,7 +50,6 @@ namespace MapsInMyFolder.Commun
             return getListFromEnglishName(new string[] { EnglishName });
         }
 
-
         private static string getCountryFromCultureName(string Name)
         {
             string resultString = Regex.Match(Name, @"(?<=\().+?(?=\))", RegexOptions.RightToLeft).Value;

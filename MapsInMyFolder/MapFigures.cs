@@ -136,7 +136,6 @@ namespace MapsInMyFolder
 
                 yield return new Figure(rectangle, name, NO, SE, MinZoom, MaxZoom, StrokeThickness, color);
             }
-
         }
 
         public void DrawFigureOnMapItemsControlFromJsonString(MapItemsControl mapviewerRectangles, string figuresJsonString, double zoomLevel)

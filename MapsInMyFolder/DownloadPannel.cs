@@ -375,7 +375,6 @@ namespace MapsInMyFolder
                     }
                     catch (Exception ex)
                     {
-                        //MessageBox.Show(ex.Message);
                         Message.NoReturnBoxAsync(ex.Message, "Erreur");
                     }
                 }, null);
@@ -446,7 +445,6 @@ namespace MapsInMyFolder
                 }
                 catch (Exception ex)
                 {
-                    //MessageBox.Show(ex.Message);
                     Message.NoReturnBoxAsync(ex.Message, "Erreur");
                 }
             }, null);
@@ -465,7 +463,6 @@ namespace MapsInMyFolder
                 }
                 catch (Exception ex)
                 {
-                    //MessageBox.Show(ex.Message);
                     Message.NoReturnBoxAsync(ex.Message, "Erreur");
                 }
             }, null);
@@ -479,12 +476,10 @@ namespace MapsInMyFolder
             {
                 try
                 {
-                    //MainPage._instance.Set_current_layer(engine.layerid);
                     MainPage._instance.layer_browser.GetMainFrame().EvaluateScriptAsync("selectionner_calque_by_id(" + engine.layerid + ")");
                 }
                 catch (Exception ex)
                 {
-                    //MessageBox.Show(ex.Message);
                     Message.NoReturnBoxAsync(ex.Message, "Erreur");
                 }
             }, null);
@@ -504,23 +499,20 @@ namespace MapsInMyFolder
                 Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)async delegate
                 {
                     Download_stop(id_int);
-                    //var result = await dialog.ShowAsync();
                     var result = await Message.SetContentDialog("Voullez-vous annuler et supprimer le téléchargement de " + engine.file_name + " ? ", "Supprimer le téléchargement", MessageDialogButton.YesNo).ShowAsync();
                     if (result == ContentDialogResult.Primary)
                     {
                         try
                         {
-                            if (MainWindow._instance.MainPage.download_panel_browser is null) { return; }
                             if (RunningState.Contains(engineinitialstate))
                             {
                                 Download_cancel(id_int);
                             }
 
-                            MainWindow._instance.MainPage.download_panel_browser.ExecuteScriptAsync("download_js_delete_db(" + id_int.ToString() + ");");
+                            MainWindow._instance?.MainPage?.download_panel_browser?.ExecuteScriptAsync("download_js_delete_db(" + id_int.ToString() + ");");
                         }
                         catch (Exception ex)
                         {
-                            //MessageBox.Show(ex.Message);
                             Message.NoReturnBoxAsync(ex.Message, "Erreur");
                         }
                     }
@@ -535,7 +527,7 @@ namespace MapsInMyFolder
             }
             else
             {
-                MainWindow._instance.MainPage.download_panel_browser.ExecuteScriptAsync("download_js_delete_db(" + id_int.ToString() + ");");
+                MainWindow._instance?.MainPage?.download_panel_browser?.ExecuteScriptAsync("download_js_delete_db(" + id_int.ToString() + ");");
             }
         }
     }

@@ -108,9 +108,7 @@ namespace MapsInMyFolder.Commun
                     }
                 }
                 return (null, null);
-
             }
-
 
             public static string FromTileXYZ(string urlbase, int Tilex, int Tiley, int z, int LayerID, InvokeFunction InvokeFunction)
             {
@@ -219,7 +217,6 @@ namespace MapsInMyFolder.Commun
                         int tuileY = NO_y + Download_Y_tile;
                         string url_to_add_inside_list = FromTileXYZ(urlbase, tuileX, tuileY, z, LayerID, InvokeFunction.getTile);
                         list_of_url_to_download.Add(new Url_class(url_to_add_inside_list, tuileX, tuileY, z, Status.waitfordownloading, downloadid));
-                        DebugMode.WriteLine("Need to download tuileX:" + tuileX + " tuileY:" + tuileY);
                         List<int> next_num_list = NextNumberFromPara(Download_X_tile, Download_Y_tile, max_x, max_y);
                         Download_X_tile = next_num_list[0];
                         Download_Y_tile = next_num_list[1];
@@ -240,9 +237,8 @@ namespace MapsInMyFolder.Commun
 
         public static void GetAllManifestResourceNames()
         {
-            Assembly assembly = Assembly.GetEntryAssembly();
             //get assembly ManifestResourceNames
-            Debug.WriteLine("get assembly ManifestResourceNames");
+            Assembly assembly = Assembly.GetEntryAssembly();
             for (int i = 0; i < assembly.GetManifestResourceNames().Length; i++)
             {
                 string name = assembly.GetManifestResourceNames()[i];
@@ -323,7 +319,7 @@ namespace MapsInMyFolder.Commun
 
         public static SolidColorBrush RgbValueToSolidColorBrush(int R, int G, int B)
         {
-            return new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(255, (byte)R, (byte)G, (byte)B));
+            return new SolidColorBrush(System.Windows.Media.Color.FromArgb(255, (byte)R, (byte)G, (byte)B));
         }
 
         public static ScrollViewer FormatDiffGetScrollViewer(string texteBase, string texteModif)
@@ -349,17 +345,20 @@ namespace MapsInMyFolder.Commun
 
         public static TextBlock FormatDiff(string texteBase, string texteModif)
         {
-            DiffMatchPatch dmp = new DiffMatchPatch();
-            dmp.Diff_Timeout = 0;
+            DiffMatchPatch dmp = new DiffMatchPatch()
+            {
+                Diff_Timeout = 0
+            };
+
             TextBlock ContentTextBlock = new TextBlock()
             {
                 TextWrapping = TextWrapping.WrapWithOverflow,
-                Foreground = Collectif.HexValueToSolidColorBrush("#FFE2E2E1"),
+                Foreground = HexValueToSolidColorBrush("#FFE2E2E1"),
                 TextAlignment = TextAlignment.Justify
             };
             List<Diff> diffs = dmp.diff_main(texteBase, texteModif);
-            SolidColorBrush BackgroundGreen = Collectif.HexValueToSolidColorBrush("#6b803f");
-            SolidColorBrush BackgroundRed = Collectif.HexValueToSolidColorBrush("#582e2e");
+            SolidColorBrush BackgroundGreen = HexValueToSolidColorBrush("#6b803f");
+            SolidColorBrush BackgroundRed = HexValueToSolidColorBrush("#582e2e");
             foreach (var diff in diffs)
             {
                 SolidColorBrush curentBrush = Brushes.Transparent;
@@ -386,14 +385,13 @@ namespace MapsInMyFolder.Commun
             SolidColorBrush brush;
             if (string.IsNullOrEmpty(hexcolor?.Trim()))
             {
-                brush = Collectif.RgbValueToSolidColorBrush(Settings.background_layer_color_R, Settings.background_layer_color_G, Settings.background_layer_color_B); ;
+                brush = RgbValueToSolidColorBrush(Settings.background_layer_color_R, Settings.background_layer_color_G, Settings.background_layer_color_B); ;
             }
             else
             {
-                brush = Collectif.HexValueToSolidColorBrush(hexcolor);
+                brush = HexValueToSolidColorBrush(hexcolor);
             }
 
-            //element.GetType().GetProperty("Background").GetValue(element);
             element.GetType().GetProperty("Background").SetValue(element, brush);
 
         }
@@ -409,7 +407,7 @@ namespace MapsInMyFolder.Commun
             {
                 settings_temp_folder = temp_folder;
             }
-            //Debug.WriteLine(settings_temp_folder);
+
             string nom_charclean = string.Concat(nom.Split(Path.GetInvalidFileNameChars()));
             string chemin = Path.Combine(settings_temp_folder, "layers", nom_charclean + "_" + identifiant + "\\");
             if (zoom != -1)
@@ -452,11 +450,10 @@ namespace MapsInMyFolder.Commun
                 {
                     BitmapErrorsMessage = "Null response";
                 }
-
             }
             else
             {
-                BitmapErrorsMessage = (((int)httpResponse?.ResponseMessage?.StatusCode).ToString() + " - " + httpResponse?.ResponseMessage?.ReasonPhrase);
+                BitmapErrorsMessage = $"{(int)httpResponse?.ResponseMessage?.StatusCode} - {httpResponse?.ResponseMessage?.ReasonPhrase}";
             }
 
             return GetEmptyImageBufferFromText(BitmapErrorsMessage);
@@ -469,23 +466,14 @@ namespace MapsInMyFolder.Commun
             const int border_tile_size = tile_size - (border_size * 2);
             const string format = "jpeg";
             var color = new double[] { Settings.background_layer_color_R, Settings.background_layer_color_G, Settings.background_layer_color_B };
-            NetVips.VOption saveVOption = getSaveVOption(format, 100, tile_size);
+            VOption saveVOption = getSaveVOption(format, 100, tile_size);
 
             if (string.IsNullOrEmpty(BitmapErrorsMessage))
             {
                 return null;
             }
-            //using (NetVips.Image text = NetVips.Image.Text(WordWrap(BitmapErrorsMessage, 20), null, null, null, NetVips.Enums.Align.Centre, null, 100, 5, null))
-            //{
-            //    int offsetX = (int)Math.Floor((double)(border_tile_size - text.Width) / 2);
-            //    int offsetY = (int)Math.Floor((double)(border_tile_size - text.Height) / 2);
-            //    using (NetVips.Image image = NetVips.Image.Black(border_tile_size, border_tile_size).Linear(color, color).Composite2(text, NetVips.Enums.BlendMode.Atop, offsetX, offsetY))
-            //    {
-            //        return image.Gravity(Enums.CompassDirection.Centre, tile_size, tile_size, Enums.Extend.Black).WriteToBuffer("." + format, saveVOption); ;
-            //    }
-            //}
 
-            using (NetVips.Image text = NetVips.Image.Text(WordWrap(BitmapErrorsMessage, 20), null, null, null, NetVips.Enums.Align.Centre, null, 100, 5, null))
+            using (NetVips.Image text = NetVips.Image.Text(WordWrap(BitmapErrorsMessage, 20), null, null, null, Enums.Align.Centre, null, 100, 5, null))
             using (NetVips.Image background = NetVips.Image.Black(border_tile_size, border_tile_size))
             {
                 int offsetX = (int)Math.Floor((double)(border_tile_size - text.Width) / 2);
@@ -497,7 +485,6 @@ namespace MapsInMyFolder.Commun
                 {
                     return GravityFinalImage.WriteToBuffer("." + format, saveVOption);
                 }
-
             }
         }
 
@@ -529,68 +516,40 @@ namespace MapsInMyFolder.Commun
             VOption saving_options;
             if (final_saveformat == "png")
             {
-                saving_options = new VOption
-                    {
-                        { "Q", quality },
-                        { "compression", 100 },
-                        { "interlace", true },
-                        { "strip", true },
-                    };
+                saving_options = new VOption {
+                    { "Q", quality },
+                    { "compression", 100 },
+                    { "interlace", true },
+                    { "strip", true },
+                };
             }
             else if (final_saveformat == "jpeg")
             {
-                saving_options = new VOption
-                    {
-                        { "Q", quality },
-                        { "interlace", true },
-                        { "optimize_coding", true },
-                        { "strip", true },
-
-                    };
+                saving_options = new VOption {
+                    { "Q", quality },
+                    { "interlace", true },
+                    { "optimize_coding", true },
+                    { "strip", true },
+                };
             }
             else if (final_saveformat == "tiff")
             {
-                saving_options = new VOption
-                    {
-                        { "Q", quality },
-                        { "tileWidth", tile_size },
-                        { "tileHeight", tile_size },
-                        { "compression", "jpeg" },
-                        { "interlace", true },
-                        { "tile", true },
-                        { "pyramid", true },
-                        { "bigtif", true }
-                    };
+                saving_options = new VOption {
+                    { "Q", quality },
+                    { "tileWidth", tile_size },
+                    { "tileHeight", tile_size },
+                    { "compression", "jpeg" },
+                    { "interlace", true },
+                    { "tile", true },
+                    { "pyramid", true },
+                    { "bigtif", true }
+                };
             }
             else
             {
                 saving_options = new VOption();
             }
             return saving_options;
-        }
-
-        public static async Task<Stream> StreamDownloadUri(Uri url)
-        {
-            try
-            {
-                using (var responseMessage = await TileGeneratorSettings.HttpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false))
-                {
-                    if (responseMessage.IsSuccessStatusCode)
-                    {
-                        return await responseMessage.Content.ReadAsStreamAsync().ConfigureAwait(false);
-                    }
-                    else
-                    {
-                        Debug.WriteLine($"DownloadStreamUrl: {url}: {(int)responseMessage.StatusCode} {responseMessage.ReasonPhrase}");
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"DownloadStreamUrl: {url}: {ex.Message}");
-            }
-
-            return null;
         }
 
         public static async Task<HttpResponse> ByteDownloadUri(Uri url, int LayerId, bool getRealRequestMessage = false)
@@ -602,17 +561,16 @@ namespace MapsInMyFolder.Commun
                 {
                     ReasonPhrase = "Aucune connexion : Vérifiez votre connexion Internet"
                 });
-
             }
 
             HttpResponse response = HttpResponse.HttpResponseError;
-            int max_retry = Settings.max_redirection_download_tile;
+            int maxRetry = Settings.max_redirection_download_tile;
             int retry = 0;
-            bool do_need_retry;
+            bool doNeedToRetry;
             Uri parsing_url = url;
             do
             {
-                do_need_retry = false;
+                doNeedToRetry = false;
                 retry++;
 
                 try
@@ -635,7 +593,7 @@ namespace MapsInMyFolder.Commun
                             // Redirect found (autodetect)  System.Net.HttpStatusCode.Found
                             Uri new_location = responseMessage.Headers.Location;
                             DebugMode.WriteLine($"DownloadByteUrl Retry : {parsing_url} to {new_location}: {(int)responseMessage.StatusCode} {responseMessage.ReasonPhrase}");
-                            do_need_retry = true;
+                            doNeedToRetry = true;
                             parsing_url = new_location;
                         }
                         else
@@ -645,6 +603,7 @@ namespace MapsInMyFolder.Commun
                             {
                                 Javascript.Functions.PrintError($"DownloadUrl - Error {(int)responseMessage.StatusCode} : {responseMessage.ReasonPhrase}. Url : {parsing_url}");
                             }
+
                             if (Settings.generate_transparent_tiles_on_error)
                             {
                                 if (getRealRequestMessage)
@@ -673,14 +632,13 @@ namespace MapsInMyFolder.Commun
                     }
                     Debug.WriteLine($"DownloadByteUrl catch: {url}: {ex.Message}");
 
-
                     if (LayerId == -2)
                     {
                         Javascript.Functions.PrintError($"DownloadUrl - Error {ex.Message}. Url : {url}");
                     }
                     response = new HttpResponse(null, null, ex.Message);
                 }
-            } while (do_need_retry && (retry < max_retry));
+            } while (doNeedToRetry && (retry < maxRetry));
 
             return response;
         }
@@ -770,26 +728,12 @@ namespace MapsInMyFolder.Commun
             }
         }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         public static string ByteArrayToString(byte[] data)
         {
             return Encoding.UTF8.GetString(data, 0, data.Length);
         }
 
-        public static Boolean CheckIfDownloadIsNeededOrCached(string save_temp_directory, string filename, int settings_max_tiles_cache_days)
+        public static bool CheckIfDownloadIsNeededOrCached(string save_temp_directory, string filename, int settings_max_tiles_cache_days)
         {
             if (!Directory.Exists(save_temp_directory))
             {
@@ -1146,13 +1090,12 @@ namespace MapsInMyFolder.Commun
                     return_texte = return_texte.Replace(Entities.Key, Entities.Value);
                 }
             }
-            //MessageBox.Show(return_texte);
+
             return return_texte;
         }
 
         public static bool IsUrlValid(string url)
         {
-
             const string pattern = @"(http|https|ftp|)\:\/\/[0-9a-zA-Z]([-.\w]*[0-9a-zA-Z])*(:(0-9)*)*(\/?)([a-zA-Z0-9\-\.\?\,\'\/\\\+&%\$#_]*)?([a-zA-Z0-9\-\?\,\'\/\+&%\$#_]+)";
             Regex reg = new Regex(pattern, RegexOptions.Compiled | RegexOptions.IgnoreCase);
             return reg.IsMatch(url);
@@ -1169,8 +1112,7 @@ namespace MapsInMyFolder.Commun
         public static string GetRichTextBoxText(RichTextBox textBox)
         {
             TextRange textRange = new TextRange(textBox.Document.ContentStart, textBox.Document.ContentEnd);
-            string return_texte = textRange.Text;
-            return return_texte;
+            return textRange.Text;
         }
 
         public static bool FilterDigitOnlyWhileWritingInTextBox(TextBox textbElement, List<char> char_supplementaire = null, bool onlyOnePoint = true, bool limitLenght = true)
@@ -1231,14 +1173,11 @@ namespace MapsInMyFolder.Commun
                 {
                     str += car.ToString();
                 }
-                if (!(char_supplementaire is null))
+                if (!(char_supplementaire is null) && char_supplementaire.Contains(car))
                 {
                     if (!(car == '.' && str.Contains(car) && onlyOnePoint))
                     {
-                        if (char_supplementaire.Contains(car))
-                        {
-                            str += car.ToString();
-                        }
+                        str += car.ToString();
                     }
                 }
             }
@@ -1247,7 +1186,7 @@ namespace MapsInMyFolder.Commun
 
         public static string Replacements(string tileBaseUrl, string x, string y, string z, int LayerID, Collectif.GetUrl.InvokeFunction invokeFunction)
         {
-            if (string.IsNullOrEmpty(tileBaseUrl)) { return String.Empty; }
+            if (string.IsNullOrEmpty(tileBaseUrl)) { return string.Empty; }
             return GetUrl.FromTileXYZ(tileBaseUrl, Convert.ToInt32(x), Convert.ToInt32(y), Convert.ToInt32(z), LayerID, invokeFunction).Replace(" ", "%20");
         }
 
@@ -1476,13 +1415,10 @@ namespace MapsInMyFolder.Commun
             //return hitTop || hitBottom;
         }
 
-        static MouseWheelEventArgs Copy(MouseWheelEventArgs e)
-            => new MouseWheelEventArgs(e.MouseDevice, e.Timestamp, e.Delta)
-            {
-                RoutedEvent = UIElement.MouseWheelEvent,
-                Source = e.Source,
-            };
+        static MouseWheelEventArgs Copy(MouseWheelEventArgs e) => new MouseWheelEventArgs(e.MouseDevice, e.Timestamp, e.Delta)
+        {
+            RoutedEvent = UIElement.MouseWheelEvent,
+            Source = e.Source,
+        };
     }
-
-
 }
