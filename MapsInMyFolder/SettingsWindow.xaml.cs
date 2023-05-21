@@ -190,6 +190,18 @@ namespace MapsInMyFolder
             map_defaut_zoom_level.Text = Settings.map_defaut_zoom_level.ToString();
             zoom_limite_taille_carte.IsChecked = Settings.zoom_limite_taille_carte;
             map_show_tile_border.IsChecked = Settings.map_show_tile_border;
+
+            //search_engine
+            SearchEngines[] SearchEngines = (SearchEngines[])Enum.GetValues(typeof(SearchEngines));
+            foreach (var searchEngine in SearchEngines)
+            {
+                search_engine.Items.Add(searchEngine.ToString());
+                if (searchEngine.ToString() == Settings.search_engine.ToString())
+                {
+                    search_engine.SelectedIndex = Array.IndexOf(SearchEngines, searchEngine);
+                }
+            }
+
             database_pathname.Text = Settings.database_pathname;
             selection_rectangle_resize_tblr_gap.Text = Settings.selection_rectangle_resize_tblr_gap.ToString();
             selection_rectangle_resize_angle_gap.Text = Settings.selection_rectangle_resize_angle_gap.ToString();
@@ -310,6 +322,11 @@ namespace MapsInMyFolder
             Settings.SE_PIN_starting_location_longitude = Convert.ToDouble(SE_PIN_starting_location_longitude.Text);
             Settings.map_defaut_zoom_level = Convert.ToInt32(map_defaut_zoom_level.Text);
             Settings.zoom_limite_taille_carte = zoom_limite_taille_carte.IsChecked ?? false;
+
+            string selectedSearchEngine = search_engine.SelectedValue.ToString();
+            Settings.search_engine = (SearchEngines)Enum.Parse(typeof(SearchEngines), selectedSearchEngine);
+            
+
             Settings.tileloader_default_script = tileloader_default_script.Text;
             Settings.tileloader_template_script = tileloader_template_script.Text;
             Settings.user_agent = user_agent.Text;

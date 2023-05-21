@@ -1119,7 +1119,7 @@ namespace MapsInMyFolder.Commun
         {
             string textboxtext = textbElement.Text;
             var cursor_position = textbElement.SelectionStart;
-            string filtered_string = FilterDigitOnly(textboxtext, char_supplementaire);
+            string filtered_string = FilterDigitOnly(textboxtext, char_supplementaire, onlyOnePoint, limitLenght);
             textbElement.SetText(filtered_string);
             if (textboxtext != filtered_string)
             {

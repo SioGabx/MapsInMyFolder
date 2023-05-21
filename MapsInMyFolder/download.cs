@@ -1313,7 +1313,7 @@ namespace MapsInMyFolder
             string format = download_engine.format;
             string save_temp_directory = download_engine.save_temp_directory;
             string filename = url.x + "_" + url.y + "." + format;
-            Boolean do_download_this_tile = Collectif.CheckIfDownloadIsNeededOrCached(save_temp_directory, filename, Settings.tiles_cache_expire_after_x_days);
+            bool do_download_this_tile = Collectif.CheckIfDownloadIsNeededOrCached(save_temp_directory, filename, Settings.tiles_cache_expire_after_x_days);
             Thread.CurrentThread.Priority = ThreadPriority.Highest;
 
             if (!do_download_this_tile)
@@ -1330,7 +1330,7 @@ namespace MapsInMyFolder
                 HttpResponse httpResponse = await TileGeneratorSettings.TileLoaderGenerator.GetImageAsync(download_engine.urlbase, url.x, url.y, url.z, download_engine.layerid, download_engine.format, save_temp_directory).ConfigureAwait(false);
                 if (httpResponse?.ResponseMessage?.IsSuccessStatusCode == true)
                 {
-                    var contentStream = Collectif.ByteArrayToStream(httpResponse.Buffer);
+                    using var contentStream = Collectif.ByteArrayToStream(httpResponse.Buffer);
                     if (httpResponse.Buffer?.Length > 0)
                     {
                         using FileStream fileStream = new FileStream(save_temp_directory + filename, FileMode.CreateNew);

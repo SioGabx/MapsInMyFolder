@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -19,6 +20,7 @@ namespace MapsInMyFolder.Commun
             {
                 string CurentCultureCountry = getCountryFromCultureName(ci.DisplayName);
                 string EnglishCultureCountry = getCountryFromCultureName(ci.EnglishName);
+                //Debug.WriteLine(CurentCultureCountry + " / " + EnglishCultureCountry + " / " + ci.Name);
                 if (!string.IsNullOrWhiteSpace(CurentCultureCountry) && !string.IsNullOrWhiteSpace(EnglishCultureCountry))
                 {
                     CountryList.Add(new Country() { EnglishName = EnglishCultureCountry, DisplayName = CurentCultureCountry });

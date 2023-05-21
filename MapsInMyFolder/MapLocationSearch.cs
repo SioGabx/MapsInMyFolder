@@ -1,6 +1,9 @@
-﻿using MapsInMyFolder.MapControl;
+﻿using MapsInMyFolder.Commun;
+using MapsInMyFolder.MapControl;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -10,6 +13,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Threading;
+using System.Xml;
 
 namespace MapsInMyFolder
 {
@@ -21,46 +25,148 @@ namespace MapsInMyFolder
         {
             try
             {
-                List<string> returnListOfAddresses = new List<string>();
+                searchEngine.ClearSearchResults();
                 string encodedSearch = System.Web.HttpUtility.UrlEncode(search.Trim());
-                string url = "https://nominatim.openstreetmap.org/search.php?q=" + encodedSearch + "&polygon_geojson=1&limit=10&format=xml&email=siogabx@siogabx.fr";
 
-                using (HttpClient client = new HttpClient())
+                switch (Settings.search_engine)
                 {
-                    using HttpResponseMessage response = client.GetAsync(url).Result;
-                    using Stream responseStream = response.Content.ReadAsStream();
+                    case SearchEngines.BingMaps:
+                        //Bing Search
+                        return BingMapSearch(encodedSearch);
+                    case SearchEngines.OpenStreetMap:
+                        //OSM Search
+                        return OpenStreetMapSearch(encodedSearch);
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+            }
+            return new List<string>();
+        }
 
-                    response.EnsureSuccessStatusCode();
+        public List<string> OpenStreetMapSearch(string encodedSearch)
+        {
+            //OSM Search
+            List<string> returnListOfAddresses = new List<string>();
 
-                    using (System.Xml.XmlReader reader = System.Xml.XmlReader.Create(responseStream))
+            string url = $"https://nominatim.openstreetmap.org/search.php?q={encodedSearch}&polygon_geojson=0&limit=5&format=xml&email=siogabx@siogabx.fr";
+            Debug.WriteLine(url);
+            using HttpResponseMessage response = TileGeneratorSettings.HttpClient.GetAsync(url).Result;
+            using Stream responseStream = response.Content.ReadAsStream();
+
+            response.EnsureSuccessStatusCode();
+
+            using (System.Xml.XmlReader reader = System.Xml.XmlReader.Create(responseStream))
+            {
+                reader.MoveToContent();
+                int idSearch = 0;
+
+                while (reader.Read())
+                {
+                    string displayAdress = reader.GetAttribute("display_name");
+
+                    if (!string.IsNullOrEmpty(displayAdress))
                     {
-                        searchEngine.ClearSearchResults();
-                        reader.MoveToContent();
-                        int idSearch = 0;
-
-                        while (reader.Read())
-                        {
-                            string address = reader.GetAttribute("display_name");
-
-                            if (!string.IsNullOrEmpty(address))
-                            {
-                                string latitude = reader.GetAttribute("lat");
-                                string longitude = reader.GetAttribute("lon");
-                                string boundingBox = reader.GetAttribute("boundingbox");
-                                returnListOfAddresses.Add(address);
-                                searchEngine.Add(new SearchEngineResult(idSearch, address, latitude, longitude, boundingBox), idSearch);
-                                idSearch++;
-                            }
-                        }
+                        string latitude = reader.GetAttribute("lat");
+                        string longitude = reader.GetAttribute("lon");
+                        string boundingBox = reader.GetAttribute("boundingbox");
+                        returnListOfAddresses.Add(displayAdress);
+                        searchEngine.Add(new SearchEngineResult(idSearch, displayAdress, latitude, longitude, boundingBox), idSearch);
+                        idSearch++;
                     }
                 }
+            }
+            return returnListOfAddresses;
+        }
 
-                return returnListOfAddresses;
-            }
-            catch (Exception)
+        public List<string> BingMapSearch(string encodedSearch)
+        {
+            //OSM Search
+            List<string> returnListOfAddresses = new List<string>();
+            const int MaxResultNumber = 5;
+            string BingMapApiKey = ApiKeys.BingMaps;
+
+            if (BingMapApiKey == "YOUR_API_KEY")
             {
-                return new List<string>();
+#if DEBUG
+                MessageBox.Show("Your Bing API Key is not set, please check MapsInMyFolder.Commun/ApiKey.cs. Fallback OpenStreetMapSearch is used");
+#endif
+                return OpenStreetMapSearch(encodedSearch);
             }
+
+            var userMapLocation = Application.Current.Dispatcher.Invoke(new Func<Location>(() => mapviewer.Center));
+            string url = $"https://dev.virtualearth.net/REST/v1/Locations?o=xml&query={encodedSearch}&userLocation={userMapLocation.Latitude},{userMapLocation.Longitude}&maxResults={MaxResultNumber}&key={BingMapApiKey}&culture={CultureInfo.CurrentUICulture.Name}";
+            Debug.WriteLine(url);
+            using HttpResponseMessage response = new HttpClient().GetAsync(url).Result;
+            using Stream responseStream = response.Content.ReadAsStream();
+            response.EnsureSuccessStatusCode();
+
+            using (XmlReader reader = System.Xml.XmlReader.Create(responseStream))
+            {
+                reader.MoveToContent();
+                int idSearch = 0;
+
+                while (reader.Read())
+                {
+                    if (reader.NodeType == XmlNodeType.Element && reader.Name == "Location")
+                    {
+                        XmlDocument xmlDoc = new XmlDocument();
+                        string InnerXML = reader.ReadOuterXml();
+                        xmlDoc.LoadXml(InnerXML);
+
+                        XmlNamespaceManager nsManager = new XmlNamespaceManager(xmlDoc.NameTable);
+                        nsManager.AddNamespace("ns", "http://schemas.microsoft.com/search/local/ws/rest/v1");
+
+                        string name = getNodeValue("/Location/Name");
+
+                        string latitude = getNodeValue("/Location/Point/Latitude");
+                        string longitude = getNodeValue("/Location/Point/Longitude");
+
+                        string southLatitude = getNodeValue("/Location/BoundingBox/SouthLatitude");
+                        string westLongitude = getNodeValue("/Location/BoundingBox/WestLongitude");
+                        string northLatitude = getNodeValue("/Location/BoundingBox/NorthLatitude");
+                        string eastLongitude = getNodeValue("/Location/BoundingBox/EastLongitude");
+
+                        string addressLine = getNodeValue("/Location/Address/AddressLine");
+                        string adminDistrict = getNodeValue("/Location/Address/AdminDistrict");
+                        string adminDistrict2 = getNodeValue("/Location/Address/AdminDistrict2");
+                        string countryRegion = getNodeValue("/Location/Address/CountryRegion");
+                        string formattedAddress = getNodeValue("/Location/Address/FormattedAddress");
+                        string locality = getNodeValue("/Location/Address/Locality");
+                        string postalCode = getNodeValue("/Location/Address/PostalCode");
+
+                        string getNodeValue(string xpath)
+                        {
+                            XmlNode node = xmlDoc.SelectSingleNode('/' + xpath.Replace("/", "/ns:"), nsManager);
+                            return node?.InnerText ?? string.Empty;
+                        }
+
+                        string concatIfNotNullOrEmpty(params string[] append)
+                        {
+                            string baseString = string.Empty;
+                            List<string> ConcatetenedElements = new List<string>();
+                            foreach (string appendItem in append)
+                            {
+                                if (!string.IsNullOrEmpty(appendItem) && !ConcatetenedElements.Contains(appendItem) && (string.IsNullOrEmpty(baseString) || !append[0].Contains(appendItem)))
+                                {
+                                    baseString += ", " + appendItem;
+                                    ConcatetenedElements.Add(appendItem);
+                                }
+                            }
+                            return baseString.Trim(',', ' ');
+
+                        }
+                        string displayAdress = concatIfNotNullOrEmpty(name, locality, adminDistrict2, adminDistrict, countryRegion);
+                        string boundingBox = concatIfNotNullOrEmpty(northLatitude, southLatitude, westLongitude, eastLongitude);
+                        returnListOfAddresses.Add(displayAdress);
+                        searchEngine.Add(new SearchEngineResult(idSearch, displayAdress, latitude, longitude, boundingBox), idSearch);
+                        idSearch++;
+                    }
+                }
+            }
+            lastSearch = null;
+            return returnListOfAddresses;
         }
 
         private void MapSearchbar_GotFocus(object sender, RoutedEventArgs e)
@@ -115,7 +221,7 @@ namespace MapsInMyFolder
             SearchStart();
         }
 
-        private string lastSearch = "";
+        private string lastSearch = "Rechercher un lieu...";
 
         private async void SearchStart(bool selectFirst = false)
         {
@@ -127,11 +233,10 @@ namespace MapsInMyFolder
                 if (text != "" && text != lastSearch)
                 {
                     lastSearch = text;
-                    List<string> listOfSearchResults = new List<string>();
-                    Task searchTask = Task.Run(() => listOfSearchResults = Search(text));
-                    await searchTask;
+                    List<string> listOfSearchResults = null;
+                    await Task.Run(() => listOfSearchResults = Search(text));
 
-                    if (listOfSearchResults.Count > 0)
+                    if (listOfSearchResults != null && listOfSearchResults.Count > 0)
                     {
                         mapSearchbarSuggestion.Foreground = System.Windows.Media.Brushes.White;
                         mapSearchbarSuggestion.ItemsSource = listOfSearchResults;
@@ -250,19 +355,6 @@ namespace MapsInMyFolder
         public void ClearSearchResults()
         {
             SearchResultList.Clear();
-        }
-
-        public List<SearchEngineResult> GetResultList()
-        {
-            List<SearchEngineResult> resultList = new List<SearchEngineResult>();
-
-            foreach (Dictionary<int, SearchEngineResult> searchDictionary in SearchResultList)
-            {
-                SearchEngineResult value = searchDictionary.Values.First();
-                resultList.Add(value);
-            }
-
-            return resultList;
         }
 
         public SearchEngineResult GetResultById(int id)

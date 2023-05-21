@@ -1059,11 +1059,12 @@ namespace MapsInMyFolder
             if (e.Key == System.Windows.Input.Key.S && System.Windows.Input.Keyboard.Modifiers == System.Windows.Input.ModifierKeys.Control)
             {
                 //CTRL + S
-                try {
+                try
+                {
                     this.Cursor = Cursors.Wait;
                     Mouse.SetCursor(Cursors.Wait);
-                SaveLayer();
-                DefaultValuesHachCode = Collectif.CheckIfInputValueHaveChange(EditeurStackPanel);
+                    SaveLayer();
+                    DefaultValuesHachCode = Collectif.CheckIfInputValueHaveChange(EditeurStackPanel);
                 }
                 finally
                 {
@@ -1099,6 +1100,7 @@ namespace MapsInMyFolder
             FullscreenRectanglesMap.MapViewer.ZoomLevel = mapviewerappercu.ZoomLevel;
             int ListOfRectanglesInTextbox = (JsonConvert.DeserializeObject<List<Dictionary<string, string>>>(TextboxRectangles.Text) ?? new List<Dictionary<string, string>>()).Count;
             int NumberOfRectangleSuccessfullyAdded = 0;
+
             foreach (MapFigures.Figure Figure in MapFigures.GetFiguresFromJsonString(TextboxRectangles.Text))
             {
                 FullscreenRectanglesMap.AddNewSelection(FullscreenRectanglesMap.mapSelectable.AddRectangle(Figure.NO, Figure.SE), Figure.Name, Figure.MinZoom.ToString(), Figure.MaxZoom.ToString(), Figure.Color, Figure.StrokeThickness.ToString());
@@ -1124,28 +1126,44 @@ namespace MapsInMyFolder
 
         private void FullscreenMap_SaveButton_Click(object sender, RoutedEventArgs e)
         {
-            var ListOfRectangleProperties = new List<Dictionary<string, string>>();
+            var ListOfRectangleProperties = new List<Dictionary<string, object>>();
             foreach (SelectionRectangle selectionRectangle in SelectionRectangle.Rectangles)
             {
                 double.TryParse(selectionRectangle.NOLatitudeTextBox.Text, out double NO_Lat);
                 double.TryParse(selectionRectangle.NOLongitudeTextBox.Text, out double NO_Long);
                 double.TryParse(selectionRectangle.SELatitudeTextBox.Text, out double SE_Lat);
                 double.TryParse(selectionRectangle.SELongitudeTextBox.Text, out double SE_Long);
-                if (NO_Lat == NO_Long && SE_Lat == SE_Long && NO_Lat == SE_Lat)
+                if (NO_Lat == NO_Long || SE_Lat == SE_Long || NO_Lat == SE_Lat || NO_Long == SE_Long)
                 {
+                    //Zero Width element
                     continue;
                 }
-                var RectangleDictionnary = new Dictionary<string, string>()
+
+                double.TryParse(selectionRectangle.StrokeThicknessTextBox.Text, out double StrokeThickness);
+
+                object GetOptimalZoomValue(string ZoomValue)
+                {
+                    if (!string.IsNullOrEmpty(ZoomValue) && ZoomValue != "∞" && ZoomValue.ToLowerInvariant() != "infinity")
+                    {
+                        if (double.TryParse((string)ZoomValue, out double doubleZoom) && doubleZoom >= 0)
+                        {
+                            return (int)Math.Floor(doubleZoom);
+                        }
+                    }
+                    return "∞";
+                }
+
+                var RectangleDictionnary = new Dictionary<string, object>()
                     {
                         { "Name", selectionRectangle.NameTextBox.Text},
                         { "Color", selectionRectangle.ColorTextBox.Text},
-                        { "StrokeThickness", selectionRectangle.StrokeThicknessTextBox.Text},
-                        { "MinZoom", selectionRectangle.MinZoomTextBox.Text},
-                        { "MaxZoom", selectionRectangle.MaxZoomTextBox.Text},
-                        { "NO_Lat", NO_Lat.ToString()},
-                        { "NO_Long", NO_Long.ToString()},
-                        { "SE_Lat", SE_Lat.ToString()},
-                        { "SE_Long", SE_Long.ToString()}
+                        { "StrokeThickness", StrokeThickness},
+                        { "MinZoom", GetOptimalZoomValue(selectionRectangle.MinZoomTextBox.Text)},
+                        { "MaxZoom", GetOptimalZoomValue(selectionRectangle.MaxZoomTextBox.Text)},
+                        { "NO_Lat", NO_Lat},
+                        { "NO_Long", NO_Long},
+                        { "SE_Lat", SE_Lat},
+                        { "SE_Long", SE_Long}
                     };
                 ListOfRectangleProperties.Add(RectangleDictionnary);
             }
@@ -1251,7 +1269,7 @@ namespace MapsInMyFolder
         private void TextboxRectangles_TextChanged(object sender, EventArgs e)
         {
             string FiguresJsonString = TextboxRectangles.Text;
-            MapFigures.DrawFigureOnMapItemsControlFromJsonString(mapviewerRectangles, FiguresJsonString, mapviewerappercu.ZoomLevel);;
+            MapFigures.DrawFigureOnMapItemsControlFromJsonString(mapviewerRectangles, FiguresJsonString, mapviewerappercu.ZoomLevel); ;
         }
         private void TextboxRectangles_KeyUp(object sender, KeyEventArgs e)
         {

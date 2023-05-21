@@ -807,9 +807,9 @@ namespace MapsInMyFolder
             foreach (MapPolygon rectangle in Rectangles.ToArray())
             {
                 var locations = GetRectangleLocation(rectangle);
-                if (locations.NO.Latitude == 0 && locations.NO.Longitude == 0 && locations.SE.Latitude == 0 && locations.SE.Longitude == 0)
+                if (locations.NO.Latitude == locations.NO.Longitude || locations.SE.Latitude == locations.SE.Longitude || locations.NO.Latitude == locations.SE.Latitude || locations.NO.Longitude == locations.SE.Longitude)
                 {
-                    numberOfUnusedRectangleDeleted++;
+                        numberOfUnusedRectangleDeleted++;
                     DeleteRectangle(rectangle);
                 }
             }

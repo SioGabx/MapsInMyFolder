@@ -169,7 +169,6 @@
                                     </ComboBox>
                                 </Grid>
 
-
                                 <Grid Margin="0,10,0,0">
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="20"/>
@@ -185,17 +184,7 @@
                                     </Grid.Resources>
                                     <Label Content="Critère de trie des calques :" Foreground="#888989" Grid.Row="0"/>
                                     <cbcontrols:MultiSelectCombobox x:Name="layersSort" ItemSeparator="," AdditionalItemSeparators="{StaticResource ResourceKey=AdditionalCharArray}" Grid.Row="1" HorizontalAlignment="Stretch" MinHeight="16" Height="Auto" RequestBringIntoView="DisableRequestBringIntoView"/>
-
-
                                 </Grid>
-
-                                <!--<Grid Margin="0,10,0,0">
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="20"/>
-                                        <RowDefinition Height="*" />
-                                    </Grid.RowDefinitions>
-                                    <CheckBox x:Name="LayersOrder" Foreground="#888989" Grid.Row="0">Trie des calques croissant</CheckBox>
-                                </Grid>-->
 
                                 <Grid Margin="0,10,0,0">
                                     <Grid.RowDefinitions>
@@ -410,6 +399,7 @@
                                     </ui:RadioButtons>
                                 </Grid>
                             </StackPanel>
+                            
                             <StackPanel x:Name="CarteSettings">
                                 <!--
                                 background_layer_opacity
@@ -511,6 +501,21 @@
                                         <RowDefinition Height="*" />
                                     </Grid.RowDefinitions>
                                     <CheckBox x:Name="map_show_tile_border" Foreground="#888989" Grid.Row="0" Content="Afficher les bordures de tuiles"/>
+                                </Grid>
+
+                                <Grid Margin="0,10,0,0">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="20"/>
+                                        <RowDefinition Height="*" />
+                                    </Grid.RowDefinitions>
+                                    <Label Content="Moteur de recherche :" Foreground="#888989" Grid.Row="0"/>
+                                    <ComboBox x:Name="search_engine" Grid.Row="1" Width="Auto" HorizontalAlignment="Stretch" VerticalContentAlignment="Stretch" Height="21" SelectedIndex="4" Cursor="Arrow" Padding="5,0,0,1" Foreground="#BCBCBC" >
+                                        <ComboBox.Resources>
+                                            <Style TargetType="{x:Type ScrollBar}" BasedOn="{StaticResource {x:Type ScrollBar}}">
+                                                <Setter Property="Margin" Value="0,0,-5,0"/>
+                                            </Style>
+                                        </ComboBox.Resources>
+                                    </ComboBox>
                                 </Grid>
 
                             </StackPanel>

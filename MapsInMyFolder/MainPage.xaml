@@ -76,7 +76,7 @@
                 </Button>
             </Grid>
 
-            <ListBox Panel.ZIndex="999" Grid.Row="1" Grid.Column="1" Grid.RowSpan="2" x:Name="mapSearchbarSuggestion" Visibility="Hidden" Margin="10,35,50,0" SelectionChanged="MapSearchbarSuggestion_SelectionChanged" Height="100" MaxHeight="140" HorizontalAlignment="Stretch" VerticalAlignment="Top" Background="#2B2B2B" />
+            <ListBox Panel.ZIndex="999" Grid.Row="1" Grid.Column="1" Grid.RowSpan="2" x:Name="mapSearchbarSuggestion" Visibility="Hidden" Margin="10,35,50,0" SelectionChanged="MapSearchbarSuggestion_SelectionChanged" Height="100" MaxHeight="175" HorizontalAlignment="Stretch" VerticalAlignment="Top" Background="#2B2B2B" />
 
             <Grid Grid.Row="2">
                 <Grid.ColumnDefinitions>

@@ -159,7 +159,7 @@ namespace MapsInMyFolder
             stackPanel.Children.Add(colorGrid);
 
             Grid strokeThicknessGrid = getGrid(false);
-            StrokeThicknessTextBox = setSimpleColumnTextBox(strokeThicknessGrid, "Epaisseur de ligne :", strokeThickness, "1");
+            StrokeThicknessTextBox = setSimpleColumnTextBox(strokeThicknessGrid, "Epaisseur de ligne :", strokeThickness, "5");
             stackPanel.Children.Add(strokeThicknessGrid);
 
             Grid zoomGrid = getGrid();
@@ -167,23 +167,8 @@ namespace MapsInMyFolder
             stackPanel.Children.Add(zoomGrid);
             MinZoomTextBox = zoomTextBox.LeftTextBox;
             MaxZoomTextBox = zoomTextBox.RightTextBox;
-            if (string.IsNullOrWhiteSpace(minZoom))
-            {
-                MinZoomTextBox.Text = "∞";
-            }
-            else
-            {
-                MinZoomTextBox.Text = minZoom;
-            }
-
-            if (string.IsNullOrWhiteSpace(maxZoom))
-            {
-                MaxZoomTextBox.Text = "∞";
-            }
-            else
-            {
-                MaxZoomTextBox.Text = maxZoom;
-            }
+            MinZoomTextBox.Text = getTextIfInfinity(minZoom);
+            MaxZoomTextBox.Text = getTextIfInfinity(maxZoom);
 
             Grid nordOuestGrid = getGrid();
             var nordOuestTextBox = setDoubleColumnTextBox(nordOuestGrid, "Nord-Ouest Latitude :", "Nord-Ouest Longitude :");
@@ -208,7 +193,47 @@ namespace MapsInMyFolder
             NOLongitudeTextBox.TextChanged += UpdateLocation_NO;
             SELatitudeTextBox.TextChanged += UpdateLocation_SE;
             SELongitudeTextBox.TextChanged += UpdateLocation_SE;
+
+
+            MinZoomTextBox.TextChanged += FilterZoomOnTextChanged;
+            MaxZoomTextBox.TextChanged += FilterZoomOnTextChanged;
+            StrokeThicknessTextBox.TextChanged += FilterStrokeThicknessOnTextChanged;
+
+
             return PropertiesDisplayElement;
+
+            string getTextIfInfinity(string texteValue)
+            {
+                if (string.IsNullOrWhiteSpace(texteValue) || texteValue == "-1" || texteValue.ToLowerInvariant() == "infinity")
+                {
+                    return "∞";
+                }
+                else if (int.TryParse(texteValue, out int _))
+                {
+                    return texteValue;
+                }
+                else
+                {
+                    return "∞";
+                }
+            }
+        }
+
+        public void FilterZoomOnTextChanged(object sender, TextChangedEventArgs e)
+        {
+            TextBox textBoxSender = sender as TextBox;
+            Collectif.FilterDigitOnlyWhileWritingInTextBox(textBoxSender, new List<char>() {'-', '∞' }, true, false);
+            if (textBoxSender.Text.Trim() == "-1")
+            {
+                textBoxSender.Text = "∞";
+            }
+            
+        }
+
+        public void FilterStrokeThicknessOnTextChanged(object sender, TextChangedEventArgs e)
+        {
+            TextBox textBoxSender = sender as TextBox;
+            Collectif.FilterDigitOnlyWhileWritingInTextBox(textBoxSender, new List<char>() {'.'}, true, false);
         }
 
         private void PropertiesDisplayElement_Unloaded(object sender, RoutedEventArgs e)
@@ -220,6 +245,11 @@ namespace MapsInMyFolder
             NOLongitudeTextBox.TextChanged -= UpdateLocation_NO;
             SELatitudeTextBox.TextChanged -= UpdateLocation_SE;
             SELongitudeTextBox.TextChanged -= UpdateLocation_SE;
+
+
+            MinZoomTextBox.TextChanged -= FilterZoomOnTextChanged;
+            MaxZoomTextBox.TextChanged -= FilterZoomOnTextChanged;
+            StrokeThicknessTextBox.TextChanged -= FilterStrokeThicknessOnTextChanged;
         }
 
         private void PropertiesDisplayElement_GotFocus(object sender, RoutedEventArgs e)
@@ -234,7 +264,9 @@ namespace MapsInMyFolder
             PropertiesDisplayElementGotFocus?.Invoke(sender, null);
         }
 
-        public void UpdateLocation_NO(object sender, TextChangedEventArgs e)
+
+            
+            public void UpdateLocation_NO(object sender, TextChangedEventArgs e)
         {
             TextBox textBoxSender = sender as TextBox;
             Collectif.FilterDigitOnlyWhileWritingInTextBox(textBoxSender, new List<char>() { '.', '-' }, true, false);
@@ -361,15 +393,16 @@ namespace MapsInMyFolder
             SelectionRectangle selectionRectangle = SelectionRectangle.GetSelectionRectangleFromRectangle(e);
             if (selectionRectangle == null)
             {
-                if (Locations.NO.Latitude != 0 && Locations.NO.Latitude != 0 && Locations.SE.Longitude != 0 && Locations.SE.Longitude != 0)
-                {
-                    AddNewSelection(e);
-                    selectionRectangle = SelectionRectangle.GetSelectionRectangleFromRectangle(e);
-                }
-                else
-                {
-                    return;
-                }
+                //if (Locations.NO.Latitude != 0 && Locations.NO.Latitude != 0 && Locations.SE.Longitude != 0 && Locations.SE.Longitude != 0)
+                //{
+                //    AddNewSelection(e);
+                //    selectionRectangle = SelectionRectangle.GetSelectionRectangleFromRectangle(e);
+                //}
+                //else
+                //{
+                //    return;
+                //}
+                return;
             }
 
             SetValue(selectionRectangle.NOLatitudeTextBox, Math.Round(Locations.NO.Latitude, 6).ToString(), selectionRectangle.UpdateLocation_NO);
