@@ -616,8 +616,8 @@ namespace MapsInMyFolder
                             return;
                         }
 
-                        MainPage._instance.ReloadPage();
-                        MainPage._instance.Set_current_layer(Layers.Current.class_id);
+                        _instance.ReloadPage();
+                        _instance.Set_current_layer(Layers.Current.class_id);
                     }
                 }
             }

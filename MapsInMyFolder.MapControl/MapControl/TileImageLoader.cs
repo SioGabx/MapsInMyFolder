@@ -91,7 +91,7 @@ namespace MapsInMyFolder.MapControl
                     {
                         cacheName = null; // no tile caching
                     }
-                 
+
                     var tasks = Enumerable.Range(0, numTasks)
                         .Select(_ => Task.Run(() => LoadPendingTiles(pendingTiles, tileSource, cacheName)));
 

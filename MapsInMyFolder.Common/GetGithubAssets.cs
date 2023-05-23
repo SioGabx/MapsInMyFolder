@@ -212,14 +212,14 @@ namespace MapsInMyFolder.Commun
             string ETag = XMLParser.Cache.Read("ETag_" + filename);
             if (!string.IsNullOrEmpty(ETag))
             {
-                TileGeneratorSettings.HttpClient.DefaultRequestHeaders.Add("If-None-Match", ETag);
+                Tiles.HttpClient.DefaultRequestHeaders.Add("If-None-Match", ETag);
             }
             Commun.HttpResponse HttpResponse = Collectif.ByteDownloadUri(new Uri(url), 0, true)?.Result;
-            if (TileGeneratorSettings.HttpClient.DefaultRequestHeaders.Contains("If-None-Match"))
+            if (Tiles.HttpClient.DefaultRequestHeaders.Contains("If-None-Match"))
             {
-                TileGeneratorSettings.HttpClient.DefaultRequestHeaders.Remove("If-None-Match");
+                Tiles.HttpClient.DefaultRequestHeaders.Remove("If-None-Match");
             }
-          
+
             if (HttpResponse?.ResponseMessage?.IsSuccessStatusCode == true)
             {
                 ETag = HttpResponse.ResponseMessage.Headers.TryGetValues("etag", out var values) ? values.FirstOrDefault() : null;

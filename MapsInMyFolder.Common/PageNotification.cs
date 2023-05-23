@@ -142,7 +142,7 @@ namespace MapsInMyFolder.Commun
                 Border ContentBorder = new Border()
                 {
                     BorderThickness = new Thickness(3),
-                    BorderBrush = System.Windows.Media.Brushes.Transparent,
+                    BorderBrush = Brushes.Transparent,
                     Margin = new Thickness(5, 2, 20, 5),
                 };
                 ContentBorder.SetValue(Grid.RowProperty, 0);
@@ -218,13 +218,13 @@ namespace MapsInMyFolder.Commun
                 return new Path()
                 {
                     Margin = new Thickness(0, 4, 0, 0),
-                    StrokeStartLineCap = System.Windows.Media.PenLineCap.Round,
-                    StrokeEndLineCap = System.Windows.Media.PenLineCap.Round,
-                    StrokeLineJoin = System.Windows.Media.PenLineJoin.Round,
+                    StrokeStartLineCap = PenLineCap.Round,
+                    StrokeEndLineCap = PenLineCap.Round,
+                    StrokeLineJoin = PenLineJoin.Round,
                     StrokeThickness = 0.8,
                     Data = (System.Windows.Media.Geometry)Application.Current.Resources["CloseButton"],
                     Stroke = Collectif.HexValueToSolidColorBrush("#FFE2E2E1"),
-                    Stretch = System.Windows.Media.Stretch.Uniform,
+                    Stretch = Stretch.Uniform,
                     Height = 10,
                     Width = 10
                 };

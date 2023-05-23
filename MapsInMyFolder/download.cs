@@ -135,7 +135,7 @@ namespace MapsInMyFolder
         public Dictionary<string, double> location;
         public int RedimWidth;
         public int RedimHeignt;
-        public TileGenerator TileLoaderGenerator;
+        public TileLoader TileLoader;
         public Enums.Interpretation interpretation;
         public ScaleInfo scaleInfo;
 
@@ -158,7 +158,7 @@ namespace MapsInMyFolder
                                           string file_name,
                                           string file_temp_name,
                                           Dictionary<string, double> location,
-                                          int RedimWidth, int RedimHeignt, TileGenerator TileLoaderGenerator,
+                                          int RedimWidth, int RedimHeignt, TileLoader TileLoaderGenerator,
                                           Enums.Interpretation interpretation,
                                           ScaleInfo scaleInfo,
                                           int nbr_of_tiles = 0,
@@ -194,7 +194,7 @@ namespace MapsInMyFolder
                 this.quality = quality;
                 this.RedimWidth = RedimWidth;
                 this.RedimHeignt = RedimHeignt;
-                this.TileLoaderGenerator = TileLoaderGenerator;
+                this.TileLoader = TileLoaderGenerator;
                 this.interpretation = interpretation;
                 this.scaleInfo = scaleInfo;
 
@@ -481,7 +481,7 @@ namespace MapsInMyFolder
 
                 string jsonScaleInfo = Newtonsoft.Json.JsonConvert.SerializeObject(download_Options.scaleInfo);
                 int dbid = Database.DB_Download_Write(Status.waitfordownloading, filename, nbrOfTiles, zoom, download_Options.NO_PIN_Location.Latitude, download_Options.NO_PIN_Location.Longitude, download_Options.SE_PIN_Location.Latitude, download_Options.SE_PIN_Location.Longitude, download_Options.id_layer, saveTempDirectory, saveDirectory, timestamp, quality, download_Options.RedimWidth, download_Options.RedimHeignt, download_Options.interpretation.ToString(), jsonScaleInfo);
-                DownloadClass engine = new DownloadClass(downloadId, dbid, Layers.Current.class_id, urls, tokenSource2, ct, format, finalSaveFormat, zoom, saveTempDirectory, saveDirectory, filename, fileTempName, location, download_Options.RedimWidth, download_Options.RedimHeignt, new TileGenerator(), download_Options.interpretation, download_Options.scaleInfo, nbrOfTiles, urlbase, identifiant, Status.waitfordownloading, tileSize, nbrOfTiles, quality);
+                DownloadClass engine = new DownloadClass(downloadId, dbid, Layers.Current.class_id, urls, tokenSource2, ct, format, finalSaveFormat, zoom, saveTempDirectory, saveDirectory, filename, fileTempName, location, download_Options.RedimWidth, download_Options.RedimHeignt, new TileLoader(), download_Options.interpretation, download_Options.scaleInfo, nbrOfTiles, urlbase, identifiant, Status.waitfordownloading, tileSize, nbrOfTiles, quality);
                 DownloadClass.Add(engine, downloadId);
 
                 Status status;
@@ -885,24 +885,24 @@ namespace MapsInMyFolder
             int fontDPI = 80;
             int lineHeight = 2;
 
-            using var lText = NetVips.Image.Text("0", font, 50, null, NetVips.Enums.Align.Centre, true, fontDPI, 0, null, true);
-            using var rText = NetVips.Image.Text($"{scaleInfo.drawScaleEchelle}m", font, 50, null, NetVips.Enums.Align.Centre, true, fontDPI, 0, null, true);
+            using var lText = Image.Text("0", font, 50, null, Enums.Align.Centre, true, fontDPI, 0, null, true);
+            using var rText = Image.Text($"{scaleInfo.drawScaleEchelle}m", font, 50, null, Enums.Align.Centre, true, fontDPI, 0, null, true);
             int width = pixelLength + lText.Width + rText.Width + margin * 4;
 
-            using var scaleBackground = NetVips.Image.Black(width, height, 4).NewFromImage(backgroundColor);
+            using var scaleBackground = Image.Black(width, height, 4).NewFromImage(backgroundColor);
             using var scaleBackgroundSrgb = scaleBackground.Copy(interpretation: Enums.Interpretation.Srgb);
-            using var scaleBackgroundSrgbWithLText = scaleBackgroundSrgb.Composite2(lText, NetVips.Enums.BlendMode.Over, margin, (int)Math.Round((double)height / 2 - (double)lText.Height / 2));
-            using var scaleBackgroundSrgbWithRText = scaleBackgroundSrgbWithLText.Composite2(rText, NetVips.Enums.BlendMode.Over, scaleBackgroundSrgb.Width - rText.Width - margin, (int)Math.Round((double)height / 2 - (double)rText.Height / 2));
-            using var lineBase = NetVips.Image.Black(pixelLength, lineHeight);
+            using var scaleBackgroundSrgbWithLText = scaleBackgroundSrgb.Composite2(lText, Enums.BlendMode.Over, margin, (int)Math.Round((double)height / 2 - (double)lText.Height / 2));
+            using var scaleBackgroundSrgbWithRText = scaleBackgroundSrgbWithLText.Composite2(rText, Enums.BlendMode.Over, scaleBackgroundSrgb.Width - rText.Width - margin, (int)Math.Round((double)height / 2 - (double)rText.Height / 2));
+            using var lineBase = Image.Black(pixelLength, lineHeight);
             using var line = lineBase.NewFromImage(lineFirstPart);
-            using var lineBase2 = NetVips.Image.Black((int)Math.Round((double)pixelLength / 2), lineHeight);
+            using var lineBase2 = Image.Black((int)Math.Round((double)pixelLength / 2), lineHeight);
             using var line2 = lineBase2.NewFromImage(lineSecondPart);
 
             using var finalLine = line.Insert(line2, line.Width - (int)Math.Round((double)pixelLength / 2), 0, false);
 
-            using var scaleBackgroundWidthAllElements = scaleBackgroundSrgbWithRText.Composite2(finalLine, NetVips.Enums.BlendMode.Atop, 2 * margin + lText.Width, (int)Math.Round((double)height / 2 - (double)finalLine.Height / 2));
+            using var scaleBackgroundWidthAllElements = scaleBackgroundSrgbWithRText.Composite2(finalLine, Enums.BlendMode.Atop, 2 * margin + lText.Width, (int)Math.Round((double)height / 2 - (double)finalLine.Height / 2));
 
-            NetVips.Image imageWidthScale = image.Composite(scaleBackgroundWidthAllElements, NetVips.Enums.BlendMode.Over, margin, image.Height - (height + margin), Enums.Interpretation.Srgb, false);
+            NetVips.Image imageWidthScale = image.Composite(scaleBackgroundWidthAllElements, Enums.BlendMode.Over, margin, image.Height - (height + margin), Enums.Interpretation.Srgb, false);
             Debug.WriteLine("End Here");
             return imageWidthScale;
         }
@@ -927,8 +927,8 @@ namespace MapsInMyFolder
 
             await Task.Run(() =>
             {
-                NetVips.Cache.MaxMem = 0;
-                NetVips.Cache.Trace = false;
+                Cache.MaxMem = 0;
+                Cache.Trace = false;
                 if (currentEngine.state == Status.error)
                 {
                     return;
@@ -1327,7 +1327,7 @@ namespace MapsInMyFolder
             }
             try
             {
-                HttpResponse httpResponse = await TileGeneratorSettings.TileLoaderGenerator.GetImageAsync(download_engine.urlbase, url.x, url.y, url.z, download_engine.layerid, download_engine.format, save_temp_directory).ConfigureAwait(false);
+                HttpResponse httpResponse = await Tiles.Loader.GetImageAsync(download_engine.urlbase, url.x, url.y, url.z, download_engine.layerid, download_engine.format, save_temp_directory).ConfigureAwait(false);
                 if (httpResponse?.ResponseMessage?.IsSuccessStatusCode == true)
                 {
                     using var contentStream = Collectif.ByteArrayToStream(httpResponse.Buffer);

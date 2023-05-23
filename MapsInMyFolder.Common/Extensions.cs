@@ -187,6 +187,20 @@ namespace MapsInMyFolder.Commun
             return false;
         }
 
+
+        public static bool Contains(this string[] array, string value)
+        {
+            for (int i = 0; i < array.Length; i++)
+            {
+                if (array[i] == value)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+
         public static string Replace(this string Texte, IEnumerable<char> oldCharArray, string newString)
         {
             foreach (char SearchStr in oldCharArray)

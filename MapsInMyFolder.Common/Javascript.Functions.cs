@@ -1,11 +1,8 @@
-﻿using Esprima;
-using Esprima.Ast;
-using Jint;
-using Jint.Native;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -79,7 +76,7 @@ namespace MapsInMyFolder.Commun
 
             static public bool ClearVar(int LayerId, object variablename = null)
             {
-                if (object.ReferenceEquals(null, variablename))
+                if (ReferenceEquals(null, variablename))
                 {
                     if (DictionnaryOfVariablesKeyLayerId.ContainsKey(LayerId))
                     {
@@ -124,13 +121,13 @@ namespace MapsInMyFolder.Commun
             {
                 if (Layers.Current.class_id == LayerId)
                 {
-                    Javascript.JavascriptInstance.Location = new Dictionary<string, double>(){
+                    JavascriptInstance.Location = new Dictionary<string, double>(){
                     {"SE_Latitude",SE_Latitude },
                     {"SE_Longitude",SE_Longitude },
                     {"NO_Latitude",NO_Latitude },
                     {"NO_Longitude",NO_Longitude }
                 };
-                    Javascript.JavascriptInstance.ZoomToNewLocation = ZoomToNewLocation;
+                    JavascriptInstance.ZoomToNewLocation = ZoomToNewLocation;
                 }
             }
 
@@ -200,18 +197,18 @@ namespace MapsInMyFolder.Commun
                 string printString = ConvertJSObjectToString(print);
                 if (!string.IsNullOrEmpty(printString))
                 {
-                    if (LayerId == -2 && TileGeneratorSettings.AcceptJavascriptPrint)
+                    if (LayerId == -2 && Tiles.AcceptJavascriptPrint)
                     {
-                        Javascript.JavascriptInstance.Logs = String.Concat(Javascript.JavascriptInstance.Logs, "\n", printString);
+                        JavascriptInstance.Logs = string.Concat(JavascriptInstance.Logs, "\n", printString);
                     }
                 }
             }
 
             static public void PrintClear()
             {
-                if (TileGeneratorSettings.AcceptJavascriptPrint)
+                if (Tiles.AcceptJavascriptPrint)
                 {
-                    Javascript.JavascriptInstance.Logs = String.Empty;
+                    JavascriptInstance.Logs = String.Empty;
                 }
             }
 
@@ -285,7 +282,7 @@ namespace MapsInMyFolder.Commun
                         Action callback = () =>
                         {
                             Debug.WriteLine("CallBack");
-                            Javascript.ExecuteScript(Layers.GetLayerById(LayerId).class_tilecomputationscript, null, LayerId, javascriptCallback?.ToString());
+                            ExecuteScript(Layers.GetLayerById(LayerId).class_tilecomputationscript, null, LayerId, javascriptCallback?.ToString());
                         };
 
                         notification = new NText(texte.ToString(), caption?.ToString(), "MainPage", callback);
@@ -304,35 +301,32 @@ namespace MapsInMyFolder.Commun
 
             static public void Help(int LayerId)
             {
-                Print(
-                    "\n\nAIDE CALCUL TUILE" + "\n" +
-                    "A chaque chargement de tuile, la function getTile est appelée avec des arguments\n" +
-                    "et dois retourner un objet contenant les remplacements à effectués.\n" +
-                    "Les arguments qui sont envoyé à la fonction de base sont les suivants : " + "\n" +
-                    " - X : Représente en WMTS le numero de la tuile X" + "\n" +
-                    " - Y : Représente en WMTS le numero de la tuile Y" + "\n" +
-                    " - Z : Représente le niveau de zoom" + "\n" +
-                    " - layerid : Représente l'ID du calque sélectionnée" + "\n" +
-                    "Exemple pour l'url \"https://tile.openstreetmap.org/{NiveauZoom}/{TuileX}/{TuileY}.png\":" + "\n" +
-                    "function getTile(args) {" + "\n" +
-                    "var returnvalue = new Object;" + "\n" +
-                    "returnvalue.TuileX = args.x;" + "\n" +
-                    "returnvalue.TuileY = args.y;" + "\n" +
-                    "returnvalue.NiveauZoom = args.z;" + "\n" +
-                    "return returnvalue;" + "\n" +
-                    "}" + "\n" +
-                    "\n" +
-                    "AIDE FUNCTIONS PERSONALISÉE" + "\n" +
-                    "print(string) : Affiche un message dans la console" + "\n" +
-                    "alert(string) : Affiche une boite de dialogue" + "\n" +
-                    "printClear(string) : Efface la console" + "\n" +
-                    "help() : Affiche cette aide" + "\n" +
-                    "setVar(\"nom_variable\",\"valeur\") : Defini la valeur de la variable. Cette variable est conservé durant l'entiéreté de l'execution de l'application" + "\n" +
-                    "getVar(\"nom_variable\") : Obtiens la valeur de la variable." + "\n" +
-                    "getTileNumber(latitude, longitude, zoom) : Converti les coordonnées en tiles" + "\n" +
-                    "getLatLong(TileX, TileY, zoom) : Converti les numero de tiles en coordonnées" + "\n" +
-                    "", LayerId);
+                StringBuilder stringBuilder = new StringBuilder();
+                stringBuilder.AppendLine("AIDE");
+                stringBuilder.AppendLine("À chaque chargement de tuile, la fonction getTile est appelée avec des arguments");
+                stringBuilder.AppendLine("et doit retourner un objet contenant les remplacements à effectuer.");
+                stringBuilder.AppendLine("La documentation du logiciel est disponible à cette adresse : ");
+                stringBuilder.AppendLine("https://github.com/SioGabx/MapsInMyFolder");
+                stringBuilder.AppendLine("");
+                stringBuilder.AppendLine("FONCTIONS");
+                stringBuilder.AppendLine(" - print(string) : Affiche un message dans la console");
+                stringBuilder.AppendLine(" - printClear() : Efface la console");
+                stringBuilder.AppendLine(" - cls() : Efface la console");
+                stringBuilder.AppendLine(" - help() : Affiche cette aide");
+                stringBuilder.AppendLine(" - setVar(\"nom_variable\",\"valeur\") : Définit la valeur de la variable. Cette variable est conservée durant l'intégralité de l'exécution de l'application");
+                stringBuilder.AppendLine(" - getVar(\"nom_variable\") : Obtient la valeur de la variable.");
+                stringBuilder.AppendLine(" - clearVar(\"nom_variable\") : Supprime la variable.");
+                stringBuilder.AppendLine(" - getTileNumber(latitude, longitude, zoom) : Convertit les coordonnées en tiles");
+                stringBuilder.AppendLine(" - getLatLong(TileX, TileY, zoom) : Convertit les numéros de tiles en coordonnées");
+                stringBuilder.AppendLine(" - setSelection(top_latitude, top_longitude, bot_latitude, bot_longitude) : Définit les coordonnées de la sélection courante");
+                stringBuilder.AppendLine(" - getSelection() : Obtient les coordonnées de la sélection courante");
+                stringBuilder.AppendLine(" - alert(\"message\", \"caption\") : Affiche un message à l'écran");
+                stringBuilder.AppendLine(" - inputbox(\"message\", \"caption\") : Demande une saisie à l'utilisateur");
+                stringBuilder.AppendLine(" - sendNotification(\"message\", \"caption\", \"callback\", \"notificationId\") : Envoie une notification à l'écran. Un callback peut être attaché et appelé lors du clic sur celle-ci");
+                stringBuilder.AppendLine(" - refreshMap() : Rafraîchit la carte à l'écran");
+                stringBuilder.AppendLine(" - getStyle() : Obtient la valeur du style");
 
+                Print(stringBuilder.ToString(), LayerId);
             }
 
             static public void PrintError(string print, int LayerId = -2)

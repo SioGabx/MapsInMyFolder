@@ -52,12 +52,12 @@ namespace MapsInMyFolder
 
             string url = $"https://nominatim.openstreetmap.org/search.php?q={encodedSearch}&polygon_geojson=0&limit=5&format=xml&email=siogabx@siogabx.fr";
             Debug.WriteLine(url);
-            using HttpResponseMessage response = TileGeneratorSettings.HttpClient.GetAsync(url).Result;
+            using HttpResponseMessage response = Tiles.HttpClient.GetAsync(url).Result;
             using Stream responseStream = response.Content.ReadAsStream();
 
             response.EnsureSuccessStatusCode();
 
-            using (System.Xml.XmlReader reader = System.Xml.XmlReader.Create(responseStream))
+            using (System.Xml.XmlReader reader = XmlReader.Create(responseStream))
             {
                 reader.MoveToContent();
                 int idSearch = 0;
@@ -102,7 +102,7 @@ namespace MapsInMyFolder
             using Stream responseStream = response.Content.ReadAsStream();
             response.EnsureSuccessStatusCode();
 
-            using (XmlReader reader = System.Xml.XmlReader.Create(responseStream))
+            using (XmlReader reader = XmlReader.Create(responseStream))
             {
                 reader.MoveToContent();
                 int idSearch = 0;

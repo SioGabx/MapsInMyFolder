@@ -28,7 +28,7 @@ namespace MapsInMyFolder
             _instance = this;
             InitializeComponent();
             MainContentFrame.Navigate(MainPage);
-            TileGeneratorSettings.handler.ServerCertificateCustomValidationCallback += (_, _, _, _) => true;
+            Tiles.handler.ServerCertificateCustomValidationCallback += (_, _, _, _) => true;
         }
 
         public MainPage MainPage = new MainPage();
@@ -72,7 +72,7 @@ namespace MapsInMyFolder
             CustomOrEditLayersPage.Init_CustomOrEditLayersWindow(prefilLayerId);
 
             MainContentFrame.Navigate(CustomOrEditLayersPage);
-            TileGeneratorSettings.AcceptJavascriptPrint = true;
+            Tiles.AcceptJavascriptPrint = true;
         }
 
         //SQLiteConnection global_conn;
@@ -114,7 +114,7 @@ namespace MapsInMyFolder
         public void LightInit()
         {
             ImageLoader.HttpClient.DefaultRequestHeaders.AddChangeIfExist("User-Agent", Settings.user_agent);
-            TileGeneratorSettings.HttpClient.DefaultRequestHeaders.AddChangeIfExist("User-Agent", Settings.user_agent);
+            Tiles.HttpClient.DefaultRequestHeaders.AddChangeIfExist("User-Agent", Settings.user_agent);
             MainPage.mapviewer.AnimationDuration = TimeSpan.FromMilliseconds(Settings.animations_duration_millisecond);
         }
 

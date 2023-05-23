@@ -325,7 +325,7 @@ namespace MapsInMyFolder
 
             string selectedSearchEngine = search_engine.SelectedValue.ToString();
             Settings.search_engine = (SearchEngines)Enum.Parse(typeof(SearchEngines), selectedSearchEngine);
-            
+
 
             Settings.tileloader_default_script = tileloader_default_script.Text;
             Settings.tileloader_template_script = tileloader_template_script.Text;

@@ -6,8 +6,9 @@ using System.Windows;
 namespace MapsInMyFolder.Commun
 {
     public enum ListDisplayType { BIG, CONDENSED, SMALL, LIST, LIST_ALTERNAT }
-    public enum SearchEngines { 
-        OpenStreetMap, 
+    public enum SearchEngines
+    {
+        OpenStreetMap,
         BingMaps
     }
 

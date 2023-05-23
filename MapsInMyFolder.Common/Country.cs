@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -11,8 +10,6 @@ namespace MapsInMyFolder.Commun
     {
         public string DisplayName { get; set; }
         public string EnglishName { get; set; }
-
-
         public static IEnumerable<Country> getList()
         {
             List<Country> CountryList = new List<Country>();
@@ -89,6 +86,4 @@ namespace MapsInMyFolder.Commun
             return false;
         }
     }
-
-
 }

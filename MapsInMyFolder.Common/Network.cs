@@ -58,7 +58,7 @@ namespace MapsInMyFolder.Commun
         private static bool _FastIsNetworkAvailable = true;
         public static bool FastIsNetworkAvailable()
         {
-                return _FastIsNetworkAvailable;
+            return _FastIsNetworkAvailable;
 
         }
 

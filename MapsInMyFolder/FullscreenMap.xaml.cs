@@ -222,18 +222,18 @@ namespace MapsInMyFolder
         public void FilterZoomOnTextChanged(object sender, TextChangedEventArgs e)
         {
             TextBox textBoxSender = sender as TextBox;
-            Collectif.FilterDigitOnlyWhileWritingInTextBox(textBoxSender, new List<char>() {'-', '∞' }, true, false);
+            Collectif.FilterDigitOnlyWhileWritingInTextBox(textBoxSender, new List<char>() { '-', '∞' }, true, false);
             if (textBoxSender.Text.Trim() == "-1")
             {
                 textBoxSender.Text = "∞";
             }
-            
+
         }
 
         public void FilterStrokeThicknessOnTextChanged(object sender, TextChangedEventArgs e)
         {
             TextBox textBoxSender = sender as TextBox;
-            Collectif.FilterDigitOnlyWhileWritingInTextBox(textBoxSender, new List<char>() {'.'}, true, false);
+            Collectif.FilterDigitOnlyWhileWritingInTextBox(textBoxSender, new List<char>() { '.' }, true, false);
         }
 
         private void PropertiesDisplayElement_Unloaded(object sender, RoutedEventArgs e)
@@ -265,8 +265,8 @@ namespace MapsInMyFolder
         }
 
 
-            
-            public void UpdateLocation_NO(object sender, TextChangedEventArgs e)
+
+        public void UpdateLocation_NO(object sender, TextChangedEventArgs e)
         {
             TextBox textBoxSender = sender as TextBox;
             Collectif.FilterDigitOnlyWhileWritingInTextBox(textBoxSender, new List<char>() { '.', '-' }, true, false);
@@ -432,7 +432,7 @@ namespace MapsInMyFolder
                 {
                     ContentGrid.Opacity = 0;
                     var doubleAnimation = new DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(Settings.animations_duration_millisecond));
-                    ContentGrid.BeginAnimation(UIElement.OpacityProperty, doubleAnimation);
+                    ContentGrid.BeginAnimation(OpacityProperty, doubleAnimation);
                     sender.InsertPosition = NotificationZone.Children.Add(ContentGrid);
                 }
             }
@@ -446,7 +446,7 @@ namespace MapsInMyFolder
                     ContentGrid = null;
                     NotificationZone.Children.Remove(ContentGrid);
                 };
-                ContentGrid.BeginAnimation(Grid.MaxHeightProperty, doubleAnimation);
+                ContentGrid.BeginAnimation(MaxHeightProperty, doubleAnimation);
             }
         }
 

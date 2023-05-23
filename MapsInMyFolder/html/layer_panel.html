@@ -78,6 +78,11 @@
             filter: brightness(0.8) grayscale(0.2)
         }
 
+        .inSelectionHighlight p {
+            color: #f8c187 !important;
+            text-shadow: -1px 1px 7px black;
+        }
+
         .layer_main_div {
             height: 195px;
             min-height: 80px;
@@ -1237,8 +1242,8 @@
         }
 
         function hideLi(li) {
-                li.classList.remove("visible");
-                li.classList.add("hidden");
+            li.classList.remove("visible");
+            li.classList.add("hidden");
         }
 
         function contains(str, substring) {

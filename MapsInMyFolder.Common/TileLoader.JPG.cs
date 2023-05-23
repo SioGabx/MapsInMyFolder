@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace MapsInMyFolder.Commun
 {
-    public partial class TileGenerator
+    public partial class TileLoader
     {
         public async Task<HttpResponse> GetTile(int layerID, string urlBase, int TileX, int TileY, int zoom)
         {
@@ -15,7 +15,8 @@ namespace MapsInMyFolder.Commun
                 return HttpResponse.HttpResponseError;
             }
 
-            if (!TileGeneratorSettings.SupportedFileType.Contains(Layer.class_format.ToLower()))
+            string[] SupportedClassFormat = new string[] { "jpeg", "jpg", "png" };
+            if (!SupportedClassFormat.Contains(Layer.class_format.ToLower()))
             {
                 Debug.WriteLine("Le format peut ne pas être supporté actuellement : " + Layer.class_format);
             }

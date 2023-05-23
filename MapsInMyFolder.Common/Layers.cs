@@ -54,7 +54,7 @@ namespace MapsInMyFolder.Commun
             this.class_hasscale = class_hasscale;
         }
 
-        public static Layers Current = Layers.Empty();
+        public static Layers Current = Empty();
 
         public class SpecialsOptions
         {
@@ -77,11 +77,11 @@ namespace MapsInMyFolder.Commun
                     }
                 }
             }
-            public string PBFJsonStyle { get; set; }
+            public string Style { get; set; }
 
             public override string ToString()
             {
-                if (string.IsNullOrWhiteSpace(BackgroundColor) && string.IsNullOrWhiteSpace(PBFJsonStyle))
+                if (string.IsNullOrWhiteSpace(BackgroundColor) && string.IsNullOrWhiteSpace(Style))
                 {
                     return string.Empty;
                 }
@@ -89,9 +89,9 @@ namespace MapsInMyFolder.Commun
                 {
                     return "{\"BackgroundColor\":\"" + BackgroundColor + "\"}";
                 }
-                else if (!string.IsNullOrWhiteSpace(PBFJsonStyle))
+                else if (!string.IsNullOrWhiteSpace(Style))
                 {
-                    return "{\"PBFJsonStyle\":\"" + System.Text.Json.JsonSerializer.Serialize<string>(PBFJsonStyle) + "\"}";
+                    return "{\"Style\":\"" + System.Text.Json.JsonSerializer.Serialize<string>(Style) + "\"}";
                 }
                 else
                 {

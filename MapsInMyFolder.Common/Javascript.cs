@@ -7,10 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Threading;
 
 namespace MapsInMyFolder.Commun
 {
@@ -38,7 +34,7 @@ namespace MapsInMyFolder.Commun
             get { return _logs; }
             set
             {
-                if (TileGeneratorSettings.AcceptJavascriptPrint)
+                if (Tiles.AcceptJavascriptPrint)
                 {
                     _logs = value;
                     OnLogsChanged();
@@ -73,7 +69,7 @@ namespace MapsInMyFolder.Commun
         }
 
         public static long OldScriptTimestamp;
-        public static readonly TimeSpan ScriptTimeOut = new TimeSpan(0,0,4);
+        public static readonly TimeSpan ScriptTimeOut = new TimeSpan(0, 0, 4);
 
 
         private static Engine SetupEngine(int LayerId)
@@ -85,7 +81,7 @@ namespace MapsInMyFolder.Commun
 
             Engine add = new Engine(options =>
             {
-                options.TimeoutInterval(new TimeSpan(0, 1,0));
+                options.TimeoutInterval(new TimeSpan(0, 1, 0));
                 options.MaxStatements(5000);
                 options.CancellationToken(JsCancelToken.Token);
             });
@@ -95,31 +91,30 @@ namespace MapsInMyFolder.Commun
 
         public static Engine SetupFunctions(Engine engine, int LayerId)
         {
-            engine.SetValue("print", (Action<object>)(stringtext => Javascript.Functions.Print(stringtext, LayerId)));
-            engine.SetValue("printClear", (Action<object>)(_ => Javascript.Functions.PrintClear()));
-            engine.SetValue("cls", (Action<object>)(_ => Javascript.Functions.PrintClear()));
-            engine.SetValue("help", (Action<object>)(_ => Javascript.Functions.Help(LayerId)));
-            engine.SetValue("setVar", (Func<object, object, bool, object>)((variable, value, isglobalvar) => Javascript.Functions.SetVar(variable, value, isglobalvar, LayerId)));
-            engine.SetValue("getVar", (Func<object, object>)(variablename => Javascript.Functions.GetVar(variablename, LayerId)));
-            engine.SetValue("clearVar", (Func<object, bool>)(variablename => Javascript.Functions.ClearVar(LayerId, variablename)));
-            engine.SetValue("getTileNumber", (Func<object, object, object, object>)((latitude, longitude, zoom) => Javascript.Functions.CoordonneesToTile(latitude, longitude, zoom)));
-            engine.SetValue("getLatLong", (Func<object, object, object, object>)((TileX, TileY, zoom) => Javascript.Functions.TileToCoordonnees(TileX, TileY, zoom)));
+            engine.SetValue("print", (Action<object>)(stringtext => Functions.Print(stringtext, LayerId)));
+            engine.SetValue("printClear", (Action<object>)(_ => Functions.PrintClear()));
+            engine.SetValue("cls", (Action<object>)(_ => Functions.PrintClear()));
+            engine.SetValue("help", (Action<object>)(_ => Functions.Help(LayerId)));
+            engine.SetValue("setVar", (Func<object, object, bool, object>)((variable, value, isglobalvar) => Functions.SetVar(variable, value, isglobalvar, LayerId)));
+            engine.SetValue("getVar", (Func<object, object>)(variablename => Functions.GetVar(variablename, LayerId)));
+            engine.SetValue("clearVar", (Func<object, bool>)(variablename => Functions.ClearVar(LayerId, variablename)));
+            engine.SetValue("getTileNumber", (Func<object, object, object, object>)((latitude, longitude, zoom) => Functions.CoordonneesToTile(latitude, longitude, zoom)));
+            engine.SetValue("getLatLong", (Func<object, object, object, object>)((TileX, TileY, zoom) => Functions.TileToCoordonnees(TileX, TileY, zoom)));
             engine.SetValue("setSelection", (Action<double, double, double, double, bool>)((NO_Latitude, NO_Longitude, SE_Latitude, SE_Longitude, ZoomToNewLocation) =>
-                Javascript.Functions.SetSelection(NO_Latitude, NO_Longitude, SE_Latitude, SE_Longitude, ZoomToNewLocation, LayerId)));
-            engine.SetValue("getSelection", (Func<object>)(() => Javascript.Functions.GetSelection()));
-            engine.SetValue("alert", (Action<object, object>)((texte, caption) => Javascript.Functions.Alert(LayerId, texte, caption)));
-            engine.SetValue("inputbox", (Func<object, object, object>)((texte, caption) => Javascript.Functions.InputBox(LayerId, texte, caption)));
+                Functions.SetSelection(NO_Latitude, NO_Longitude, SE_Latitude, SE_Longitude, ZoomToNewLocation, LayerId)));
+            engine.SetValue("getSelection", (Func<object>)(() => Functions.GetSelection()));
+            engine.SetValue("alert", (Action<object, object>)((texte, caption) => Functions.Alert(LayerId, texte, caption)));
+            engine.SetValue("inputbox", (Func<object, object, object>)((texte, caption) => Functions.InputBox(LayerId, texte, caption)));
             engine.SetValue("sendNotification", (Func<object, object, object, object, object>)((texte, caption, callback, notifId) =>
-                Javascript.Functions.SendNotification(LayerId, texte, caption, callback, notifId)));
+                Functions.SendNotification(LayerId, texte, caption, callback, notifId)));
             engine.SetValue("refreshMap", (Func<object>)(() =>
             {
-                Javascript.JavascriptActionEvent?.Invoke(LayerId, JavascriptAction.refreshMap);
+                JavascriptActionEvent?.Invoke(LayerId, JavascriptAction.refreshMap);
                 return null;
             }));
-
+            engine.SetValue("getStyle", (Func<object>)(() => Tiles.Loader.GetStyle(LayerId)));
             return engine;
         }
-
 
         #region engines
         private static readonly Dictionary<int, CancellationTokenSource> JsListCancelTocken = new Dictionary<int, CancellationTokenSource>();
@@ -127,7 +122,7 @@ namespace MapsInMyFolder.Commun
 
         public static void EngineStopAll()
         {
-            Javascript.setOldScriptTimestamp();
+            setOldScriptTimestamp();
             foreach (KeyValuePair<int, CancellationTokenSource> tockensource in JsListCancelTocken)
             {
                 Debug.WriteLine("Revoking" + tockensource.Key);
@@ -178,9 +173,9 @@ namespace MapsInMyFolder.Commun
                 catch (Exception ex)
                 {
                     Debug.WriteLine(ex.Message);
-                    Javascript.Functions.PrintError(ex.Message);
+                    Functions.PrintError(ex.Message);
                 }
-                
+
             }
             return null;
         }
@@ -201,7 +196,7 @@ namespace MapsInMyFolder.Commun
 
         public static void EngineClearList()
         {
-            Javascript.setOldScriptTimestamp();
+            setOldScriptTimestamp();
             //lock (locker)
             //{
             ListOfEngines.Clear();
@@ -259,11 +254,8 @@ namespace MapsInMyFolder.Commun
             {
                 script = Layers.GetLayerById(LayerId).class_tilecomputationscript;
             }
-            Engine add;
-            //lock (locker)
-            //{
-                add = EngineGetById(LayerId, script);
-            //}
+            Engine add = EngineGetById(LayerId, script);
+
             if (add == null || string.IsNullOrEmpty(functionName))
             {
                 return false;
@@ -272,12 +264,12 @@ namespace MapsInMyFolder.Commun
 
             return evaluateValue.AsBoolean();
         }
-        public static Jint.Native.JsValue ExecuteScript(string script, Dictionary<string, object> arguments, int LayerId, Collectif.GetUrl.InvokeFunction InvokeFunction)
+        public static JsValue ExecuteScript(string script, Dictionary<string, object> arguments, int LayerId, Collectif.GetUrl.InvokeFunction InvokeFunction)
         {
             return ExecuteScript(script, arguments, LayerId, InvokeFunction.ToString());
         }
-       
-        public static Jint.Native.JsValue ExecuteScript(string script, Dictionary<string, object> arguments, int LayerId, string InvokeFunctionString)
+
+        public static JsValue ExecuteScript(string script, Dictionary<string, object> arguments, int LayerId, string InvokeFunctionString)
         {
             long ScriptTimestamp = GetTimestamp();
             lock (ExecuteScriptLocker)
@@ -294,11 +286,10 @@ namespace MapsInMyFolder.Commun
                 {
                     return null;
                 }
-                Jint.Native.JsValue jsValue = null;
+                JsValue jsValue = null;
 
                 try
                 {
-                    //Debug.WriteLine("LAST INVOKE " + InvokeFunctionString + "  " + LayerId);
                     jsValue = add?.Invoke(InvokeFunctionString, arguments);
                 }
                 catch (Exception ex)
@@ -306,12 +297,11 @@ namespace MapsInMyFolder.Commun
                     Debug.WriteLine(ex.Message);
                     if (ex.Message == "Can only invoke functions")
                     {
-                        //PrintError("No main function fund. Use \"function getT(args) {}\"");
-                        Javascript.Functions.PrintError("La fonction " + InvokeFunctionString + " n'as pas été trouvé dans le script. Faite help() pour obtenir de l'aide sur cette commande.");
+                        Functions.PrintError("La fonction " + InvokeFunctionString + " n'as pas été trouvé dans le script. Faite help() pour obtenir de l'aide sur cette commande.");
                     }
                     else
                     {
-                        Javascript.Functions.PrintError(ex.Message);
+                        Functions.PrintError(ex.Message);
                     }
                     return null;
                 }
@@ -346,7 +336,7 @@ namespace MapsInMyFolder.Commun
             var add = EngineGetById(LayerId, "");
             try
             {
-                Javascript.Functions.Print("> " + command, LayerId);
+                Functions.Print("> " + command, LayerId);
                 string evaluateResultString = string.Empty;// add.Evaluate(command).ToString();
                 JsValue evaluateResult = add.Evaluate(command);
                 if ((evaluateResult.IsArray() || evaluateResult.IsObject()) && evaluateResult.GetType().FullName != "Jint.Runtime.Interop.DelegateWrapper")
@@ -364,13 +354,13 @@ namespace MapsInMyFolder.Commun
                 }
                 if (!string.IsNullOrEmpty(evaluateResultString) && evaluateResultString != "null")
                 {
-                    Javascript.Functions.Print("< " + evaluateResultString, LayerId);
+                    Functions.Print("< " + evaluateResultString, LayerId);
                 }
             }
             catch (Exception ex)
             {
                 Debug.WriteLine(ex.Message);
-                Javascript.Functions.PrintError(ex.Message);
+                Functions.PrintError(ex.Message);
             }
         }
     }

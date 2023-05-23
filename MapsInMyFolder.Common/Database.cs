@@ -54,7 +54,7 @@ namespace MapsInMyFolder.Commun
             SQLiteConnection.CreateFile(database_pathname);
             //DB_CreateTables(database_pathname).Dispose();
             RefreshPanels.Invoke(null, EventArgs.Empty);
-            await Database.CheckIfNewerVersionAvailable();
+            await CheckIfNewerVersionAvailable();
         }
 
         private static async Task<bool> DB_DownloadFile(string database_url, string database_pathname)
@@ -114,7 +114,7 @@ namespace MapsInMyFolder.Commun
                     GitHubFile githubAssets = GetGithubAssets.GetContentAssetsFromGithub(new Uri(Settings.github_repository_url).PathAndQuery, String.Empty, Settings.github_database_name);
                     if (!(githubAssets is null) && await DB_DownloadFile(githubAssets?.Download_url, database_pathname))
                     {
-                        int UserVersion = Database.ExecuteScalarSQLCommand("PRAGMA user_version");
+                        int UserVersion = ExecuteScalarSQLCommand("PRAGMA user_version");
                         XMLParser.Cache.Write("dbVersion", UserVersion.ToString());
                         XMLParser.Cache.WriteAttribute("dbVersion", "dbSha", githubAssets?.Sha);
                         RefreshPanels.Invoke(null, EventArgs.Empty);
@@ -361,7 +361,7 @@ namespace MapsInMyFolder.Commun
         {
             try
             {
-                return Database.ExecuteNonQuerySQLCommand("CREATE TABLE IF NOT EXISTS 'DOWNLOADS' ('ID' INTEGER NOT NULL UNIQUE,'STATE' TEXT,'INFOS' TEXT,'FILE_NAME' TEXT,'NBR_TILES' INTEGER,'ZOOM' INTEGER,'NO_LAT' REAL,'NO_LONG' REAL,'SE_LAT' REAL,'SE_LONG' REAL,'LAYER_ID' INTEGER,'TEMP_DIRECTORY' TEXT,'SAVE_DIRECTORY' TEXT,'TIMESTAMP' TEXT,'QUALITY' INTEGER,'REDIMWIDTH' INTEGER,'REDIMHEIGHT' INTEGER,'COLORINTERPRETATION' TEXT,'SCALEINFO' TEXT,PRIMARY KEY('ID' AUTOINCREMENT));");
+                return ExecuteNonQuerySQLCommand("CREATE TABLE IF NOT EXISTS 'DOWNLOADS' ('ID' INTEGER NOT NULL UNIQUE,'STATE' TEXT,'INFOS' TEXT,'FILE_NAME' TEXT,'NBR_TILES' INTEGER,'ZOOM' INTEGER,'NO_LAT' REAL,'NO_LONG' REAL,'SE_LAT' REAL,'SE_LONG' REAL,'LAYER_ID' INTEGER,'TEMP_DIRECTORY' TEXT,'SAVE_DIRECTORY' TEXT,'TIMESTAMP' TEXT,'QUALITY' INTEGER,'REDIMWIDTH' INTEGER,'REDIMHEIGHT' INTEGER,'COLORINTERPRETATION' TEXT,'SCALEINFO' TEXT,PRIMARY KEY('ID' AUTOINCREMENT));");
             }
             catch (Exception e)
             {
@@ -377,13 +377,13 @@ namespace MapsInMyFolder.Commun
                 return -1;
             }
 
-            
+
 
             string InsertCommandText = $"INSERT INTO 'DOWNLOADS'('STATE','INFOS', 'FILE_NAME', 'NBR_TILES', 'ZOOM', 'NO_LAT', 'NO_LONG', 'SE_LAT', 'SE_LONG', 'LAYER_ID', 'TEMP_DIRECTORY', 'SAVE_DIRECTORY','TIMESTAMP','QUALITY','REDIMWIDTH','REDIMHEIGHT', 'COLORINTERPRETATION', 'SCALEINFO') VALUES('{STATE}','','{FILE_NAME}','{NBR_TILES}','{ZOOM}','{NO_LAT}','{NO_LONG}','{SE_LAT}','{SE_LONG}','{LAYER_ID}','{TEMP_DIRECTORY}','{SAVE_DIRECTORY}','{TIMESTAMP}','{QUALITY}','{REDIMWIDTH}','{REDIMHEIGHT}','{COLORINTERPRETATION}','{SCALEINFO}');";
             //Make sur that select last_insert_rowid() is launch just after insert
             var DatabaseConnexion = DB_Connection();
-            Database.ExecuteNonQuerySQLCommand(DatabaseConnexion, InsertCommandText);
-            return Database.ExecuteScalarSQLCommand(DatabaseConnexion, "select last_insert_rowid() from DOWNLOADS");
+            ExecuteNonQuerySQLCommand(DatabaseConnexion, InsertCommandText);
+            return ExecuteScalarSQLCommand(DatabaseConnexion, "select last_insert_rowid() from DOWNLOADS");
         }
 
         public static void DB_Download_Update(int bdid, string ROW, string value)
@@ -391,7 +391,7 @@ namespace MapsInMyFolder.Commun
             try
             {
                 string UpdateCommandText = "UPDATE 'DOWNLOADS' SET '" + ROW + "'='" + value.Replace("\"", "") + "' WHERE ID=" + bdid;
-                Database.ExecuteNonQuerySQLCommand(UpdateCommandText);
+                ExecuteNonQuerySQLCommand(UpdateCommandText);
             }
             catch (Exception ex)
             {
@@ -404,7 +404,7 @@ namespace MapsInMyFolder.Commun
             try
             {
                 string DeleteCommandText = "DELETE FROM 'DOWNLOADS' WHERE ID=" + Math.Abs(bdid);
-                Database.ExecuteNonQuerySQLCommand(DeleteCommandText);
+                ExecuteNonQuerySQLCommand(DeleteCommandText);
             }
             catch (Exception ex)
             {
@@ -425,7 +425,7 @@ namespace MapsInMyFolder.Commun
 
         private static async Task<(bool IsNewVersionAvailable, int NewVersionNumber)> CompareVersion()
         {
-            int UserVersion = Database.ExecuteScalarSQLCommand("PRAGMA user_version");
+            int UserVersion = ExecuteScalarSQLCommand("PRAGMA user_version");
             int LastCheckDatabaseVersion = Convert.ToInt32(XMLParser.Cache.Read("dbVersion"));
             string LastCheckDatabaseSha = XMLParser.Cache.ReadAttribute("dbVersion", "dbSha");
 
@@ -448,7 +448,7 @@ namespace MapsInMyFolder.Commun
                 }
             }
             //Download database from github
-            string databaseFileName = System.IO.Path.GetFileName(Settings.database_pathname);
+            string databaseFileName = Path.GetFileName(Settings.database_pathname);
             if (string.IsNullOrWhiteSpace(databaseFileName))
             {
                 databaseFileName = "database";
@@ -483,7 +483,7 @@ namespace MapsInMyFolder.Commun
         public static async void StartUpdating()
         {
             GitHubFile githubAssets = GetGithubAssets.GetContentAssetsFromGithub(new Uri(Settings.github_repository_url).PathAndQuery, String.Empty, Settings.github_database_name);
-            string databaseFileName = System.IO.Path.GetFileName(Settings.database_pathname);
+            string databaseFileName = Path.GetFileName(Settings.database_pathname);
             if (string.IsNullOrWhiteSpace(databaseFileName))
             {
                 databaseFileName = "database";
@@ -586,7 +586,7 @@ namespace MapsInMyFolder.Commun
                     }
                 }
                 SQLExecute.Append("COMMIT;");
-                Database.ExecuteNonQuerySQLCommand(SQLExecute.ToString());
+                ExecuteNonQuerySQLCommand(SQLExecute.ToString());
             }
         }
 

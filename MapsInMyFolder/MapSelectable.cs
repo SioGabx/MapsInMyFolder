@@ -5,8 +5,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows;
-using System.Windows.Input;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace MapsInMyFolder
 {
@@ -809,7 +809,7 @@ namespace MapsInMyFolder
                 var locations = GetRectangleLocation(rectangle);
                 if (locations.NO.Latitude == locations.NO.Longitude || locations.SE.Latitude == locations.SE.Longitude || locations.NO.Latitude == locations.SE.Latitude || locations.NO.Longitude == locations.SE.Longitude)
                 {
-                        numberOfUnusedRectangleDeleted++;
+                    numberOfUnusedRectangleDeleted++;
                     DeleteRectangle(rectangle);
                 }
             }

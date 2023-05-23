@@ -8,7 +8,6 @@ using System.Data.SQLite;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -72,7 +71,8 @@ namespace MapsInMyFolder
 
             Init_LayerEditableTextbox(prefilLayerId);
             SetAppercuLayers(forceUpdate: true);
-            DoShowSpecialOptionPBFJsonStyle();
+            DoExpandStyleTextBox();
+
             if (Database.ExecuteScalarSQLCommand("SELECT COUNT(*) FROM 'main'.'EDITEDLAYERS' WHERE ID = " + LayerId) == 0)
             {
                 ResetInfoLayerClikableLabel.IsEnabled = false;
@@ -256,7 +256,7 @@ namespace MapsInMyFolder
             TextBoxSetValueAndLock(TextboxLayerTileUrl, LayerInEditMode.class_tile_url);
             TextBoxSetValueAndLock(TextboxLayerTileWidth, tileSize);
             TextBoxSetValueAndLock(TextboxSpecialOptionBackgroundColor, LayerInEditMode.class_specialsoptions.BackgroundColor?.TrimEnd('#'));
-            TextBoxSetValueAndLock(TextboxSpecialOptionPBFJsonStyle, LayerInEditMode.class_specialsoptions.PBFJsonStyle);
+            TextBoxSetValueAndLock(TextboxLayerStyle, LayerInEditMode.class_specialsoptions.Style);
 
             string[] class_pays = LayerInEditMode.class_pays.Split(';', StringSplitOptions.RemoveEmptyEntries);
             List<Country> SelectedCountries = Country.getListFromEnglishName(class_pays);
@@ -718,7 +718,7 @@ namespace MapsInMyFolder
             layers.class_specialsoptions = new Layers.SpecialsOptions()
             {
                 BackgroundColor = TextboxSpecialOptionBackgroundColor.Text,
-                PBFJsonStyle = TextboxSpecialOptionPBFJsonStyle.Text,
+                Style = TextboxLayerStyle.Text,
             };
 
             layers.class_hasscale = has_scale.IsChecked ?? false;
@@ -794,7 +794,7 @@ namespace MapsInMyFolder
         void DisposeElementOnLeave()
         {
             Javascript.Functions.PrintClear();
-            TileGeneratorSettings.AcceptJavascriptPrint = false;
+            Tiles.AcceptJavascriptPrint = false;
             Javascript.EngineStopAll();
             if (UpdateTimer is not null)
             {
@@ -996,30 +996,36 @@ namespace MapsInMyFolder
 
         private void TextboxLayerFormat_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            DoShowSpecialOptionPBFJsonStyle();
+            DoExpandStyleTextBox();
         }
 
-        void DoShowSpecialOptionPBFJsonStyle()
+        void DoExpandStyleTextBox()
         {
-            if (SpecialOptionPBFJsonStyle is null || !IsInitialized)
+            if (TextboxLayerFormat is ComboBox combobox)
             {
-                return;
-            }
-            ComboBoxItem comboBoxItem = TextboxLayerFormat.SelectedItem as ComboBoxItem;
-            if (comboBoxItem is null)
-            {
-                TextboxLayerFormat.SelectedItem = TextboxLayerFormat.Items[0];
-                return;
-            }
-            if (comboBoxItem.Content.ToString() == "PBF")
-            {
-                SpecialOptionPBFJsonStyle.Visibility = Visibility.Visible;
-            }
-            else
-            {
-                SpecialOptionPBFJsonStyle.Visibility = Visibility.Collapsed;
+                if (combobox.SelectedItem is ComboBoxItem comboBoxItem)
+                {
+                    if (TextboxLayerStyle is null)
+                    {
+                        return;
+                    }
+
+                    if (comboBoxItem.Content.ToString() == "PBF")
+                    {
+                        TextboxLayerStyle.MinHeight = 120;
+                    }
+                    else
+                    {
+                        TextboxLayerStyle.MinHeight = 0;
+                    }
+                }
+                else
+                {
+                    TextboxLayerFormat.SelectedItem = TextboxLayerFormat?.Items[0];
+                }
             }
         }
+
 
         private void TextboxSpecialOptionBackgroundColor_TextChanged(object sender, TextChangedEventArgs e)
         {
@@ -1056,7 +1062,7 @@ namespace MapsInMyFolder
 
         private void Page_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key == System.Windows.Input.Key.S && System.Windows.Input.Keyboard.Modifiers == System.Windows.Input.ModifierKeys.Control)
+            if (e.Key == Key.S && Keyboard.Modifiers == ModifierKeys.Control)
             {
                 //CTRL + S
                 try
@@ -1145,7 +1151,7 @@ namespace MapsInMyFolder
                 {
                     if (!string.IsNullOrEmpty(ZoomValue) && ZoomValue != "∞" && ZoomValue.ToLowerInvariant() != "infinity")
                     {
-                        if (double.TryParse((string)ZoomValue, out double doubleZoom) && doubleZoom >= 0)
+                        if (double.TryParse(ZoomValue, out double doubleZoom) && doubleZoom >= 0)
                         {
                             return (int)Math.Floor(doubleZoom);
                         }
@@ -1171,7 +1177,7 @@ namespace MapsInMyFolder
             string SerializedProperties = "";
             if (ListOfRectangleProperties.Count > 0)
             {
-                SerializedProperties = JsonConvert.SerializeObject(ListOfRectangleProperties, Newtonsoft.Json.Formatting.Indented);
+                SerializedProperties = JsonConvert.SerializeObject(ListOfRectangleProperties, Formatting.Indented);
             }
             TextboxRectangles.TextArea.Document.Text = SerializedProperties;
             DoWeNeedToUpdateMoinsUnLayer();

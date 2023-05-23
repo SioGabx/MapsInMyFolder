@@ -163,11 +163,11 @@ namespace MapsInMyFolder
                 string Separator = "\n----------------------------------------------------------";
                 Separator += Separator + Separator;
                 File.AppendAllText(
-                    Path.Combine(Settings.working_folder, "crash.log"), Separator + 
-                    "\nException.Message :\n" + e.Exception.Message + 
-                    "\nException.StackTrace :\n" + e.Exception.StackTrace + 
-                    "\n\nException.String :\n" + e.Exception.ToString() , System.Text.Encoding.UTF8);
-                
+                    Path.Combine(Settings.working_folder, "crash.log"), Separator +
+                    "\nException.Message :\n" + e.Exception.Message +
+                    "\nException.StackTrace :\n" + e.Exception.StackTrace +
+                    "\n\nException.String :\n" + e.Exception.ToString(), System.Text.Encoding.UTF8);
+
                 MessageBox.Show("Une erreur s'est produite, l'application est desormais instable. Il est fortement recommandé de relancer l'application ! \n\n" + e.Exception.Message, "Erreur fatale");
                 //Message.NoReturnBoxAsync("Une erreur innatendu s'est produite, l'application va devoir se fermer", "Erreur");
             }

@@ -68,6 +68,7 @@ namespace MapsInMyFolder
             if (layer_searchbar.Text == "Rechercher un calque, un site...")
             {
                 layer_searchbar.Text = "";
+                layer_searchbar.Foreground = (System.Windows.Media.SolidColorBrush)new System.Windows.Media.BrushConverter().ConvertFromString("#BCBCBC");
             }
         }
 
@@ -128,7 +129,7 @@ namespace MapsInMyFolder
                 {
                     ContentGrid.Opacity = 0;
                     var doubleAnimation = new DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(Settings.animations_duration_millisecond));
-                    ContentGrid.BeginAnimation(UIElement.OpacityProperty, doubleAnimation);
+                    ContentGrid.BeginAnimation(OpacityProperty, doubleAnimation);
                     sender.InsertPosition = NotificationZone.Children.Add(ContentGrid);
                 }
             }
@@ -142,7 +143,7 @@ namespace MapsInMyFolder
                     ContentGrid = null;
                     NotificationZone.Children.Remove(ContentGrid);
                 };
-                ContentGrid.BeginAnimation(Grid.MaxHeightProperty, doubleAnimation);
+                ContentGrid.BeginAnimation(MaxHeightProperty, doubleAnimation);
             }
         }
 
@@ -229,7 +230,7 @@ namespace MapsInMyFolder
 
             if (isAnimating)
             {
-                label.BeginAnimation(UIElement.OpacityProperty, null);
+                label.BeginAnimation(OpacityProperty, null);
                 fadeInAnimation.From = label.Opacity;
                 fadeInAnimation.To = 1.0;
             }
@@ -255,9 +256,9 @@ namespace MapsInMyFolder
             storyboard.Children.Add(fadeInAnimation);
             storyboard.Children.Add(fadeOutAnimation);
             Storyboard.SetTarget(fadeInAnimation, label);
-            Storyboard.SetTargetProperty(fadeInAnimation, new PropertyPath(UIElement.OpacityProperty));
+            Storyboard.SetTargetProperty(fadeInAnimation, new PropertyPath(OpacityProperty));
             Storyboard.SetTarget(fadeOutAnimation, label);
-            Storyboard.SetTargetProperty(fadeOutAnimation, new PropertyPath(UIElement.OpacityProperty));
+            Storyboard.SetTargetProperty(fadeOutAnimation, new PropertyPath(OpacityProperty));
 
             fadeOutAnimation.Completed += (s, e) => isAnimating = false;
 

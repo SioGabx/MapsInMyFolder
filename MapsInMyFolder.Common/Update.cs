@@ -16,7 +16,7 @@ namespace MapsInMyFolder.Commun
         public static event EventHandler NewUpdateFoundEvent = delegate { };
         public static string GetActualVersionFormatedString()
         {
-            Version version = Update.AssemblyVersion;
+            Version version = AssemblyVersion;
             return String.Format("{0}.{1}.{2}", version.Major, version.Minor, version.Build);
         }
 

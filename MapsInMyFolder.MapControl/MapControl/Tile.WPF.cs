@@ -34,6 +34,7 @@ namespace MapsInMyFolder.MapControl
                 {
                     Image.Opacity = 1d;
                 }
+
                 #region drawborder
                 if (Commun.Settings.map_show_tile_border || Commun.Settings.is_in_debug_mode)
                 {
@@ -49,14 +50,14 @@ namespace MapsInMyFolder.MapControl
                             if (Commun.Settings.is_in_debug_mode)
                             {
                                 string TileLocationText = "TileX : " + this.X.ToString() + "\n" +
-                                                                             "TileY : " + this.Y.ToString() + "\n" +
-                                                                             "Zoom  : " + this.ZoomLevel.ToString();
-                                dc.DrawText(new FormattedText(TileLocationText, System.Globalization.CultureInfo.CurrentCulture, System.Windows.FlowDirection.LeftToRight, new Typeface("Arial"), 12, couleur, 150), new System.Windows.Point(05, 05));
+                                                          "TileY : " + this.Y.ToString() + "\n" +
+                                                          "Zoom  : " + this.ZoomLevel.ToString();
+                                dc.DrawText(new FormattedText(TileLocationText, System.Globalization.CultureInfo.CurrentCulture, System.Windows.FlowDirection.LeftToRight, new Typeface("Arial"), 12, couleur, 150), new System.Windows.Point(5, 5));
                             }
                             Pen pen = new Pen(couleur, 1);
-                            dc.DrawRectangle(Brushes.Transparent, pen, new System.Windows.Rect(0, 0, image.Width, image.Height));
+                            dc.DrawRectangle(Brushes.Transparent, pen, new System.Windows.Rect(0, 0, bImage.PixelWidth, bImage.PixelHeight));
                         }
-                        RenderTargetBitmap targetBitmap = new RenderTargetBitmap(Convert.ToInt32(image.Width), Convert.ToInt32(image.Height), 96, 96, PixelFormats.Default);
+                        RenderTargetBitmap targetBitmap = new RenderTargetBitmap(bImage.PixelWidth, bImage.PixelHeight, 96, 96, PixelFormats.Default);
                         targetBitmap.Render(dVisual);
                         WriteableBitmap wBitmap = new WriteableBitmap(targetBitmap);
                         Image.Source = wBitmap;

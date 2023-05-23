@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -189,7 +188,7 @@ namespace MapsInMyFolder
                             return;
                         }
 
-                        HttpResponse httpResponse = TileGeneratorSettings.TileLoaderGenerator.GetImageAsync(url.url, tileX + url.index_x, tileY + url.index_y, zoom, layerID, pbfdisableadjacent: true).Result;
+                        HttpResponse httpResponse = Tiles.Loader.GetImageAsync(url.url, tileX + url.index_x, tileY + url.index_y, zoom, layerID, pbfdisableadjacent: true).Result;
 
                         if (updateMigniatureParraleleToken.IsCancellationRequested && updateMigniatureParraleleToken.CanBeCanceled)
                         {
@@ -202,7 +201,7 @@ namespace MapsInMyFolder
                         }
                         else
                         {
-                            bitmapImageArray[url.index_x, url.index_y] = Collectif.GetEmptyImageBufferFromText(httpResponse);
+                            bitmapImageArray[url.index_x, url.index_y] = Collectif.GetEmptyImageBufferFromText(httpResponse, "jpeg");
                         }
                     });
                 }, updateMigniatureParraleleToken);
@@ -776,8 +775,9 @@ namespace MapsInMyFolder
 
         void TextBoxRedimDimensionChanged(TextBox AttachedTextbox, ComboBox AttachedComboBoxUnit, TextBox OpositeTextbox, string SourcePropertyName)
         {
-            if (!IsInitialized) { 
-                return; 
+            if (!IsInitialized)
+            {
+                return;
             }
             if (string.IsNullOrWhiteSpace(AttachedTextbox.Text))
             {

@@ -34,21 +34,22 @@ namespace MapsInMyFolder.MapControl
                 else if (uri.Scheme == "http" || uri.Scheme == "https")
                 {
                     Commun.HttpResponse response;
+
+                    string SaveTempDir = "";
+                    string fileformat = string.Empty;
+                    if (!(tileSource is null) && tileSource.LayerID != 0)
+                    {
+                        Layers layers = Layers.GetLayerById(tileSource.LayerID);
+                        if (layers is null)
+                        {
+                            return null;
+                        }
+                        SaveTempDir = Collectif.GetSaveTempDirectory(layers.class_name, layers.class_identifiant, z);
+                        fileformat = layers.class_format;
+                    }
                     if (z != -1)
                     {
-                        string SaveTempDir = "";
-                        string fileformat = string.Empty;
-                        if (!(tileSource is null) && tileSource.LayerID != 0)
-                        {
-                            Layers layers = Layers.GetLayerById(tileSource.LayerID);
-                            if (layers is null)
-                            {
-                                return null;
-                            }
-                            SaveTempDir = Collectif.GetSaveTempDirectory(layers.class_name, layers.class_identifiant, z);
-                            fileformat = layers.class_format;
-                        }
-                        response = await TileGeneratorSettings.TileLoaderGenerator.GetImageAsync(uri.ToString(), x, y, z, tileSource.LayerID, fileformat, SaveTempDir);
+                        response = await Tiles.Loader.GetImageAsync(uri.ToString(), x, y, z, tileSource.LayerID, fileformat, SaveTempDir);
                     }
                     else
                     {
@@ -63,7 +64,7 @@ namespace MapsInMyFolder.MapControl
                     }
                     else if (Settings.map_view_error_tile)
                     {
-                        image = await LoadImageAsync(Collectif.GetEmptyImageBufferFromText(response)).ConfigureAwait(false);
+                        image = await LoadImageAsync(Collectif.GetEmptyImageBufferFromText(response, fileformat)).ConfigureAwait(false);
                     }
                 }
                 else

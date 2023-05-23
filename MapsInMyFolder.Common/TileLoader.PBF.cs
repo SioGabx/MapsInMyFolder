@@ -9,7 +9,7 @@ using System.Windows.Media.Imaging;
 
 namespace MapsInMyFolder.Commun
 {
-    public partial class TileGenerator
+    public partial class TileLoader
     {
         public async Task<HttpResponse> GetTilePBF(int LayerID, string urlBase, int TileX, int TileY, int TileZoom, string save_temp_directory, int render_tile_size, int TextSizeMultiplicateur, double OverflowTextCorrectingValue, bool pbfdisableadjacent = false)
         {
@@ -314,93 +314,19 @@ namespace MapsInMyFolder.Commun
         }
 
 
-        public static MapsInMyFolder.VectorTileRenderer.Style PBFGetStyle(int layerID)
+        public static VectorTileRenderer.Style PBFGetStyle(int layerID)
         {
-            string styleValueOrUrlOrPath;
-            Layers layers = Layers.GetLayerById(layerID);
             try
             {
-                styleValueOrUrlOrPath = layers?.class_specialsoptions?.PBFJsonStyle;
-            }
-            catch (Exception ex)
-            {
-                Javascript.Functions.PrintError("Tile style load Layer : " + ex.Message, layerID);
-                return null;
-            }
-            if (string.IsNullOrEmpty(styleValueOrUrlOrPath))
-            {
-                Javascript.Functions.PrintError("Tile style non défini", layerID);
-                return null;
-            }
-
-            try
-            {
-                //if this is a url, then download the style and save it
-                if (Uri.IsWellFormedUriString(styleValueOrUrlOrPath, UriKind.Absolute) && Collectif.IsUrlValid(styleValueOrUrlOrPath))
+                string styleValueOrUrlOrPath = Tiles.Loader.GetStyle(layerID);
+                if (!string.IsNullOrEmpty(styleValueOrUrlOrPath))
                 {
-                    string path = Path.Combine(Collectif.GetSaveTempDirectory(layers.class_name, layers.class_identifiant), "layerstyle", styleValueOrUrlOrPath.GetHashCode().ToString() + ".json");
-                    if (File.Exists(path))
-                    {
-                        styleValueOrUrlOrPath = path;
-                    }
-                    else
-                    {
-                        //if file not exist, then download it ONCE
-                        lock (PBF_RenderingAsync_Locker)
-                        {
-                            //maybe after the lock the file exist now
-                            if (File.Exists(path))
-                            {
-                                styleValueOrUrlOrPath = path;
-                            }
-                            else
-                            {
-                                Debug.WriteLine("Load style from url :" + path);
-                                #region downloadStyleFromUrl
-                                try
-                                {
-                                    HttpResponse httpResponse = Collectif.ByteDownloadUri(new Uri(styleValueOrUrlOrPath), layerID, true).Result;
-                                    if (httpResponse?.ResponseMessage.IsSuccessStatusCode == true)
-                                    {
-                                        if (httpResponse.Buffer != null)
-                                        {
-                                            styleValueOrUrlOrPath = Collectif.ByteArrayToString(httpResponse.Buffer);
-                                            if (!string.IsNullOrEmpty(styleValueOrUrlOrPath))
-                                            {
-                                                //save filetodisk
-                                                string path_dir = Path.GetDirectoryName(path);
-                                                if (!Directory.Exists(path_dir))
-                                                {
-                                                    Directory.CreateDirectory(path_dir);
-                                                }
-                                                File.WriteAllText(path, styleValueOrUrlOrPath);
-                                            }
-                                        }
-                                        else
-                                        {
-                                            Debug.WriteLine("VectorTileRenderer.Style buffer from url is null");
-                                        }
-                                    }
-                                    else
-                                    {
-                                        Debug.WriteLine("VectorTileRenderer.Style response from url is null");
-                                    }
-                                }
-                                catch (Exception ex)
-                                {
-                                    Debug.WriteLine(ex.Message);
-                                }
-                                #endregion
-                            }
-                        }
-                    }
+                    return new VectorTileRenderer.Style(styleValueOrUrlOrPath);
                 }
-
-                return new MapsInMyFolder.VectorTileRenderer.Style(styleValueOrUrlOrPath);
             }
             catch (Exception ex)
             {
-                Javascript.Functions.PrintError("Tile style : " + ex.Message, layerID);
+                Javascript.Functions.PrintError("Une erreur s'est produite lors du chargement du style : " + ex.Message, layerID);
             }
             return null;
         }

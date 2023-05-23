@@ -3,7 +3,6 @@ using MapsInMyFolder.Commun;
 using ModernWpf.Controls;
 using System;
 using System.Collections.Generic;
-using System.Data.SQLite;
 using System.Diagnostics;
 using System.Threading;
 using System.Windows;
@@ -120,7 +119,7 @@ namespace MapsInMyFolder
                             Download_INFOS = "Introuvable.";
                         }
                     }
-                    DownloadClass engine = new DownloadClass(downloadid, DB_Download_ID, DB_Download_LAYER_ID, urls, tokenSource2, ct, format, final_saveformat, DB_Download_ZOOM, DB_Download_TEMP_DIRECTORY, DB_Download_SAVE_DIRECTORY, DB_Download_FILE_NAME, filetempname, location, REDIMWIDTH, REDIMHEIGHT, new TileGenerator(), COLORINTERPRETATION, SCALEINFO, DB_Download_NBR_TILES, layers.class_tile_url, layers.class_identifiant, engine_status, layers.class_tiles_size, quality: DB_Download_QUALITY);
+                    DownloadClass engine = new DownloadClass(downloadid, DB_Download_ID, DB_Download_LAYER_ID, urls, tokenSource2, ct, format, final_saveformat, DB_Download_ZOOM, DB_Download_TEMP_DIRECTORY, DB_Download_SAVE_DIRECTORY, DB_Download_FILE_NAME, filetempname, location, REDIMWIDTH, REDIMHEIGHT, new TileLoader(), COLORINTERPRETATION, SCALEINFO, DB_Download_NBR_TILES, layers.class_tile_url, layers.class_identifiant, engine_status, layers.class_tiles_size, quality: DB_Download_QUALITY);
                     DownloadClass.Add(engine, downloadid);
                     string commande_add = "add_download(" + downloadid + @",""" + engine_status.ToString() + @""",""" + DB_Download_FILE_NAME + @""",0," + DB_Download_NBR_TILES + @",""" + Download_INFOS + @""",""" + DB_Download_TIMESTAMP + @""");";
                     if (engine_status == Status.error)

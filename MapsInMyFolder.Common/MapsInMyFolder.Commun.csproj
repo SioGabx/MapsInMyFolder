@@ -178,7 +178,7 @@
     <Compile Include="Collectif.cs" />
     <Compile Include="Country.cs" />
     <Compile Include="DiffMatchPatch.cs" />
-    <Compile Include="JavascriptFunctions.cs" />
+    <Compile Include="Javascript.Functions.cs" />
     <Compile Include="JSBeautify.cs" />
     <Compile Include="Map.cs" />
     <Compile Include="Database.cs" />
@@ -191,16 +191,16 @@
     <Compile Include="PageNotification.cs" />
     <Compile Include="ScaleInfo.cs" />
     <Compile Include="Settings.cs" />
-    <Compile Include="TileGenerator.cs" />
+    <Compile Include="TileLoader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TileGenerator.PBF_Tiles.cs" />
+    <Compile Include="TileLoader.PBF.cs" />
     <Compile Include="TileLocationCalculator.cs" />
     <Compile Include="Update.cs" />
     <Compile Include="GetGithubAssets.cs" />
     <Compile Include="XMLParser.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="TileGenerator.GenericFileFormat_Tiles.cs" />
+    <Compile Include="TileLoader.JPG.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\.editorconfig">

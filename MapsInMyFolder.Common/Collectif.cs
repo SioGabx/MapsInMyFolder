@@ -319,7 +319,7 @@ namespace MapsInMyFolder.Commun
 
         public static SolidColorBrush RgbValueToSolidColorBrush(int R, int G, int B)
         {
-            return new SolidColorBrush(System.Windows.Media.Color.FromArgb(255, (byte)R, (byte)G, (byte)B));
+            return new SolidColorBrush(Color.FromArgb(255, (byte)R, (byte)G, (byte)B));
         }
 
         public static ScrollViewer FormatDiffGetScrollViewer(string texteBase, string texteModif)
@@ -335,7 +335,7 @@ namespace MapsInMyFolder.Commun
             StackPanel ScrollViewerElementContent = new StackPanel()
             {
                 Margin = new Thickness(0, 0, 25, 0),
-                Background = Collectif.HexValueToSolidColorBrush("#303031"),
+                Background = HexValueToSolidColorBrush("#303031"),
             };
             ScrollViewerElementContent.Children.Add(FormatDiffTextblock);
             ScrollViewerElement.Content = ScrollViewerElementContent;
@@ -437,7 +437,7 @@ namespace MapsInMyFolder.Commun
             }
         }
 
-        public static byte[] GetEmptyImageBufferFromText(HttpResponse httpResponse)
+        public static byte[] GetEmptyImageBufferFromText(HttpResponse httpResponse, string FileFormat)
         {
             string BitmapErrorsMessage;
             if (httpResponse is null || httpResponse.ResponseMessage is null)
@@ -456,34 +456,63 @@ namespace MapsInMyFolder.Commun
                 BitmapErrorsMessage = $"{(int)httpResponse?.ResponseMessage?.StatusCode} - {httpResponse?.ResponseMessage?.ReasonPhrase}";
             }
 
-            return GetEmptyImageBufferFromText(BitmapErrorsMessage);
+            return GetEmptyImageBufferFromText(BitmapErrorsMessage, FileFormat);
         }
 
-        public static byte[] GetEmptyImageBufferFromText(string BitmapErrorsMessage)
+        public static byte[] GetEmptyImageBufferFromText(string BitmapErrorsMessage, string FileFormat)
         {
             const int tile_size = 300;
             const int border_size = 1;
             const int border_tile_size = tile_size - (border_size * 2);
-            const string format = "jpeg";
-            var color = new double[] { Settings.background_layer_color_R, Settings.background_layer_color_G, Settings.background_layer_color_B };
-            VOption saveVOption = getSaveVOption(format, 100, tile_size);
-
-            if (string.IsNullOrEmpty(BitmapErrorsMessage))
+            if (FileFormat == "png")
             {
-                return null;
-            }
+                const string format = "png";
+                double[] color = new double[] { Settings.background_layer_color_R, Settings.background_layer_color_G, Settings.background_layer_color_B, 60 };
+                VOption saveVOption = getSaveVOption(format, 100, tile_size);
 
-            using (NetVips.Image text = NetVips.Image.Text(WordWrap(BitmapErrorsMessage, 20), null, null, null, Enums.Align.Centre, null, 100, 5, null))
-            using (NetVips.Image background = NetVips.Image.Black(border_tile_size, border_tile_size))
-            {
-                int offsetX = (int)Math.Floor((double)(border_tile_size - text.Width) / 2);
-                int offsetY = (int)Math.Floor((double)(border_tile_size - text.Height) / 2);
-
-                using (NetVips.Image image = background.Linear(color, color))
-                using (NetVips.Image finalImage = image.Composite2(text, NetVips.Enums.BlendMode.Atop, offsetX, offsetY))
-                using (NetVips.Image GravityFinalImage = finalImage.Gravity(Enums.CompassDirection.Centre, tile_size, tile_size, Enums.Extend.Black))
+                if (string.IsNullOrEmpty(BitmapErrorsMessage))
                 {
-                    return GravityFinalImage.WriteToBuffer("." + format, saveVOption);
+                    return null;
+                }
+
+                using (NetVips.Image text = NetVips.Image.Text(WordWrap(BitmapErrorsMessage, 20), null, null, null, Enums.Align.Centre, null, 100, 5, null, true))
+                using (NetVips.Image background = NetVips.Image.Black(border_tile_size, border_tile_size))
+                {
+                    int offsetX = (int)Math.Floor((double)(border_tile_size - text.Width) / 2);
+                    int offsetY = (int)Math.Floor((double)(border_tile_size - text.Height) / 2);
+
+                    using (NetVips.Image image = background.Linear(color, color))
+                    using (NetVips.Image SrgbImage = image.Copy(interpretation: Enums.Interpretation.Srgb))
+                    using (NetVips.Image finalImage = SrgbImage.Composite2(text, Enums.BlendMode.Xor, offsetX, offsetY))
+                    using (NetVips.Image GravityFinalImage = finalImage.Gravity(Enums.CompassDirection.Centre, tile_size, tile_size, Enums.Extend.Background, new double[] { 0, 0, 0, 255 }))
+                    {
+                        return GravityFinalImage.WriteToBuffer("." + format, saveVOption);
+                    }
+                }
+            }
+            else
+            {
+                const string format = "jpeg";
+                var color = new double[] { Settings.background_layer_color_R, Settings.background_layer_color_G, Settings.background_layer_color_B };
+                VOption saveVOption = getSaveVOption(format, 100, tile_size);
+
+                if (string.IsNullOrEmpty(BitmapErrorsMessage))
+                {
+                    return null;
+                }
+
+                using (NetVips.Image text = NetVips.Image.Text(WordWrap(BitmapErrorsMessage, 20), null, null, null, Enums.Align.Centre, null, 100, 5, null, true))
+                using (NetVips.Image background = NetVips.Image.Black(border_tile_size, border_tile_size))
+                {
+                    int offsetX = (int)Math.Floor((double)(border_tile_size - text.Width) / 2);
+                    int offsetY = (int)Math.Floor((double)(border_tile_size - text.Height) / 2);
+
+                    using (NetVips.Image image = background.Linear(color, color))
+                    using (NetVips.Image finalImage = image.Composite2(text, Enums.BlendMode.Atop, offsetX, offsetY))
+                    using (NetVips.Image GravityFinalImage = finalImage.Gravity(Enums.CompassDirection.Centre, tile_size, tile_size, Enums.Extend.Black))
+                    {
+                        return GravityFinalImage.WriteToBuffer("." + format, saveVOption);
+                    }
                 }
             }
         }
@@ -557,7 +586,7 @@ namespace MapsInMyFolder.Commun
 
             if (!Network.FastIsNetworkAvailable())
             {
-                return new HttpResponse(null, new HttpResponseMessage(System.Net.HttpStatusCode.ServiceUnavailable)
+                return new HttpResponse(null, new HttpResponseMessage(HttpStatusCode.ServiceUnavailable)
                 {
                     ReasonPhrase = "Aucune connexion : Vérifiez votre connexion Internet"
                 });
@@ -575,7 +604,7 @@ namespace MapsInMyFolder.Commun
 
                 try
                 {
-                    using (var responseMessage = await TileGeneratorSettings.HttpClient.GetAsync(parsing_url, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false))
+                    using (var responseMessage = await Tiles.HttpClient.GetAsync(parsing_url, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false))
                     {
                         if (responseMessage is null)
                         {
@@ -660,7 +689,7 @@ namespace MapsInMyFolder.Commun
 
             public async Task StartDownload()
             {
-                using (var response = await TileGeneratorSettings.HttpClient.GetAsync(_downloadUrl, HttpCompletionOption.ResponseHeadersRead))
+                using (var response = await Tiles.HttpClient.GetAsync(_downloadUrl, HttpCompletionOption.ResponseHeadersRead))
                 {
                     await DownloadFileFromHttpResponseMessage(response);
                 }
