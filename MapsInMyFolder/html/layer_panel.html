@@ -1988,9 +1988,8 @@
 
         layer_Csharp_call_from_js.request_search_string()
             .then(function (initSearchValue) {
-                console.log(initSearchValue);
+                console.log("search " + initSearchValue);
                 if (initSearchValue != null && initSearchValue != undefined) {
-
                     search(initSearchValue);
                 }
             });

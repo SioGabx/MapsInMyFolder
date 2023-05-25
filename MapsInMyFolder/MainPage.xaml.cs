@@ -277,23 +277,10 @@ namespace MapsInMyFolder
             isAnimating = true;
         }
 
+        private void Start_Download_Click(object sender, RoutedEventArgs e)
+        {
+            mapSelectable.CleanRectangleLocations();
+            MainWindow._instance.FrameLoad_PrepareDownload();
+        }
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }

@@ -22,7 +22,7 @@ namespace MapsInMyFolder
                 return;
             }
 
-            DownloadClass.Clear();
+            DownloadSettings.Clear();
             string SelectCommandText = "SELECT * FROM 'DOWNLOADS' ORDER BY 'TIMESTAMP' ASC";
             using var sqlite_datareader = Database.ExecuteExecuteReaderSQLCommand(SelectCommandText);
 
@@ -67,7 +67,7 @@ namespace MapsInMyFolder
 
                     ScaleInfo SCALEINFO = System.Text.Json.JsonSerializer.Deserialize<ScaleInfo>(DB_Download_SCALEINFO, new System.Text.Json.JsonSerializerOptions() { IncludeFields = true });
 
-                    List<Url_class> urls = null;
+                    List<TilesUrl> urls = null;
                     CancellationTokenSource tokenSource2 = new CancellationTokenSource();
                     CancellationToken ct = tokenSource2.Token;
                     Status engine_status;
@@ -119,8 +119,8 @@ namespace MapsInMyFolder
                             Download_INFOS = "Introuvable.";
                         }
                     }
-                    DownloadClass engine = new DownloadClass(downloadid, DB_Download_ID, DB_Download_LAYER_ID, urls, tokenSource2, ct, format, final_saveformat, DB_Download_ZOOM, DB_Download_TEMP_DIRECTORY, DB_Download_SAVE_DIRECTORY, DB_Download_FILE_NAME, filetempname, location, REDIMWIDTH, REDIMHEIGHT, new TileLoader(), COLORINTERPRETATION, SCALEINFO, DB_Download_NBR_TILES, layers.class_tile_url, layers.class_identifiant, engine_status, layers.class_tiles_size, quality: DB_Download_QUALITY);
-                    DownloadClass.Add(engine, downloadid);
+                    DownloadSettings engine = new DownloadSettings(downloadid, DB_Download_ID, DB_Download_LAYER_ID, urls, tokenSource2, ct, format, final_saveformat, DB_Download_ZOOM, DB_Download_TEMP_DIRECTORY, DB_Download_SAVE_DIRECTORY, DB_Download_FILE_NAME, filetempname, location, REDIMWIDTH, REDIMHEIGHT, new TileLoader(), COLORINTERPRETATION, SCALEINFO, DB_Download_NBR_TILES, layers.class_tile_url, layers.class_identifiant, engine_status, layers.class_tiles_size, quality: DB_Download_QUALITY);
+                    DownloadSettings.Add(engine, downloadid);
                     string commande_add = "add_download(" + downloadid + @",""" + engine_status.ToString() + @""",""" + DB_Download_FILE_NAME + @""",0," + DB_Download_NBR_TILES + @",""" + Download_INFOS + @""",""" + DB_Download_TIMESTAMP + @""");";
                     if (engine_status == Status.error)
                     {
@@ -212,7 +212,7 @@ namespace MapsInMyFolder
         {
             if (id != 0)
             {
-                var engine = DownloadClass.GetEngineById(id);
+                var engine = DownloadSettings.GetEngineById(id);
                 if (engine is null) return false;
                 if (System.IO.Directory.Exists(engine.save_directory))
                 {
@@ -317,7 +317,7 @@ namespace MapsInMyFolder
             int id_int = Convert.ToInt32(id);
             if (id_int != 0)
             {
-                var engine = DownloadClass.GetEngineById(id_int);
+                var engine = DownloadSettings.GetEngineById(id_int);
                 if (engine is null) return;
                 Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
                {
@@ -339,7 +339,7 @@ namespace MapsInMyFolder
             int id_int = Convert.ToInt32(id);
             if (IsFileOk(id_int))
             {
-                var engine = DownloadClass.GetEngineById(id_int);
+                var engine = DownloadSettings.GetEngineById(id_int);
                 if (engine is null) return;
                 Process.Start("explorer.exe", "/select,\"" + engine.save_directory + engine.file_name + "\"");
             }
@@ -351,7 +351,7 @@ namespace MapsInMyFolder
 
             if (IsFileOk(id_int))
             {
-                var engine = DownloadClass.GetEngineById(id_int);
+                var engine = DownloadSettings.GetEngineById(id_int);
                 if (engine is null) return;
                 new Process
                 {
@@ -369,7 +369,7 @@ namespace MapsInMyFolder
 
             if (IsFileOk(id_int))
             {
-                var engine = DownloadClass.GetEngineById(id_int);
+                var engine = DownloadSettings.GetEngineById(id_int);
                 if (engine is null) return;
                 System.IO.File.Delete(engine.save_directory + engine.file_name);
 
@@ -386,7 +386,7 @@ namespace MapsInMyFolder
                     }
                 }, null);
 
-                foreach (DownloadClass eng in DownloadClass.GetEngineList())
+                foreach (DownloadSettings eng in DownloadSettings.GetEngineList())
                 {
                     if (eng.state == Status.success)
                     {
@@ -398,7 +398,7 @@ namespace MapsInMyFolder
         public void Download_opentempfolder(double id)
         {
             int id_int = Convert.ToInt32(id);
-            var engine = DownloadClass.GetEngineById(id_int);
+            var engine = DownloadSettings.GetEngineById(id_int);
 
             if (engine is null) return;
             if (System.IO.Directory.Exists(engine.save_temp_directory))
@@ -417,7 +417,7 @@ namespace MapsInMyFolder
         public void Download_delete_db(double id)
         {
             int id_int = Convert.ToInt32(id);
-            var engine = DownloadClass.GetEngineById(id_int);
+            var engine = DownloadSettings.GetEngineById(id_int);
             if (engine is null) return;
             Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
             {
@@ -436,7 +436,7 @@ namespace MapsInMyFolder
         public void Download_copyloc(double id)
         {
             int id_int = Convert.ToInt32(id);
-            var engine = DownloadClass.GetEngineById(id_int);
+            var engine = DownloadSettings.GetEngineById(id_int);
             if (engine is null) return;
             Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
             {
@@ -459,7 +459,7 @@ namespace MapsInMyFolder
         public void Download_copypath(double id)
         {
             int id_int = Convert.ToInt32(id);
-            var engine = DownloadClass.GetEngineById(id_int);
+            var engine = DownloadSettings.GetEngineById(id_int);
             if (engine is null) return;
             Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
             {
@@ -477,7 +477,7 @@ namespace MapsInMyFolder
         public void Download_makecourant(double id)
         {
             int id_int = Convert.ToInt32(id);
-            var engine = DownloadClass.GetEngineById(id_int);
+            var engine = DownloadSettings.GetEngineById(id_int);
             if (engine is null) return;
             Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
             {
@@ -495,7 +495,7 @@ namespace MapsInMyFolder
         public void Download_cancel_deleted_db(double id)
         {
             int id_int = Convert.ToInt32(id);
-            var engine = DownloadClass.GetEngineById(id_int);
+            var engine = DownloadSettings.GetEngineById(id_int);
             Status engineinitialstate = engine.state;
             if (engine is null) return;
 

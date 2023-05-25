@@ -70,7 +70,7 @@ namespace MapsInMyFolder
     }
 
 
-    public class Download_Options
+    public class DownloadOptions
     {
         public int id_layer;
         public string save_path;
@@ -89,7 +89,7 @@ namespace MapsInMyFolder
         public Enums.Interpretation interpretation;
         public ScaleInfo scaleInfo;
 
-        public Download_Options(int id_layer, string save_path, string format, string filename, string identifiant, string name, int tile_size, int zoom, int quality, string urlbase, MapControl.Location NO_PIN_Location, MapControl.Location SE_PIN_Location, int RedimWidth, int RedimHeignt, Enums.Interpretation interpretation, ScaleInfo scaleInfo)
+        public DownloadOptions(int id_layer, string save_path, string format, string filename, string identifiant, string name, int tile_size, int zoom, int quality, string urlbase, MapControl.Location NO_PIN_Location, MapControl.Location SE_PIN_Location, int RedimWidth, int RedimHeignt, Enums.Interpretation interpretation, ScaleInfo scaleInfo)
         {
             this.id_layer = id_layer;
             this.save_path = save_path;
@@ -110,12 +110,12 @@ namespace MapsInMyFolder
         }
     }
 
-    public class DownloadClass
+    public class DownloadSettings
     {
         public int id;
         public int dbid;
         public int layerid;
-        public List<Url_class> urls;
+        public List<TilesUrl> urls;
         public CancellationTokenSource cancellation_token_source;
         public CancellationToken cancellation_token;
         public string format;
@@ -144,10 +144,10 @@ namespace MapsInMyFolder
         public string last_command_non_important;
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1068:Les paramètres CancellationToken doivent venir en dernier", Justification = "it is safe to suppress a warning from this rule to avoid a breaking change and it more readible")]
-        public DownloadClass(int id,
+        public DownloadSettings(int id,
                                           int dbid,
                                           int layerid,
-                                          List<Url_class> urls,
+                                          List<TilesUrl> urls,
                                           CancellationTokenSource cancellation_token_source,
                                           CancellationToken cancellation_token,
                                           string format,
@@ -204,116 +204,33 @@ namespace MapsInMyFolder
             }
         }
 
-        //public static List<Dictionary<int, DownloadClass>> Engine_list { get; set; } = new List<Dictionary<int, DownloadClass>>();
-        //public static int Number_of_download { get; set; } = 0;
+        public static Dictionary<int, DownloadSettings> DownloadEngineDictionnary { get; set; } = new Dictionary<int, DownloadSettings>();
+        public static int CurrentNumberOfDownload { get; set; } = 0;
 
-        ///// <summary>
-        ///// Ajoute une download_main_engine_class dans la liste des engines accessible
-        ///// </summary>
-        ///// <param name="engine"></param>
-        ///// <param name="id"></param>
-        ///// <returns></returns>
-        //public static int Add(DownloadClass engine, int id)
-        //{
-        //    int number_of_engine_in_list = Engine_list.Count + 1;
-        //    Engine_list.Add(new Dictionary<int, DownloadClass> { { id, engine } });
-        //    return number_of_engine_in_list;
-        //}
-
-        //public static int GetId()
-        //{
-        //    return Engine_list.Count + 1;
-        //}
-
-        //public static List<DownloadClass> GetEngineList()
-        //{
-        //    List<DownloadClass> EngineList = new List<DownloadClass>();
-
-        //    foreach (Dictionary<int, DownloadClass> engine_dic in Engine_list)
-        //    {
-        //        DownloadClass value = engine_dic.Values.First();
-        //        EngineList.Add(value);
-        //    }
-        //    return EngineList;
-        //}
-
-        ///// <summary>
-        ///// return the engine_class with the id give
-        ///// </summary>
-        ///// <param name="id"></param>
-        ///// <returns></returns>
-        //public static DownloadClass GetEngineById(int id)
-        //{
-        //    foreach (Dictionary<int, DownloadClass> engine_dic in Engine_list)
-        //    {
-        //        try
-        //        {
-        //            if (engine_dic.Keys.First() == id)
-        //            {
-        //                DownloadClass return_download_main_engine_class = engine_dic[id];
-        //                return return_download_main_engine_class;
-        //            }
-        //        }
-        //        catch (KeyNotFoundException)
-        //        {
-        //            Console.WriteLine("Erreur : l'id de la tache n'existe pas.");
-        //        }
-        //    }
-        //    return null;
-        //}
-
-
-
-        public static Dictionary<int, DownloadClass> Engine_dict { get; set; } = new Dictionary<int, DownloadClass>();
-        public static int Number_of_download { get; set; } = 0;
-
-        /// <summary>
-        /// Ajoute une DownloadClass dans le dictionnaire des engines accessibles
-        /// </summary>
-        /// <param name="engine">L'objet DownloadClass à ajouter</param>
-        /// <param name="id">L'ID de l'objet</param>
-        /// <returns>Le nombre total d'objets dans le dictionnaire après l'ajout</returns>
-        public static int Add(DownloadClass engine, int id)
+        public static int Add(DownloadSettings engine, int id)
         {
-            Engine_dict.Add(id, engine);
-            return Engine_dict.Count;
+            DownloadEngineDictionnary.Add(id, engine);
+            return DownloadEngineDictionnary.Count;
         }
 
-        /// <summary>
-        /// Clear le dictionnaire des engines accessibles
-        /// </summary>
-        /// <returns>void</returns>
         public static void Clear()
         {
-            Engine_dict.Clear();
+            DownloadEngineDictionnary.Clear();
         }
 
-        /// <summary>
-        /// Obtient un nouvel ID pour une DownloadClass
-        /// </summary>
-        /// <returns>Le nouvel ID</returns>
         public static int GetId()
         {
-            return Engine_dict.Count + 1;
+            return DownloadEngineDictionnary.Count + 1;
         }
 
-        /// <summary>
-        /// Récupère la liste des DownloadClass dans le dictionnaire des engines
-        /// </summary>
-        /// <returns>La liste des DownloadClass</returns>
-        public static DownloadClass[] GetEngineList()
+        public static DownloadSettings[] GetEngineList()
         {
-            return Engine_dict.Values.ToArray();
+            return DownloadEngineDictionnary.Values.ToArray();
         }
 
-        /// <summary>
-        /// Récupère la DownloadClass correspondant à l'ID donné
-        /// </summary>
-        /// <param name="id">L'ID de la DownloadClass recherchée</param>
-        /// <returns>L'objet DownloadClass correspondant, ou null si l'ID n'est pas trouvé</returns>
-        public static DownloadClass GetEngineById(int id)
+        public static DownloadSettings GetEngineById(int id)
         {
-            if (Engine_dict.TryGetValue(id, out DownloadClass engine))
+            if (DownloadEngineDictionnary.TryGetValue(id, out DownloadSettings engine))
             {
                 return engine;
             }
@@ -324,15 +241,6 @@ namespace MapsInMyFolder
             }
         }
 
-    }
-
-    public partial class MainPage : System.Windows.Controls.Page
-    {
-        private void Start_Download_Click(object sender, RoutedEventArgs e)
-        {
-            mapSelectable.CleanRectangleLocations();
-            MainWindow._instance.FrameLoad_PrepareDownload();
-        }
     }
 
     public partial class MainWindow : Window
@@ -348,7 +256,7 @@ namespace MapsInMyFolder
                 else
                 {
                     int nbr_engine_progress = 0;
-                    foreach (var _ in DownloadClass.GetEngineList().Where(engine => !(engine.state == Status.cancel || engine.state == Status.pause || engine.state == Status.error || engine.state == Status.success)))
+                    foreach (var _ in DownloadSettings.GetEngineList().Where(engine => !(engine.state == Status.cancel || engine.state == Status.pause || engine.state == Status.error || engine.state == Status.success)))
                     {
                         nbr_engine_progress++;
                     }
@@ -378,14 +286,12 @@ namespace MapsInMyFolder
             CheckIfReadyToStartDownload();
         }
 
-
-
         static void CheckIfReadyToStartDownload()
         {
             int maxSimultaneousDownloads = Settings.max_download_project_in_parralele;
             int numDownloadsStarted = 0;
 
-            foreach (DownloadClass engine in DownloadClass.GetEngineList())
+            foreach (DownloadSettings engine in DownloadSettings.GetEngineList())
             {
                 if (numDownloadsStarted >= maxSimultaneousDownloads)
                     break;
@@ -416,7 +322,7 @@ namespace MapsInMyFolder
         static string GetListOfIdsAndStates()
         {
             StringBuilder sb = new StringBuilder();
-            foreach (DownloadClass engine in DownloadClass.GetEngineList())
+            foreach (DownloadSettings engine in DownloadSettings.GetEngineList())
             {
                 sb.AppendLine($"{engine.id} : {engine.state}");
             }
@@ -424,12 +330,12 @@ namespace MapsInMyFolder
         }
 
 
-        public void PrepareDownloadBeforeStart(Download_Options download_Options)
+        public void PrepareDownloadBeforeStart(DownloadOptions download_Options)
         {
             CheckifMultipleDownloadInProgress();
             MainPage.Download_panel_open();
             MainPage.download_panel_browser?.ExecuteScriptAsync("document.getElementById(\"main\").scrollIntoView({ behavior: \"smooth\", block: \"start\", inline: \"nearest\"})");
-            Download_Options download_Options_edited = download_Options;
+            DownloadOptions download_Options_edited = download_Options;
             download_Options_edited.id_layer = Layers.Current.class_id;
             download_Options_edited.identifiant = Layers.Current.class_identifiant;
             download_Options_edited.name = Layers.Current.class_name;
@@ -437,9 +343,9 @@ namespace MapsInMyFolder
             download_Options_edited.urlbase = Layers.Current.class_tile_url;
             StartDownload(download_Options_edited);
         }
-        void StartDownload(Download_Options download_Options)
+        void StartDownload(DownloadOptions download_Options)
         {
-            int downloadId = DownloadClass.GetId();
+            int downloadId = DownloadSettings.GetId();
             string format = Layers.Current.class_format;
             string finalSaveFormat = download_Options.format;
             int zoom = download_Options.zoom;
@@ -475,15 +381,15 @@ namespace MapsInMyFolder
             { "SE_Longitude", download_Options.SE_PIN_Location.Longitude }
         };
 
-                List<Url_class> urls = Collectif.GetUrl.GetListOfUrlFromLocation(location, zoom, urlbase, Layers.Current.class_id, downloadId);
+                List<TilesUrl> urls = Collectif.GetUrl.GetListOfUrlFromLocation(location, zoom, urlbase, Layers.Current.class_id, downloadId);
                 CancellationTokenSource tokenSource2 = new CancellationTokenSource();
                 CancellationToken ct = tokenSource2.Token;
                 string timestamp = Convert.ToString(new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds());
 
                 string jsonScaleInfo = Newtonsoft.Json.JsonConvert.SerializeObject(download_Options.scaleInfo);
                 int dbid = Database.DB_Download_Write(Status.waitfordownloading, filename, nbrOfTiles, zoom, download_Options.NO_PIN_Location.Latitude, download_Options.NO_PIN_Location.Longitude, download_Options.SE_PIN_Location.Latitude, download_Options.SE_PIN_Location.Longitude, download_Options.id_layer, saveTempDirectory, saveDirectory, timestamp, quality, download_Options.RedimWidth, download_Options.RedimHeignt, download_Options.interpretation.ToString(), jsonScaleInfo);
-                DownloadClass engine = new DownloadClass(downloadId, dbid, Layers.Current.class_id, urls, tokenSource2, ct, format, finalSaveFormat, zoom, saveTempDirectory, saveDirectory, filename, fileTempName, location, download_Options.RedimWidth, download_Options.RedimHeignt, new TileLoader(), download_Options.interpretation, download_Options.scaleInfo, nbrOfTiles, urlbase, identifiant, Status.waitfordownloading, tileSize, nbrOfTiles, quality);
-                DownloadClass.Add(engine, downloadId);
+                DownloadSettings engine = new DownloadSettings(downloadId, dbid, Layers.Current.class_id, urls, tokenSource2, ct, format, finalSaveFormat, zoom, saveTempDirectory, saveDirectory, filename, fileTempName, location, download_Options.RedimWidth, download_Options.RedimHeignt, new TileLoader(), download_Options.interpretation, download_Options.scaleInfo, nbrOfTiles, urlbase, identifiant, Status.waitfordownloading, tileSize, nbrOfTiles, quality);
+                DownloadSettings.Add(engine, downloadId);
 
                 Status status;
                 string info;
@@ -502,11 +408,6 @@ namespace MapsInMyFolder
                 string commandAdd = $"add_download({downloadId}, '{status}', '{filename}', 0, {nbrOfTiles}, '{info}', 'recent')";
                 MainPage.download_panel_browser?.ExecuteScriptAsync(commandAdd);
 
-                if (DownloadClass.GetEngineById(downloadId) != engine)
-                {
-                    Message.NoReturnBoxAsync("Intégrité rompue de l'engine de téléchargement. Veuillez relancer l'application (erreur fatale)", "Erreur");
-                }
-
                 CheckIfReadyToStartDownload();
             }
             else
@@ -517,14 +418,14 @@ namespace MapsInMyFolder
 
         public static void AbordAndCancelWithTokenDownload(int engineId)
         {
-            DownloadClass engine = DownloadClass.GetEngineById(engineId);
+            DownloadSettings engine = DownloadSettings.GetEngineById(engineId);
 
             if (engine.state != Status.error)
             {
                 engine.state = Status.pause;
             }
 
-            engine.cancellation_token = engine.cancellation_token_source.Token;
+            //engine.cancellation_token = engine.cancellation_token_source.Token;
             CancellationTokenSource canceltocken = engine.cancellation_token_source;
             canceltocken.Cancel();
             CheckIfReadyToStartDownload();
@@ -532,7 +433,7 @@ namespace MapsInMyFolder
 
         public static void StopingDownload(int engineId)
         {
-            DownloadClass engine = DownloadClass.GetEngineById(engineId);
+            DownloadSettings engine = DownloadSettings.GetEngineById(engineId);
             string info = $"{engine.nbr_of_tiles - engine.nbr_of_tiles_waiting_for_downloading}/{engine.nbr_of_tiles}";
             UpdateDownloadPanel(engineId, $"En pause... ({info})", "", true, Status.pause);
             AbordAndCancelWithTokenDownload(engineId);
@@ -540,51 +441,51 @@ namespace MapsInMyFolder
 
         public static void CancelDownload(int engineId)
         {
-            DownloadClass engine = DownloadClass.GetEngineById(engineId);
-
-            if (engine.state != Status.error)
-            {
-                engine.state = Status.cancel;
-            }
-
+            DownloadSettings engine = DownloadSettings.GetEngineById(engineId);
             UpdateDownloadPanel(engineId, "Annulé...", "", true, Status.cancel);
             AbordAndCancelWithTokenDownload(engineId);
         }
 
         public void RestartDownloadFromZero(int engineId)
         {
-            DownloadClass engine = DownloadClass.GetEngineById(engineId);
+            DownloadSettings engine = DownloadSettings.GetEngineById(engineId);
             engine.nbr_of_tiles_waiting_for_downloading = engine.nbr_of_tiles;
             RestartDownload(engineId);
         }
-        public void RestartDownload(int engineId)
+
+        public bool CheckNetworkAvailable(int engineId, string progress = "0", bool isImportant = true)
         {
             if (!Network.IsNetworkAvailable())
             {
                 UpdateDownloadPanel(engineId, "En attente d'une connexion internet", state: Status.noconnection);
+                return false;
             }
-            DownloadClass engine = DownloadClass.GetEngineById(engineId);
+            return true;
+        }
+
+        public void RestartDownload(int engineId)
+        {
+            CheckNetworkAvailable(engineId);
+            DownloadSettings engine = DownloadSettings.GetEngineById(engineId);
             engine.state = Status.waitfordownloading;
             CheckifMultipleDownloadInProgress();
+
             string info = $"{engine.nbr_of_tiles - engine.nbr_of_tiles_waiting_for_downloading}/{engine.nbr_of_tiles}";
             UpdateDownloadPanel(engineId, $"Reprise... ({info})", "", true, Status.progress);
+
             if (engine.urls is null || engine.urls.Count == 0)
             {
                 UpdateDownloadPanel(engineId, "Génération des URLs...", "", true, Status.progress);
                 engine.urls = Collectif.GetUrl.GetListOfUrlFromLocation(engine.location, engine.zoom, engine.urlbase, engine.layerid, engine.id);
             }
-            foreach (Commun.Url_class url in engine.urls)
-            {
-                url.status = Status.waitfordownloading;
-            }
+
+            engine.urls.ForEach(url => url.status = Status.waitfordownloading);
+
             engine.cancellation_token_source?.Cancel();
             engine.cancellation_token_source = new CancellationTokenSource();
             engine.cancellation_token = engine.cancellation_token_source.Token;
-            if (!Network.IsNetworkAvailable())
-            {
-                UpdateDownloadPanel(engineId, "En attente d'une connexion internet", "0", true, Status.noconnection);
-            }
-            if (DownloadClass.Number_of_download < Settings.max_download_project_in_parralele && Network.IsNetworkAvailable())
+
+            if (DownloadSettings.CurrentNumberOfDownload < Settings.max_download_project_in_parralele && CheckNetworkAvailable(engineId, "0", true))
             {
                 UpdateDownloadPanel(engineId, "Vérification de l'intégrité...", "0", true, Status.no_data);
                 DownloadThisEngine(engine);
@@ -595,9 +496,9 @@ namespace MapsInMyFolder
             }
         }
 
-        async void DownloadThisEngine(DownloadClass downloadEngineClassArgs)
+        async void DownloadThisEngine(DownloadSettings downloadEngineClassArgs)
         {
-            DownloadClass.Number_of_download++;
+            DownloadSettings.CurrentNumberOfDownload++;
             downloadEngineClassArgs.state = Status.progress;
             CheckIfReadyToStartDownload();
 
@@ -632,7 +533,7 @@ namespace MapsInMyFolder
                 downloadEngineClassArgs.state = Status.error;
             }
 
-            DownloadClass.Number_of_download--;
+            DownloadSettings.CurrentNumberOfDownload--;
             CheckifMultipleDownloadInProgress();
 
             await Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
@@ -643,129 +544,128 @@ namespace MapsInMyFolder
             CheckIfReadyToStartDownload();
         }
 
-        private async Task ParallelDownloadTilesTask(DownloadClass downloadEngineClass)
+        private void WaitForInternet(DownloadSettings downloadEngineClass)
         {
-            List<Url_class> urls = downloadEngineClass.urls;
+            CancellationTokenSource cancellationTokenSource = downloadEngineClass.cancellation_token_source;
+            CancellationToken cancellationToken = downloadEngineClass.cancellation_token;
+
+            bool isNetworkAvailable;
+            do
+            {
+                isNetworkAvailable = Network.FastIsNetworkAvailable();
+
+                if (cancellationToken.IsCancellationRequested && cancellationToken.CanBeCanceled)
+                {
+                    cancellationTokenSource?.Cancel();
+                    Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
+                    {
+                        TaskbarItemInfo.ProgressValue = 0;
+                    }, null);
+                    return;
+                }
+
+                if (!isNetworkAvailable)
+                {
+                    UpdateDownloadPanel(downloadEngineClass.id, "En attente d'une connexion internet", state: Status.noconnection);
+                    Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
+                    {
+                        TaskbarItemInfo.ProgressState = System.Windows.Shell.TaskbarItemProgressState.Paused;
+                    }, null);
+                    Thread.Sleep(500);
+                }
+            } while (!isNetworkAvailable);
+
+            Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
+            {
+                if (TaskbarItemInfo.ProgressState == System.Windows.Shell.TaskbarItemProgressState.Paused)
+                {
+                    CheckifMultipleDownloadInProgress();
+                    UpdateDownloadPanel(downloadEngineClass.id, "Connecté ! Reprise du téléchargement", state: Status.progress);
+                }
+            }, null);
+        }
+
+        private async Task ParallelDownloadTilesTask(DownloadSettings downloadEngineClass)
+        {
+            List<TilesUrl> urls = downloadEngineClass.urls;
             CancellationTokenSource cancellationTokenSource = downloadEngineClass.cancellation_token_source;
             CancellationToken cancellationToken = downloadEngineClass.cancellation_token;
 
             await Task.Run(() =>
             {
-                DebugMode.WriteLine("Téléchargement en parallèle des fichiers : " + urls.Count());
-
                 Parallel.ForEach(urls, new ParallelOptions { MaxDegreeOfParallelism = Settings.max_download_tiles_in_parralele }, url =>
                 {
-                    bool isNetworkNotAvailable;
-
-                    do
-                    {
-                        isNetworkNotAvailable = !Network.FastIsNetworkAvailable();
-
-                        if (cancellationToken.IsCancellationRequested && cancellationToken.CanBeCanceled)
-                        {
-                            cancellationTokenSource?.Cancel();
-                            Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
-                            {
-                                TaskbarItemInfo.ProgressValue = 0;
-                            }, null);
-                            return;
-                        }
-
-                        if (isNetworkNotAvailable)
-                        {
-                            UpdateDownloadPanel(downloadEngineClass.id, "En attente d'une connexion internet", state: Status.noconnection);
-                            Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
-                            {
-                                TaskbarItemInfo.ProgressState = System.Windows.Shell.TaskbarItemProgressState.Paused;
-                            }, null);
-                            Thread.Sleep(250);
-                        }
-                    } while (isNetworkNotAvailable);
-
-                    Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
-                    {
-                        if (TaskbarItemInfo.ProgressState == System.Windows.Shell.TaskbarItemProgressState.Paused)
-                        {
-                            CheckifMultipleDownloadInProgress();
-                            UpdateDownloadPanel(downloadEngineClass.id, "Connecté ! Reprise du téléchargement", state: Status.progress);
-                        }
-                    }, null);
-
-                    DebugMode.WriteLine("start new DownloadUrlAsync");
+                    WaitForInternet(downloadEngineClass);
                     DownloadUrlAsync(url).Wait();
-                    DebugMode.WriteLine("end new DownloadUrlAsync");
                 });
             }, cancellationTokenSource.Token);
-
-            Debug.WriteLine("Parallel DownloadUrlAsync end");
         }
 
-        static private int CheckDownloadIsComplete(DownloadClass downloadEngineClass)
+        static private int CheckDownloadIsComplete(DownloadSettings downloadEngineClass)
         {
-            if (downloadEngineClass.nbr_of_tiles_waiting_for_downloading == 0)
+            if (downloadEngineClass.nbr_of_tiles_waiting_for_downloading != 0)
             {
-                DebugMode.WriteLine("Vérification du téléchargement...");
-                UpdateDownloadPanel(downloadEngineClass.id, "Vérification du téléchargement...", "0", true, Status.progress);
-                Task.Delay(500).Wait();
-                int numberOfUrlClassWaitingForDownloading = 0;
+                return downloadEngineClass.nbr_of_tiles_waiting_for_downloading;
+            }
 
-                if (downloadEngineClass.state != Status.pause && downloadEngineClass.state != Status.cancel)
+            UpdateDownloadPanel(downloadEngineClass.id, "Vérification du téléchargement...", "0", true, Status.progress);
+            Task.Delay(500).Wait();
+            int numberOfUrlClassWaitingForDownloading = 0;
+
+            if (downloadEngineClass.state == Status.pause && downloadEngineClass.state == Status.cancel)
+            {
+                numberOfUrlClassWaitingForDownloading++;
+            }
+            else
+            {
+                foreach (TilesUrl urlClass in downloadEngineClass.urls)
                 {
-                    foreach (Url_class urlClass in downloadEngineClass.urls)
+                    if ((urlClass.status != Status.no_data) || !Settings.generate_transparent_tiles_on_404)
                     {
-                        if ((urlClass.status != Status.no_data) || !Settings.generate_transparent_tiles_on_404)
+                        if (urlClass.status == Status.waitfordownloading)
                         {
-                            if (urlClass.status == Status.waitfordownloading)
-                            {
-                                numberOfUrlClassWaitingForDownloading++;
-                            }
+                            numberOfUrlClassWaitingForDownloading++;
+                        }
+                        string filename = $"{downloadEngineClass.save_temp_directory}{urlClass.x}_{urlClass.y}.{downloadEngineClass.format}";
 
-                            string filename = $"{downloadEngineClass.save_temp_directory}{urlClass.x}_{urlClass.y}.{downloadEngineClass.format}";
-
-                            if (File.Exists(filename))
+                        if (File.Exists(filename))
+                        {
+                            FileInfo fileInfo = new FileInfo(filename);
+                            if (fileInfo.Length == 0)
                             {
-                                FileInfo fileInfo = new FileInfo(filename);
-
-                                if (fileInfo.Length == 0)
-                                {
-                                    urlClass.status = Status.waitfordownloading;
-                                    DebugMode.WriteLine("Tile Taille corrompu");
-                                    numberOfUrlClassWaitingForDownloading++;
-                                }
-                            }
-                            else
-                            {
-                                DebugMode.WriteLine("Le fichier n'existe pas");
+                                //taille corrompu
                                 urlClass.status = Status.waitfordownloading;
                                 numberOfUrlClassWaitingForDownloading++;
                             }
                         }
                         else
                         {
-                            DebugMode.WriteLine("Tuile no_data");
+                            //Le fichier n'existe pas
+                            urlClass.status = Status.waitfordownloading;
+                            numberOfUrlClassWaitingForDownloading++;
                         }
                     }
                 }
-                else
-                {
-                    numberOfUrlClassWaitingForDownloading++;
-                }
-
-                downloadEngineClass.nbr_of_tiles_waiting_for_downloading = numberOfUrlClassWaitingForDownloading;
-                return numberOfUrlClassWaitingForDownloading;
             }
 
-            return downloadEngineClass.nbr_of_tiles_waiting_for_downloading;
+            downloadEngineClass.nbr_of_tiles_waiting_for_downloading = numberOfUrlClassWaitingForDownloading;
+            return numberOfUrlClassWaitingForDownloading;
         }
 
         static void DownloadFinish(int id)
         {
-            DownloadClass currentEngine = DownloadClass.GetEngineById(id);
+            DownloadSettings currentEngine = DownloadSettings.GetEngineById(id);
             if (currentEngine.state != Status.error)
             {
                 currentEngine.state = Status.success;
             }
 
+            currentEngine.urls.Clear();
+            currentEngine.SkippedPanelUpdate = 0;
+            currentEngine.last_command = null;
+            currentEngine.last_command_non_important = null;
+            currentEngine.cancellation_token_source.Dispose();
+            currentEngine.cancellation_token_source = null;
             Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
             {
                 UpdateDownloadPanel(id, "Terminé.", "100", true, Status.success);
@@ -774,7 +674,7 @@ namespace MapsInMyFolder
 
         public static async void UpdateDownloadPanel(int id, string info = "", string progress = "", bool isImportant = false, Status state = Status.no_data)
         {
-            DownloadClass engine = DownloadClass.GetEngineById(id);
+            DownloadSettings engine = DownloadSettings.GetEngineById(id);
 
             if (!string.IsNullOrEmpty(info) && isImportant)
             {
@@ -839,36 +739,25 @@ namespace MapsInMyFolder
             {
                 engine.SkippedPanelUpdate = 0;
 
-                try
+                await Task.Run(async () =>
                 {
-                    await Task.Run(async () =>
+                    engine.last_command = commandExecuted;
+
+                    if (!isImportant)
                     {
-                        engine.last_command = commandExecuted;
+                        engine.last_command_non_important = commandExecuted;
+                    }
+                    await _instance?.MainPage?.download_panel_browser?.EvaluateScriptAsync(commandExecuted);
 
-                        if (!isImportant)
-                        {
-                            engine.last_command_non_important = commandExecuted;
-                        }
-
-                        if (_instance.MainPage.download_panel_browser != null)
-                        {
-                            await _instance.MainPage.download_panel_browser.GetMainFrame().EvaluateScriptAsync(commandExecuted);
-
-                            if (isImportant)
-                            {
-                                await Task.Delay(250);
-                            }
-                        }
-                    });
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine($"Erreur UpdateDownloadPanel: {ex.Message}");
-                }
+                    if (isImportant)
+                    {
+                        await Task.Delay(250);
+                    }
+                });
             }
         }
 
-        NetVips.Image AddGraphicalScale(NetVips.Image image, ScaleInfo scaleInfo)
+        Image AddGraphicalScale(NetVips.Image image, ScaleInfo scaleInfo)
         {
             if (!scaleInfo.doDrawScale)
             {
@@ -902,15 +791,13 @@ namespace MapsInMyFolder
 
             using var scaleBackgroundWidthAllElements = scaleBackgroundSrgbWithRText.Composite2(finalLine, Enums.BlendMode.Atop, 2 * margin + lText.Width, (int)Math.Round((double)height / 2 - (double)finalLine.Height / 2));
 
-            NetVips.Image imageWidthScale = image.Composite(scaleBackgroundWidthAllElements, Enums.BlendMode.Over, margin, image.Height - (height + margin), Enums.Interpretation.Srgb, false);
-            Debug.WriteLine("End Here");
-            return imageWidthScale;
+            return image.Composite(scaleBackgroundWidthAllElements, Enums.BlendMode.Over, margin, image.Height - (height + margin), Enums.Interpretation.Srgb, false);
         }
 
         async Task Assemblage(int id)
         {
             UpdateDownloadPanel(id, "Assemblage...  1/2", "0", true, Status.assemblage);
-            DownloadClass currentEngine = DownloadClass.GetEngineById(id);
+            DownloadSettings currentEngine = DownloadSettings.GetEngineById(id);
             string format = currentEngine.format;
             string saveDirectory = currentEngine.save_directory;
             string saveTempFilename = currentEngine.file_temp_name;
@@ -934,7 +821,7 @@ namespace MapsInMyFolder
                     return;
                 }
 
-                using var image = GetImageFromTiles(currentEngine);
+                using var image = EngineTilesToSingleImage(currentEngine);
                 if (image == null)
                 {
                     return;
@@ -973,7 +860,8 @@ namespace MapsInMyFolder
                 TaskbarItemInfo.ProgressValue = 0;
             }, null);
         }
-        static private NetVips.Image ResizeImage(DownloadClass currentEngine, NetVips.Image imageRogner, double width, double height)
+
+        static private Image ResizeImage(DownloadSettings currentEngine, NetVips.Image imageRogner, double width, double height)
         {
             try
             {
@@ -1002,87 +890,7 @@ namespace MapsInMyFolder
             return imageRogner;
         }
 
-        private void SaveImage(DownloadClass currentEngine, NetVips.Image imageRogner)
-        {
-            int tileSize = currentEngine.tile_size;
-            string saveTempDirectory = currentEngine.save_temp_directory;
-            string saveDirectory = currentEngine.save_directory;
-            string saveTempFilename = currentEngine.file_temp_name;
-            string saveFilename = currentEngine.file_name;
-
-            UpdateDownloadPanel(currentEngine.id, "Enregistrement...", "0", true, Status.enregistrement);
-            Thread.Sleep(500);
-            var progress = new Progress<int>(percent => UpdateDownloadPanel(currentEngine.id, "", Convert.ToString(percent)));
-            imageRogner.SetProgress(progress);
-            string imageTempsAssemblagePath = Path.Combine(saveTempDirectory, saveTempFilename);
-
-            if (Directory.Exists(saveTempDirectory))
-            {
-                if (File.Exists(imageTempsAssemblagePath))
-                {
-                    File.Delete(imageTempsAssemblagePath);
-                }
-            }
-            else
-            {
-                Directory.CreateDirectory(saveTempDirectory);
-            }
-
-            try
-            {
-                imageRogner.WriteToFile(imageTempsAssemblagePath, Collectif.getSaveVOption(currentEngine.final_saveformat, currentEngine.quality, tileSize));
-                //imageRogner.Jpegsave(imageTempsAssemblagePath, 100, null, false, false, false, false, false, null, Enums.ForeignSubsample.Off, null, true, null, null);
-            }
-            catch (Exception ex)
-            {
-                UpdateDownloadPanel(currentEngine.id, "Erreur enregistrement du fichier", "", true, Status.error);
-                Debug.WriteLine("Erreur enregistrement du fichier" + ex.Message);
-            }
-            if (File.Exists(imageTempsAssemblagePath))
-            {
-                UpdateDownloadPanel(currentEngine.id, "Déplacement..", "", true, Status.progress);
-                string targetFilePath = Path.Combine(saveDirectory, saveFilename);
-                if (Directory.Exists(saveDirectory))
-                {
-                    if (File.Exists(targetFilePath))
-                    {
-                        File.Delete(targetFilePath);
-                        foreach (DownloadClass eng in DownloadClass.GetEngineList())
-                        {
-                            string engineFilePath = Path.Combine(eng.save_directory, eng.file_name);
-                            if (eng.state == Status.success && engineFilePath == targetFilePath)
-                            {
-                                UpdateDownloadPanel(eng.id, "Remplacé", "0", true, Status.deleted);
-                                Database.DB_Download_Update(eng.dbid, "INFOS", "Remplacé");
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    Directory.CreateDirectory(saveDirectory);
-                }
-                string finalFilePath = Path.Combine(saveDirectory, saveFilename);
-                if (Directory.Exists(saveDirectory))
-                {
-                    if (File.Exists(finalFilePath))
-                    {
-                        File.Delete(finalFilePath);
-                    }
-                    File.Move(imageTempsAssemblagePath, finalFilePath);
-                }
-            }
-            else
-            {
-                Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
-                {
-                    Message.NoReturnBoxAsync("Une erreur fatale est survenue lors de l'assemblage du fichier \"" + saveFilename + "\"", "Erreur");
-                }, null);
-            }
-        }
-
-
-        private NetVips.Image GetImageFromTiles(DownloadClass curent_engine)
+        private Image EngineTilesToSingleImage(DownloadSettings curent_engine)
         {
             string format = curent_engine.format;
             string save_temp_directory = curent_engine.save_temp_directory;
@@ -1172,7 +980,7 @@ namespace MapsInMyFolder
                     horizontalArray.Add(tempsimage);
                 }
 
-                NetVips.Image tempArrayJoinImage;
+                Image tempArrayJoinImage;
 
                 try
                 {
@@ -1250,10 +1058,10 @@ namespace MapsInMyFolder
             return image;
         }
 
-        void InternalUpdateProgressBar(DownloadClass download_engine)
+        void InternalUpdateProgressBar(DownloadSettings download_engine)
         {
             int number_of_url_class_waiting_for_downloading = 0;
-            foreach (Url_class urclass in download_engine?.urls)
+            foreach (TilesUrl urclass in download_engine?.urls)
             {
                 if (urclass.status == Status.waitfordownloading)
                 {
@@ -1303,10 +1111,10 @@ namespace MapsInMyFolder
             }, null);
         }
 
-        public async Task DownloadUrlAsync(Url_class url)
+        public async Task DownloadUrlAsync(TilesUrl url)
         {
             string id = url.x + "/" + url.y;
-            DownloadClass download_engine = DownloadClass.GetEngineById(url.downloadid);
+            DownloadSettings download_engine = DownloadSettings.GetEngineById(url.downloadid);
             int z = download_engine.zoom;
             string format = download_engine.format;
             string save_temp_directory = download_engine.save_temp_directory;
@@ -1381,6 +1189,84 @@ namespace MapsInMyFolder
                 }
             }
 
+        }
+
+        private void SaveImage(DownloadSettings currentEngine, NetVips.Image imageRogner)
+        {
+            int tileSize = currentEngine.tile_size;
+            string saveTempDirectory = currentEngine.save_temp_directory;
+            string saveDirectory = currentEngine.save_directory;
+            string saveTempFilename = currentEngine.file_temp_name;
+            string saveFilename = currentEngine.file_name;
+
+            UpdateDownloadPanel(currentEngine.id, "Enregistrement...", "0", true, Status.enregistrement);
+            Thread.Sleep(500);
+            var progress = new Progress<int>(percent => UpdateDownloadPanel(currentEngine.id, "", Convert.ToString(percent)));
+            imageRogner.SetProgress(progress);
+            string imageTempsAssemblagePath = Path.Combine(saveTempDirectory, saveTempFilename);
+
+            if (Directory.Exists(saveTempDirectory))
+            {
+                if (File.Exists(imageTempsAssemblagePath))
+                {
+                    File.Delete(imageTempsAssemblagePath);
+                }
+            }
+            else
+            {
+                Directory.CreateDirectory(saveTempDirectory);
+            }
+
+            try
+            {
+                imageRogner.WriteToFile(imageTempsAssemblagePath, Collectif.getSaveVOption(currentEngine.final_saveformat, currentEngine.quality, tileSize));
+            }
+            catch (Exception ex)
+            {
+                UpdateDownloadPanel(currentEngine.id, "Erreur enregistrement du fichier", "", true, Status.error);
+                Debug.WriteLine("Erreur enregistrement du fichier" + ex.Message);
+            }
+            if (File.Exists(imageTempsAssemblagePath))
+            {
+                UpdateDownloadPanel(currentEngine.id, "Déplacement..", "", true, Status.progress);
+                string targetFilePath = Path.Combine(saveDirectory, saveFilename);
+                if (Directory.Exists(saveDirectory))
+                {
+                    if (File.Exists(targetFilePath))
+                    {
+                        File.Delete(targetFilePath);
+                        foreach (DownloadSettings eng in DownloadSettings.GetEngineList())
+                        {
+                            string engineFilePath = Path.Combine(eng.save_directory, eng.file_name);
+                            if (eng.state == Status.success && engineFilePath == targetFilePath)
+                            {
+                                UpdateDownloadPanel(eng.id, "Remplacé", "0", true, Status.deleted);
+                                Database.DB_Download_Update(eng.dbid, "INFOS", "Remplacé");
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    Directory.CreateDirectory(saveDirectory);
+                }
+                string finalFilePath = Path.Combine(saveDirectory, saveFilename);
+                if (Directory.Exists(saveDirectory))
+                {
+                    if (File.Exists(finalFilePath))
+                    {
+                        File.Delete(finalFilePath);
+                    }
+                    File.Move(imageTempsAssemblagePath, finalFilePath);
+                }
+            }
+            else
+            {
+                Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
+                {
+                    Message.NoReturnBoxAsync("Une erreur fatale est survenue lors de l'assemblage du fichier \"" + saveFilename + "\"", "Erreur");
+                }, null);
+            }
         }
     }
 }

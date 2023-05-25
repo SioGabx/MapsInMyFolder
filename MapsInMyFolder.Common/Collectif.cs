@@ -195,7 +195,7 @@ namespace MapsInMyFolder.Commun
                 return new List<int>() { return_x, return_y };
             }
 
-            public static List<Url_class> GetListOfUrlFromLocation(Dictionary<string, double> location, int z, string urlbase, int LayerID, int downloadid = 0)
+            public static List<TilesUrl> GetListOfUrlFromLocation(Dictionary<string, double> location, int z, string urlbase, int LayerID, int downloadid = 0)
             {
                 var NO_tile = CoordonneesToTile(location["NO_Latitude"], location["NO_Longitude"], z);
                 var SE_tile = CoordonneesToTile(location["SE_Latitude"], location["SE_Longitude"], z);
@@ -204,7 +204,7 @@ namespace MapsInMyFolder.Commun
                 int SE_x = SE_tile.X;
                 int SE_y = SE_tile.Y;
 
-                List<Url_class> list_of_url_to_download = new List<Url_class>();
+                List<TilesUrl> list_of_url_to_download = new List<TilesUrl>();
                 int Download_X_tile = 0;
                 int Download_Y_tile = 0;
                 int max_x = Math.Abs(SE_x - NO_x) + 1;
@@ -216,7 +216,7 @@ namespace MapsInMyFolder.Commun
                         int tuileX = NO_x + Download_X_tile;
                         int tuileY = NO_y + Download_Y_tile;
                         string url_to_add_inside_list = FromTileXYZ(urlbase, tuileX, tuileY, z, LayerID, InvokeFunction.getTile);
-                        list_of_url_to_download.Add(new Url_class(url_to_add_inside_list, tuileX, tuileY, z, Status.waitfordownloading, downloadid));
+                        list_of_url_to_download.Add(new TilesUrl(url_to_add_inside_list, tuileX, tuileY, z, Status.waitfordownloading, downloadid));
                         List<int> next_num_list = NextNumberFromPara(Download_X_tile, Download_Y_tile, max_x, max_y);
                         Download_X_tile = next_num_list[0];
                         Download_Y_tile = next_num_list[1];

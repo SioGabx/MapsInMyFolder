@@ -54,7 +54,7 @@ namespace MapsInMyFolder
             TextBoxSetValueAndLock(TextboxLayerScript, Settings.tileloader_default_script);
             PaysComboBox.ItemSource = Country.getList();
 
-
+            SetContextMenu();
 
             TextboxLayerScript.TextArea.Options.ConvertTabsToSpaces = true;
             TextboxLayerScript.TextArea.Options.IndentationSize = 4;
@@ -167,31 +167,7 @@ namespace MapsInMyFolder
             helpConsoleMenuItem.Click += helpConsoleMenuItem_Click;
             helpConsoleMenuItem.Unloaded += helpConsoleMenuItem_Unloaded;
             TextboxLayerScriptConsole.ContextMenu.Items.Add(helpConsoleMenuItem);
-
-
-
-
-
-
-
-
-
-
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
         private void TextboxLayerScript_Caret_PositionChanged(object sender, EventArgs e)
         {
@@ -250,7 +226,7 @@ namespace MapsInMyFolder
             List<string> Site = new List<string>();
             List<string> SiteUrl = new List<string>();
 
-            foreach (MapsInMyFolder.Commun.Layers layer in Layers.GetLayersList())
+            foreach (Layers layer in Layers.GetLayersList())
             {
                 if (layer.class_id < 0)
                 {
@@ -755,33 +731,31 @@ namespace MapsInMyFolder
             }
             if (result == ContentDialogResult.Primary)
             {
-                DisposeElementOnLeave();
-                MainPage.ClearCache(LayerId, false);
-                Javascript.EngineStopAll();
-                Settings.map_show_tile_border = ShowTileBorderArchive;
-                Settings.is_in_debug_mode = IsInDebugModeArchive;
-                MainWindow._instance.FrameBack();
-                Javascript.EngineClearList();
-                //MainWindow.RefreshAllPanels();
-                MainPage._instance.ReloadPage();
+                DisposeElementBeforeLeave();
+                Leave();
             }
         }
         private void SaveEditButton_Click(object sender, RoutedEventArgs e)
         {
-            DisposeElementOnLeave();
+            DisposeElementBeforeLeave();
             SaveLayer();
-            MainPage.ClearCache(LayerId, false);
-            Javascript.EngineStopAll();
-            Settings.map_show_tile_border = ShowTileBorderArchive;
-            Settings.is_in_debug_mode = IsInDebugModeArchive;
-            MainWindow._instance.FrameBack();
-            Javascript.EngineClearList();
-            MainPage._instance.ReloadPage();
+            Leave();
             if (Layers.Current.class_id == LayerId)
             {
 
                 MainPage._instance.Set_current_layer(Layers.Current.class_id);
             }
+        }
+
+        public void Leave(bool NoTransition = false)
+        {
+            MainPage.ClearCache(LayerId, false);
+            Javascript.EngineStopAll();
+            Settings.map_show_tile_border = ShowTileBorderArchive;
+            Settings.is_in_debug_mode = IsInDebugModeArchive;
+            MainWindow._instance.FrameBack(NoTransition);
+            Javascript.EngineClearList();
+            MainPage._instance.ReloadPage();
         }
 
         public void UpdateMoinsUnLayer()
@@ -898,7 +872,7 @@ namespace MapsInMyFolder
             }
         }
 
-        void DisposeElementOnLeave()
+        void DisposeElementBeforeLeave()
         {
             Javascript.Functions.PrintClear();
             Tiles.AcceptJavascriptPrint = false;
@@ -1005,13 +979,9 @@ namespace MapsInMyFolder
                 var result = await Message.SetContentDialog("Voullez-vous vraiment redefinir par default les informations et paramêtres de ce calque ? \nCette action est irréversible !", "Confirmer", MessageDialogButton.YesCancel).ShowAsync();
                 if (result == ContentDialogResult.Primary)
                 {
-                    Settings.is_in_debug_mode = IsInDebugModeArchive;
-                    Settings.map_show_tile_border = ShowTileBorderArchive;
-                    Javascript.EngineStopAll();
+                    DisposeElementBeforeLeave();
                     Database.ExecuteNonQuerySQLCommand("DELETE FROM EDITEDLAYERS WHERE ID=" + LayerId);
-                    MainPage._instance.ReloadPage();
-                    Javascript.EngineClearList();
-                    MainWindow._instance.FrameBack(true);
+                    Leave(true);
                     MainWindow._instance.FrameLoad_CustomOrEditLayers(LayerId);
                 }
                 result = ContentDialogResult.None;
@@ -1031,8 +1001,7 @@ namespace MapsInMyFolder
                 dialog.Visibility = Visibility.Visible;
                 if (result == ContentDialogResult.Primary)
                 {
-                    Javascript.EngineStopAll();
-                    Javascript.EngineClearList();
+                    DisposeElementBeforeLeave();
                     Database.ExecuteNonQuerySQLCommand(@$"
                     DELETE FROM EDITEDLAYERS WHERE ID={LayerId};
                     DELETE FROM CUSTOMSLAYERS WHERE ID={LayerId};
@@ -1044,17 +1013,13 @@ namespace MapsInMyFolder
                         Database.ExecuteScalarSQLCommand($"INSERT INTO EDITEDLAYERS ('ID', 'VISIBILITY') VALUES ({LayerId},'DELETED')");
                     }
 
-                    Settings.map_show_tile_border = ShowTileBorderArchive;
-                    Settings.is_in_debug_mode = IsInDebugModeArchive;
-                    MainWindow._instance.FrameBack();
+                    Leave();
                 }
-                result = ContentDialogResult.None;
             }
             catch (Exception ex)
             {
                 Debug.WriteLine(ex.Message);
             }
-            MainPage._instance.ReloadPage();
         }
 
         private void TextboxLayerScriptConsoleSender_KeyUp(object sender, KeyEventArgs e)
@@ -1220,6 +1185,7 @@ namespace MapsInMyFolder
             {
                 FullscreenRectanglesMap.SaveButton.Click -= FullscreenMap_SaveButton_Click;
                 FullscreenRectanglesMap.Unloaded -= FullscreenRectanglesMap_Unloaded;
+                SelectionRectangle.Rectangles.Clear();
             }
 
 

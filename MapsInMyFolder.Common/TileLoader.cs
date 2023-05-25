@@ -20,7 +20,7 @@ namespace MapsInMyFolder.Commun
         }
     }
 
-    public class Url_class
+    public class TilesUrl
     {
         public string url;
         public int x;
@@ -29,7 +29,7 @@ namespace MapsInMyFolder.Commun
         public Status status;
         public int downloadid;
 
-        public Url_class(string url, int x, int y, int z, Status status, int downloadid)
+        public TilesUrl(string url, int x, int y, int z, Status status, int downloadid)
         {
             this.url = url;
             this.x = x;

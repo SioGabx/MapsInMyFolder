@@ -32,23 +32,6 @@ namespace MapsInMyFolder
             return searchText;
         }
 
-        //public async void SearchLayerStart(bool IsIgnoringLastInput = false)
-        //{
-        //    await Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Send, (SendOrPostCallback)async delegate
-        //    {
-        //        string SearchValue = SearchGetText();
-        //        if ((last_input != SearchValue || IsIgnoringLastInput) && SearchValue != null)
-        //        {
-        //            layer_searchbar.Foreground = (System.Windows.Media.SolidColorBrush)new System.Windows.Media.BrushConverter().ConvertFromString("#BCBCBC");
-        //            if (layer_browser.IsLoaded)
-        //            {
-        //                last_input = SearchValue;
-        //                Debug.WriteLine("Search: " + SearchValue);
-        //                await layer_browser.GetMainFrame().EvaluateScriptAsync($"search('{SearchValue}');", "about:blank", 1, null, true);
-        //            }
-        //        }
-        //    }, null);
-        //}
         public async void SearchLayerStart(bool IsIgnoringLastInput = false)
         {
             await Task.Run(async () =>
@@ -818,12 +801,9 @@ namespace MapsInMyFolder
             }, null);
         }
 
-        public void Request_search_string()
+        public string Request_search_string()
         {
-            Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Send, (SendOrPostCallback)delegate
-            {
-                MainWindow._instance.MainPage.SearchGetText();
-            }, null);
+            return Application.Current.Dispatcher.Invoke(() => MainWindow._instance.MainPage.SearchGetText(), DispatcherPriority.Send);
         }
 
         public void Refresh_panel()

@@ -227,7 +227,7 @@ namespace MapsInMyFolder.Commun
                     StrokeEndLineCap = PenLineCap.Round,
                     StrokeLineJoin = PenLineJoin.Round,
                     StrokeThickness = 0.8,
-                    Data = (System.Windows.Media.Geometry)Application.Current.Resources["CloseButton"],
+                    Data = (Geometry)Application.Current.Resources["CloseButton"],
                     Stroke = Collectif.HexValueToSolidColorBrush("#FFE2E2E1"),
                     Stretch = Stretch.Uniform,
                     Height = 10,
@@ -311,7 +311,5 @@ namespace MapsInMyFolder.Commun
                 SendUpdate();
             }
         }
-
     }
-
 }

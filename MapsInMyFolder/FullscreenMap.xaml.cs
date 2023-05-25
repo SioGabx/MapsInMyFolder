@@ -363,8 +363,6 @@ namespace MapsInMyFolder
             Notification.UpdateNotification -= Notification_UpdateNotification;
             mapSelectable.OnLocationUpdated -= MapSelectable_OnLocationUpdated;
             mapSelectable.OnRectangleDeleted -= MapSelectable_OnRectangleDeleted;
-
-            SelectionRectangle.Rectangles.Clear();
         }
 
         private void MapSelectable_OnRectangleDeleted(object sender, MapPolygon e)

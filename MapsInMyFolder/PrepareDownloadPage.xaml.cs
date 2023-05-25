@@ -1146,7 +1146,7 @@ namespace MapsInMyFolder
             ScaleInfo scaleInfo = new ScaleInfo(initialScale, targetScale, distanceInMeterPerPixels, drawScale, drawScaleInfo.Scale, drawScaleInfo.PixelLenght);
 
             var selectionLocation = MainPage.mapSelectable.GetRectangleLocation();
-            Download_Options downloadOptions = new Download_Options(0, saveDirectory, format, filename, "", "", 0, zoom, quality, "", selectionLocation.NO, selectionLocation.SE, redimWidth, redimHeight, interpretation, scaleInfo);
+            DownloadOptions downloadOptions = new DownloadOptions(0, saveDirectory, format, filename, "", "", 0, zoom, quality, "", selectionLocation.NO, selectionLocation.SE, redimWidth, redimHeight, interpretation, scaleInfo);
             MainWindow._instance.PrepareDownloadBeforeStart(downloadOptions);
             TextBoxScaleIsLock(false);
             ClosePage();
