@@ -54,17 +54,7 @@ namespace MapsInMyFolder
             TextBoxSetValueAndLock(TextboxLayerScript, Settings.tileloader_default_script);
             PaysComboBox.ItemSource = Country.getList();
 
-            MenuItem IndentermenuItem = new MenuItem();
-            IndentermenuItem.Header = "Indenter";
-            IndentermenuItem.Icon = new ModernWpf.Controls.FontIcon() { Glyph = "\uE12F", Foreground = Collectif.HexValueToSolidColorBrush("#888989") };
-            IndentermenuItem.Click += (sender, e) => IndenterCode(sender, e, TextboxLayerScript);
-            TextboxLayerScript.ContextMenu.Items.Add(IndentermenuItem);
 
-            MenuItem templateMenuItem = new MenuItem();
-            templateMenuItem.Header = "Script template";
-            templateMenuItem.Icon = new ModernWpf.Controls.FontIcon() { Glyph = "\uE15C", Foreground = Collectif.HexValueToSolidColorBrush("#888989") };
-            templateMenuItem.Click += (sender, e) => putScriptTemplate(TextboxLayerScript);
-            TextboxLayerScript.ContextMenu.Items.Add(templateMenuItem);
 
             TextboxLayerScript.TextArea.Options.ConvertTabsToSpaces = true;
             TextboxLayerScript.TextArea.Options.IndentationSize = 4;
@@ -78,20 +68,9 @@ namespace MapsInMyFolder
                 ResetInfoLayerClikableLabel.IsEnabled = false;
                 ResetInfoLayerClikableLabel.Opacity = 0.6;
             }
-            var keyeventHandler = new KeyEventHandler(TextboxLayerScriptConsoleSender_KeyDown);
-            TextboxLayerScriptConsoleSender.AddHandler(PreviewKeyDownEvent, keyeventHandler, handledEventsToo: true);
-
-            MenuItem clearConsoleMenuItem = new MenuItem();
-            clearConsoleMenuItem.Header = "Effacer";
-            clearConsoleMenuItem.Icon = new ModernWpf.Controls.FontIcon() { Glyph = "\uE127", Foreground = Collectif.HexValueToSolidColorBrush("#888989") };
-            clearConsoleMenuItem.Click += (sender, e) => Javascript.Functions.PrintClear();
-            TextboxLayerScriptConsole.ContextMenu.Items.Add(clearConsoleMenuItem);
-
-            MenuItem helpConsoleMenuItem = new MenuItem();
-            helpConsoleMenuItem.Header = "Aide";
-            helpConsoleMenuItem.Icon = new ModernWpf.Controls.FontIcon() { Glyph = "\uE11B", Foreground = Collectif.HexValueToSolidColorBrush("#888989") };
-            helpConsoleMenuItem.Click += (sender, e) => { Javascript.Functions.Help(-2); TextboxLayerScriptConsole.ScrollToEnd(); };
-            TextboxLayerScriptConsole.ContextMenu.Items.Add(helpConsoleMenuItem);
+            //var keyeventHandler = new KeyEventHandler(TextboxLayerScriptConsoleSender_KeyDown);
+            //TextboxLayerScriptConsoleSender.AddHandler(PreviewKeyDownEvent, keyeventHandler, handledEventsToo: true);
+            TextboxLayerScriptConsoleSender.PreviewKeyDown += TextboxLayerScriptConsoleSender_KeyDown;
 
             TextboxLayerScript.TextArea.Caret.CaretBrush = Collectif.HexValueToSolidColorBrush("#f18712");//rgb(241 135 18)
             TextboxRectangles.TextArea.Caret.CaretBrush = Collectif.HexValueToSolidColorBrush("#f18712");//rgb(241 135 18)
@@ -106,6 +85,113 @@ namespace MapsInMyFolder
             Javascript.LogsChanged += Javascript_LogsChanged;
             Javascript.JavascriptActionEvent += JavascriptActionEvent;
         }
+
+        void SetContextMenu()
+        {
+            MenuItem IndentermenuItem = new MenuItem();
+            IndentermenuItem.Header = "Indenter";
+            IndentermenuItem.Icon = new ModernWpf.Controls.FontIcon() { Glyph = "\uE12F", Foreground = Collectif.HexValueToSolidColorBrush("#888989") };
+            void IndentermenuItem_Click(object sender, EventArgs e)
+            {
+                IndenterCode(sender, e, TextboxLayerScript);
+            }
+
+            void IndentermenuItem_Unloaded(object sender, EventArgs e)
+            {
+                IndentermenuItem.Click -= IndentermenuItem_Click;
+                IndentermenuItem.Unloaded -= IndentermenuItem_Unloaded;
+            }
+
+            IndentermenuItem.Click += IndentermenuItem_Click;
+            IndentermenuItem.Unloaded += IndentermenuItem_Unloaded;
+            TextboxLayerScript.ContextMenu.Items.Add(IndentermenuItem);
+
+            MenuItem templateMenuItem = new MenuItem();
+            templateMenuItem.Header = "Script template";
+            templateMenuItem.Icon = new ModernWpf.Controls.FontIcon() { Glyph = "\uE15C", Foreground = Collectif.HexValueToSolidColorBrush("#888989") };
+
+            void templateMenuItem_Click(object sender, EventArgs e)
+            {
+                putScriptTemplate(TextboxLayerScript);
+            }
+
+            void templateMenuItem_Unloaded(object sender, EventArgs e)
+            {
+                templateMenuItem.Click -= templateMenuItem_Click;
+                templateMenuItem.Unloaded -= templateMenuItem_Unloaded;
+            }
+            templateMenuItem.Click += templateMenuItem_Click;
+            templateMenuItem.Unloaded += templateMenuItem_Unloaded;
+            TextboxLayerScript.ContextMenu.Items.Add(templateMenuItem);
+
+
+
+
+            MenuItem clearConsoleMenuItem = new MenuItem();
+            clearConsoleMenuItem.Header = "Effacer";
+            clearConsoleMenuItem.Icon = new ModernWpf.Controls.FontIcon() { Glyph = "\uE127", Foreground = Collectif.HexValueToSolidColorBrush("#888989") };
+
+
+            void clearConsoleMenuItem_Click(object sender, EventArgs e)
+            {
+                Javascript.Functions.PrintClear();
+            }
+
+            void clearConsoleMenuItem_Unloaded(object sender, EventArgs e)
+            {
+                clearConsoleMenuItem.Click -= clearConsoleMenuItem_Click;
+                clearConsoleMenuItem.Unloaded -= clearConsoleMenuItem_Unloaded;
+            }
+
+            clearConsoleMenuItem.Click += clearConsoleMenuItem_Click;
+            clearConsoleMenuItem.Unloaded += clearConsoleMenuItem_Unloaded;
+            TextboxLayerScriptConsole.ContextMenu.Items.Add(clearConsoleMenuItem);
+
+            MenuItem helpConsoleMenuItem = new MenuItem();
+            helpConsoleMenuItem.Header = "Aide";
+            helpConsoleMenuItem.Icon = new ModernWpf.Controls.FontIcon() { Glyph = "\uE11B", Foreground = Collectif.HexValueToSolidColorBrush("#888989") };
+
+
+            void helpConsoleMenuItem_Click(object sender, EventArgs e)
+            {
+                Javascript.Functions.Help(-2);
+                TextboxLayerScriptConsole.ScrollToEnd();
+            }
+
+            void helpConsoleMenuItem_Unloaded(object sender, EventArgs e)
+            {
+                helpConsoleMenuItem.Click -= helpConsoleMenuItem_Click;
+                helpConsoleMenuItem.Unloaded -= helpConsoleMenuItem_Unloaded;
+            }
+
+            helpConsoleMenuItem.Click += helpConsoleMenuItem_Click;
+            helpConsoleMenuItem.Unloaded += helpConsoleMenuItem_Unloaded;
+            TextboxLayerScriptConsole.ContextMenu.Items.Add(helpConsoleMenuItem);
+
+
+
+
+
+
+
+
+
+
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         private void TextboxLayerScript_Caret_PositionChanged(object sender, EventArgs e)
         {
@@ -658,7 +744,28 @@ namespace MapsInMyFolder
                 Database.ExecuteNonQuerySQLCommand($"UPDATE 'main'.'EDITEDLAYERS' SET 'NOM'={NOM},'DESCRIPTION'={DESCRIPTION},'CATEGORIE'={CATEGORIE},'PAYS'={PAYS},'IDENTIFIANT'={IDENTIFIANT},'TILE_URL'={TILE_URL},'TILE_FALLBACK_URL'={TILE_FALLBACK_URL},'MIN_ZOOM'={MIN_ZOOM},'MAX_ZOOM'={MAX_ZOOM},'FORMAT'={FORMAT},'SITE'={SITE},'SITE_URL'={SITE_URL},'TILE_SIZE'={TILE_SIZE},'TILECOMPUTATIONSCRIPT'={TILECOMPUTATIONSCRIPT},'VISIBILITY'='{Visibility.Visible}','SPECIALSOPTIONS'={SPECIALSOPTIONS}, 'RECTANGLES'={RECTANGLES}, 'VERSION'={LastVersion}, 'HAS_SCALE'={HAS_SCALE} WHERE ID = {LayerId}");
             }
         }
-
+        private async void ClosePage_button_Click(object sender, RoutedEventArgs e)
+        {
+            int ValuesHachCode = Collectif.CheckIfInputValueHaveChange(EditeurStackPanel);
+            ContentDialogResult result = ContentDialogResult.Primary;
+            if (DefaultValuesHachCode != ValuesHachCode)
+            {
+                var dialog = Message.SetContentDialog("Voullez-vous vraiment quitter cette page ? Les modifications effectuée seront perdues", "Confirmer", MessageDialogButton.YesCancel);
+                result = await dialog.ShowAsync();
+            }
+            if (result == ContentDialogResult.Primary)
+            {
+                DisposeElementOnLeave();
+                MainPage.ClearCache(LayerId, false);
+                Javascript.EngineStopAll();
+                Settings.map_show_tile_border = ShowTileBorderArchive;
+                Settings.is_in_debug_mode = IsInDebugModeArchive;
+                MainWindow._instance.FrameBack();
+                Javascript.EngineClearList();
+                //MainWindow.RefreshAllPanels();
+                MainPage._instance.ReloadPage();
+            }
+        }
         private void SaveEditButton_Click(object sender, RoutedEventArgs e)
         {
             DisposeElementOnLeave();
@@ -804,6 +911,7 @@ namespace MapsInMyFolder
             Javascript.JavascriptActionEvent -= JavascriptActionEvent;
             TextboxRectangles.TextArea.Caret.PositionChanged -= TextboxRectangles_Caret_PositionChanged;
             TextboxLayerScript.TextArea.Caret.PositionChanged -= TextboxLayerScript_Caret_PositionChanged;
+            TextboxLayerScriptConsoleSender.PreviewKeyDown -= TextboxLayerScriptConsoleSender_KeyDown;
             //make sure to reload base layer if curent layer is png
             Layers.Current.class_format = "jpeg";
         }
@@ -862,28 +970,7 @@ namespace MapsInMyFolder
             }
         }
 
-        private async void ClosePage_button_Click(object sender, RoutedEventArgs e)
-        {
-            int ValuesHachCode = Collectif.CheckIfInputValueHaveChange(EditeurStackPanel);
-            ContentDialogResult result = ContentDialogResult.Primary;
-            if (DefaultValuesHachCode != ValuesHachCode)
-            {
-                var dialog = Message.SetContentDialog("Voullez-vous vraiment quitter cette page ? Les modifications effectuée seront perdues", "Confirmer", MessageDialogButton.YesCancel);
-                result = await dialog.ShowAsync();
-            }
-            if (result == ContentDialogResult.Primary)
-            {
-                DisposeElementOnLeave();
-                MainPage.ClearCache(LayerId, false);
-                Javascript.EngineStopAll();
-                Settings.map_show_tile_border = ShowTileBorderArchive;
-                Settings.is_in_debug_mode = IsInDebugModeArchive;
-                MainWindow._instance.FrameBack();
-                Javascript.EngineClearList();
-                //MainWindow.RefreshAllPanels();
-                MainPage._instance.ReloadPage();
-            }
-        }
+
 
         private void ClickableLabel_MouseEnter(object sender, MouseEventArgs e)
         {
@@ -1127,7 +1214,15 @@ namespace MapsInMyFolder
                 InfoUnusedRectangleDeleted.Register();
             }
             FullscreenRectanglesMap.SaveButton.Click += FullscreenMap_SaveButton_Click;
+            FullscreenRectanglesMap.Unloaded += FullscreenRectanglesMap_Unloaded;
             MainWindow._instance.MainContentFrame.Navigate(FullscreenRectanglesMap);
+            void FullscreenRectanglesMap_Unloaded(object sender2, RoutedEventArgs e2)
+            {
+                FullscreenRectanglesMap.SaveButton.Click -= FullscreenMap_SaveButton_Click;
+                FullscreenRectanglesMap.Unloaded -= FullscreenRectanglesMap_Unloaded;
+            }
+
+
         }
 
         private void FullscreenMap_SaveButton_Click(object sender, RoutedEventArgs e)

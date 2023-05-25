@@ -363,6 +363,8 @@ namespace MapsInMyFolder
             Notification.UpdateNotification -= Notification_UpdateNotification;
             mapSelectable.OnLocationUpdated -= MapSelectable_OnLocationUpdated;
             mapSelectable.OnRectangleDeleted -= MapSelectable_OnRectangleDeleted;
+
+            SelectionRectangle.Rectangles.Clear();
         }
 
         private void MapSelectable_OnRectangleDeleted(object sender, MapPolygon e)
@@ -393,15 +395,6 @@ namespace MapsInMyFolder
             SelectionRectangle selectionRectangle = SelectionRectangle.GetSelectionRectangleFromRectangle(e);
             if (selectionRectangle == null)
             {
-                //if (Locations.NO.Latitude != 0 && Locations.NO.Latitude != 0 && Locations.SE.Longitude != 0 && Locations.SE.Longitude != 0)
-                //{
-                //    AddNewSelection(e);
-                //    selectionRectangle = SelectionRectangle.GetSelectionRectangleFromRectangle(e);
-                //}
-                //else
-                //{
-                //    return;
-                //}
                 return;
             }
 
@@ -440,12 +433,14 @@ namespace MapsInMyFolder
             {
                 Grid ContentGrid = Collectif.FindChildByName<Grid>(NotificationZone, NotificationInternalArgs.NotificationId);
                 var doubleAnimation = new DoubleAnimation(ContentGrid.ActualHeight, 0, new Duration(TimeSpan.FromSeconds(0.1)));
-                doubleAnimation.Completed += (sender, e) =>
+                void DeleteAfterAnimation(object sender, EventArgs eventArgs)
                 {
                     ContentGrid?.Children?.Clear();
                     ContentGrid = null;
                     NotificationZone.Children.Remove(ContentGrid);
-                };
+                    doubleAnimation.Completed -= DeleteAfterAnimation;
+                }
+                doubleAnimation.Completed += DeleteAfterAnimation;
                 ContentGrid.BeginAnimation(MaxHeightProperty, doubleAnimation);
             }
         }
@@ -467,18 +462,6 @@ namespace MapsInMyFolder
             selectionRectangle?.PropertiesDisplayElement.BringIntoView();
         }
 
-        public void SetLayer()
-        {
-            Layers Layer = Layers.GetLayerById(Settings.layer_startup_id);
-            MapViewer.MapLayer = new MapTileLayer
-            {
-                TileSource = new TileSource { UriFormat = "https://tile.openstreetmap.org/{z}/{x}/{y}.png", LayerID = Layer.class_id },
-                SourceName = Layer.class_identifiant,
-                MaxZoomLevel = Layer.class_max_zoom ?? 0,
-                MinZoomLevel = Layer.class_min_zoom ?? 0,
-                Description = ""
-            };
-        }
 
         private void AddRectangle_Click(object sender, RoutedEventArgs e)
         {
@@ -521,6 +504,11 @@ namespace MapsInMyFolder
         {
             PageDispose();
             MainWindow._instance.FrameBack();
+        }
+
+        private void SaveButton_Click(object sender, RoutedEventArgs e)
+        {
+            PageDispose();
         }
     }
 }

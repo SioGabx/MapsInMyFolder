@@ -122,12 +122,16 @@ namespace MapsInMyFolder.Commun
                 if (Layers.Current.class_id == LayerId)
                 {
                     JavascriptInstance.Location = new Dictionary<string, double>(){
-                    {"SE_Latitude",SE_Latitude },
-                    {"SE_Longitude",SE_Longitude },
-                    {"NO_Latitude",NO_Latitude },
-                    {"NO_Longitude",NO_Longitude }
-                };
+                        {"SE_Latitude",SE_Latitude },
+                        {"SE_Longitude",SE_Longitude },
+                        {"NO_Latitude",NO_Latitude },
+                        {"NO_Longitude",NO_Longitude }
+                    };
                     JavascriptInstance.ZoomToNewLocation = ZoomToNewLocation;
+                }
+                else
+                {
+                    PrintError("Impossible de définir la selection, le calque n'est pas courrant");
                 }
             }
 
@@ -136,15 +140,13 @@ namespace MapsInMyFolder.Commun
                 return new Dictionary<string, Dictionary<string, double>>
                 {
                     {
-                        "SE",
-                        new Dictionary<string, double>() {
+                        "SE", new Dictionary<string, double>() {
                             {"lat",Map.CurentSelection.SE_Latitude },
                             {"long",Map.CurentSelection.SE_Longitude }
                         }
                     },
                     {
-                        "NO",
-                        new Dictionary<string, double>() {
+                        "NO", new Dictionary<string, double>() {
                             {"lat",Map.CurentSelection.NO_Latitude },
                             {"long",Map.CurentSelection.NO_Longitude }
                         }
@@ -180,12 +182,13 @@ namespace MapsInMyFolder.Commun
                 string returnString = supposedString?.ToString();
 
                 if (returnString != null &&
-                    (supposedString is object || supposedString is object[] ||
-                    supposedString is System.Dynamic.ExpandoObject || supposedString is Dictionary<string, string> ||
-                    supposedString is Dictionary<string, object>) &&
-                    supposedString.GetType().FullName != "Jint.Runtime.Interop.DelegateWrapper")
+                    (supposedString.GetType() == typeof(object) ||
+                    supposedString.GetType() == typeof(object[]) ||
+                    supposedString.GetType() == typeof(System.Dynamic.ExpandoObject) ||
+                    supposedString.GetType() == typeof(Dictionary<string, string>) ||
+                    supposedString.GetType() == typeof(Dictionary<string, object>))
+                && (supposedString.GetType().FullName != "Jint.Runtime.Interop.DelegateWrapper"))
                 {
-                    //Debug.WriteLine(supposedString.GetType().FullName);
                     returnString = JsonConvert.SerializeObject(supposedString);
                 }
 
@@ -227,11 +230,14 @@ namespace MapsInMyFolder.Commun
                     TextBox = Application.Current.Dispatcher.Invoke(new Func<TextBox>(() =>
                     {
                         var (textBox, dialog) = Message.SetInputBoxDialog(texte, caption);
-                        dialog.Closed += (_, __) =>
+
+                        void Dialog_Closed(object sender, EventArgs e)
                         {
-                            // stops the frame
                             frame.Continue = false;
-                        };
+                            dialog.Closed -= Dialog_Closed;
+                        }
+
+                        dialog.Closed += Dialog_Closed;
                         dialog.ShowAsync();
                         return textBox;
                     }));
@@ -254,10 +260,13 @@ namespace MapsInMyFolder.Commun
                     Application.Current.Dispatcher.Invoke(new Action(() =>
                     {
                         var dialog = Message.SetContentDialog(texte, caption);
-                        dialog.Closed += (_, __) =>
+                        void Dialog_Closed(object sender, EventArgs e)
                         {
-                            frame.Continue = false; // stops the frame
-                        };
+                            frame.Continue = false;
+                            dialog.Closed -= Dialog_Closed;
+                        }
+
+                        dialog.Closed += Dialog_Closed;
                         dialog.ShowAsync();
                     }));
                     Dispatcher.PushFrame(frame);
@@ -318,7 +327,7 @@ namespace MapsInMyFolder.Commun
                 stringBuilder.AppendLine(" - clearVar(\"nom_variable\") : Supprime la variable.");
                 stringBuilder.AppendLine(" - getTileNumber(latitude, longitude, zoom) : Convertit les coordonnées en tiles");
                 stringBuilder.AppendLine(" - getLatLong(TileX, TileY, zoom) : Convertit les numéros de tiles en coordonnées");
-                stringBuilder.AppendLine(" - setSelection(top_latitude, top_longitude, bot_latitude, bot_longitude) : Définit les coordonnées de la sélection courante");
+                stringBuilder.AppendLine(" - setSelection(top_latitude, top_longitude, bot_latitude, bot_longitude, zoomToBound) : Définit les coordonnées de la sélection courante");
                 stringBuilder.AppendLine(" - getSelection() : Obtient les coordonnées de la sélection courante");
                 stringBuilder.AppendLine(" - alert(\"message\", \"caption\") : Affiche un message à l'écran");
                 stringBuilder.AppendLine(" - inputbox(\"message\", \"caption\") : Demande une saisie à l'utilisateur");

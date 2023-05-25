@@ -76,7 +76,13 @@ namespace MapsInMyFolder.Commun
         {
             Debug.WriteLine("New Settup Engine for layer" + LayerId);
             CancellationTokenSource JsCancelToken = new CancellationTokenSource();
-            JsListCancelTocken.Remove(LayerId);
+
+            if (JsListCancelTocken.TryGetValue(LayerId, out CancellationTokenSource cancelTockenToDispose))
+            {
+                cancelTockenToDispose.Dispose();
+                JsListCancelTocken.Remove(LayerId);
+            }
+
             JsListCancelTocken.Add(LayerId, JsCancelToken);
 
             Engine add = new Engine(options =>
@@ -182,11 +188,17 @@ namespace MapsInMyFolder.Commun
 
         public static void EngineDeleteById(int LayerId)
         {
-            //lock (locker)
-            //{
-            ListOfEngines.Remove(LayerId);
-            JsListCancelTocken.Remove(LayerId);
-            //}
+            if (ListOfEngines.TryGetValue(LayerId, out Engine engineToDispose))
+            {
+                ListOfEngines.Remove(LayerId);
+                engineToDispose.Dispose();
+            }
+
+            if (JsListCancelTocken.TryGetValue(LayerId, out CancellationTokenSource cancelTockenToDispose))
+            {
+                JsListCancelTocken.Remove(LayerId);
+                cancelTockenToDispose.Dispose();
+            }
         }
 
         public static void EngineUpdate(Engine engine, int LayerId)
@@ -197,11 +209,10 @@ namespace MapsInMyFolder.Commun
         public static void EngineClearList()
         {
             setOldScriptTimestamp();
-            //lock (locker)
-            //{
+            ListOfEngines.Values.DisposeItems();
             ListOfEngines.Clear();
+            JsListCancelTocken.Values.DisposeItems();
             JsListCancelTocken.Clear();
-            //}
         }
         #endregion
 
@@ -260,9 +271,17 @@ namespace MapsInMyFolder.Commun
             {
                 return false;
             }
-            JsValue evaluateValue = add?.Evaluate("typeof " + functionName + " === 'function'") ?? false;
+            try
+            {
+                JsValue evaluateValue = add?.Evaluate("typeof " + functionName + " === 'function'") ?? false;
+                return evaluateValue.AsBoolean();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                return false;
+            }
 
-            return evaluateValue.AsBoolean();
         }
         public static JsValue ExecuteScript(string script, Dictionary<string, object> arguments, int LayerId, Collectif.GetUrl.InvokeFunction InvokeFunction)
         {

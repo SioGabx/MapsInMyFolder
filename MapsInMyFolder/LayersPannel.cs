@@ -85,9 +85,6 @@ namespace MapsInMyFolder
             {
                 layer_browser.ExecuteScriptAsync("CefSharp.BindObjectAsync(\"layer_Csharp_call_from_js\");");
                 layer_browser.ExecuteScriptAsync("StartObserving();");
-                layer_browser.ToolTipOpening += (o, e) => { e.Handled = true; };
-
-
             }
             catch (Exception ex)
             {

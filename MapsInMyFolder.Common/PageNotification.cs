@@ -10,7 +10,6 @@ using System.Windows.Shapes;
 
 namespace MapsInMyFolder.Commun
 {
-
     public abstract partial class Notification
     {
         public int InsertPosition = 0;
@@ -96,8 +95,6 @@ namespace MapsInMyFolder.Commun
             ContentGrid.Children.Add(Elements.CloseButton(Remove));
             return ContentGrid;
         }
-
-
     }
 
     public abstract partial class Notification
@@ -118,12 +115,15 @@ namespace MapsInMyFolder.Commun
 
                 if (OnClickCallback != null)
                 {
-                    ContentGrid.MouseLeftButtonUp += (s, o) =>
+                    ContentGrid.MouseLeftButtonUp += ContentGrid_MouseLeftButtonUp;
+
+                    void ContentGrid_MouseLeftButtonUp(object sender, MouseButtonEventArgs o)
                     {
                         o.Handled = true;
                         CloseCallback();
                         OnClickCallback();
-                    };
+                        ContentGrid.MouseLeftButtonUp -= ContentGrid_MouseLeftButtonUp;
+                    }
                 }
 
                 System.Windows.Shapes.Rectangle BorderBottom = new System.Windows.Shapes.Rectangle()
@@ -205,11 +205,16 @@ namespace MapsInMyFolder.Commun
                 };
 
                 CloseButton.Content = CloseButtonPath();
-                CloseButton.Click += (_, e) =>
+                CloseButton.Click += CloseButton_Click;
+
+
+                void CloseButton_Click(object sender, EventArgs o)
                 {
                     CloseCallback();
                     CloseButton.IsEnabled = false;
-                };
+                    CloseButton.Click -= CloseButton_Click;
+                }
+
                 return CloseButton;
             }
 

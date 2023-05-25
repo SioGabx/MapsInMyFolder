@@ -2,6 +2,7 @@
 using MapsInMyFolder.MapControl;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -43,15 +44,19 @@ namespace MapsInMyFolder
 
         public void Preload()
         {
+            Debug.WriteLine("Preloading MainPage");
             ReloadPage();
             MapLoad();
         }
+
         void Init()
         {
+            Debug.WriteLine("Init MainPage");
             Init_download_panel();
             Init_layer_panel();
             isInitialised = true;
-            Notification.UpdateNotification += (Notification, NotificationArgs) => UpdateNotification((Notification)Notification, NotificationArgs);
+            Notification.UpdateNotification += UpdateNotification;
+            layer_browser.ToolTipOpening += (o, e) => e.Handled = true;
         }
         private void Map_panel_open_location_panel_Click(object sender, RoutedEventArgs e)
         {
@@ -108,20 +113,20 @@ namespace MapsInMyFolder
             SearchLayerStart();
         }
 
-        public void UpdateNotification(Notification sender, (string NotificationId, string Destinateur) NotificationInternalArgs)
+        public void UpdateNotification(object sender, (string NotificationId, string Destinateur) NotificationInternalArgs)
         {
-            if (sender is not null)
+            if (sender is Notification Notif)
             {
                 if (NotificationInternalArgs.Destinateur != "MainPage")
                 {
                     return;
                 }
-                Grid ContentGrid = sender.Get();
+                Grid ContentGrid = Notif.Get();
                 if (Collectif.FindChildByName<Grid>(NotificationZone, NotificationInternalArgs.NotificationId) != null)
                 {
                     Grid NotificationZoneContentGrid = Collectif.FindChildByName<Grid>(NotificationZone, NotificationInternalArgs.NotificationId);
                     NotificationZone.Children.Remove(NotificationZoneContentGrid);
-                    NotificationZone.Children.Insert(Math.Min(sender.InsertPosition, NotificationZone.Children.Count), ContentGrid);
+                    NotificationZone.Children.Insert(Math.Min(Notif.InsertPosition, NotificationZone.Children.Count), ContentGrid);
                     NotificationZoneContentGrid.Children.Clear();
                     NotificationZoneContentGrid = null;
                 }
@@ -130,19 +135,21 @@ namespace MapsInMyFolder
                     ContentGrid.Opacity = 0;
                     var doubleAnimation = new DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(Settings.animations_duration_millisecond));
                     ContentGrid.BeginAnimation(OpacityProperty, doubleAnimation);
-                    sender.InsertPosition = NotificationZone.Children.Add(ContentGrid);
+                    Notif.InsertPosition = NotificationZone.Children.Add(ContentGrid);
                 }
             }
             else if (Collectif.FindChildByName<Grid>(NotificationZone, NotificationInternalArgs.NotificationId) != null)
             {
                 Grid ContentGrid = Collectif.FindChildByName<Grid>(NotificationZone, NotificationInternalArgs.NotificationId);
                 var doubleAnimation = new DoubleAnimation(ContentGrid.ActualHeight, 0, new Duration(TimeSpan.FromSeconds(0.1)));
-                doubleAnimation.Completed += (sender, e) =>
+                void DeleteAfterAnimation(object sender, EventArgs e)
                 {
                     ContentGrid?.Children?.Clear();
                     ContentGrid = null;
                     NotificationZone.Children.Remove(ContentGrid);
-                };
+                    doubleAnimation.Completed -= DeleteAfterAnimation;
+                }
+                doubleAnimation.Completed += DeleteAfterAnimation;
                 ContentGrid.BeginAnimation(MaxHeightProperty, doubleAnimation);
             }
         }
@@ -203,8 +210,6 @@ namespace MapsInMyFolder
             if (ZoomToNewLocation)
             {
                 ActiveRectangleSelection = mapSelectable.GetRectangleLocation();
-                Point NO_Point_Bounds = mapviewer.LocationToView(ActiveRectangleSelection.NO);
-                Point SE_Point_Bounds = mapviewer.LocationToView(ActiveRectangleSelection.SE);
                 double pourcentage_Lat = Math.Abs((ActiveRectangleSelection.NO.Latitude - ActiveRectangleSelection.SE.Latitude) / 2);
                 double pourcentage_Lng = Math.Abs((ActiveRectangleSelection.NO.Latitude - ActiveRectangleSelection.SE.Latitude) / 2);
                 Location NO_Location_Bounds = new Location(ActiveRectangleSelection.NO.Latitude - pourcentage_Lat, ActiveRectangleSelection.NO.Longitude - pourcentage_Lng);
@@ -260,7 +265,13 @@ namespace MapsInMyFolder
             Storyboard.SetTarget(fadeOutAnimation, label);
             Storyboard.SetTargetProperty(fadeOutAnimation, new PropertyPath(OpacityProperty));
 
-            fadeOutAnimation.Completed += (s, e) => isAnimating = false;
+            void AnimationCompleted(object sender, EventArgs e)
+            {
+                isAnimating = false;
+                fadeOutAnimation.Completed -= AnimationCompleted;
+            }
+
+            fadeOutAnimation.Completed += AnimationCompleted;
 
             storyboard.Begin();
             isAnimating = true;

@@ -107,7 +107,7 @@
                 <StackPanel x:Name="NotificationZone" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Grid.RowSpan="2" Margin="10,0,0,0" VerticalAlignment="Top">
 
                 </StackPanel>
-                <Button x:Name="SaveButton" Grid.Row="1" Grid.Column="1" Style="{DynamicResource RoundedButton}" Content="Enregistrer" Height="45" Margin="0,0,15,15" VerticalAlignment="Top" Foreground="#fff" FontSize="18"/>
+                <Button x:Name="SaveButton" Grid.Row="1" Grid.Column="1" Style="{DynamicResource RoundedButton}" Content="Enregistrer" Height="45" Margin="0,0,15,15" VerticalAlignment="Top" Foreground="#fff" FontSize="18" Click="SaveButton_Click"/>
             </Grid>
         </Grid>
 

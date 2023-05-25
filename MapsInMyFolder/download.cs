@@ -348,7 +348,7 @@ namespace MapsInMyFolder
                 else
                 {
                     int nbr_engine_progress = 0;
-                    foreach (var _ in DownloadClass.GetEngineList().Where(engine => engine.state == Status.progress))
+                    foreach (var _ in DownloadClass.GetEngineList().Where(engine => !(engine.state == Status.cancel || engine.state == Status.pause || engine.state == Status.error || engine.state == Status.success)))
                     {
                         nbr_engine_progress++;
                     }
@@ -359,6 +359,7 @@ namespace MapsInMyFolder
                     }
                     else if (nbr_engine_progress <= 1 && TaskbarItemInfo.ProgressState != System.Windows.Shell.TaskbarItemProgressState.Normal)
                     {
+                        TaskbarItemInfo.ProgressValue = 0;
                         TaskbarItemInfo.ProgressState = System.Windows.Shell.TaskbarItemProgressState.Normal;
                     }
                 }
@@ -564,6 +565,7 @@ namespace MapsInMyFolder
             }
             DownloadClass engine = DownloadClass.GetEngineById(engineId);
             engine.state = Status.waitfordownloading;
+            CheckifMultipleDownloadInProgress();
             string info = $"{engine.nbr_of_tiles - engine.nbr_of_tiles_waiting_for_downloading}/{engine.nbr_of_tiles}";
             UpdateDownloadPanel(engineId, $"Reprise... ({info})", "", true, Status.progress);
             if (engine.urls is null || engine.urls.Count == 0)
@@ -661,7 +663,7 @@ namespace MapsInMyFolder
 
                         if (cancellationToken.IsCancellationRequested && cancellationToken.CanBeCanceled)
                         {
-                            cancellationTokenSource.Cancel();
+                            cancellationTokenSource?.Cancel();
                             Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
                             {
                                 TaskbarItemInfo.ProgressValue = 0;
@@ -755,8 +757,6 @@ namespace MapsInMyFolder
 
             return downloadEngineClass.nbr_of_tiles_waiting_for_downloading;
         }
-
-
 
         static void DownloadFinish(int id)
         {
@@ -1178,11 +1178,7 @@ namespace MapsInMyFolder
                 {
                     tempArrayJoinImage = Image.Arrayjoin(horizontalArray.ToArray(), background: new double[] { 255, 255, 255, 255 });
 
-                    foreach (NetVips.Image imgtodispose in horizontalArray)
-                    {
-                        imgtodispose.Dispose();
-                    }
-
+                    horizontalArray.DisposeItems();
                     horizontalArray.Clear();
                 }
                 catch (Exception ex)
@@ -1238,9 +1234,11 @@ namespace MapsInMyFolder
                         verticalArray[i] = Image.Black(tile_size, tile_size);
                     }
                 }
-
+                Image[] ImagesVerticalArray = verticalArray.ToArray();
                 image = Image.Arrayjoin(verticalArray.ToArray(), across: 1);
 
+                ImagesVerticalArray.DisposeItems();
+                verticalArray.DisposeItems();
                 verticalArray.Clear();
             }
             catch (Exception ex)
@@ -1255,7 +1253,7 @@ namespace MapsInMyFolder
         void InternalUpdateProgressBar(DownloadClass download_engine)
         {
             int number_of_url_class_waiting_for_downloading = 0;
-            foreach (Url_class urclass in download_engine.urls)
+            foreach (Url_class urclass in download_engine?.urls)
             {
                 if (urclass.status == Status.waitfordownloading)
                 {

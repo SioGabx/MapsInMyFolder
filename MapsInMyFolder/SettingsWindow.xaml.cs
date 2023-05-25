@@ -43,7 +43,20 @@ namespace MapsInMyFolder
 
         private void SetTextEditorPositionChangedHandler(TextEditor textEditor, int scrollOffset)
         {
-            textEditor.TextArea.Caret.PositionChanged += (_, _) => Collectif.TextEditorCursorPositionChanged(textEditor, SettingsGrid, SettingsScrollViewer, scrollOffset);
+
+            void textEditor_PositionChanged(object sender, EventArgs e)
+            {
+                Collectif.TextEditorCursorPositionChanged(textEditor, SettingsGrid, SettingsScrollViewer, scrollOffset);
+            }
+
+            void textEditor_Unloaded(object sender, EventArgs e)
+            {
+                textEditor.TextArea.Caret.PositionChanged -= textEditor_PositionChanged;
+                textEditor.Unloaded -= textEditor_Unloaded;
+            }
+
+            textEditor.TextArea.Caret.PositionChanged += textEditor_PositionChanged;
+            textEditor.Unloaded += textEditor_Unloaded;
         }
 
         private void SetFixMouseWheelBehavior(TextEditor textEditor)
@@ -56,7 +69,19 @@ namespace MapsInMyFolder
             MenuItem indenterMenuItem = new MenuItem();
             indenterMenuItem.Header = header;
             indenterMenuItem.Icon = new ModernWpf.Controls.FontIcon() { Glyph = "\uE12F", Foreground = Collectif.HexValueToSolidColorBrush("#888989") };
-            indenterMenuItem.Click += (sender, e) => Collectif.IndenterCode(sender, e, textEditor);
+            void indenterMenuItem_Click(object sender, EventArgs e)
+            {
+                Collectif.IndenterCode(sender, e, textEditor);
+            }
+
+            void indenterMenuItem_Unloaded(object sender, EventArgs e)
+            {
+                indenterMenuItem.Click -= indenterMenuItem_Click;
+                indenterMenuItem.Unloaded -= indenterMenuItem_Unloaded;
+            }
+
+            indenterMenuItem.Click += indenterMenuItem_Click;
+            indenterMenuItem.Unloaded += indenterMenuItem_Unloaded;
             textEditor.ContextMenu.Items.Add(indenterMenuItem);
         }
 

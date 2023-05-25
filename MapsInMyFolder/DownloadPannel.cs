@@ -179,7 +179,15 @@ namespace MapsInMyFolder
             {
                 EasingFunction = new PowerEase { EasingMode = EasingMode.EaseInOut }
             };
-            hide_anim.Completed += (s, e) => download_panel.Visibility = Visibility.Hidden;
+            hide_anim.Completed += hide_anim_Completed;
+
+            void hide_anim_Completed(object sender, EventArgs e)
+            {
+                download_panel.Visibility = Visibility.Hidden;
+                hide_anim.Completed -= hide_anim_Completed;
+            }
+
+
             download_panel.BeginAnimation(OpacityProperty, hide_anim);
         }
 

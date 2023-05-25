@@ -98,6 +98,7 @@ namespace MapsInMyFolder
                     Debug.WriteLine(ex.ToString());
                 }
             };
+
             Database.NewUpdateFoundEvent += (o, e) =>
             {
                 try

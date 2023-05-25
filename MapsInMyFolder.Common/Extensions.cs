@@ -219,7 +219,13 @@ namespace MapsInMyFolder.Commun
             return Texte;
         }
 
-
+        public static void DisposeItems<T>(this IEnumerable<T> collection) where T : IDisposable
+        {
+            foreach (T item in collection)
+            {
+                item.Dispose();
+            }
+        }
 
     }
 }
