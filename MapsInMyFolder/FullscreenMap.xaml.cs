@@ -26,7 +26,7 @@ namespace MapsInMyFolder
 
         public event EventHandler<RoutedEventArgs> PropertiesDisplayElementGotFocus;
 
-        public static List<SelectionRectangle> Rectangles = new List<SelectionRectangle>();
+        public static List<SelectionRectangle> Rectangles { get; set; } = new List<SelectionRectangle>();
 
         public static SelectionRectangle GetSelectionRectangleFromRectangle(MapPolygon searchedRectangle)
         {
@@ -468,11 +468,33 @@ namespace MapsInMyFolder
 
         public void AddNewSelection(MapPolygon NewRectangle = null, string Nom = null, string MinZoom = null, string MaxZoom = null, string Color = null, string StrokeThickness = null)
         {
+            DeleteUnusedRectangles();
+            if (NewRectangle == null)
+            {
+                NewRectangle = mapSelectable.AddRectangle(new Location(0, 0), new Location(0, 0));
+            }
+            SelectionRectangle selectionRectangle = new SelectionRectangle(NewRectangle, Nom, MinZoom, MaxZoom, Color, StrokeThickness)
+            {
+
+                mapSelectable = mapSelectable
+            };
+
+            SelectionRectangle.Rectangles.Add(selectionRectangle);
+
+            selectionRectangle.Focus(true);
+            RectanglesStackPanel.Children.Add(selectionRectangle.PropertiesDisplayElement);
+
+            MapViewer.Focus();
+            SelectionScrollViewer.ScrollToEnd();
+        }
+
+        private void DeleteUnusedRectangles()
+        {
             int NumberOfElementInside = RectanglesStackPanel.Children.Count;
             int NumberOfUnusedRectangleDeleted = mapSelectable.DeleteUnusedRectangles();
             if (NumberOfUnusedRectangleDeleted > 0 && NumberOfElementInside != RectanglesStackPanel.Children.Count)
             {
-                string infoText = NumberOfUnusedRectangleDeleted == 1 ? "Une sélection vide a été supprimée" : $"{NumberOfElementInside - RectanglesStackPanel.Children.Count} sélections vides ont été supprimées";
+                string infoText = NumberOfUnusedRectangleDeleted == 1 ? Languages.Current["editorSelectionsNotificationEmptySelectionDeletedSingle"] : Languages.GetWithArguments("editorSelectionsNotificationEmptySelectionDeletedMultiples", NumberOfElementInside - RectanglesStackPanel.Children.Count);
                 Notification InfoUnusedRectangleDeleted = new NText(infoText, "MapsInMyFolder", "FullscreenMap")
                 {
                     NotificationId = "InfoUnusedRectangleDeleted",
@@ -481,21 +503,6 @@ namespace MapsInMyFolder
                 };
                 InfoUnusedRectangleDeleted.Register();
             }
-
-            if (NewRectangle == null)
-            {
-                NewRectangle = mapSelectable.AddRectangle(new Location(0, 0), new Location(0, 0));
-            }
-            SelectionRectangle selectionRectangle = new SelectionRectangle(NewRectangle, Nom, MinZoom, MaxZoom, Color, StrokeThickness)
-            {
-                mapSelectable = mapSelectable
-            };
-            SelectionRectangle.Rectangles.Add(selectionRectangle);
-            selectionRectangle.Focus(true);
-            RectanglesStackPanel.Children.Add(selectionRectangle.PropertiesDisplayElement);
-
-            MapViewer.Focus();
-            SelectionScrollViewer.ScrollToEnd();
         }
 
         private void ClosePage_button_Click(object sender, RoutedEventArgs e)

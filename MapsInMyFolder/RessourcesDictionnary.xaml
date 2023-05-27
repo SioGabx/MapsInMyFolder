@@ -9,6 +9,7 @@
     xmlns:editing="clr-namespace:ICSharpCode.AvalonEdit.Editing;assembly=ICSharpCode.AvalonEdit"
     xmlns:rendering="clr-namespace:ICSharpCode.AvalonEdit.Rendering;assembly=ICSharpCode.AvalonEdit"
     xmlns:map="clr-namespace:MapsInMyFolder.MapControl;assembly=MapsInMyFolder.MapControl" xmlns:sys="clr-namespace:System;assembly=netstandard">
+   
     <Style TargetType="avalonEdit:TextEditor">
         <Setter Property="Background" Value="#303031"></Setter>
         <Setter Property="Foreground" Value="#BCBCBC"></Setter>

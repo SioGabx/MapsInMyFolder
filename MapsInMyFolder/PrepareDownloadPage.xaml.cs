@@ -1147,9 +1147,11 @@ namespace MapsInMyFolder
 
             var selectionLocation = MainPage.mapSelectable.GetRectangleLocation();
             DownloadOptions downloadOptions = new DownloadOptions(0, saveDirectory, format, filename, "", "", 0, zoom, quality, "", selectionLocation.NO, selectionLocation.SE, redimWidth, redimHeight, interpretation, scaleInfo);
+            
             MainWindow._instance.PrepareDownloadBeforeStart(downloadOptions);
-            TextBoxScaleIsLock(false);
             ClosePage();
+            TextBoxScaleIsLock(false);
+            
         }
 
         private void ClosePage_button_Click(object sender, RoutedEventArgs e)

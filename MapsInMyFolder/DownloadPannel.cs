@@ -21,7 +21,6 @@ namespace MapsInMyFolder
             {
                 return;
             }
-
             DownloadSettings.Clear();
             string SelectCommandText = "SELECT * FROM 'DOWNLOADS' ORDER BY 'TIMESTAMP' ASC";
             using var sqlite_datareader = Database.ExecuteExecuteReaderSQLCommand(SelectCommandText);
@@ -139,7 +138,7 @@ namespace MapsInMyFolder
 
         public void Init_download_panel()
         {
-            string resource_data = Collectif.ReadResourceString("html/download_panel.html");
+            string resource_data = Collectif.ReadResourceString("HTML/download_panel.html");
             download_panel_browser.LoadHtml(resource_data);
             if (download_panel_browser is null) { return; }
             try

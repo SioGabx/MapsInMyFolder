@@ -76,8 +76,7 @@ namespace MapsInMyFolder
             TextboxRectangles.TextArea.Caret.CaretBrush = Collectif.HexValueToSolidColorBrush("#f18712");//rgb(241 135 18)
             TextboxRectangles.TextArea.Caret.PositionChanged += TextboxRectangles_Caret_PositionChanged;
             TextboxLayerScript.TextArea.Caret.PositionChanged += TextboxLayerScript_Caret_PositionChanged;
-            ScrollViewerHelper.SetFixMouseWheel(Collectif.GetDescendantByType(TextboxLayerScript, typeof(ScrollViewer)) as ScrollViewer, true);
-            ScrollViewerHelper.SetFixMouseWheel(Collectif.GetDescendantByType(TextboxRectangles, typeof(ScrollViewer)) as ScrollViewer, true);
+            FixTextEditorScrollIssues();
 
             AutoUpdateLayer.IsChecked = Settings.editor_autoupdatelayer;
             DefaultValuesHachCode = Collectif.CheckIfInputValueHaveChange(EditeurStackPanel);
@@ -86,88 +85,73 @@ namespace MapsInMyFolder
             Javascript.JavascriptActionEvent += JavascriptActionEvent;
         }
 
+        void FixTextEditorScrollIssues()
+        {
+            ScrollViewerHelper.SetFixMouseWheel(Collectif.GetDescendantByType(TextboxLayerScript, typeof(ScrollViewer)) as ScrollViewer, true);
+            ScrollViewerHelper.SetFixMouseWheel(Collectif.GetDescendantByType(TextboxRectangles, typeof(ScrollViewer)) as ScrollViewer, true);
+        }
+
         void SetContextMenu()
         {
             MenuItem IndentermenuItem = new MenuItem();
             IndentermenuItem.Header = "Indenter";
             IndentermenuItem.Icon = new ModernWpf.Controls.FontIcon() { Glyph = "\uE12F", Foreground = Collectif.HexValueToSolidColorBrush("#888989") };
+            IndentermenuItem.Click += IndentermenuItem_Click;
+            TextboxLayerScript.ContextMenu.Items.Add(IndentermenuItem);
             void IndentermenuItem_Click(object sender, EventArgs e)
             {
                 IndenterCode(sender, e, TextboxLayerScript);
             }
-
-            void IndentermenuItem_Unloaded(object sender, EventArgs e)
-            {
-                IndentermenuItem.Click -= IndentermenuItem_Click;
-                IndentermenuItem.Unloaded -= IndentermenuItem_Unloaded;
-            }
-
-            IndentermenuItem.Click += IndentermenuItem_Click;
-            IndentermenuItem.Unloaded += IndentermenuItem_Unloaded;
-            TextboxLayerScript.ContextMenu.Items.Add(IndentermenuItem);
-
             MenuItem templateMenuItem = new MenuItem();
             templateMenuItem.Header = "Script template";
             templateMenuItem.Icon = new ModernWpf.Controls.FontIcon() { Glyph = "\uE15C", Foreground = Collectif.HexValueToSolidColorBrush("#888989") };
 
+
+            templateMenuItem.Click += templateMenuItem_Click;
+            TextboxLayerScript.ContextMenu.Items.Add(templateMenuItem);
             void templateMenuItem_Click(object sender, EventArgs e)
             {
-                putScriptTemplate(TextboxLayerScript);
+                PutScriptTemplate(TextboxLayerScript);
             }
-
-            void templateMenuItem_Unloaded(object sender, EventArgs e)
-            {
-                templateMenuItem.Click -= templateMenuItem_Click;
-                templateMenuItem.Unloaded -= templateMenuItem_Unloaded;
-            }
-            templateMenuItem.Click += templateMenuItem_Click;
-            templateMenuItem.Unloaded += templateMenuItem_Unloaded;
-            TextboxLayerScript.ContextMenu.Items.Add(templateMenuItem);
-
-
-
 
             MenuItem clearConsoleMenuItem = new MenuItem();
             clearConsoleMenuItem.Header = "Effacer";
             clearConsoleMenuItem.Icon = new ModernWpf.Controls.FontIcon() { Glyph = "\uE127", Foreground = Collectif.HexValueToSolidColorBrush("#888989") };
-
-
+            clearConsoleMenuItem.Click += clearConsoleMenuItem_Click;
+            TextboxLayerScriptConsole.ContextMenu.Items.Add(clearConsoleMenuItem);
             void clearConsoleMenuItem_Click(object sender, EventArgs e)
             {
                 Javascript.Functions.PrintClear();
             }
 
-            void clearConsoleMenuItem_Unloaded(object sender, EventArgs e)
-            {
-                clearConsoleMenuItem.Click -= clearConsoleMenuItem_Click;
-                clearConsoleMenuItem.Unloaded -= clearConsoleMenuItem_Unloaded;
-            }
-
-            clearConsoleMenuItem.Click += clearConsoleMenuItem_Click;
-            clearConsoleMenuItem.Unloaded += clearConsoleMenuItem_Unloaded;
-            TextboxLayerScriptConsole.ContextMenu.Items.Add(clearConsoleMenuItem);
-
             MenuItem helpConsoleMenuItem = new MenuItem();
             helpConsoleMenuItem.Header = "Aide";
             helpConsoleMenuItem.Icon = new ModernWpf.Controls.FontIcon() { Glyph = "\uE11B", Foreground = Collectif.HexValueToSolidColorBrush("#888989") };
-
-
+            helpConsoleMenuItem.Click += helpConsoleMenuItem_Click;
+            TextboxLayerScriptConsole.ContextMenu.Items.Add(helpConsoleMenuItem);
             void helpConsoleMenuItem_Click(object sender, EventArgs e)
             {
                 Javascript.Functions.Help(-2);
                 TextboxLayerScriptConsole.ScrollToEnd();
             }
 
-            void helpConsoleMenuItem_Unloaded(object sender, EventArgs e)
-            {
-                helpConsoleMenuItem.Click -= helpConsoleMenuItem_Click;
-                helpConsoleMenuItem.Unloaded -= helpConsoleMenuItem_Unloaded;
-            }
+            CustomOrEditLayers.Unloaded += CustomOrEditLayers_Unloaded;
 
-            helpConsoleMenuItem.Click += helpConsoleMenuItem_Click;
-            helpConsoleMenuItem.Unloaded += helpConsoleMenuItem_Unloaded;
-            TextboxLayerScriptConsole.ContextMenu.Items.Add(helpConsoleMenuItem);
+            void CustomOrEditLayers_Unloaded(object sender, RoutedEventArgs e)
+            {
+                CustomOrEditLayers.Unloaded -= CustomOrEditLayers_Unloaded;
+                helpConsoleMenuItem.Click -= helpConsoleMenuItem_Click;
+                clearConsoleMenuItem.Click -= clearConsoleMenuItem_Click;
+                templateMenuItem.Click -= templateMenuItem_Click;
+                IndentermenuItem.Click -= IndentermenuItem_Click;
+                TextboxLayerScriptConsole.ContextMenu.Items.Remove(helpConsoleMenuItem);
+                TextboxLayerScriptConsole.ContextMenu.Items.Remove(clearConsoleMenuItem);
+                TextboxLayerScript.ContextMenu.Items.Remove(templateMenuItem);
+                TextboxLayerScript.ContextMenu.Items.Remove(IndentermenuItem);
+            }
         }
+
+
 
         private void TextboxLayerScript_Caret_PositionChanged(object sender, EventArgs e)
         {
@@ -344,7 +328,7 @@ namespace MapsInMyFolder
             Collectif.setBackgroundOnUIElement(mapviewerappercu, LayerInEditMode?.class_specialsoptions?.BackgroundColor);
         }
 
-        void putScriptTemplate(ICSharpCode.AvalonEdit.TextEditor textBox)
+        void PutScriptTemplate(ICSharpCode.AvalonEdit.TextEditor textBox)
         {
             Collectif.InsertTextAtCaretPosition(textBox, Settings.tileloader_template_script);
             DoWeNeedToUpdateMoinsUnLayer();
@@ -1156,7 +1140,15 @@ namespace MapsInMyFolder
             });
             FullscreenRectanglesMap.MapViewer.Center = mapviewerappercu.Center;
             FullscreenRectanglesMap.MapViewer.ZoomLevel = mapviewerappercu.ZoomLevel;
-            int ListOfRectanglesInTextbox = (JsonConvert.DeserializeObject<List<Dictionary<string, string>>>(TextboxRectangles.Text) ?? new List<Dictionary<string, string>>()).Count;
+            int ListOfRectanglesInTextbox = 1;
+            try
+            {
+                ListOfRectanglesInTextbox = (JsonConvert.DeserializeObject<List<Dictionary<string, string>>>(TextboxRectangles.Text) ?? new List<Dictionary<string, string>>()).Count;
+            }
+            catch (Exception ex)
+            {
+                Javascript.Functions.PrintError(ex.Message);
+            }
             int NumberOfRectangleSuccessfullyAdded = 0;
 
             foreach (MapFigures.Figure Figure in MapFigures.GetFiguresFromJsonString(TextboxRectangles.Text))
@@ -1181,14 +1173,15 @@ namespace MapsInMyFolder
             FullscreenRectanglesMap.SaveButton.Click += FullscreenMap_SaveButton_Click;
             FullscreenRectanglesMap.Unloaded += FullscreenRectanglesMap_Unloaded;
             MainWindow._instance.MainContentFrame.Navigate(FullscreenRectanglesMap);
+
             void FullscreenRectanglesMap_Unloaded(object sender2, RoutedEventArgs e2)
             {
                 FullscreenRectanglesMap.SaveButton.Click -= FullscreenMap_SaveButton_Click;
                 FullscreenRectanglesMap.Unloaded -= FullscreenRectanglesMap_Unloaded;
                 SelectionRectangle.Rectangles.Clear();
+                FixTextEditorScrollIssues();
+                SetContextMenu();
             }
-
-
         }
 
         private void FullscreenMap_SaveButton_Click(object sender, RoutedEventArgs e)

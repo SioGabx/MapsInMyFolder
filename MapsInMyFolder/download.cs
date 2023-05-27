@@ -256,7 +256,7 @@ namespace MapsInMyFolder
                 else
                 {
                     int nbr_engine_progress = 0;
-                    foreach (var _ in DownloadSettings.GetEngineList().Where(engine => !(engine.state == Status.cancel || engine.state == Status.pause || engine.state == Status.error || engine.state == Status.success)))
+                    foreach (var _ in DownloadSettings.GetEngineList().Where(engine => !(engine.state == Status.cancel || engine.state == Status.pause || engine.state == Status.error || engine.state == Status.success || engine.state == Status.deleted)))
                     {
                         nbr_engine_progress++;
                     }
@@ -286,11 +286,11 @@ namespace MapsInMyFolder
             CheckIfReadyToStartDownload();
         }
 
-        static void CheckIfReadyToStartDownload()
+        static async void CheckIfReadyToStartDownload()
         {
             int maxSimultaneousDownloads = Settings.max_download_project_in_parralele;
             int numDownloadsStarted = 0;
-
+            await Task.Delay(500);
             foreach (DownloadSettings engine in DownloadSettings.GetEngineList())
             {
                 if (numDownloadsStarted >= maxSimultaneousDownloads)
@@ -419,13 +419,6 @@ namespace MapsInMyFolder
         public static void AbordAndCancelWithTokenDownload(int engineId)
         {
             DownloadSettings engine = DownloadSettings.GetEngineById(engineId);
-
-            if (engine.state != Status.error)
-            {
-                engine.state = Status.pause;
-            }
-
-            //engine.cancellation_token = engine.cancellation_token_source.Token;
             CancellationTokenSource canceltocken = engine.cancellation_token_source;
             canceltocken.Cancel();
             CheckIfReadyToStartDownload();
@@ -436,6 +429,7 @@ namespace MapsInMyFolder
             DownloadSettings engine = DownloadSettings.GetEngineById(engineId);
             string info = $"{engine.nbr_of_tiles - engine.nbr_of_tiles_waiting_for_downloading}/{engine.nbr_of_tiles}";
             UpdateDownloadPanel(engineId, $"En pause... ({info})", "", true, Status.pause);
+            engine.state = Status.pause;
             AbordAndCancelWithTokenDownload(engineId);
         }
 
@@ -443,6 +437,7 @@ namespace MapsInMyFolder
         {
             DownloadSettings engine = DownloadSettings.GetEngineById(engineId);
             UpdateDownloadPanel(engineId, "Annulé...", "", true, Status.cancel);
+            engine.state = Status.cancel;
             AbordAndCancelWithTokenDownload(engineId);
         }
 
@@ -480,8 +475,12 @@ namespace MapsInMyFolder
             }
 
             engine.urls.ForEach(url => url.status = Status.waitfordownloading);
+            if (engine.cancellation_token_source != null)
+            {
+                engine.cancellation_token_source.Cancel();
+                engine.cancellation_token_source.Dispose();
+            }
 
-            engine.cancellation_token_source?.Cancel();
             engine.cancellation_token_source = new CancellationTokenSource();
             engine.cancellation_token = engine.cancellation_token_source.Token;
 
@@ -544,7 +543,7 @@ namespace MapsInMyFolder
             CheckIfReadyToStartDownload();
         }
 
-        private void WaitForInternet(DownloadSettings downloadEngineClass)
+        private bool WaitForInternet(DownloadSettings downloadEngineClass)
         {
             CancellationTokenSource cancellationTokenSource = downloadEngineClass.cancellation_token_source;
             CancellationToken cancellationToken = downloadEngineClass.cancellation_token;
@@ -561,7 +560,7 @@ namespace MapsInMyFolder
                     {
                         TaskbarItemInfo.ProgressValue = 0;
                     }, null);
-                    return;
+                    return false;
                 }
 
                 if (!isNetworkAvailable)
@@ -583,6 +582,7 @@ namespace MapsInMyFolder
                     UpdateDownloadPanel(downloadEngineClass.id, "Connecté ! Reprise du téléchargement", state: Status.progress);
                 }
             }, null);
+            return true;
         }
 
         private async Task ParallelDownloadTilesTask(DownloadSettings downloadEngineClass)
@@ -590,15 +590,21 @@ namespace MapsInMyFolder
             List<TilesUrl> urls = downloadEngineClass.urls;
             CancellationTokenSource cancellationTokenSource = downloadEngineClass.cancellation_token_source;
             CancellationToken cancellationToken = downloadEngineClass.cancellation_token;
-
-            await Task.Run(() =>
+            try
             {
-                Parallel.ForEach(urls, new ParallelOptions { MaxDegreeOfParallelism = Settings.max_download_tiles_in_parralele }, url =>
+                await Task.Run(() =>
                 {
-                    WaitForInternet(downloadEngineClass);
-                    DownloadUrlAsync(url).Wait();
-                });
-            }, cancellationTokenSource.Token);
+                    Parallel.ForEach(urls, new ParallelOptions { MaxDegreeOfParallelism = Settings.max_download_tiles_in_parralele, CancellationToken = cancellationToken }, url =>
+                    {
+                        WaitForInternet(downloadEngineClass);
+                        DownloadUrlAsync(url).Wait();
+                    });
+                }, cancellationTokenSource.Token);
+            }
+            catch (System.OperationCanceledException)
+            {
+
+            }
         }
 
         static private int CheckDownloadIsComplete(DownloadSettings downloadEngineClass)
@@ -1060,6 +1066,10 @@ namespace MapsInMyFolder
 
         void InternalUpdateProgressBar(DownloadSettings download_engine)
         {
+            if (download_engine == null)
+            {
+                return;
+            }
             int number_of_url_class_waiting_for_downloading = 0;
             foreach (TilesUrl urclass in download_engine?.urls)
             {
@@ -1083,13 +1093,9 @@ namespace MapsInMyFolder
             {
                 try
                 {
-                    if (number_of_url_class_waiting_for_downloading != 0)
+                    if (number_of_url_class_waiting_for_downloading == 0)
                     {
-                        //CheckifMultipleDownloadInProgress();
-                    }
-                    else
-                    {
-                        TaskbarItemInfo.ProgressState = System.Windows.Shell.TaskbarItemProgressState.Indeterminate;
+                        CheckifMultipleDownloadInProgress();
                     }
                     TaskbarItemInfo.ProgressValue = (double)progress;
                 }

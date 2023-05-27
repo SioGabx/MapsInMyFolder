@@ -285,8 +285,13 @@
             visibility: hidden;
         }
 
+        p.timeline:not(:has(+li)) {
+            display:none;
+        }
 
-
+        body:not(:has(li)) .nodownloadmessage {
+            display: flex;
+        }
 
         /*  ------------------ CONTEXT MENU ------------------ */
 
@@ -491,6 +496,7 @@
             justify-content: center;
             align-items: center;
             display: none;
+            user-select: none;
         }
 
             .nodownloadmessage p {
@@ -499,9 +505,6 @@
                 color: #888989;
             }
 
-        body:has(ul:empty) .nodownloadmessage {
-            display: flex;
-        }
     </style>
 </head>
 

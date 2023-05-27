@@ -250,6 +250,10 @@ namespace MapsInMyFolder.Commun
         {
             using (Stream stream = ReadResourceStream(pathWithSlash))
             {
+                if (stream == null)
+                {
+                    return string.Empty;
+                }
                 string return_rsx = String.Empty;
                 using (StreamReader reader = new StreamReader(stream, Encoding.UTF8, true))
                 {
@@ -371,7 +375,7 @@ namespace MapsInMyFolder.Commun
                     curentBrush = BackgroundRed;
                 }
 
-                ContentTextBlock.Inlines.Add(new System.Windows.Documents.Run()
+                ContentTextBlock.Inlines.Add(new Run()
                 {
                     Text = diff.text,
                     Background = curentBrush,
@@ -1415,23 +1419,32 @@ namespace MapsInMyFolder.Commun
             var scrollViewer = d as ScrollViewer;
             if (scrollViewer == null) return;
 
-            void FixMouseWheel_PreviewMouseWheel(object sender, MouseWheelEventArgs e2)
+            //void FixMouseWheel_PreviewMouseWheel(object sender, MouseWheelEventArgs e2)
+            //{
+            //    var parent = scrollViewer.Parent as UIElement;
+            //    if (parent is null) return;
+
+            //    var argsCopy = Copy(e2);
+            //    parent.RaiseEvent(argsCopy);
+            //}
+
+            //scrollViewer.PreviewMouseWheel += FixMouseWheel_PreviewMouseWheel;
+            //scrollViewer.Unloaded += FixMouseWheel_Unloaded;
+
+            //void FixMouseWheel_Unloaded(object sender, EventArgs e2)
+            //{
+            //    scrollViewer.PreviewMouseWheel -= FixMouseWheel_PreviewMouseWheel;
+            //    scrollViewer.Unloaded -= FixMouseWheel_Unloaded;
+            //}
+
+            scrollViewer.PreviewMouseWheel += (s2, e2) =>
             {
                 var parent = scrollViewer.Parent as UIElement;
                 if (parent is null) return;
 
                 var argsCopy = Copy(e2);
                 parent.RaiseEvent(argsCopy);
-            }
-
-            scrollViewer.PreviewMouseWheel += FixMouseWheel_PreviewMouseWheel;
-            scrollViewer.Unloaded += FixMouseWheel_Unloaded;
-
-            void FixMouseWheel_Unloaded(object sender, EventArgs e2)
-            {
-                scrollViewer.PreviewMouseWheel -= FixMouseWheel_PreviewMouseWheel;
-                scrollViewer.Unloaded -= FixMouseWheel_Unloaded;
-            }
+            };
         }
 
         static MouseWheelEventArgs Copy(MouseWheelEventArgs e) => new MouseWheelEventArgs(e.MouseDevice, e.Timestamp, e.Delta)

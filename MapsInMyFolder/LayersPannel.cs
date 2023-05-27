@@ -25,7 +25,7 @@ namespace MapsInMyFolder
         public string SearchGetText()
         {
             string searchText = null;
-            if (layer_searchbar.Text != "Rechercher un calque, un site...")
+            if (layer_searchbar.Text != Languages.Current["layerPanelSearchPlaceholder"])
             {
                 searchText = layer_searchbar.Text.Replace("'", "’").Trim();
             }
@@ -39,12 +39,11 @@ namespace MapsInMyFolder
                 await Application.Current.Dispatcher.BeginInvoke(new Action(() =>
                 {
                     string SearchValue = SearchGetText();
-                    if ((last_input != SearchValue || IsIgnoringLastInput) && SearchValue != null)
+                    if ((last_input != SearchValue || IsIgnoringLastInput) && SearchValue != null && layer_browser?.IsInitialized == true)
                     {
                         last_input = SearchValue;
                         Debug.WriteLine("Search: " + SearchValue);
-                        //layer_browser.ExecuteScriptAsync("search", SearchValue);
-                        layer_browser.ExecuteScriptAsync("search", SearchValue);
+                        layer_browser?.ExecuteScriptAsync("search", SearchValue);
                     }
                 }));
             });
@@ -374,7 +373,7 @@ namespace MapsInMyFolder
             GenerateHTMLFromLayerList(ListOfLayerRejected, false);
 
             generated_layers.AppendLine("</ul>");
-            string resource_data = Collectif.ReadResourceString("html/layer_panel.html");
+            string resource_data = Collectif.ReadResourceString("HTML/layer_panel.html");
             return resource_data.Replace("<!--htmllayerplaceholder-->", generated_layers.ToString());
         }
 

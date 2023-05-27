@@ -191,7 +191,7 @@ namespace MapsInMyFolder
         {
             void LoadHighlighting(string Name, string FileName, string StyleExtension)
             {
-                using (Stream s = Collectif.ReadResourceStream(@"editorTheme\" + FileName))
+                using (Stream s = Collectif.ReadResourceStream(@"EditorTheme\" + FileName))
                 {
                     if (s == null)
                     {

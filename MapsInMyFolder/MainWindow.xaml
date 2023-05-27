@@ -1,16 +1,30 @@
-﻿<Window x:Class="MapsInMyFolder.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:ui="http://schemas.modernwpf.com/2019"
-        ui:WindowHelper.UseModernWindowStyle="True" ResizeMode="CanResize" Closing="Window_Closing" Loaded="Window_Loaded" mc:Ignorable="d"
-        Title="MainWindow" Height="695" Width="1160" ContentRendered="Window_ContentRendered"
-        MinWidth="750" MinHeight="450" Background="#FF0A0C0C"
-        ui:TitleBar.ExtendViewIntoTitleBar="True" ui:TitleBar.IsBackButtonVisible="False" ui:TitleBar.Style="{DynamicResource AppTitleBarStyle}"
-        ui:TitleBar.ButtonStyle="{DynamicResource AppTitleBarButtonStyle}"
-        ui:ThemeManager.RequestedTheme="Dark" KeyDown="Window_KeyDown">
-    
+﻿<Window
+    x:Class="MapsInMyFolder.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:commun="clr-namespace:MapsInMyFolder.Commun;assembly=MapsInMyFolder.Commun"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ui="http://schemas.modernwpf.com/2019"
+    Title="MainWindow"
+    Width="1160"
+    Height="695"
+    MinWidth="750"
+    MinHeight="450"
+    ui:ThemeManager.RequestedTheme="Dark"
+    ui:TitleBar.ButtonStyle="{DynamicResource AppTitleBarButtonStyle}"
+    ui:TitleBar.ExtendViewIntoTitleBar="True"
+    ui:TitleBar.IsBackButtonVisible="False"
+    ui:TitleBar.Style="{DynamicResource AppTitleBarStyle}"
+    ui:WindowHelper.UseModernWindowStyle="True"
+    Background="#FF0A0C0C"
+    Closing="Window_Closing"
+    ContentRendered="Window_ContentRendered"
+    KeyDown="Window_KeyDown"
+    Loaded="Window_Loaded"
+    ResizeMode="CanResize"
+    mc:Ignorable="d">
+
     <Window.TaskbarItemInfo>
         <TaskbarItemInfo />
     </Window.TaskbarItemInfo>
@@ -18,7 +32,7 @@
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="RessourcesDictionnary.xaml"/>
+                <ResourceDictionary Source="RessourcesDictionnary.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Window.Resources>
@@ -29,7 +43,11 @@
             <RowDefinition />
         </Grid.RowDefinitions>
 
-        <Grid Grid.Row="0" x:Name="AppTitleBar" Background="Black" ui:ThemeManager.RequestedTheme="Dark">
+        <Grid
+            x:Name="AppTitleBar"
+            Grid.Row="0"
+            ui:ThemeManager.RequestedTheme="Dark"
+            Background="Black">
             <Grid.Style>
                 <Style TargetType="Grid">
                     <Setter Property="TextElement.Foreground" Value="WhiteSmoke" />
@@ -43,31 +61,100 @@
                 <ColumnDefinition Width="140" />
             </Grid.ColumnDefinitions>
 
-            <TextBlock Grid.Column="1" x:Name="TitleTextBox" FontFamily="Segoe UI Light" FontSize="13" HorizontalAlignment="Left" VerticalAlignment="Center" />
+            <TextBlock
+                x:Name="TitleTextBox"
+                Grid.Column="1"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Center"
+                FontFamily="Segoe UI Light"
+                FontSize="13" />
 
             <StackPanel
                 x:Name="titlebar_buttons"
                 Grid.Column="2"
-                Orientation="Horizontal" HorizontalAlignment="Right">
-                <ui:TitleBarButton x:Name="open_download_panel_titlebar_button" Click="Map_panel_open_download_panel_Click" Style="{StaticResource AppTitleBarButtonStyle}" FontFamily="Segoe UI Light" FontSize="13" Width="Auto" Padding="16,0">
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                        <Path  x:Name="open_download_panel_titlebar_button_path" Panel.ZIndex="999" Fill="Transparent" StrokeStartLineCap="round" StrokeEndLineCap="round" StrokeLineJoin="round" StrokeThickness="0.8" Data="{StaticResource DownloadButton}" Stroke="{Binding ElementName=AppTitleBar, Path=(TextElement.Foreground)}" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center" RenderTransformOrigin="0,0" MaxWidth="15" MaxHeight="15"/>
-                        <Label x:Name="open_download_panel_titlebar_button_label" HorizontalAlignment="Center" Foreground="{Binding ElementName=AppTitleBar, Path=(TextElement.Foreground)}" VerticalAlignment="Center" Margin="10,0,0,0">Téléchargements</Label>
+                HorizontalAlignment="Right"
+                Orientation="Horizontal">
+                <ui:TitleBarButton
+                    x:Name="open_download_panel_titlebar_button"
+                    Width="Auto"
+                    Padding="16,0"
+                    Click="Map_panel_open_download_panel_Click"
+                    FontFamily="Segoe UI Light"
+                    FontSize="13"
+                    Style="{StaticResource AppTitleBarButtonStyle}">
+                    <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
+                        <Path
+                            x:Name="open_download_panel_titlebar_button_path"
+                            MaxWidth="15"
+                            MaxHeight="15"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Panel.ZIndex="999"
+                            Data="{StaticResource DownloadButton}"
+                            Fill="Transparent"
+                            RenderTransformOrigin="0,0"
+                            Stretch="Uniform"
+                            Stroke="{Binding ElementName=AppTitleBar, Path=(TextElement.Foreground)}"
+                            StrokeEndLineCap="round"
+                            StrokeLineJoin="round"
+                            StrokeStartLineCap="round"
+                            StrokeThickness="0.8" />
+                        <Label
+                            x:Name="open_download_panel_titlebar_button_label"
+                            Margin="10,0,0,0"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Content="{Binding Source={x:Static commun:Languages.Current}, Path=[downloadPanelTitle]}"
+                            Foreground="{Binding ElementName=AppTitleBar, Path=(TextElement.Foreground)}" />
                     </StackPanel>
 
                 </ui:TitleBarButton>
-                <Rectangle Fill="#333" Width="1" Margin="0,8" />
-                <ui:TitleBarButton Click="Map_panel_open_settings_panel_Click" Style="{StaticResource AppTitleBarButtonStyle}" FontFamily="Segoe UI Light" FontSize="13" Width="Auto" Padding="16,0">
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                        <Path Panel.ZIndex="999" Fill="Transparent" StrokeStartLineCap="round" StrokeEndLineCap="round" StrokeLineJoin="round" StrokeThickness="0.8" Data="{StaticResource SettingsButton}" Stroke="{Binding ElementName=AppTitleBar, Path=(TextElement.Foreground)}" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center" RenderTransformOrigin="0,0" MaxWidth="15" MaxHeight="15"/>
-                        <Label HorizontalAlignment="Center" Foreground="{Binding ElementName=AppTitleBar, Path=(TextElement.Foreground)}" VerticalAlignment="Center" Margin="10,0,0,0">Paramêtres</Label>
+                <Rectangle
+                    Width="1"
+                    Margin="0,8"
+                    Fill="#333" />
+                <ui:TitleBarButton
+                    Width="Auto"
+                    Padding="16,0"
+                    Click="Map_panel_open_settings_panel_Click"
+                    FontFamily="Segoe UI Light"
+                    FontSize="13"
+                    Style="{StaticResource AppTitleBarButtonStyle}">
+                    <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
+                        <Path
+                            MaxWidth="15"
+                            MaxHeight="15"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Panel.ZIndex="999"
+                            Data="{StaticResource SettingsButton}"
+                            Fill="Transparent"
+                            RenderTransformOrigin="0,0"
+                            Stretch="Uniform"
+                            Stroke="{Binding ElementName=AppTitleBar, Path=(TextElement.Foreground)}"
+                            StrokeEndLineCap="round"
+                            StrokeLineJoin="round"
+                            StrokeStartLineCap="round"
+                            StrokeThickness="0.8" />
+                        <Label
+                            Margin="10,0,0,0"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPanelTitle]}"
+                            Foreground="{Binding ElementName=AppTitleBar, Path=(TextElement.Foreground)}" />
                     </StackPanel>
 
                 </ui:TitleBarButton>
-                <Rectangle Fill="#333" Width="1" Margin="15,8" />
+                <Rectangle
+                    Width="1"
+                    Margin="15,8"
+                    Fill="#333" />
             </StackPanel>
         </Grid>
 
-        <ui:Frame x:Name="MainContentFrame" Grid.Row="1" Navigating="MainContentFrame_Navigating"/>
+        <ui:Frame
+            x:Name="MainContentFrame"
+            Grid.Row="1"
+            Navigating="MainContentFrame_Navigating" />
     </Grid>
 </Window>

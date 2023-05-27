@@ -133,7 +133,10 @@ namespace MapsInMyFolder
                 Location NO = new Location(NO_Lat, NO_Long);
                 Location SE = new Location(SE_Lat, SE_Long);
                 rectangle.Locations = new List<Location>() { NO, new Location(SE.Latitude, NO.Longitude), SE, new Location(NO.Latitude, SE.Longitude) };
-
+                if (MapSelectable.IsZeroWidthRectangle(NO, SE))
+                {
+                    yield break;
+                }
                 yield return new Figure(rectangle, name, NO, SE, MinZoom, MaxZoom, StrokeThickness, color);
             }
         }

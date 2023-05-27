@@ -342,9 +342,9 @@ namespace MapsInMyFolder
                 StrokeDashCap = System.Windows.Media.PenLineCap.Square
             };
             ApplyRectangleActiveColor(rectangle);
+            AttachEventToRectangle(rectangle);
             SetRectangleLocation(NO, SE, rectangle);
             CleanRectangleLocations(rectangle);
-            AttachEventToRectangle(rectangle);
             Rectangles.Add(rectangle);
             return rectangle;
         }
@@ -412,6 +412,7 @@ namespace MapsInMyFolder
             {
                 return false;
             }
+            
             if (map.Children.Contains(rectangle))
             {
 
@@ -655,7 +656,6 @@ namespace MapsInMyFolder
             {
                 if (Math.Abs(NO.Longitude) >= 180 || Math.Abs(SE.Longitude) >= 180)
                 {
-                    Point MAX_No_PlacementPoint = map.LocationToView(new Location(0, -180));
                     Point Target_No_PlacementPoint = map.LocationToView(NO);
                     Point Target_Se_PlacementPoint = map.LocationToView(SE);
                     Location NOFix;
@@ -725,10 +725,28 @@ namespace MapsInMyFolder
             }
 
             rectangle.Locations = new List<Location>() { NO, new Location(SE.Latitude, NO.Longitude), SE, new Location(NO.Latitude, SE.Longitude) };
-
-            rectangle.Visibility = NO.Latitude == SE.Latitude && NO.Longitude == SE.Longitude ? Visibility.Hidden : Visibility.Visible;
-
+            UpdateRectangleVisibility(rectangle, NO, SE);
             OnLocationUpdated?.Invoke(this, rectangle);
+        }
+
+        void UpdateRectangleVisibility(MapPolygon rectangle, Location NO, Location SE)
+        {
+            if (rectangle == null)
+            {
+                return;
+            }
+            if (NO == null || SE == null)
+            {
+                var currentRectangleLocation = GetRectangleLocation(rectangle);
+                NO = currentRectangleLocation.NO;
+                SE = currentRectangleLocation.SE;
+            }
+            rectangle.Visibility = IsZeroWidthRectangle(NO, SE) ? Visibility.Hidden : Visibility.Visible;
+        }
+
+        public static bool IsZeroWidthRectangle(Location NO, Location SE)
+        {
+            return NO.Latitude == NO.Longitude || SE.Latitude == SE.Longitude || NO.Latitude == SE.Latitude || NO.Longitude == SE.Longitude;
         }
 
         private (Location NO, Location SE) SnapToGrid(Location NO, Location SE, MapPolygon rectangle)
@@ -807,7 +825,7 @@ namespace MapsInMyFolder
             foreach (MapPolygon rectangle in Rectangles.ToArray())
             {
                 var locations = GetRectangleLocation(rectangle);
-                if (locations.NO.Latitude == locations.NO.Longitude || locations.SE.Latitude == locations.SE.Longitude || locations.NO.Latitude == locations.SE.Latitude || locations.NO.Longitude == locations.SE.Longitude)
+                if (IsZeroWidthRectangle(locations.NO, locations.SE))
                 {
                     numberOfUnusedRectangleDeleted++;
                     DeleteRectangle(rectangle);
@@ -842,7 +860,7 @@ namespace MapsInMyFolder
 
         private void SetHandCursor()
         {
-            map.Cursor = new Cursor(Collectif.ReadResourceStream("cursors/closedhand.cur"));
+            map.Cursor = new Cursor(Collectif.ReadResourceStream("Cursors/closedhand.cur"));
         }
 
         private void SaveCurrentMousePosition(MouseEventArgs e)

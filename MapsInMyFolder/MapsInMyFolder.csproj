@@ -26,12 +26,15 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <NoWarn>CS8002,NU1701</NoWarn>
+    <NoWarn>CS8002,NU1701,XDG0062</NoWarn>
     <ApplicationIcon>icone\icone_v2.ico</ApplicationIcon>
     <RepositoryUrl>https://github.com/SioGabx/MapsInMyFolder</RepositoryUrl>
     <Copyright>SioGabx</Copyright>
     <Version>0.4.4-alpha</Version>
     <AllowUnsafeBlocks>False</AllowUnsafeBlocks>
+
+    <!--<DisableXamlDesignTimeDataWarnings>true</DisableXamlDesignTimeDataWarnings>-->
+
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -46,20 +49,25 @@
   <ItemGroup>
     <None Remove="closedhand.cur" />
     <None Remove="download_panel.html" />
-    <None Remove="editorTheme\Json.xshd" />
+    <None Remove="EditorTheme\Json.xshd" />
+    <None Remove="Languages\French.ini" />
     <None Remove="layer_panel.html" />
     <None Remove="ScriptEditorTheme.xshd" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="icone\icone_v2.ico" />
-    <EmbeddedResource Include="editorTheme\Javascript.xshd" />
+    <Content Include="Icone\icone_v2.ico" />
+    <EmbeddedResource Include="EditorTheme\Javascript.xshd" />
+    <EmbeddedResource Include="EditorTheme\Json.xshd" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="cursors\closedhand.cur" />
-    <EmbeddedResource Include="editorTheme\Json.xshd" />
-    <EmbeddedResource Include="html\download_panel.html" />
+    <EmbeddedResource Include="Cursors\closedhand.cur" />
+   
+    <EmbeddedResource Include="HTML\download_panel.html" />
+    <EmbeddedResource Include="HTML\layer_panel.html" />
+    
+    <EmbeddedResource Include="Languages\French.ini" />
   </ItemGroup>
 
   <ItemGroup>
@@ -77,12 +85,8 @@
     <PackageReference Include="NetVips.Native.win-x64" Version="8.14.2" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="System.Data.SQLite" Version="1.0.117" />
-    <PackageReference Include="System.Text.Json" Version="7.0.0" />
+    <PackageReference Include="System.Text.Json" Version="7.0.2" />
     <PackageReference Include="wix" Version="3.11.2" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="html\layer_panel.html" />
   </ItemGroup>
 
   <ItemGroup>
@@ -112,9 +116,5 @@
   <ItemGroup>
     <PackageReference Update="chromiumembeddedframework.runtime.win-x86" Version="104.4.24" />
   </ItemGroup>
-
-  <!--<Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="RMDIR &quot;$(TargetDir)af-ZA/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)am-ET/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)ar-SA/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)az-Latn-AZ/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)be-BY/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)bg-BG/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)bn-BD/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)bs-Latn-BA/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)ca-ES/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)cs/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)cs-CZ/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)da-DK/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)de/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)de-DE/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)de-DE/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)el-GR/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)en-GB/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)es-ES/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)es-MX/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)et-EE/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)eu-ES/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)fa-IR/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)fi-FI/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)fr-CA/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)fr-FR/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)gl-ES/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)ha-Latn-NG/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)he-IL/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)hi-IN/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)hr-HR/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)hu-HU/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)id-ID/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)is-IS/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)it-IT/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)ja-JP/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)ka-GE/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)kk-KZ/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)km-KH/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)kn-IN/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)ko-KR/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)lo-LA/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)lt-LT/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)lv-LV/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)mk-MK/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)ml-IN/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)ms-MY/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)nb-NO/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)nl-NL/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)nn-NO/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)pl/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)es/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)fr/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)it/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)ja/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)ko/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)pl-PL/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)pt-BR/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)pt-PT/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)ro-RO/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)ru/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)ru-RU/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)sk-SK/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)sl-SI/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)sq-AL/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)sr-Latn-RS/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)sv-SE/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)sw-KE/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)ta-IN/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)te-IN/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)th-TH/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)tr/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)tr-TR/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)uk-UA/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)uz-Latn-UZ/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)vi-VN/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)zh-CN/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)zh-Hans/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)zh-Hant/&quot; /S /Q &#xD;&#xA;RMDIR &quot;$(TargetDir)zh-TW/&quot; /S /Q " />
-  </Target>-->
 
 </Project>

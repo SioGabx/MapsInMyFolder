@@ -209,6 +209,16 @@ namespace MapsInMyFolder.Commun
             }
             return Texte;
         }
+        
+        public static string ReplaceSingle(this string chaine, string oldValue, string newValue)
+        {
+            int index = chaine.IndexOf(oldValue);
+            if (index != -1)
+            {
+                chaine = chaine.Remove(index, oldValue.Length).Insert(index, newValue);
+            }
+            return chaine;
+        }
 
         public static string ReplaceLoop(this string Texte, string oldString, string newString)
         {
