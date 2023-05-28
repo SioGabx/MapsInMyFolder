@@ -25,7 +25,7 @@ namespace MapsInMyFolder
         public string SearchGetText()
         {
             string searchText = null;
-            if (layer_searchbar.Text != Languages.Current["layerPanelSearchPlaceholder"])
+            if (layer_searchbar.Text != Languages.Current["searchLayerPlaceholder"])
             {
                 searchText = layer_searchbar.Text.Replace("'", "’").Trim();
             }

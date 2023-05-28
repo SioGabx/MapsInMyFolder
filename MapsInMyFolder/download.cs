@@ -307,7 +307,7 @@ namespace MapsInMyFolder
                     else
                     {
                         DebugMode.WriteLine("Aucune connexion internet");
-                        UpdateDownloadPanel(engine.id, "En attente de connexion internet", "", true, Status.progress);
+                        UpdateDownloadPanel(engine.id, Languages.Current["downloadPanelStateInfoFileInternetConnexionWaiting"], "", true, Status.progress);
                     }
                 }
             }
@@ -374,12 +374,12 @@ namespace MapsInMyFolder
                 }
 
                 Dictionary<string, double> location = new Dictionary<string, double>
-        {
-            { "NO_Latitude", download_Options.NO_PIN_Location.Latitude },
-            { "NO_Longitude", download_Options.NO_PIN_Location.Longitude },
-            { "SE_Latitude", download_Options.SE_PIN_Location.Latitude },
-            { "SE_Longitude", download_Options.SE_PIN_Location.Longitude }
-        };
+                {
+                    { "NO_Latitude", download_Options.NO_PIN_Location.Latitude },
+                    { "NO_Longitude", download_Options.NO_PIN_Location.Longitude },
+                    { "SE_Latitude", download_Options.SE_PIN_Location.Latitude },
+                    { "SE_Longitude", download_Options.SE_PIN_Location.Longitude }
+                };
 
                 List<TilesUrl> urls = Collectif.GetUrl.GetListOfUrlFromLocation(location, zoom, urlbase, Layers.Current.class_id, downloadId);
                 CancellationTokenSource tokenSource2 = new CancellationTokenSource();
@@ -396,12 +396,12 @@ namespace MapsInMyFolder
 
                 if (Network.IsNetworkAvailable())
                 {
-                    info = "En attente... (0/" + nbrOfTiles + ")";
+                    info = $"{Languages.Current["downloadPanelStateInfoFileWaiting"]} (0/{nbrOfTiles})";
                     status = Status.progress;
                 }
                 else
                 {
-                    info = "En attente d'une connexion internet";
+                    info = Languages.Current["downloadPanelStateInfoFileInternetConnexionWaiting"];
                     status = Status.noconnection;
                 }
 
@@ -428,7 +428,7 @@ namespace MapsInMyFolder
         {
             DownloadSettings engine = DownloadSettings.GetEngineById(engineId);
             string info = $"{engine.nbr_of_tiles - engine.nbr_of_tiles_waiting_for_downloading}/{engine.nbr_of_tiles}";
-            UpdateDownloadPanel(engineId, $"En pause... ({info})", "", true, Status.pause);
+            UpdateDownloadPanel(engineId, $"{Languages.Current["downloadPanelStateInfoFilePaused"]} ({info})", "", true, Status.pause);
             engine.state = Status.pause;
             AbordAndCancelWithTokenDownload(engineId);
         }
@@ -436,7 +436,7 @@ namespace MapsInMyFolder
         public static void CancelDownload(int engineId)
         {
             DownloadSettings engine = DownloadSettings.GetEngineById(engineId);
-            UpdateDownloadPanel(engineId, "Annulé...", "", true, Status.cancel);
+            UpdateDownloadPanel(engineId, Languages.Current["downloadPanelStateInfoFileCanceled"], "", true, Status.cancel);
             engine.state = Status.cancel;
             AbordAndCancelWithTokenDownload(engineId);
         }
@@ -448,11 +448,11 @@ namespace MapsInMyFolder
             RestartDownload(engineId);
         }
 
-        public bool CheckNetworkAvailable(int engineId, string progress = "0", bool isImportant = true)
+        public bool CheckNetworkAvailable(int engineId)
         {
             if (!Network.IsNetworkAvailable())
             {
-                UpdateDownloadPanel(engineId, "En attente d'une connexion internet", state: Status.noconnection);
+                UpdateDownloadPanel(engineId, Languages.Current["downloadPanelStateInfoFileInternetConnexionWaiting"], state: Status.noconnection);
                 return false;
             }
             return true;
@@ -466,11 +466,11 @@ namespace MapsInMyFolder
             CheckifMultipleDownloadInProgress();
 
             string info = $"{engine.nbr_of_tiles - engine.nbr_of_tiles_waiting_for_downloading}/{engine.nbr_of_tiles}";
-            UpdateDownloadPanel(engineId, $"Reprise... ({info})", "", true, Status.progress);
+            UpdateDownloadPanel(engineId, $"{Languages.Current["downloadPanelStateInfoFileRestarting"]} ({info})", "", true, Status.progress);
 
             if (engine.urls is null || engine.urls.Count == 0)
             {
-                UpdateDownloadPanel(engineId, "Génération des URLs...", "", true, Status.progress);
+                UpdateDownloadPanel(engineId, Languages.Current["downloadPanelStateInfoFileGeneratingURL"], "", true, Status.progress);
                 engine.urls = Collectif.GetUrl.GetListOfUrlFromLocation(engine.location, engine.zoom, engine.urlbase, engine.layerid, engine.id);
             }
 
@@ -484,14 +484,14 @@ namespace MapsInMyFolder
             engine.cancellation_token_source = new CancellationTokenSource();
             engine.cancellation_token = engine.cancellation_token_source.Token;
 
-            if (DownloadSettings.CurrentNumberOfDownload < Settings.max_download_project_in_parralele && CheckNetworkAvailable(engineId, "0", true))
+            if (DownloadSettings.CurrentNumberOfDownload < Settings.max_download_project_in_parralele && CheckNetworkAvailable(engineId))
             {
-                UpdateDownloadPanel(engineId, "Vérification de l'intégrité...", "0", true, Status.no_data);
+                UpdateDownloadPanel(engineId, Languages.Current["downloadPanelStateInfoFileIntegrityCheck"], "0", true, Status.no_data);
                 DownloadThisEngine(engine);
             }
             else
             {
-                UpdateDownloadPanel(engineId, $"En attente... ({info})", "", true, Status.progress);
+                UpdateDownloadPanel(engineId, $"{Languages.Current["downloadPanelStateInfoFileWaiting"]} ({info})", "", true, Status.progress);
             }
         }
 
@@ -515,7 +515,7 @@ namespace MapsInMyFolder
 
                 if (nbrPass != 1)
                 {
-                    UpdateDownloadPanel(downloadEngineClassArgs.id, $"Erreur, tentative de téléchargement {nbrPass}/{settingsMaxRetryDownload} ...", isImportant: true, state: Status.progress);
+                    UpdateDownloadPanel(downloadEngineClassArgs.id, Languages.GetWithArguments("downloadPanelStateInfoFileErrorsAttempt", nbrPass, settingsMaxRetryDownload), isImportant: true, state: Status.progress);
                 }
 
                 await ParallelDownloadTilesTask(downloadEngineClassArgs);
@@ -528,7 +528,7 @@ namespace MapsInMyFolder
             }
             else if (nbrPass == settingsMaxRetryDownload)
             {
-                UpdateDownloadPanel(downloadEngineClassArgs.id, $"Erreur lors du téléchargement ({settingsMaxRetryDownload} reprises).", "100", true, Status.error);
+                UpdateDownloadPanel(downloadEngineClassArgs.id, Languages.GetWithArguments("downloadPanelStateInfoFileErrorsAttempt", settingsMaxRetryDownload), "100", true, Status.error);
                 downloadEngineClassArgs.state = Status.error;
             }
 
@@ -565,7 +565,7 @@ namespace MapsInMyFolder
 
                 if (!isNetworkAvailable)
                 {
-                    UpdateDownloadPanel(downloadEngineClass.id, "En attente d'une connexion internet", state: Status.noconnection);
+                    UpdateDownloadPanel(downloadEngineClass.id, Languages.Current["downloadPanelStateInfoFileInternetConnexionWaiting"], state: Status.noconnection);
                     Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
                     {
                         TaskbarItemInfo.ProgressState = System.Windows.Shell.TaskbarItemProgressState.Paused;
@@ -579,7 +579,7 @@ namespace MapsInMyFolder
                 if (TaskbarItemInfo.ProgressState == System.Windows.Shell.TaskbarItemProgressState.Paused)
                 {
                     CheckifMultipleDownloadInProgress();
-                    UpdateDownloadPanel(downloadEngineClass.id, "Connecté ! Reprise du téléchargement", state: Status.progress);
+                    UpdateDownloadPanel(downloadEngineClass.id, Languages.Current["downloadPanelStateInfoFileInternetConnexionBack"], state: Status.progress);
                 }
             }, null);
             return true;
@@ -614,7 +614,7 @@ namespace MapsInMyFolder
                 return downloadEngineClass.nbr_of_tiles_waiting_for_downloading;
             }
 
-            UpdateDownloadPanel(downloadEngineClass.id, "Vérification du téléchargement...", "0", true, Status.progress);
+            UpdateDownloadPanel(downloadEngineClass.id, Languages.Current["downloadPanelStateInfoFileDownloadCheck"], "0", true, Status.progress);
             Task.Delay(500).Wait();
             int numberOfUrlClassWaitingForDownloading = 0;
 
@@ -674,7 +674,7 @@ namespace MapsInMyFolder
             currentEngine.cancellation_token_source = null;
             Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
             {
-                UpdateDownloadPanel(id, "Terminé.", "100", true, Status.success);
+                UpdateDownloadPanel(id, Languages.Current["downloadPanelStateInfoFileCompleted"], "100", true, Status.success);
             }, null);
         }
 
@@ -802,7 +802,7 @@ namespace MapsInMyFolder
 
         async Task Assemblage(int id)
         {
-            UpdateDownloadPanel(id, "Assemblage...  1/2", "0", true, Status.assemblage);
+            UpdateDownloadPanel(id, $"{Languages.Current["downloadPanelStateInfoFileAssembly"]}  1/2", "0", true, Status.assemblage);
             DownloadSettings currentEngine = DownloadSettings.GetEngineById(id);
             string format = currentEngine.format;
             string saveDirectory = currentEngine.save_directory;
@@ -832,7 +832,7 @@ namespace MapsInMyFolder
                 {
                     return;
                 }
-                UpdateDownloadPanel(id, "Rognage...", "0", true, Status.rognage);
+                UpdateDownloadPanel(id, Languages.Current["downloadPanelStateInfoFileCropping"], "0", true, Status.rognage);
                 Cache.MaxFiles = 0;
 
                 using var imageRognerBase = Image.Black(rognageInfo.width, rognageInfo.height);
@@ -844,7 +844,7 @@ namespace MapsInMyFolder
                     return;
                 }
                 SaveImage(currentEngine, imageWithScale);
-                UpdateDownloadPanel(id, "Libération des ressources..", "100", true, Status.cleanup);
+                UpdateDownloadPanel(id, Languages.Current["downloadPanelStateInfoFileFreeingResourcesProgress"], "100", true, Status.cleanup);
 
                 Debug.WriteLine(
                     "NetVips.Cache.Size" + " : " + Cache.Size + "\n" +
@@ -858,7 +858,7 @@ namespace MapsInMyFolder
                 GC.WaitForPendingFinalizers();
             });
 
-            UpdateDownloadPanel(id, "Finalisation...", "100", true, Status.cleanup);
+            UpdateDownloadPanel(id, Languages.Current["downloadPanelStateInfoFileFinalization"], "100", true, Status.cleanup);
             DownloadFinish(id);
             await Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
             {
@@ -873,7 +873,7 @@ namespace MapsInMyFolder
             {
                 if (currentEngine.RedimWidth != -1 && currentEngine.RedimHeignt != -1)
                 {
-                    UpdateDownloadPanel(currentEngine.id, "Redimensionnement...", "0", true, Status.rognage);
+                    UpdateDownloadPanel(currentEngine.id, Languages.Current["downloadPanelStateInfoFileResizing"], "0", true, Status.rognage);
                     double hrink = currentEngine.RedimHeignt / height;
                     double Vrink = currentEngine.RedimWidth / width;
 
@@ -964,13 +964,13 @@ namespace MapsInMyFolder
                         catch (Exception ex)
                         {
                             Debug.WriteLine("Erreur NetVips : " + ex.ToString());
-                            UpdateDownloadPanel(curent_engine.id, "Erreur fatale lors de l'assemblage P1", "", true, state: Status.error);
+                            UpdateDownloadPanel(curent_engine.id, $"{Languages.Current["downloadPanelStateInfoFileAssemblyError"]} P1", "", true, state: Status.error);
                             return null;
                         }
                     }
                     else
                     {
-                        Debug.WriteLine("Image not exist, generating empty tile : " + filename);
+                        //Image not exist, generating empty tile :
                         try
                         {
                             tempsimage = Image.Black(tile_size, tile_size) + new double[] { 0, 0, 0, 0 };
@@ -978,7 +978,7 @@ namespace MapsInMyFolder
                         catch (Exception ex)
                         {
                             Debug.WriteLine("Erreur NetVips : " + ex.ToString());
-                            UpdateDownloadPanel(curent_engine.id, "Erreur fatale lors de l'assemblage P2", "", true, state: Status.error);
+                            UpdateDownloadPanel(curent_engine.id, $"{Languages.Current["downloadPanelStateInfoFileAssemblyError"]} P2", "", true, state: Status.error);
                             return null;
                         }
                     }
@@ -997,7 +997,7 @@ namespace MapsInMyFolder
                 }
                 catch (Exception ex)
                 {
-                    UpdateDownloadPanel(curent_engine.id, "Erreur fatale lors de l'assemblage horizontal", "", true, Status.error);
+                    UpdateDownloadPanel(curent_engine.id, $"{Languages.Current["downloadPanelStateInfoFileAssemblyError"]} P3", "", true, Status.error);
                     Debug.WriteLine(ex.Message);
                     return null;
                 }
@@ -1024,7 +1024,7 @@ namespace MapsInMyFolder
                 }
             }
 
-            UpdateDownloadPanel(curent_engine.id, "Assemblage...  2/2", "0", true, Status.assemblage);
+            UpdateDownloadPanel(curent_engine.id, $"{Languages.Current["downloadPanelStateInfoFileAssembly"]}  2/2", "0", true, Status.assemblage);
             Task.Factory.StartNew(() => Thread.Sleep(300));
 
             NetVips.Image image = Image.Black((decalage_x * tile_size) + 1, 1);
@@ -1057,7 +1057,7 @@ namespace MapsInMyFolder
             }
             catch (Exception ex)
             {
-                UpdateDownloadPanel(curent_engine.id, "Erreur fatale lors de l'assemblage vertical", "", true, Status.error);
+                UpdateDownloadPanel(curent_engine.id, $"{Languages.Current["downloadPanelStateInfoFileAssemblyError"]} P4", "", true, Status.error);
                 Debug.WriteLine(ex.Message);
             }
 
@@ -1130,10 +1130,10 @@ namespace MapsInMyFolder
 
             if (!do_download_this_tile)
             {
-                DebugMode.WriteLine("Existing tile");
+                //Existing tile
                 url.status = Status.success;
 
-                await Task.Factory.StartNew(() => Thread.Sleep(20));
+                await Task.Delay(20);
                 InternalUpdateProgressBar(download_engine);
                 return;
             }
@@ -1177,13 +1177,11 @@ namespace MapsInMyFolder
                         url.status = Status.error;
                     }
                     Debug.WriteLine($"Download Fail: {url.url}: {(int)(httpResponse?.ResponseMessage?.StatusCode ?? 0)} {httpResponse?.ResponseMessage?.ReasonPhrase}");
-                    Debug.WriteLine("url.status is " + url.status);
                 }
             }
             catch (Exception a)
             {
                 Debug.WriteLine("Exception Download : " + a.Message);
-                DebugMode.WriteLine(url.status);
             }
             finally
             {
@@ -1191,7 +1189,6 @@ namespace MapsInMyFolder
                 if (Settings.waiting_before_start_another_tile_download > 0 && download_engine.nbr_of_tiles_waiting_for_downloading > 0)
                 {
                     Thread.Sleep(Settings.waiting_before_start_another_tile_download);
-                    DebugMode.WriteLine("Pause...");
                 }
             }
 
@@ -1205,7 +1202,7 @@ namespace MapsInMyFolder
             string saveTempFilename = currentEngine.file_temp_name;
             string saveFilename = currentEngine.file_name;
 
-            UpdateDownloadPanel(currentEngine.id, "Enregistrement...", "0", true, Status.enregistrement);
+            UpdateDownloadPanel(currentEngine.id, Languages.Current["downloadPanelStateInfoFileSaving"], "0", true, Status.enregistrement);
             Thread.Sleep(500);
             var progress = new Progress<int>(percent => UpdateDownloadPanel(currentEngine.id, "", Convert.ToString(percent)));
             imageRogner.SetProgress(progress);
@@ -1229,12 +1226,11 @@ namespace MapsInMyFolder
             }
             catch (Exception ex)
             {
-                UpdateDownloadPanel(currentEngine.id, "Erreur enregistrement du fichier", "", true, Status.error);
-                Debug.WriteLine("Erreur enregistrement du fichier" + ex.Message);
+                UpdateDownloadPanel(currentEngine.id, Languages.Current["downloadPanelStateInfoFileSavingError"], "", true, Status.error);
             }
             if (File.Exists(imageTempsAssemblagePath))
             {
-                UpdateDownloadPanel(currentEngine.id, "Déplacement..", "", true, Status.progress);
+                UpdateDownloadPanel(currentEngine.id, Languages.Current["downloadPanelStateInfoFileMoving"], "", true, Status.progress);
                 string targetFilePath = Path.Combine(saveDirectory, saveFilename);
                 if (Directory.Exists(saveDirectory))
                 {
@@ -1246,8 +1242,8 @@ namespace MapsInMyFolder
                             string engineFilePath = Path.Combine(eng.save_directory, eng.file_name);
                             if (eng.state == Status.success && engineFilePath == targetFilePath)
                             {
-                                UpdateDownloadPanel(eng.id, "Remplacé", "0", true, Status.deleted);
-                                Database.DB_Download_Update(eng.dbid, "INFOS", "Remplacé");
+                                UpdateDownloadPanel(eng.id, Languages.Current["downloadPanelStateInfoFileReplaced"], "0", true, Status.deleted);
+                                Database.DB_Download_Update(eng.dbid, "INFOS", Languages.Current["downloadPanelStateInfoFileReplaced"]);
                             }
                         }
                     }

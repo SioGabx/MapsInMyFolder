@@ -773,9 +773,10 @@ namespace MapsInMyFolder.Commun
                 Directory.CreateDirectory(save_temp_directory);
                 return true;
             }
-            if (File.Exists(save_temp_directory + filename))
+
+            if (File.Exists(Path.Combine(save_temp_directory,filename)))
             {
-                FileInfo filinfo = new FileInfo(save_temp_directory + filename);
+                FileInfo filinfo = new FileInfo(Path.Combine(save_temp_directory, filename));
                 long size = filinfo.Length;
                 DateTime date_du_telechargement = DateTime.Now;
                 date_du_telechargement = date_du_telechargement.AddDays(-Math.Abs(settings_max_tiles_cache_days));

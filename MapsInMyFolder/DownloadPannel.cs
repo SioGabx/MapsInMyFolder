@@ -70,7 +70,7 @@ namespace MapsInMyFolder
                     CancellationTokenSource tokenSource2 = new CancellationTokenSource();
                     CancellationToken ct = tokenSource2.Token;
                     Status engine_status;
-                    string Download_INFOS = "Annulé.";
+                    string Download_INFOS = Languages.Current["downloadPanelStateInfoFileCanceled"];
                     switch (DB_Download_STATE)
                     {
                         case "error":
@@ -88,7 +88,7 @@ namespace MapsInMyFolder
                         case "success":
                         case "cleanup":
                             engine_status = Status.success;
-                            Download_INFOS = "Téléchargé.";
+                            Download_INFOS = Languages.Current["downloadPanelStateInfoFileDownloaded"];
                             break;
                         case "no_data":
                             engine_status = Status.no_data;
@@ -98,7 +98,7 @@ namespace MapsInMyFolder
                             engine_status = Status.deleted;
                             if (string.IsNullOrEmpty(DB_Download_INFOS))
                             {
-                                Download_INFOS = "Supprimé.";
+                                Download_INFOS = Languages.Current["downloadPanelStateInfoFileDeleted"];
                             }
                             else
                             {
@@ -115,7 +115,7 @@ namespace MapsInMyFolder
                         if (!System.IO.File.Exists(DB_Download_SAVE_DIRECTORY + DB_Download_FILE_NAME))
                         {
                             engine_status = Status.deleted;
-                            Download_INFOS = "Introuvable.";
+                            Download_INFOS = Languages.Current["downloadPanelStateInfoFileNotFound"];
                         }
                     }
                     DownloadSettings engine = new DownloadSettings(downloadid, DB_Download_ID, DB_Download_LAYER_ID, urls, tokenSource2, ct, format, final_saveformat, DB_Download_ZOOM, DB_Download_TEMP_DIRECTORY, DB_Download_SAVE_DIRECTORY, DB_Download_FILE_NAME, filetempname, location, REDIMWIDTH, REDIMHEIGHT, new TileLoader(), COLORINTERPRETATION, SCALEINFO, DB_Download_NBR_TILES, layers.class_tile_url, layers.class_identifiant, engine_status, layers.class_tiles_size, quality: DB_Download_QUALITY);
@@ -221,7 +221,7 @@ namespace MapsInMyFolder
                     }
                     else if (engine.state == Status.success)
                     {
-                        MainWindow.UpdateDownloadPanel(id, "Introuvable.", isImportant: true, state: Status.deleted);
+                        MainWindow.UpdateDownloadPanel(id, Languages.Current["downloadPanelStateInfoFileNotFound"], isImportant: true, state: Status.deleted);
                     }
                 }
                 else
@@ -245,7 +245,6 @@ namespace MapsInMyFolder
                     }
                     catch (Exception ex)
                     {
-                        //MessageBox.Show(ex.Message);
                         Message.NoReturnBoxAsync(ex.Message, "Erreur");
                     }
                 }, null);
@@ -265,7 +264,6 @@ namespace MapsInMyFolder
                     }
                     catch (Exception ex)
                     {
-                        //MessageBox.Show(ex.Message);
                         Message.NoReturnBoxAsync(ex.Message, "Erreur");
                     }
                 }, null);
@@ -285,7 +283,6 @@ namespace MapsInMyFolder
                     }
                     catch (Exception ex)
                     {
-                        //MessageBox.Show(ex.Message);
                         Message.NoReturnBoxAsync(ex.Message, "Erreur");
                     }
                 }, null);
@@ -305,7 +302,6 @@ namespace MapsInMyFolder
                     }
                     catch (Exception ex)
                     {
-                        //MessageBox.Show(ex.Message);
                         Message.NoReturnBoxAsync(ex.Message, "Erreur");
                     }
                 }, null);
@@ -326,7 +322,6 @@ namespace MapsInMyFolder
                    }
                    catch (Exception ex)
                    {
-                       //MessageBox.Show(ex.Message);
                        Message.NoReturnBoxAsync(ex.Message, "Erreur");
                    }
                }, null);

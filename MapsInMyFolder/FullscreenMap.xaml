@@ -38,7 +38,7 @@
                 Margin="28,10,0,0"
                 HorizontalAlignment="Left"
                 VerticalAlignment="Top"
-                Content="{Binding Source={x:Static commun:Languages.Current}, Path=[editorSelectionsPanelTitle]}"
+                Content="{Binding Source={x:Static commun:Languages.Current}, Path=[editorTitleSelections]}"
                 FontFamily="Segoe UI Light"
                 FontSize="30"
                 Foreground="#FFE2E2E1" />
@@ -63,7 +63,7 @@
                         Margin="10,20,10,10"
                         HorizontalAlignment="Stretch"
                         Click="AddRectangle_Click"
-                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[editorSelectionsPanelAddNew]}" />
+                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[editorSelectionsAddNew]}" />
 
                 </StackPanel>
             </ScrollViewer>
@@ -82,7 +82,7 @@
                 Margin="28,10,0,0"
                 HorizontalAlignment="Left"
                 VerticalAlignment="Top"
-                Content="{Binding Source={x:Static commun:Languages.Current}, Path=[mapPanelTitle]}"
+                Content="{Binding Source={x:Static commun:Languages.Current}, Path=[mapTitle]}"
                 FontFamily="Segoe UI Light"
                 FontSize="30"
                 Foreground="#FFE2E2E1" />
@@ -99,7 +99,7 @@
                 Cursor="Hand"
                 Foreground="#FFE2E2E1"
                 Style="{DynamicResource IconButton}"
-                ToolTip="{Binding Source={x:Static commun:Languages.Current}, Path=[editorCloseWindow]}">
+                ToolTip="{Binding Source={x:Static commun:Languages.Current}, Path=[tooltipsCloseWindow]}">
                 <Path
                     Width="20"
                     Height="20"
@@ -160,10 +160,33 @@
                     Margin="0,0,15,15"
                     VerticalAlignment="Top"
                     Click="SaveButton_Click"
-                    Content="{Binding Source={x:Static commun:Languages.Current}, Path=[saveButtonText]}"
+                    Content="{Binding Source={x:Static commun:Languages.Current}, Path=[editorButtonSave]}"
                     FontSize="18"
                     Foreground="#fff"
                     Style="{DynamicResource RoundedButton}" />
+                <Label
+                    x:Name="ZoomLevelIndicator"
+                    Grid.Row="1"
+                    Grid.Column="0"
+                    Margin="10,0,0,0"
+                    Padding="1,1,3,1"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Bottom"
+                    HorizontalContentAlignment="Left"
+                    VerticalContentAlignment="Center"
+                    Background="#6F000000"
+                    Foreground="#e2e2e1">
+                    <Label.Content>
+                        <TextBlock>
+                            <TextBlock.Text>
+                                <MultiBinding StringFormat="{}{0}: {1:0.#}">
+                                    <Binding Path="[ZoomLevelIndicator]" Source="{x:Static commun:Languages.Current}" />
+                                    <Binding ElementName="MapViewer" Path="ZoomLevel" />
+                                </MultiBinding>
+                            </TextBlock.Text>
+                        </TextBlock>
+                    </Label.Content>
+                </Label>
             </Grid>
         </Grid>
     </Grid>

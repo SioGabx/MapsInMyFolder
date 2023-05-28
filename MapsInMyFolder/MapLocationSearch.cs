@@ -46,7 +46,7 @@ namespace MapsInMyFolder
 
         private void MapSearchbar_GotFocus(object sender, RoutedEventArgs e)
         {
-            if (mapSearchbar.Text == Languages.Current["mapPanelSearchPlaceholder"])
+            if (mapSearchbar.Text == Languages.Current["searchMapPlaceholder"])
             {
                 mapSearchbar.Text = "";
             }
@@ -64,7 +64,7 @@ namespace MapsInMyFolder
             if (string.IsNullOrWhiteSpace(mapSearchbar.Text))
             {
                 searchResult.Visibility = Visibility.Hidden;
-                mapSearchbar.Text = Languages.Current["mapPanelSearchPlaceholder"];
+                mapSearchbar.Text = Languages.Current["searchMapPlaceholder"];
                 mapSearchbar.Foreground = (System.Windows.Media.SolidColorBrush)new System.Windows.Media.BrushConverter().ConvertFromString("#5A5A5A");
             }
         }
@@ -73,7 +73,7 @@ namespace MapsInMyFolder
 
         private void MapSearchbar_TextChanged(object sender, TextChangedEventArgs e)
         {
-            if (mapSearchbar.Text != Languages.Current["mapPanelSearchPlaceholder"])
+            if (mapSearchbar.Text != Languages.Current["searchMapPlaceholder"])
             {
                 searchResult.Visibility = Visibility.Hidden;
                 mapSearchbar.Foreground = (System.Windows.Media.SolidColorBrush)new System.Windows.Media.BrushConverter().ConvertFromString("#BCBCBC");
@@ -96,7 +96,7 @@ namespace MapsInMyFolder
             SearchStart();
         }
 
-        private string lastSearch = Languages.Current["mapPanelSearchPlaceholder"];
+        private string lastSearch = Languages.Current["searchMapPlaceholder"];
 
         private async void SearchStart(bool selectFirst = false)
         {

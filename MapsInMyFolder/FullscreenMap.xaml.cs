@@ -151,19 +151,19 @@ namespace MapsInMyFolder
             };
 
             Grid zoneNameGrid = getGrid(false);
-            NameTextBox = setSimpleColumnTextBox(zoneNameGrid, "Nom :", name, "Selection sans nom");
+            NameTextBox = setSimpleColumnTextBox(zoneNameGrid, Languages.Current["editorSelectionsPropertyNameName"], name, Languages.Current["editorSelectionsPropertyDefaultValueName"]);
             stackPanel.Children.Add(zoneNameGrid);
 
             Grid colorGrid = getGrid(false);
-            ColorTextBox = setSimpleColumnTextBox(colorGrid, "Couleur (hex) :", color, "#000000");
+            ColorTextBox = setSimpleColumnTextBox(colorGrid, Languages.Current["editorSelectionsPropertyNameColor"], color, "#000000");
             stackPanel.Children.Add(colorGrid);
 
             Grid strokeThicknessGrid = getGrid(false);
-            StrokeThicknessTextBox = setSimpleColumnTextBox(strokeThicknessGrid, "Epaisseur de ligne :", strokeThickness, "5");
+            StrokeThicknessTextBox = setSimpleColumnTextBox(strokeThicknessGrid, Languages.Current["editorSelectionsPropertyNameStrokeThickness"], strokeThickness, "5");
             stackPanel.Children.Add(strokeThicknessGrid);
 
             Grid zoomGrid = getGrid();
-            var zoomTextBox = setDoubleColumnTextBox(zoomGrid, "Min Zoom :", "Max Zoom :");
+            var zoomTextBox = setDoubleColumnTextBox(zoomGrid, Languages.Current["editorSelectionsPropertyNameMinZoom"], Languages.Current["editorSelectionsPropertyNameMaxZoom"]);
             stackPanel.Children.Add(zoomGrid);
             MinZoomTextBox = zoomTextBox.LeftTextBox;
             MaxZoomTextBox = zoomTextBox.RightTextBox;
@@ -171,13 +171,13 @@ namespace MapsInMyFolder
             MaxZoomTextBox.Text = getTextIfInfinity(maxZoom);
 
             Grid nordOuestGrid = getGrid();
-            var nordOuestTextBox = setDoubleColumnTextBox(nordOuestGrid, "Nord-Ouest Latitude :", "Nord-Ouest Longitude :");
+            var nordOuestTextBox = setDoubleColumnTextBox(nordOuestGrid, Languages.Current["editorSelectionsPropertyNameNorthwestLatitude"], Languages.Current["editorSelectionsPropertyNameNorthwestLongitude"]);
             stackPanel.Children.Add(nordOuestGrid);
             NOLatitudeTextBox = nordOuestTextBox.LeftTextBox;
             NOLongitudeTextBox = nordOuestTextBox.RightTextBox;
 
             Grid sudEstGrid = getGrid();
-            var sudEstTextBox = setDoubleColumnTextBox(sudEstGrid, "Sud-Est Latitude :", "Sud-Est Longitude :");
+            var sudEstTextBox = setDoubleColumnTextBox(sudEstGrid, Languages.Current["editorSelectionsPropertyNameSoutheastLatitude"], Languages.Current["editorSelectionsPropertyNameSoutheastLongitude"]);
             stackPanel.Children.Add(sudEstGrid);
             PropertiesDisplayElement.Child = stackPanel;
             SELatitudeTextBox = sudEstTextBox.LeftTextBox;
@@ -193,7 +193,6 @@ namespace MapsInMyFolder
             NOLongitudeTextBox.TextChanged += UpdateLocation_NO;
             SELatitudeTextBox.TextChanged += UpdateLocation_SE;
             SELongitudeTextBox.TextChanged += UpdateLocation_SE;
-
 
             MinZoomTextBox.TextChanged += FilterZoomOnTextChanged;
             MaxZoomTextBox.TextChanged += FilterZoomOnTextChanged;
@@ -227,7 +226,6 @@ namespace MapsInMyFolder
             {
                 textBoxSender.Text = "∞";
             }
-
         }
 
         public void FilterStrokeThicknessOnTextChanged(object sender, TextChangedEventArgs e)
@@ -246,7 +244,6 @@ namespace MapsInMyFolder
             SELatitudeTextBox.TextChanged -= UpdateLocation_SE;
             SELongitudeTextBox.TextChanged -= UpdateLocation_SE;
 
-
             MinZoomTextBox.TextChanged -= FilterZoomOnTextChanged;
             MaxZoomTextBox.TextChanged -= FilterZoomOnTextChanged;
             StrokeThicknessTextBox.TextChanged -= FilterStrokeThicknessOnTextChanged;
@@ -263,8 +260,6 @@ namespace MapsInMyFolder
             mapSelectable?.SetRectangleAsActive(Rectangle);
             PropertiesDisplayElementGotFocus?.Invoke(sender, null);
         }
-
-
 
         public void UpdateLocation_NO(object sender, TextChangedEventArgs e)
         {
@@ -460,7 +455,6 @@ namespace MapsInMyFolder
             selectionRectangle?.PropertiesDisplayElement.BringIntoView();
         }
 
-
         private void AddRectangle_Click(object sender, RoutedEventArgs e)
         {
             AddNewSelection();
@@ -480,7 +474,6 @@ namespace MapsInMyFolder
             };
 
             SelectionRectangle.Rectangles.Add(selectionRectangle);
-
             selectionRectangle.Focus(true);
             RectanglesStackPanel.Children.Add(selectionRectangle.PropertiesDisplayElement);
 

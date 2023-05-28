@@ -104,7 +104,7 @@
                             Margin="10,0,0,0"
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center"
-                            Content="{Binding Source={x:Static commun:Languages.Current}, Path=[downloadPanelTitle]}"
+                            Content="{Binding Source={x:Static commun:Languages.Current}, Path=[downloadTitle]}"
                             Foreground="{Binding ElementName=AppTitleBar, Path=(TextElement.Foreground)}" />
                     </StackPanel>
 
@@ -140,7 +140,7 @@
                             Margin="10,0,0,0"
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center"
-                            Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPanelTitle]}"
+                            Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsTitle]}"
                             Foreground="{Binding ElementName=AppTitleBar, Path=(TextElement.Foreground)}" />
                     </StackPanel>
 

@@ -44,7 +44,6 @@ namespace MapsInMyFolder
 
         public void Preload()
         {
-            Debug.WriteLine("Preloading MainPage");
             ReloadPage();
             MapLoad();
         }
@@ -60,8 +59,7 @@ namespace MapsInMyFolder
         }
         private void Map_panel_open_location_panel_Click(object sender, RoutedEventArgs e)
         {
-            Debug.WriteLine(Languages.Current["Key1"]);
-            //Message.NoReturnBoxAsync("Cette fonctionnalité fait l'objet d'une prochaine mise à jour, elle n'as pas encore été ajoutée à cette version !", "Erreur");
+            Message.NoReturnBoxAsync("Cette fonctionnalité fait l'objet d'une prochaine mise à jour, elle n'as pas encore été ajoutée à cette version !", "Erreur");
         }
 
         private void Download_panel_close_button_Click(object sender, RoutedEventArgs e)
@@ -71,7 +69,7 @@ namespace MapsInMyFolder
 
         private void Layer_searchbar_GotFocus(object sender, RoutedEventArgs e)
         {
-            if (layer_searchbar.Text == "Rechercher un calque, un site...")
+            if (layer_searchbar.Text == Languages.Current["searchLayerPlaceholder"])
             {
                 layer_searchbar.Text = "";
                 layer_searchbar.Foreground = (System.Windows.Media.SolidColorBrush)new System.Windows.Media.BrushConverter().ConvertFromString("#BCBCBC");
@@ -100,7 +98,7 @@ namespace MapsInMyFolder
         {
             if (string.IsNullOrWhiteSpace(layer_searchbar.Text))
             {
-                layer_searchbar.Text = "Rechercher un calque, un site...";
+                layer_searchbar.Text = Languages.Current["searchLayerPlaceholder"];
                 layer_searchbar.Foreground = (System.Windows.Media.SolidColorBrush)new System.Windows.Media.BrushConverter().ConvertFromString("#5A5A5A");
             }
             else
@@ -189,8 +187,8 @@ namespace MapsInMyFolder
             Commun.Map.CurentSelection.SE_Longitude = ActiveRectangleSelection.SE.Longitude;
             if (Settings.visibility_pins == Visibility.Visible)
             {
-                NO_PIN.Content = "Latitude = " + Math.Round(NO_PIN.Location.Latitude, 6).ToString() + "\nLongitude = " + Math.Round(NO_PIN.Location.Longitude, 6).ToString();
-                SE_PIN.Content = "Latitude = " + Math.Round(SE_PIN.Location.Latitude, 6).ToString() + "\nLongitude = " + Math.Round(SE_PIN.Location.Longitude, 6).ToString();
+                NO_PIN.Content = $"{Languages.Current["mapLatitude"]} = {Math.Round(NO_PIN.Location.Latitude, 6)}\n{Languages.Current["mapLongitude"]} = {Math.Round(NO_PIN.Location.Longitude, 6)}";
+                SE_PIN.Content = $"{Languages.Current["mapLatitude"]} = {Math.Round(SE_PIN.Location.Latitude, 6)}\n{Languages.Current["mapLongitude"]} = {Math.Round(SE_PIN.Location.Longitude, 6)}";
             }
         }
 

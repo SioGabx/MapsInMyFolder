@@ -41,7 +41,7 @@
                 Margin="28,10,0,0"
                 HorizontalAlignment="Left"
                 VerticalAlignment="Top"
-                Content="{Binding Source={x:Static commun:Languages.Current}, Path=[layerPanelTitle]}"
+                Content="{Binding Source={x:Static commun:Languages.Current}, Path=[layerTitle]}"
                 FontFamily="Segoe UI Light"
                 FontSize="30"
                 Foreground="#FFE2E2E1" />
@@ -55,7 +55,7 @@
                 KeyDown="Layer_searchbar_KeyDown"
                 LostFocus="Layer_searchbar_LostFocus"
                 Style="{DynamicResource TextBoxCleanStyle_16}"
-                Text="{Binding Source={x:Static commun:Languages.Current}, Path=[layerPanelSearchPlaceholder]}"
+                Text="{Binding Source={x:Static commun:Languages.Current}, Path=[searchLayerPlaceholder]}"
                 TextChanged="Layer_searchbar_TextChanged" />
 
             <Border
@@ -86,7 +86,7 @@
                 Margin="28,10,0,0"
                 HorizontalAlignment="Left"
                 VerticalAlignment="Top"
-                Content="{Binding Source={x:Static commun:Languages.Current}, Path=[mapPanelTitle]}"
+                Content="{Binding Source={x:Static commun:Languages.Current}, Path=[mapTitle]}"
                 FontFamily="Segoe UI Light"
                 FontSize="30"
                 Foreground="#FFE2E2E1" />
@@ -110,7 +110,7 @@
                     KeyDown="MapSearchbar_KeyDown"
                     LostFocus="MapSearchbar_LostFocus"
                     Style="{DynamicResource TextBoxCleanStyle_16}"
-                    Text="{Binding Source={x:Static commun:Languages.Current}, Path=[mapPanelSearchPlaceholder]}"
+                    Text="{Binding Source={x:Static commun:Languages.Current}, Path=[searchMapPlaceholder]}"
                     TextChanged="MapSearchbar_TextChanged" />
 
                 <Rectangle
@@ -250,7 +250,7 @@
                     Margin="0,0,15,15"
                     VerticalAlignment="Top"
                     Click="Start_Download_Click"
-                    Content="{Binding Source={x:Static commun:Languages.Current}, Path=[mapPanelStartDownloadButton]}"
+                    Content="{Binding Source={x:Static commun:Languages.Current}, Path=[downloadButtonStart]}"
                     FontSize="18"
                     Foreground="#fff"
                     Style="{DynamicResource RoundedButton}" />
@@ -271,7 +271,7 @@
                         <TextBlock>
                             <TextBlock.Text>
                                 <MultiBinding StringFormat="{}{0}: {1:0.#}">
-                                    <Binding Path="[ZoomLevelIndicator]" Source="{x:Static commun:Languages.Current}" />
+                                    <Binding Path="[mapZoomLevelIndicator]" Source="{x:Static commun:Languages.Current}" />
                                     <Binding ElementName="mapviewer" Path="ZoomLevel" />
                                 </MultiBinding>
                             </TextBlock.Text>
