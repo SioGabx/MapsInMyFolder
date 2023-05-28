@@ -183,12 +183,12 @@
             <Grid Grid.Row="2">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="265" />
+                    <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="15" />
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*" />
-                    <RowDefinition Height="60" />
+                    <RowDefinition Height="Auto" />
                     <RowDefinition Height="15" />
                 </Grid.RowDefinitions>
 
@@ -247,6 +247,7 @@
                     Grid.Row="1"
                     Grid.Column="1"
                     Height="45"
+                    MinWidth="230"
                     Margin="0,0,15,15"
                     VerticalAlignment="Top"
                     Click="Start_Download_Click"
@@ -351,7 +352,7 @@
                     Margin="28,10,0,0"
                     HorizontalAlignment="Left"
                     VerticalAlignment="Top"
-                    Content="{Binding Source={x:Static commun:Languages.Current}, Path=[downloadPanelTitle]}"
+                    Content="{Binding Source={x:Static commun:Languages.Current}, Path=[downloadTitle]}"
                     FontFamily="Segoe UI Light"
                     FontSize="30"
                     Foreground="#FFE2E2E1" />
@@ -367,7 +368,7 @@
                     Cursor="Hand"
                     Foreground="#FFE2E2E1"
                     Style="{DynamicResource IconButton}"
-                    ToolTip="{Binding Source={x:Static commun:Languages.Current}, Path=[downloadPanelCloseTooltips]}">
+                    ToolTip="{Binding Source={x:Static commun:Languages.Current}, Path=[tooltipsClosePanel]}">
                     <Path
                         Width="20"
                         Height="20"

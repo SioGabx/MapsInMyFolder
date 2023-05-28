@@ -206,7 +206,7 @@ namespace MapsInMyFolder
         {
             this.map = map;
             map.Focusable = true;
-            System.Windows.Controls.UIElementCollection uIElementCollection = map.Children;
+            UIElementCollection uIElementCollection = map.Children;
             try
             {
                 foreach (UIElement element in uIElementCollection)

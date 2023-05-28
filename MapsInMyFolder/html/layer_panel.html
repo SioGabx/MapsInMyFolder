@@ -587,8 +587,8 @@
 
 <body>
     <div class="nolayermessage">
-        <p>La base de donnée des calques est vide.</p><br />
-        <p>Pour commencer à ajouter des calques, faites clic-droit, puis cliquez sur "ajouter un calque"</p>
+        <p>%layerMessageNoData%</p><br />
+        <p>%layerMessageHowToAddLayer%</p>
     </div>
     <!--  ------------------ CONTENT ------------------ -->
     <!--htmllayerplaceholder-->
@@ -617,7 +617,7 @@
                         <polygon points="70.87 11.26 90.23 50.5 133.54 56.8 102.2 87.34 109.6 130.47 70.87 110.11 32.13 130.47 39.53 87.34 8.19 56.8 51.5 50.5" />
                     </svg>
                 </div>
-                <a href="#">Ajouter aux favoris</a>
+                <a href="#">%layerContextMenuAddFavorite%</a>
             </div>
         </div>
         <div class="menu item" id="retirer_favori">
@@ -628,7 +628,7 @@
                         <path d="m9.6791 133.61 125.83-119.95"></path>
                     </svg>
                 </div>
-                <a href="#">Retirer des favoris</a>
+                <a href="#">%layerContextMenuRemoveFavorite%</a>
             </div>
         </div>
 
@@ -640,7 +640,7 @@
                         <path d="M137.6,67.8a121.2,121.2,0,0,0-19.34-17.69c-15.77-11.64-32.15-17.8-47.39-17.8s-31.63,6.16-47.4,17.8A121.74,121.74,0,0,0,4.13,67.8a4.81,4.81,0,0,0,0,6.13A121.2,121.2,0,0,0,23.47,91.62c15.77,11.65,32.16,17.8,47.4,17.8s31.62-6.15,47.39-17.8A120.67,120.67,0,0,0,137.6,73.93,4.81,4.81,0,0,0,137.6,67.8ZM70.87,95.87a25,25,0,1,1,25-25A25,25,0,0,1,70.87,95.87Z" />
                     </svg>
                 </div>
-                <a href="#">Afficher le calque</a>
+                <a href="#">%layerContextMenuShowLayer%</a>
             </div>
         </div>
         <div class="menu item" id="masquer_calque">
@@ -652,7 +652,7 @@
                         <path d="M8,130.84,133.78,10.89" />
                     </svg>
                 </div>
-                <a href="#">Masquer le calque</a>
+                <a href="#">%layerContextMenuHideLayer%</a>
             </div>
         </div>
         <div class="item_hr"></div>
@@ -665,7 +665,7 @@
                         <path d="m18.22 105.26 17.36 17.59" />
                     </svg>
                 </div>
-                <a href="#">Modifier le calque</a>
+                <a href="#">%layerContextMenuEditLayer%</a>
             </div>
         </div>
         <div class="menu item" id="supprimer_cache_calque">
@@ -680,7 +680,7 @@
 		c2.2,3.3,4.4,6.7,6.6,10c4.4-0.9,10.7-1.8,15.2-2.7c-2.9,3-6.5,6.9-9.5,9.8L86.2,123.4z" />
                     </svg>
                 </div>
-                <a href="#">Vider le cache du calque</a>
+                <a href="#">%layerContextMenuEmptyLayerCache%</a>
             </div>
         </div>
         <div class="item_hr"></div>
@@ -692,7 +692,7 @@
                         <line x1="8" y1="71" x2="134" y2="71" />
                     </svg>
                 </div>
-                <a href="#">Ajouter un calque</a>
+                <a href="#">%layerContextMenuAddLayer%</a>
             </div>
         </div>
         <div class="menu item shiftkeydownrequired" id="ajouter_calque_template">
@@ -703,7 +703,7 @@
                         <line x1="8" y1="71" x2="134" y2="71" />
                     </svg>
                 </div>
-                <a href="#">Ajouter un calque [comme template]</a>
+                <a href="#">%layerContextMenuAddLayerFromTemplate%</a>
             </div>
         </div>
         <!--        <div class="item_hr"></div>-->
@@ -716,7 +716,7 @@
                         <path d="M8,130.84,133.78,10.89" />
                     </svg>
                 </div>
-                <a href="#">Afficher les calques masqué</a>
+                <a href="#">%layerContextMenuShowHiddenLayer%</a>
             </div>
         </div>
         <div class="menu item" id="basculer_affichage_hidemasque">
@@ -727,7 +727,7 @@
                         <path d="M137.6,67.8a121.2,121.2,0,0,0-19.34-17.69c-15.77-11.64-32.15-17.8-47.39-17.8s-31.63,6.16-47.4,17.8A121.74,121.74,0,0,0,4.13,67.8a4.81,4.81,0,0,0,0,6.13A121.2,121.2,0,0,0,23.47,91.62c15.77,11.65,32.16,17.8,47.4,17.8s31.62-6.15,47.39-17.8A120.67,120.67,0,0,0,137.6,73.93,4.81,4.81,0,0,0,137.6,67.8ZM70.87,95.87a25,25,0,1,1,25-25A25,25,0,0,1,70.87,95.87Z" />
                     </svg>
                 </div>
-                <a href="#">Masquer les calques masqué</a>
+                <a href="#">%layerContextMenuHideHiddenLayer%</a>
             </div>
         </div>
         <div class="menu item" id="actualiser_panel">
@@ -741,7 +741,7 @@
                         </g>
                     </svg>
                 </div>
-                <a href="#">Actualiser</a>
+                <a href="#">%layerContextMenuRefresh%</a>
             </div>
         </div>
     </div>
@@ -933,7 +933,7 @@
                 }
 
                 layer_Csharp_call_from_js.layer_visibility(parseInt(id), true)
-                eye.title = "Masquer le calque";
+                eye.title = "%layerContextMenuHideLayer%";
             } else {
                 //C# supprimer des favoris
                 if (eye.classList.contains("orange")) {
@@ -944,7 +944,7 @@
                     liElement.classList.remove("layerVisible");
                 }
                 layer_Csharp_call_from_js.layer_visibility(parseInt(id), false)
-                eye.title = "Afficher le calque";
+                eye.title = "%layerContextMenuShowLayer%";
 
                 if (liElement.classList.contains("layerHiddenStateProgress")) {
                     setTimeout(function () {
@@ -993,14 +993,14 @@
                     star.classList.add("orange")
                 }
                 layer_Csharp_call_from_js.layer_favorite(parseInt(id), true)
-                star.title = "Supprimer le calque des favoris";
+                star.title = "%layerContextMenuRemoveFavorite%";
             } else {
                 //C# supprimer des favoris
                 if (star.classList.contains("orange")) {
                     star.classList.remove("orange")
                 }
                 layer_Csharp_call_from_js.layer_favorite(parseInt(id), false)
-                star.title = "Ajouter le calque aux favoris";
+                star.title = "%layerContextMenuAddFavorite%";
             }
         }
 
@@ -1032,51 +1032,6 @@
 
         }
 
-        //function cleantxt(source) {
-        //    let source_clean = source.toLowerCase();
-        //    source_clean = source_clean.replaceAll("é", "e");
-        //    source_clean = source_clean.replaceAll("è", "e");
-        //    source_clean = source_clean.replaceAll("ê", "e");
-        //    source_clean = source_clean.replaceAll("ô", "o");
-        //    source_clean = source_clean.replaceAll("î", "i");
-        //    source_clean = source_clean.replaceAll("à", "a");
-        //    source_clean = source_clean.replaceAll("â", "a");
-        //    source_clean = source_clean.replaceAll("æ", "ae");
-        //    source_clean = source_clean.replaceAll("ë", "e");
-        //    source_clean = source_clean.replaceAll("ï", "i");
-        //    source_clean = source_clean.replaceAll("œ", "oe");
-        //    source_clean = source_clean.replaceAll("ù", "u");
-        //    source_clean = source_clean.replaceAll("û", "u");
-        //    source_clean = source_clean.replaceAll("ü", "u");
-        //    source_clean = source_clean.replaceAll("ç", "c");
-        //    return source_clean;
-        //}
-
-        //function search(string) {
-        //    let input = cleantxt(string);
-        //    let filter = input.toLowerCase();
-        //    let li = document.getElementsByTagName('li');
-
-        //    // Loop through all list items, and hide those who don't match the search query
-        //    for (let i = 0; i < li.length; i++) {
-        //        //console.log('clear classList of id ' + i);
-        //        paragraphe = li[i].getElementsByTagName("p");
-        //        for (z = 0; z < paragraphe.length; z++) {
-        //            let a = li[i].getElementsByTagName("p")[z];
-        //            let txtValue = cleantxt(a.innerText).toLowerCase();
-        //            //console.log('Recherche de : "' + filter + '" dans "' + txtValue + '"')
-        //            if (txtValue.indexOf(filter) > -1) {
-        //                li[i].classList.add("visible");
-        //                li[i].classList.remove("hidden");
-        //                //console.log('found : ' + i); console.log(li[i]);
-        //            } else if (!li[i].classList.contains("visible")) {
-        //                li[i].classList.add("hidden");
-        //            }
-        //        }
-        //    }
-        //    CheckIfIntersectionObserverHasDetectedEachElements();
-        //}
-
     </script>
     <script>
         function search(originalSearchedText) {
@@ -1105,7 +1060,6 @@
                     let SpecifierIdentifier = specifier + ":";
                     if (argument.startsWith(SpecifierIdentifier)) {
                         let index = searchArguments.indexOf(argument);
-                        //console.log(argument + " " + index);
                         if (index > -1) {
                             searchArguments.splice(index, 1);
                         }
@@ -1137,10 +1091,8 @@
                             }
                             return;
                         }
-
                     });
                 }
-
             });
 
             applySearch(filteredLayers);
@@ -1787,9 +1739,9 @@
 
                         //if multiple element, then change text :
                         if (getSelectedElements().length <= 1) {
-                            document.querySelector("#supprimer_cache_calque a").innerText = "Vider le cache du calque";
-                            document.querySelector("#afficher_calque a").innerText = "Afficher le calque";
-                            document.querySelector("#masquer_calque a").innerText = "Masquer le calque";
+                            document.querySelector("#supprimer_cache_calque a").innerText = "%layerContextMenuEmptyLayerCache%";
+                            document.querySelector("#afficher_calque a").innerText = "%layerContextMenuShowLayer%";
+                            document.querySelector("#masquer_calque a").innerText = "%layerContextMenuHideLayer%";
                         } else {
                             update_lock_state("modifier_calque", true);
                             update_lock_state("supprimer_cache_calque", false);
@@ -1797,9 +1749,9 @@
                             update_lock_state("ajouter_favori", false);
                             update_lock_state("afficher_calque", false);
                             update_lock_state("masquer_calque", false);
-                            document.querySelector("#supprimer_cache_calque a").innerText = "Vider le cache des calque";
-                            document.querySelector("#afficher_calque a").innerText = "Afficher les calques";
-                            document.querySelector("#masquer_calque a").innerText = "Masquer les calques";
+                            document.querySelector("#supprimer_cache_calque a").innerText = "%layerContextMenuEmptyLayersCache%";
+                            document.querySelector("#afficher_calque a").innerText = "%layerContextMenuShowLayers%";
+                            document.querySelector("#masquer_calque a").innerText = "%layerContextMenuHideLayers%";
                         }
 
                         if (document.querySelector("ul").classList.contains("showHiddenLayer")) {

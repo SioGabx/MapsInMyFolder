@@ -195,7 +195,7 @@ namespace MapsInMyFolder
             {
                 if (conn is null)
                 {
-                    return "<style>p{font-family: \"Segoe UI\";color:#888989;font-size:14px;}</style><p>Aucune base de données trouvée. Veuillez relancer l'application.</p><p>Si le problème persiste, veuillez réessayer ultérieurement</p>";
+                    return "<style>p{font-family: \"Segoe UI\";color:#888989;font-size:14px;}</style><p>" + Languages.Current["layerMessageNoDatabase"] + "</p>";
                 }
             }
 
@@ -222,7 +222,7 @@ namespace MapsInMyFolder
 
         static string DB_Layer_CreateHTML(List<Layers> layers, List<Layers> editedlayers)
         {
-            Layers.Layers_Dictionary_List.Clear();
+            Layers.Clear();
             StringBuilder generated_layers = new StringBuilder("<ul class=\"");
             generated_layers.Append(Settings.layerpanel_displaystyle.ToString().ToLower());
             generated_layers.AppendLine("\">");
@@ -282,12 +282,11 @@ namespace MapsInMyFolder
                         }
                     }
 
-                    Dictionary<int, Layers> temp_Layers_dictionnary = new Dictionary<int, Layers> { { Convert.ToInt32(LayerWithReplacement.class_id), LayerWithReplacement } };
-                    Layers.Layers_Dictionary_List.Add(temp_Layers_dictionnary);
+                    Layers.Add(Convert.ToInt32(LayerWithReplacement.class_id), LayerWithReplacement);
 
                     string orangestar = LayerWithReplacement.class_favorite
-                        ? @"class=""star orange"" title=""Supprimer le calque des favoris"""
-                        : @"class=""star"" title=""Ajouter le calque aux favoris""";
+                        ? @$"class=""star orange"" title=""{Languages.Current["layerContextMenuRemoveFavorite"]}"""
+                        : @$"class=""star"" title=""{Languages.Current["layerContextMenuAddFavorite"]}""";
 
                     string orangelayervisibility;
                     string visibility = "layer";
@@ -319,12 +318,12 @@ namespace MapsInMyFolder
                     {
                         if (LayerWithReplacement.class_visibility == "Hidden")
                         {
-                            orangelayervisibility = @"class=""eye"" title=""Afficher le calque""";
+                            orangelayervisibility = @$"class=""eye"" title=""{Languages.Current["layerContextMenuShowLayer"]}""";
                             visibility += "Hidden";
                         }
                         else
                         {
-                            orangelayervisibility = @"class=""eye orange"" title=""Masquer le calque""";
+                            orangelayervisibility = @$"class=""eye orange"" title=""{Languages.Current["layerContextMenuHideLayer"]}""";
                             visibility += "Visible";
                         }
                     }
@@ -345,7 +344,7 @@ namespace MapsInMyFolder
                     string WarningMessageDiv = string.Empty;
                     if (Initial_ClassVersion > LayerWithReplacement.class_version)
                     {
-                        WarningMessageDiv = $"<div class=\"warning\" title=\"Une erreur sur le calque à été détéctée.\nCliquez pour en savoir +\" onclick=\"show_warning(event, '{LayerWithReplacement.class_id}');\"></div>";
+                        WarningMessageDiv = $"<div class=\"warning\" title=\"{Languages.Current["layerMessageErrorDetectedClickHere"]}\" onclick=\"show_warning(event, '{LayerWithReplacement.class_id}');\"></div>";
                     }
 
                     generated_layers.AppendLine(@$"
@@ -374,6 +373,7 @@ namespace MapsInMyFolder
 
             generated_layers.AppendLine("</ul>");
             string resource_data = Collectif.ReadResourceString("HTML/layer_panel.html");
+            resource_data = Languages.ReplaceInString(resource_data);
             return resource_data.Replace("<!--htmllayerplaceholder-->", generated_layers.ToString());
         }
 
@@ -394,16 +394,14 @@ namespace MapsInMyFolder
 
             Layers layer = Layers.GetLayerById(id);
 
-            if (Layers.Layers_Dictionary_List.Count == 0)
+            if (Layers.Count() == 0)
             {
-                layer = Layers.Empty(0);
-                Dictionary<int, Layers> x = new Dictionary<int, Layers> { { 0, layer } };
-                Layers.Layers_Dictionary_List.Add(x);
+                Layers.Add(0, Layers.Empty(0));
             }
 
             if (layer is null || layer_startup_id == 0)
             {
-                layer = Layers.GetLayerById(Layers.Layers_Dictionary_List[0].Keys.First());
+                layer = Layers.GetLayersList().First();
                 Settings.layer_startup_id = layer.class_id;
                 if (layer_startup_id == 0)
                 {
@@ -510,7 +508,6 @@ namespace MapsInMyFolder
             {
                 Javascript.EngineDeleteById(id);
                 string temp_dir = Collectif.GetSaveTempDirectory(layers.class_name, layers.class_identifiant);
-                Debug.WriteLine("Cache path : " + temp_dir);
                 if (Directory.Exists(temp_dir))
                 {
                     DirectorySize = Collectif.GetDirectorySize(temp_dir);
@@ -518,7 +515,7 @@ namespace MapsInMyFolder
                 }
                 if (ShowMessageBox)
                 {
-                    Message.NoReturnBoxAsync("Le cache du calque \"" + layers.class_name + "\" à été vidé. " + Collectif.FormatBytes(DirectorySize) + " libéré.", "Opération réussie");
+                    Message.NoReturnBoxAsync(Languages.GetWithArguments("layerMessageCacheCleared", layers.class_name, Collectif.FormatBytes(DirectorySize)), Languages.Current["dialogTitleOperationSuccess"]);
                 }
             }
             catch (Exception ex)
@@ -556,7 +553,7 @@ namespace MapsInMyFolder
                         if (EditedDB_TILECOMPUTATIONSCRIPT != LastDB_TILECOMPUTATIONSCRIPT && !string.IsNullOrWhiteSpace(EditedDB_TILECOMPUTATIONSCRIPT))
                         {
                             TextBlock textBlock = new TextBlock();
-                            textBlock.Text = "Le script de chargement des tuiles de ce calque a été modifié lors de la dernière mise à jour mais ce calque comporte des remplacements.";
+                            textBlock.Text = Languages.Current["layerMessageErrorUpdateTileComputationScriptChanged"];
                             textBlock.TextWrapping = TextWrapping.Wrap;
                             AskMsg.Children.Add(textBlock);
                             AskMsg.Children.Add(Collectif.FormatDiffGetScrollViewer(EditedDB_TILECOMPUTATIONSCRIPT, LastDB_TILECOMPUTATIONSCRIPT));
@@ -566,7 +563,7 @@ namespace MapsInMyFolder
                         if (EditedDB_TILE_URL != LastDB_TILE_URL && !string.IsNullOrWhiteSpace(EditedDB_TILE_URL))
                         {
                             TextBlock textBlock = new TextBlock();
-                            textBlock.Text = "L'URL de chargement des tuiles a été modifiée lors de la dernière mise à jour mais ce calque comporte des remplacements.";
+                            textBlock.Text = Languages.Current["layerMessageErrorUpdateTileURLChanged"];
                             textBlock.TextWrapping = TextWrapping.Wrap;
                             AskMsg.Children.Add(textBlock);
                             AskMsg.Children.Add(Collectif.FormatDiffGetScrollViewer(EditedDB_TILE_URL, LastDB_TILE_URL));
@@ -574,7 +571,7 @@ namespace MapsInMyFolder
                         }
 
                         TextBlock textBlockAsk = new TextBlock();
-                        textBlockAsk.Text = "Voulez-vous mettre à jour les champs suivant la dernière mise à jour ?";
+                        textBlockAsk.Text = Languages.Current["layerMessageErrorUpdateAskFix"];
                         textBlockAsk.TextWrapping = TextWrapping.Wrap;
                         textBlockAsk.FontWeight = FontWeight.FromOpenTypeWeight(600);
                         AskMsg.Children.Add(textBlockAsk);
@@ -711,7 +708,7 @@ namespace MapsInMyFolder
         }
     }
 
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Marquer les membres comme étant static", Justification = "Used by CEFSHARP, static isnt a option here")]
+   // [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Marquer les membres comme étant static", Justification = "Used by CEFSHARP, static isnt a option here")]
     public class Layer_Csharp_call_from_js
     {
         public void Clear_cache(string listOfId = "0")
@@ -728,18 +725,20 @@ namespace MapsInMyFolder
                 }, null);
                 DebugMode.WriteLine("Clear_cache layer " + id_int);
             }
-            string layerName = "";
+
+            string memoryFreed = Collectif.FormatBytes(DirectorySize);
+            string cacheCleanedMessage = "";
             if (splittedListOfId.Count() == 1)
             {
-                layerName = "Le cache du calque \"" + Layers.GetLayerById(int.Parse(splittedListOfId[0])).class_name + "\" à été vidé";
+                cacheCleanedMessage = Languages.GetWithArguments("layerMessageCacheCleared", Layers.GetLayerById(int.Parse(splittedListOfId[0])).class_name, memoryFreed);
             }
             else
             {
-                layerName = "Le cache des calques séléctionné ont été vidés";
+                cacheCleanedMessage = Languages.GetWithArguments("layerMessageCachesCleared", Layers.GetLayerById(int.Parse(splittedListOfId[0])).class_name, memoryFreed);
             }
             Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
             {
-                Message.NoReturnBoxAsync(layerName + " (" + Collectif.FormatBytes(DirectorySize) + " libéré).", "Opération réussie");
+                Message.NoReturnBoxAsync(cacheCleanedMessage, Languages.Current["dialogTitleOperationSuccess"]);
             }, null);
         }
 

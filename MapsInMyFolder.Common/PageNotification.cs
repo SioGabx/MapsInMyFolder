@@ -198,7 +198,7 @@ namespace MapsInMyFolder.Commun
                     Width = 25,
                     Foreground = Collectif.HexValueToSolidColorBrush("#FFE2E2E1"),
                     Cursor = Cursors.Hand,
-                    ToolTip = "Fermer cette notification",
+                    ToolTip = Languages.Current["tooltipsCloseNotification"],
                     Margin = new Thickness(0, 0, 0, 0),
                     VerticalAlignment = VerticalAlignment.Top,
                     HorizontalAlignment = HorizontalAlignment.Right

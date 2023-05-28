@@ -148,7 +148,7 @@ namespace MapsInMyFolder.Commun
                     {
                         ConvertedValue = Convert.ChangeType(fieldValue, value_type);
                         IsErrorOnConvert = true;
-                        Message.NoReturnBoxAsync("Une mauvaise valeur à été détécté dans les paramètres ! La valeur par défault à été réappliqué \n    - Nom : " + fieldName + "\n    - Valeur : " + value + "\n    - Valeur par defaut : " + fieldValue, "Erreur");
+                        Message.NoReturnBoxAsync(Languages.GetWithArguments("settingsMessageErrorWrongValueOnLoad", fieldName, value, fieldValue), Languages.Current["dialogTitleOperationFailed"]);
                     }
                     finally
                     {

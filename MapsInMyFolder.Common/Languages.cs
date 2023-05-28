@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
@@ -6,44 +7,53 @@ using System.Windows.Data;
 
 namespace MapsInMyFolder.Commun
 {
-    public class LanguageDictionaryWrapper<TKey, TValue>
+    public class LanguageDictionaryWrapper<TKey, TValue> : IEnumerable<KeyValuePair<TKey, TValue>>
     {
-        private readonly Dictionary<string, string> _dictionary;
+        private readonly Dictionary<TKey, TValue> _dictionary;
 
-        public LanguageDictionaryWrapper(Dictionary<string, string> dictionary)
+        public LanguageDictionaryWrapper(Dictionary<TKey, TValue> dictionary)
         {
             _dictionary = dictionary;
         }
 
-        public string NullKeyValue => "NullKey";
+        public TValue NullKeyValue => default(TValue);
 
-        public string this[string key]
+        public TValue this[TKey key]
         {
             get
             {
-                string value = "";
+                TValue value;
                 if (_dictionary is null)
                 {
                     return NullKeyValue;
                 }
-                if (_dictionary.TryGetValue(key, out value) && !string.IsNullOrEmpty(value))
+                if (_dictionary.TryGetValue(key, out value) && !EqualityComparer<TValue>.Default.Equals(value, default(TValue)))
                 {
                     return value;
                 }
-                else if (!string.IsNullOrEmpty(key))
+                else if (!EqualityComparer<TKey>.Default.Equals(key, default(TKey)))
                 {
-                    return $"%{key}%";
+                    return (TValue)(object)$"%{key}%";
                 }
                 else
                 {
                     return NullKeyValue;
                 }
-
             }
             set
             {
                 _dictionary[key] = value;
             }
+        }
+
+        public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
+        {
+            return _dictionary.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
     }
 
@@ -83,9 +93,18 @@ namespace MapsInMyFolder.Commun
             
             foreach (var arg in args)
             {
-                RawValue = RawValue.ReplaceSingle("%s", arg.ToString());
+                RawValue = RawValue.ReplaceSingle("{%s}", arg.ToString());
             }
             return RawValue;
+        }
+
+        public static string ReplaceInString(string texte)
+        {
+            foreach (KeyValuePair<string, string> keyValuePair in Current)
+            {
+                texte = texte.Replace($"%{keyValuePair.Key}%", keyValuePair.Value);
+            }
+            return texte;
         }
     }
 }

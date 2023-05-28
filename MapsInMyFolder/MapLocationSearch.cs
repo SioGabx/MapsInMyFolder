@@ -237,18 +237,10 @@ namespace MapsInMyFolder
 
         public static SearchEngineResult GetResultById(int id)
         {
-            try
-            {
                 if (SearchResultList.TryGetValue(id, out SearchEngineResult result))
                 {
                     return result;
                 }
-
-            }
-            catch (KeyNotFoundException)
-            {
-                Debug.WriteLine("Erreur : l'id n'existe pas.");
-            }
 
             return null;
         }

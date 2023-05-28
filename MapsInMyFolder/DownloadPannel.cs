@@ -139,6 +139,7 @@ namespace MapsInMyFolder
         public void Init_download_panel()
         {
             string resource_data = Collectif.ReadResourceString("HTML/download_panel.html");
+            resource_data = Languages.ReplaceInString(resource_data);
             download_panel_browser.LoadHtml(resource_data);
             if (download_panel_browser is null) { return; }
             try
@@ -179,15 +180,13 @@ namespace MapsInMyFolder
                 EasingFunction = new PowerEase { EasingMode = EasingMode.EaseInOut }
             };
             hide_anim.Completed += hide_anim_Completed;
+            download_panel.BeginAnimation(OpacityProperty, hide_anim); 
 
             void hide_anim_Completed(object sender, EventArgs e)
             {
                 download_panel.Visibility = Visibility.Hidden;
                 hide_anim.Completed -= hide_anim_Completed;
             }
-
-
-            download_panel.BeginAnimation(OpacityProperty, hide_anim);
         }
 
         public void Download_panel_open()
@@ -245,7 +244,7 @@ namespace MapsInMyFolder
                     }
                     catch (Exception ex)
                     {
-                        Message.NoReturnBoxAsync(ex.Message, "Erreur");
+                        Message.NoReturnBoxAsync(ex.Message, Languages.Current["dialogTitleOperationFailed"]);
                     }
                 }, null);
             }
@@ -264,7 +263,7 @@ namespace MapsInMyFolder
                     }
                     catch (Exception ex)
                     {
-                        Message.NoReturnBoxAsync(ex.Message, "Erreur");
+                        Message.NoReturnBoxAsync(ex.Message, Languages.Current["dialogTitleOperationFailed"]);
                     }
                 }, null);
             }
@@ -283,7 +282,7 @@ namespace MapsInMyFolder
                     }
                     catch (Exception ex)
                     {
-                        Message.NoReturnBoxAsync(ex.Message, "Erreur");
+                        Message.NoReturnBoxAsync(ex.Message, Languages.Current["dialogTitleOperationFailed"]);
                     }
                 }, null);
             }
@@ -302,7 +301,7 @@ namespace MapsInMyFolder
                     }
                     catch (Exception ex)
                     {
-                        Message.NoReturnBoxAsync(ex.Message, "Erreur");
+                        Message.NoReturnBoxAsync(ex.Message, Languages.Current["dialogTitleOperationFailed"]);
                     }
                 }, null);
             }
@@ -322,7 +321,7 @@ namespace MapsInMyFolder
                    }
                    catch (Exception ex)
                    {
-                       Message.NoReturnBoxAsync(ex.Message, "Erreur");
+                       Message.NoReturnBoxAsync(ex.Message, Languages.Current["dialogTitleOperationFailed"]);
                    }
                }, null);
             }
@@ -371,15 +370,15 @@ namespace MapsInMyFolder
                 {
                     try
                     {
-                        MainWindow.UpdateDownloadPanel(id_int, "Supprimé", "0", true, Status.deleted);
+                        MainWindow.UpdateDownloadPanel(id_int, Languages.Current["downloadStateDeleted"], "0", true, Status.deleted);
                         Database.DB_Download_Update(id_int, "STATE", nameof(Status.deleted));
                     }
                     catch (Exception ex)
                     {
-                        Message.NoReturnBoxAsync(ex.Message, "Erreur");
+                        Message.NoReturnBoxAsync(ex.Message, Languages.Current["dialogTitleOperationFailed"]);
                     }
                 }, null);
-
+                
                 foreach (DownloadSettings eng in DownloadSettings.GetEngineList())
                 {
                     if (eng.state == Status.success)
@@ -403,7 +402,7 @@ namespace MapsInMyFolder
             {
                 Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
                 {
-                    Message.NoReturnBoxAsync("Le dossier temporaire n'existe plus. \n\nChemin du dossier : \n" + engine.save_temp_directory, "Erreur");
+                    Message.NoReturnBoxAsync(Languages.GetWithArguments("downloadMessageErrorTempFolderNotFound", engine.save_temp_directory), Languages.Current["dialogTitleOperationFailed"]);
                 }, null);
             }
         }
@@ -422,7 +421,7 @@ namespace MapsInMyFolder
                 catch (Exception ex)
                 {
                     //MessageBox.Show(ex.Message);
-                    Message.NoReturnBoxAsync(ex.Message, "Erreur");
+                    Message.NoReturnBoxAsync(ex.Message, Languages.Current["dialogTitleOperationFailed"]);
                 }
             }, null);
         }
@@ -446,7 +445,7 @@ namespace MapsInMyFolder
                 }
                 catch (Exception ex)
                 {
-                    Message.NoReturnBoxAsync(ex.Message, "Erreur");
+                    Message.NoReturnBoxAsync(ex.Message, Languages.Current["dialogTitleOperationFailed"]);
                 }
             }, null);
         }
@@ -464,7 +463,7 @@ namespace MapsInMyFolder
                 }
                 catch (Exception ex)
                 {
-                    Message.NoReturnBoxAsync(ex.Message, "Erreur");
+                    Message.NoReturnBoxAsync(ex.Message, Languages.Current["dialogTitleOperationFailed"]);
                 }
             }, null);
         }
@@ -481,7 +480,7 @@ namespace MapsInMyFolder
                 }
                 catch (Exception ex)
                 {
-                    Message.NoReturnBoxAsync(ex.Message, "Erreur");
+                    Message.NoReturnBoxAsync(ex.Message, Languages.Current["dialogTitleOperationFailed"]);
                 }
             }, null);
         }
@@ -500,7 +499,7 @@ namespace MapsInMyFolder
                 Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)async delegate
                 {
                     Download_stop(id_int);
-                    var result = await Message.SetContentDialog("Voullez-vous annuler et supprimer le téléchargement de " + engine.file_name + " ? ", "Supprimer le téléchargement", MessageDialogButton.YesNo).ShowAsync();
+                    var result = await Message.SetContentDialog(Languages.GetWithArguments("downloadMessageAskCancelDeleteDownload", engine.file_name), "MapsInMyFolder", MessageDialogButton.YesNo).ShowAsync();
                     if (result == ContentDialogResult.Primary)
                     {
                         try
@@ -514,7 +513,7 @@ namespace MapsInMyFolder
                         }
                         catch (Exception ex)
                         {
-                            Message.NoReturnBoxAsync(ex.Message, "Erreur");
+                            Message.NoReturnBoxAsync(ex.Message, Languages.Current["dialogTitleOperationFailed"]);
                         }
                     }
                     else

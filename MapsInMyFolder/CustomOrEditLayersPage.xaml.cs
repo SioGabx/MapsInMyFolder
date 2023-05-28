@@ -94,7 +94,7 @@ namespace MapsInMyFolder
         void SetContextMenu()
         {
             MenuItem IndentermenuItem = new MenuItem();
-            IndentermenuItem.Header = "Indenter";
+            IndentermenuItem.Header = Languages.Current["editorContextMenuIndent"];
             IndentermenuItem.Icon = new ModernWpf.Controls.FontIcon() { Glyph = "\uE12F", Foreground = Collectif.HexValueToSolidColorBrush("#888989") };
             IndentermenuItem.Click += IndentermenuItem_Click;
             TextboxLayerScript.ContextMenu.Items.Add(IndentermenuItem);
@@ -103,10 +103,8 @@ namespace MapsInMyFolder
                 IndenterCode(sender, e, TextboxLayerScript);
             }
             MenuItem templateMenuItem = new MenuItem();
-            templateMenuItem.Header = "Script template";
+            templateMenuItem.Header = Languages.Current["editorContextMenuScriptTemplate"];
             templateMenuItem.Icon = new ModernWpf.Controls.FontIcon() { Glyph = "\uE15C", Foreground = Collectif.HexValueToSolidColorBrush("#888989") };
-
-
             templateMenuItem.Click += templateMenuItem_Click;
             TextboxLayerScript.ContextMenu.Items.Add(templateMenuItem);
             void templateMenuItem_Click(object sender, EventArgs e)
@@ -115,7 +113,7 @@ namespace MapsInMyFolder
             }
 
             MenuItem clearConsoleMenuItem = new MenuItem();
-            clearConsoleMenuItem.Header = "Effacer";
+            clearConsoleMenuItem.Header = Languages.Current["editorContextMenuConsoleErase"];
             clearConsoleMenuItem.Icon = new ModernWpf.Controls.FontIcon() { Glyph = "\uE127", Foreground = Collectif.HexValueToSolidColorBrush("#888989") };
             clearConsoleMenuItem.Click += clearConsoleMenuItem_Click;
             TextboxLayerScriptConsole.ContextMenu.Items.Add(clearConsoleMenuItem);
@@ -125,7 +123,7 @@ namespace MapsInMyFolder
             }
 
             MenuItem helpConsoleMenuItem = new MenuItem();
-            helpConsoleMenuItem.Header = "Aide";
+            helpConsoleMenuItem.Header = Languages.Current["editorContextMenuConsoleHelp"];
             helpConsoleMenuItem.Icon = new ModernWpf.Controls.FontIcon() { Glyph = "\uE11B", Foreground = Collectif.HexValueToSolidColorBrush("#888989") };
             helpConsoleMenuItem.Click += helpConsoleMenuItem_Click;
             TextboxLayerScriptConsole.ContextMenu.Items.Add(helpConsoleMenuItem);
@@ -136,7 +134,6 @@ namespace MapsInMyFolder
             }
 
             CustomOrEditLayers.Unloaded += CustomOrEditLayers_Unloaded;
-
             void CustomOrEditLayers_Unloaded(object sender, RoutedEventArgs e)
             {
                 CustomOrEditLayers.Unloaded -= CustomOrEditLayers_Unloaded;
@@ -194,14 +191,9 @@ namespace MapsInMyFolder
 
         static void GenerateTempLayerInDicList()
         {
-            Layers.RemoveLayerById(-2);
             Layers MoinsUnEditLayer = Layers.Empty();
             MoinsUnEditLayer.class_id = InternalEditorId;
-            Dictionary<int, Layers> DicLayers = new Dictionary<int, Layers>
-            {
-                { -2, MoinsUnEditLayer }
-            };
-            Layers.Layers_Dictionary_List.Add(DicLayers);
+            Layers.Add(-2, MoinsUnEditLayer);
         }
 
         void Init_LayerEditableTextbox(int prefilLayerId)
@@ -258,11 +250,11 @@ namespace MapsInMyFolder
             TextboxLayerName.Text = LayerInEditMode.class_name;
             if (LayerId > 0 && !string.IsNullOrEmpty(LayerInEditMode.class_name.Trim()))
             {
-                CalqueType.Content = string.Concat("Calque - ", LayerInEditMode.class_name);
+                CalqueType.Content = string.Concat(Languages.Current["editorTitleLayer"], " - ", LayerInEditMode.class_name);
             }
             else if (LayerId != prefilLayerId)
             {
-                CalqueType.Content = "Nouveau calque (basé sur le calque N°" + prefilLayerId + ")";
+                CalqueType.Content = Languages.GetWithArguments("editorTitleNewLayerBasedOn", prefilLayerId);
             }
             TextboxLayerCategories.Text = LayerInEditMode.class_categorie;
             TextboxLayerSiteUrl.Text = LayerInEditMode.class_site_url;
@@ -487,7 +479,7 @@ namespace MapsInMyFolder
                 if (!HasErrorZoomLevelMinZoom && Convert.ToInt32(TextBoxLayerMaxZoom.Text) <= Convert.ToInt32(TextBoxLayerMinZoom.Text))
                 {
                     //Le zoom minimum ne peux pas être supérieur ou égal au zoom maximum !;
-                    Message.NoReturnBoxAsync("Le zoom minimum ne peux pas être supérieur ou égal au zoom maximum !", "Erreur");
+                    Message.NoReturnBoxAsync(Languages.Current["editorMessageErrorMinZoomGreaterThanMaxZoom"], Languages.Current["dialogTitleOperationFailed"]);
                     HasErrorZoomLevelMinZoom = true;
                 }
                 else
@@ -497,7 +489,7 @@ namespace MapsInMyFolder
                 if (!HasErrorZoomLevelMinZoom && Convert.ToInt32(TextBoxLayerMinZoom.Text) >= Convert.ToInt32(TextBoxLayerMaxZoom.Text))
                 {
                     //Le zoom maximum ne peux pas être inférieur ou égal au zoom minimum !
-                    Message.NoReturnBoxAsync("Le zoom maximum ne peux pas être inférieur ou égal au zoom minimum !", "Erreur");
+                    Message.NoReturnBoxAsync(Languages.Current["editorMessageErrorMinZoomLessThanMaxZoom"], Languages.Current["dialogTitleOperationFailed"]);
                     HasErrorZoomLevelMaxZoom = true;
                 }
                 else
@@ -580,7 +572,7 @@ namespace MapsInMyFolder
             Layers layers = Layers.GetLayerById(-2);
             if (layers is null)
             {
-                Message.NoReturnBoxAsync("Une erreur s'est produite lors de l'enregistrement, veuillez réessayer.");
+                Message.NoReturnBoxAsync(Languages.Current["editorMessageErrorDatabaseSave"], Languages.Current["dialogTitleOperationFailed"]);
             }
             string NOM = Collectif.HTMLEntities(layers.class_name);
             string DESCRIPTION = Collectif.HTMLEntities(layers.class_description);
@@ -710,7 +702,7 @@ namespace MapsInMyFolder
             ContentDialogResult result = ContentDialogResult.Primary;
             if (DefaultValuesHachCode != ValuesHachCode)
             {
-                var dialog = Message.SetContentDialog("Voullez-vous vraiment quitter cette page ? Les modifications effectuée seront perdues", "Confirmer", MessageDialogButton.YesCancel);
+                var dialog = Message.SetContentDialog(Languages.Current["editorMessageLeaveWithoutSaving"], Languages.Current["dialogTitleOperationConfirm"], MessageDialogButton.YesCancel);
                 result = await dialog.ShowAsync();
             }
             if (result == ContentDialogResult.Primary)
@@ -765,7 +757,6 @@ namespace MapsInMyFolder
                 GenerateTempLayerInDicList();
                 layers = Layers.GetLayerById(-2);
             }
-            Layers.RemoveLayerById(-2);
             layers.class_name = NOM;
             layers.class_description = DESCRIPTION;
             layers.class_categorie = CATEGORIE;
@@ -787,13 +778,7 @@ namespace MapsInMyFolder
             };
 
             layers.class_hasscale = has_scale.IsChecked ?? false;
-
-
-            Dictionary<int, Layers> DicLayers = new Dictionary<int, Layers>
-            {
-                { -2, layers }
-            };
-            Layers.Layers_Dictionary_List.Add(DicLayers);
+            Layers.Add(-2, layers);
         }
 
         async void AutoDetectZoom()
@@ -801,7 +786,7 @@ namespace MapsInMyFolder
             string label_base_content = LabelAutoDetectZoom.Content.ToString();
             if (string.IsNullOrEmpty(TextboxLayerTileUrl.Text))
             {
-                Message.NoReturnBoxAsync("Le champ URL doit être rempli avant de lancer cette fonction", "Erreur");
+                Message.NoReturnBoxAsync(Languages.Current["editorMessageErrorAutoDetectZoomURLNotDefined"], Languages.Current["dialogTitleOperationFailed"]);
                 return;
             }
 
@@ -815,7 +800,7 @@ namespace MapsInMyFolder
 
             for (int i = 0; i < 30; i++)
             {
-                string infotext = $"Analyse.... (niveau de zoom {i})";
+                string infotext = Languages.GetWithArguments("editorMessageAutoDetectReport", i);
                 LabelAutoDetectZoom.Content = infotext;
                 Javascript.Functions.Print(infotext, -2);
 
@@ -829,7 +814,7 @@ namespace MapsInMyFolder
                     if (!IsSuccessLastRequest && ZoomMinimum == -1)
                     {
                         ZoomMinimum = i;
-                        Javascript.Functions.Print($"Zoom minimum détecté ({ZoomMinimum}) !", -2);
+                        Javascript.Functions.Print(Languages.GetWithArguments("editorMessageAutoDetectReportMinZoomDetected", ZoomMinimum), -2);
                         TextBoxLayerMinZoom.Text = ZoomMinimum.ToString();
                     }
                     IsSuccessLastRequest = true;
@@ -839,7 +824,7 @@ namespace MapsInMyFolder
                     if (IsSuccessLastRequest && ZoomMaximum == -1)
                     {
                         ZoomMaximum = i - 1;
-                        Javascript.Functions.Print($"Zoom maximal détecté ({ZoomMaximum}) !", -2);
+                        Javascript.Functions.Print(Languages.GetWithArguments("editorMessageAutoDetectReportMaxZoomDetected", ZoomMinimum), -2);
                         TextBoxLayerMaxZoom.Text = ZoomMaximum.ToString();
                         LabelAutoDetectZoom.Content = label_base_content;
                         LabelAutoDetectZoom.IsEnabled = true;
@@ -851,7 +836,7 @@ namespace MapsInMyFolder
 
             if (ZoomMaximum == -1)
             {
-                LabelAutoDetectZoom.Content = "Le zoom maximal n'a pas pu être trouvé, veuillez réessayer...";
+                LabelAutoDetectZoom.Content = Languages.Current["editorMessageAutoDetectReportMaxZoomNotFound"];
                 LabelAutoDetectZoom.IsEnabled = true;
             }
         }
@@ -960,7 +945,7 @@ namespace MapsInMyFolder
         {
             try
             {
-                var result = await Message.SetContentDialog("Voullez-vous vraiment redefinir par default les informations et paramêtres de ce calque ? \nCette action est irréversible !", "Confirmer", MessageDialogButton.YesCancel).ShowAsync();
+                var result = await Message.SetContentDialog(Languages.Current["editorMessageResetLayerProperty"], Languages.Current["dialogTitleOperationConfirm"], MessageDialogButton.YesCancel).ShowAsync();
                 if (result == ContentDialogResult.Primary)
                 {
                     DisposeElementBeforeLeave();
@@ -980,7 +965,7 @@ namespace MapsInMyFolder
         {
             try
             {
-                var dialog = Message.SetContentDialog("Voullez-vous vraiment supprimer ce calque ? \nCette action est irréversible !", "Confirmer", MessageDialogButton.YesCancel);
+                var dialog = Message.SetContentDialog(Languages.Current["editorMessageDeleteLayer"], Languages.Current["dialogTitleOperationConfirm"], MessageDialogButton.YesCancel);
                 var result = await dialog.ShowAsync();
                 dialog.Visibility = Visibility.Visible;
                 if (result == ContentDialogResult.Primary)
@@ -1122,7 +1107,7 @@ namespace MapsInMyFolder
             {
                 if (string.IsNullOrEmpty(TextboxLayerTileUrl.Text))
                 {
-                    Message.NoReturnBoxAsync("Le champ URL doit être remplis avant de lancer cette fonction", "Erreur");
+                    Message.NoReturnBoxAsync(Languages.Current["editorMessageErrorAutoDetectZoomURLNotDefined"], Languages.Current["dialogTitleOperationFailed"]);
                     return;
                 }
                 else
@@ -1160,8 +1145,7 @@ namespace MapsInMyFolder
             if (NumberOfErrors > 0)
             {
                 string infoText = (NumberOfErrors == 1) ?
-                "Un rectangle n'as pas pu être converti suite à une ou des erreurs. Vérifiez ses propriétés avant de continuer. Vous perdrez ces données si vous enregistrez maintenant." :
-                $"{NumberOfErrors} rectangles n'ont pas pu être convertis suite à une ou des erreurs. Vérifiez leurs propriétés avant de continuer. Vous perdrez leurs données si vous enregistrez maintenant.";
+                Languages.Current["editorMessageErrorRectangleConversion"] : Languages.GetWithArguments("editorMessageErrorRectanglesConversion", NumberOfErrors); ;
                 Notification InfoUnusedRectangleDeleted = new NText(infoText, "MapsInMyFolder", "FullscreenMap", () => MainWindow._instance.FrameBack())
                 {
                     NotificationId = "InfoUnusedRectangleDeleted",

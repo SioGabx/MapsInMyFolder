@@ -22,7 +22,7 @@ namespace MapsInMyFolder.Commun
                 string variablenameString;
                 if (variablename is null)
                 {
-                    PrintError("Le nom de la variable n'est pas défini !");
+                    PrintError("The variable name is not defined!");
                     return null;
                 }
                 else
@@ -51,7 +51,7 @@ namespace MapsInMyFolder.Commun
                 string variablenameString;
                 if (variablename is null)
                 {
-                    PrintError("Le nom de la variable n'est pas défini !", LayerId);
+                    PrintError("The variable name is not defined!", LayerId);
                     return null;
                 }
                 else
@@ -70,7 +70,6 @@ namespace MapsInMyFolder.Commun
                         }
                     }
                 }
-                PrintError("La variable " + variablenameString + " n'est pas défini", LayerId);
                 return null;
             }
 
@@ -108,11 +107,6 @@ namespace MapsInMyFolder.Commun
                 if (DictionnaryOfVariablesKeyLayerId.TryGetValue(LayerId, out Dictionary<string, object> VariableKeyAndValue))
                 {
                     VariableKeyAndValue.Remove(variablename);
-                    Print("< Info : La variable à été disposée");
-                }
-                else
-                {
-                    PrintError("La variable " + variablename + " n'existe pas");
                 }
             }
             #endregion
@@ -131,7 +125,7 @@ namespace MapsInMyFolder.Commun
                 }
                 else
                 {
-                    PrintError("Impossible de définir la selection, le calque n'est pas courrant");
+                    PrintError("Unable to define the selection, the layer is not active.");
                 }
             }
 
@@ -278,7 +272,7 @@ namespace MapsInMyFolder.Commun
             {
                 if (LayerId == -2 || LayerId != Layers.Current.class_id)
                 {
-                    PrintError("Impossible d'envoyer une notification depuis l'editeur ou si le calque n'est pas courant");
+                    PrintError("Unable to send a notification from the editor or if the layer is not active.");
                     return null;
                 }
                 Notification notification = null;
@@ -290,7 +284,6 @@ namespace MapsInMyFolder.Commun
                         string NotificationId = "LayerId_" + LayerId + "_" + notifId ?? "single";
                         Action callback = () =>
                         {
-                            Debug.WriteLine("CallBack");
                             ExecuteScript(Layers.GetLayerById(LayerId).class_tilecomputationscript, null, LayerId, javascriptCallback?.ToString());
                         };
 

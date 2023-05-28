@@ -77,7 +77,7 @@ namespace MapsInMyFolder
             RognageInfo rognageInfo = GetOriginalImageSize();
             if (rognageInfo != null)
             {
-                Label_ImgSize.Content = $"{rognageInfo.width} x {rognageInfo.height} pixels";
+                Label_ImgSize.Content = $"{rognageInfo.width} x {rognageInfo.height}";
                 if (TextBox_Redim_HUnit.SelectedIndex == 0 && TextBox_Redim_HUnit.SelectedIndex == 0)
                 {
                     TextBox_Redim_Width.SetText(rognageInfo.width.ToString());
@@ -91,7 +91,7 @@ namespace MapsInMyFolder
             lastRequestZoom = -1;
             UpdateMigniatureParralele();
             GetCenterViewCityName();
-            Label_SliderMinMax.Content = $"Niveau de zoom (min={Layers.Current.class_min_zoom}, max={Layers.Current.class_max_zoom})";
+            Label_SliderMinMax.Content = Languages.GetWithArguments("preparePropertyZoomLevelMinMax", Layers.Current.class_min_zoom, Layers.Current.class_max_zoom);
             ZoomSlider.Value = Math.Round(MainWindow._instance.MainPage.mapviewer.ZoomLevel);
             TextBox_quality_number.Text = "100";
             const int largeur = 128;
@@ -118,7 +118,7 @@ namespace MapsInMyFolder
                 CheckBoxAddScaleToImage.IsEnabled = false;
                 TextBox_Scale.Visibility = Visibility.Collapsed;
                 TextBox_NoScale.Visibility = Visibility.Visible;
-                Label_ScalePrefix.Content = "Sans echelle";
+                Label_ScalePrefix.Content = Languages.Current["preparePropertyScaleNotDefined"];
                 Label_ScalePrefix.Foreground = Collectif.HexValueToSolidColorBrush("#5A5A5A");
                 Label_Scale.Foreground = Collectif.HexValueToSolidColorBrush("#5A5A5A");
             }
@@ -332,7 +332,6 @@ namespace MapsInMyFolder
             }
             else if (bitmap != null)
             {
-                Debug.WriteLine("Null element");
                 bitmap = new BitmapImage();
                 bitmap.Freeze();
                 ImageTilePreview.Source = bitmap;
@@ -360,9 +359,7 @@ namespace MapsInMyFolder
                 }
 
                 string url = "https://nominatim.openstreetmap.org/reverse?lat=" + LocaMillieux.Latitude + "&lon=" + LocaMillieux.Longitude + "&zoom=18&format=xml&email=siogabx@siogabx.fr";
-                DebugMode.WriteLine("Recherche ville centre : lat=" + LocaMillieux.Latitude + " lon=" + LocaMillieux.Longitude + "\nurl=" + url);
-
-                using (HttpClient client = new HttpClient())
+                 using (HttpClient client = new HttpClient())
                 using (HttpResponseMessage response = await client.GetAsync(url))
                 using (Stream responseStream = await response.Content.ReadAsStreamAsync())
                 {
@@ -492,12 +489,8 @@ namespace MapsInMyFolder
 
             void Update_Label_Label_ImgSizeF()
             {
-                string final_size = "";
                 List<string> final_size_int = FinalSize();
-                final_size += final_size_int[0];
-                final_size += " x ";
-                final_size += final_size_int[1];
-                final_size += " pixels";
+                string final_size = $"{final_size_int[0]} x {final_size_int[1]} {Languages.Current["preparePropertyUnitsPixels"]}";
 
                 if (!double.TryParse(TextBox_Redim_Width.Text, out double ScaleConvertedAttachedTextBoxText))
                 {
@@ -515,14 +508,14 @@ namespace MapsInMyFolder
                 }
 
                 double ScaleShrink = ((double)SizeInPixel / rognage_info.width);
-
+                
                 if (ScaleShrink < 1)
                 {
-                    final_size += $" | {Math.Round(1 - ScaleShrink, 2)}x plus petite";
+                    final_size += $" | {Languages.GetWithArguments("preparePropertyResizedImageSizeIndicatorSmaller", Math.Round(1 - ScaleShrink, 2))}";
                 }
                 else if (ScaleShrink > 1)
                 {
-                    final_size += $" | {Math.Abs(Math.Round(ScaleShrink, 2))}x plus grande";
+                    final_size += $" | {Languages.GetWithArguments("preparePropertyResizedImageSizeIndicatorBigger", Math.Abs(Math.Round(ScaleShrink, 2)))}";
                 }
 
                 Label_ImgSizeF.Content = final_size;
@@ -600,7 +593,7 @@ namespace MapsInMyFolder
             }
 
             double distanceInMeterPerPixels = ScaleInfo.GetDistanceInMeterPerPixels(targetScale);
-            TextBox_Scale.ToolTip = $"Mêtres par pixels : {Math.Round(distanceInMeterPerPixels, 3).ToString()}";
+            TextBox_Scale.ToolTip = $"{Languages.Current["preparePropertyTooltipsScale"]} : {Math.Round(distanceInMeterPerPixels, 3)}";
 
             var redimSize = GetSizeAfterRedim();
             var optimalScale = ScaleInfo.SearchOptimalScale(distanceInMeterPerPixels, redimSize.Width);
@@ -610,17 +603,17 @@ namespace MapsInMyFolder
 
             if (checkBoxAddScaleToImageEnable)
             {
-                CheckBoxAddScaleToImage.Content = "Ajouter une echelle graphique à l'image";
+                CheckBoxAddScaleToImage.Content = Languages.Current["preparePropertyNameAddScaleBar"];
             }
             else
             {
                 if (Layers.Current.class_hasscale)
                 {
-                    CheckBoxAddScaleToImage.Content = "Ajouter une echelle graphique à l'image (image trop petite)";
+                    CheckBoxAddScaleToImage.Content = Languages.Current["preparePropertyNameAddScaleBar"] + " " + Languages.Current["preparePropertyNameAddScaleBarErrorsTooSmall"];
                 }
                 else
                 {
-                    CheckBoxAddScaleToImage.Content = "Ajouter une echelle graphique à l'image (les tuiles de ce calque ne sont pas à l'echelle)";
+                    CheckBoxAddScaleToImage.Content = Languages.Current["preparePropertyNameAddScaleBar"] + " " + Languages.Current["preparePropertyNameAddScaleBarErrorsLayerNotAtScale"];
                 }
             }
         }
@@ -1086,7 +1079,7 @@ namespace MapsInMyFolder
             SaveFileDialog saveFileDialog1 = new SaveFileDialog()
             {
                 Filter = filterConcat(filter, tiffFilter),
-                Title = "Selectionnez un emplacement de sauvegarde :",
+                Title = Languages.Current["saveFileDialogSelectSaveLocation"],
                 RestoreDirectory = true,
                 OverwritePrompt = true,
                 FileName = strName,
@@ -1134,7 +1127,7 @@ namespace MapsInMyFolder
             double initialScale = GetScale().Scale;
             if (!double.TryParse(TextBox_Scale.Text, out double targetScale))
             {
-                throw new FormatException("Impossible de convertir la valeur d'échelle en numéro (double)");
+                throw new FormatException("Unable to convert the scale value to a number (double).");
             }
 
             double distanceInMeterPerPixels = ScaleInfo.GetDistanceInMeterPerPixels(targetScale);

@@ -34,7 +34,7 @@ namespace MapsInMyFolder.Commun
                     return;
                 }
 
-                ContentDialogResult result = await Message.SetContentDialog($"La base de données n'as pas été trouvée à partir du chemin \"{database_pathname}\".\nVoullez-vous en crée une nouvelle depuis la ressource en ligne ?", "Confirmer", MessageDialogButton.YesNoRetry).ShowAsync();
+                ContentDialogResult result = await Message.SetContentDialog(Languages.GetWithArguments("databaseMessageNotFoundAskDownload", database_pathname), Languages.Current["dialogTitleOperationConfirm"], MessageDialogButton.YesNoRetry).ShowAsync();
 
                 if (result == ContentDialogResult.Primary)
                 {
@@ -63,7 +63,7 @@ namespace MapsInMyFolder.Commun
             {
                 return false;
             }
-            string NotificationMsg = $"Téléchargement en cours de la base de donnée depuis {new Uri(database_url).Host}...";
+            string NotificationMsg = Languages.GetWithArguments("databaseNotificationStartDownloading", new Uri(database_url).Host);
             NProgress DatabaseDownloadNotification = new NProgress(NotificationMsg, "MapsInMyFolder", "MainPage", null, 0, false) { };
             DatabaseDownloadNotification.Register();
 
@@ -121,7 +121,7 @@ namespace MapsInMyFolder.Commun
                         return;
                     }
 
-                    ContentDialogResult ErrorDetectedWantToAbord = await Message.SetContentDialog("Une erreur s'est produite lors du téléchargement.\nVoullez-vous reessayer ou annuler (et donc créer une database vide) ?", "Confirmer", MessageDialogButton.RetryCancel).ShowAsync();
+                    ContentDialogResult ErrorDetectedWantToAbord = await Message.SetContentDialog(Languages.Current["databaseMessageDownloadingErrorUnknown"], Languages.Current["dialogTitleOperationConfirm"], MessageDialogButton.RetryCancel).ShowAsync();
                     if (ErrorDetectedWantToAbord != ContentDialogResult.Primary)
                     {
                         break;
@@ -130,7 +130,7 @@ namespace MapsInMyFolder.Commun
                 else
                 {
                     //print network not available
-                    ContentDialogResult NoConnexionDetectedWantToAbord = await Message.SetContentDialog("Impossible de télécharger la dernière base de données en ligne car vous n'êtes pas connecté à internet. Voullez-vous reessayer ?", "Confirmer", MessageDialogButton.YesNo).ShowAsync();
+                    ContentDialogResult NoConnexionDetectedWantToAbord = await Message.SetContentDialog(Languages.Current["databaseMessageDownloadingErrorNoConnexion"], Languages.Current["dialogTitleOperationConfirm"], MessageDialogButton.YesNo).ShowAsync();
 
                     if (NoConnexionDetectedWantToAbord != ContentDialogResult.Primary)
                     {
@@ -503,7 +503,7 @@ namespace MapsInMyFolder.Commun
                         XMLParser.Cache.WriteAttribute("dbVersion", "dbSha", githubAssets?.Sha);
                     }
                 }
-                Notification ApplicationUpdateNotification = new NText("La mise à jour de la base de donnée à été effectuée avec succès", "MapsInMyFolder", "MainPage")
+                Notification ApplicationUpdateNotification = new NText(Languages.Current["databaseNotificationUpdateSuccess"], "MapsInMyFolder", "MainPage")
                 {
                     NotificationId = "DatabaseUpdateNotification",
                     DisappearAfterAMoment = true,

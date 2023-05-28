@@ -59,7 +59,7 @@ namespace MapsInMyFolder
         }
         private void Map_panel_open_location_panel_Click(object sender, RoutedEventArgs e)
         {
-            Message.NoReturnBoxAsync("Cette fonctionnalité fait l'objet d'une prochaine mise à jour, elle n'as pas encore été ajoutée à cette version !", "Erreur");
+            Message.NoReturnBoxAsync(Languages.Current["updateErrorFeatureNotAvailable"], Languages.Current["dialogTitleOperationFailed"]);
         }
 
         private void Download_panel_close_button_Click(object sender, RoutedEventArgs e)

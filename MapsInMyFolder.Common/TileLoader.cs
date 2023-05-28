@@ -99,13 +99,13 @@ namespace MapsInMyFolder.Commun
             }
             catch (Exception ex)
             {
-                Javascript.Functions.PrintError("Style error : " + ex.Message, layerID);
+                Javascript.Functions.PrintError("Layer style error : " + ex.Message, layerID);
                 return null;
             }
 
             if (string.IsNullOrWhiteSpace(styleValueOrUrlOrPath))
             {
-                Javascript.Functions.PrintError("Le style du calque n'est pas défini", layerID);
+                Javascript.Functions.PrintError("The layer style is not defined.", layerID);
                 return null;
             }
 

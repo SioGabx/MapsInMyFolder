@@ -15,12 +15,6 @@ namespace MapsInMyFolder.Commun
                 return HttpResponse.HttpResponseError;
             }
 
-            string[] SupportedClassFormat = new string[] { "jpeg", "jpg", "png" };
-            if (!SupportedClassFormat.Contains(Layer.class_format.ToLower()))
-            {
-                Debug.WriteLine("Le format peut ne pas être supporté actuellement : " + Layer.class_format);
-            }
-
             try
             {
                 string url = Collectif.GetUrl.FromTileXYZ(urlBase, TileX, TileY, zoom, layerID, Collectif.GetUrl.InvokeFunction.getTile);

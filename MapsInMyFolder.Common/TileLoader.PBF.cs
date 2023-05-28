@@ -97,11 +97,9 @@ namespace MapsInMyFolder.Commun
                 if (do_download_this_tile)
                 {
                     Uri uri = new Uri(Collectif.GetUrl.FromTileXYZ(urlBase, TileX, TileY, zoom, LayerID, Collectif.GetUrl.InvokeFunction.getTile));
-                    DebugMode.WriteLine("Tache n°" + tache + " : Telechargement u1");
                     response = await Collectif.ByteDownloadUri(uri, LayerID, true);
                     if (response?.Buffer is null)
                     {
-                        DebugMode.WriteLine("Tache n°" + tache + " : u1 is null");
                         return response;
                     }
 
@@ -113,7 +111,6 @@ namespace MapsInMyFolder.Commun
                         }
                         if (!File.Exists(save_filename) && cache_tile)
                         {
-                            DebugMode.WriteLine("Ecriture de  : " + save_temp_directory_rawBPF + filename);
                             lock (PBF_RenderingAsync_Locker)
                             {
                                 File.WriteAllBytes(save_filename, response.Buffer);
@@ -139,7 +136,7 @@ namespace MapsInMyFolder.Commun
                 VectorTileRenderer.Style style = PBFGetStyle(LayerID);
                 if (style is null)
                 {
-                    Javascript.Functions.PrintError("Tile style est null", LayerID);
+                    Javascript.Functions.PrintError("The layer style is not defined.", LayerID);
                     return HttpResponse.HttpResponseError;
                 }
 
@@ -217,7 +214,7 @@ namespace MapsInMyFolder.Commun
                         for (int j = 0; j < 3; j++)
                         {
                             if (i == 1 && j == 1) { continue; }
-                            DebugMode.WriteLine("Recherche de colisions");
+                            //Recherche de colisions
                             try
                             {
                                 if (!(providers[j][i] is null))
@@ -251,7 +248,7 @@ namespace MapsInMyFolder.Commun
                     StreamPBFFile.Dispose();
                 }
                 ReturnCanvasAndCollisions = null;
-                async Task<MapsInMyFolder.VectorTileRenderer.Renderer.ICanvasCollisions> CreateBitmap(ICanvas bitmapf, int PosX, int PosY, VectorTileRenderer.Sources.PbfTileSource pbfTileSource, MapsInMyFolder.VectorTileRenderer.Renderer.Collisions collisions, bool createCanvas = false, int NbrTileHeightWidth = 1)
+                async Task<Renderer.ICanvasCollisions> CreateBitmap(ICanvas bitmapf, int PosX, int PosY, VectorTileRenderer.Sources.PbfTileSource pbfTileSource, MapsInMyFolder.VectorTileRenderer.Renderer.Collisions collisions, bool createCanvas = false, int NbrTileHeightWidth = 1)
                 {
                     if (pbfTileSource != null)
                     {
@@ -268,8 +265,7 @@ namespace MapsInMyFolder.Commun
                             GenerateCanvas = createCanvas
                         };
                         style.SetSourceProvider(0, pbfTileSource);
-                        MapsInMyFolder.VectorTileRenderer.Renderer.ICanvasCollisions bitmapff = await Renderer.Render(style, bitmapf, 0, 0, zoom, 1, options: options, collisions: collisions);
-                        return bitmapff;
+                        return await Renderer.Render(style, bitmapf, 0, 0, zoom, 1, options: options, collisions: collisions);
                     }
                     else
                     {
@@ -286,12 +282,7 @@ namespace MapsInMyFolder.Commun
                 {
                     Int32Rect int32Rect = new Int32Rect(render_tile_size, render_tile_size, render_tile_size, render_tile_size);
                     CroppedBitmap cb = new CroppedBitmap(img, int32Rect);
-                    //double scale_transform = (double)256 / (double)render_tile_size;
-                    //TransformedBitmap cb_r = new TransformedBitmap(cb, new ScaleTransform(scale_transform, scale_transform));
-                    //DebugMode.WriteLine("FINALLLL SIZE TILE W=" + cb_r.Width + " H=" + cb_r.Height + " SCALETRANSFORM=" + scale_transform);
                     cb.Freeze();
-                    //cb_r.Freeze();
-                    //img_cropped = cb_r;
                     img_cropped = cb;
                 }
                 else
@@ -300,16 +291,12 @@ namespace MapsInMyFolder.Commun
                 }
                 img_cropped.Freeze();
                 img = null;
-                DebugMode.WriteLine("Tache n°" + tache + " : Cropping to byte");
-
                 return new HttpResponse(Collectif.GetBytesFromBitmapSource(img_cropped), response.ResponseMessage);
             }
             catch (Exception ex)
             {
                 Debug.WriteLine("Tache n°" + tache + " : Erreur f GetProviderFromXYZ" + ex.Message + "\n" + ex.ToString());
             }
-
-            DebugMode.WriteLine("Tache n°" + tache + " : end return null");
             return HttpResponse.HttpResponseError;
         }
 
@@ -326,7 +313,7 @@ namespace MapsInMyFolder.Commun
             }
             catch (Exception ex)
             {
-                Javascript.Functions.PrintError("Une erreur s'est produite lors du chargement du style : " + ex.Message, layerID);
+                Javascript.Functions.PrintError("An error occurred while loading the style. " + ex.Message, layerID);
             }
             return null;
         }
@@ -351,7 +338,6 @@ namespace MapsInMyFolder.Commun
                         tp_response = await Collectif.ByteDownloadUri(temp_uri, 0, true).ConfigureAwait(false);
                         if (tp_response?.Buffer is null)
                         {
-                            DebugMode.WriteLine("Erreur loading g");
                             return null;
                         }
 
@@ -388,14 +374,11 @@ namespace MapsInMyFolder.Commun
                                 bool success = false;
                                 try
                                 {
-                                    DebugMode.WriteLine("Trying to read file");
                                     StreamPBFFile = File.OpenRead(prov_save_filename);
                                     success = true;
-                                    DebugMode.WriteLine("End read file");
                                 }
                                 catch (Exception ex)
                                 {
-                                    Debug.WriteLine("TileGenerator : Failed to load " + prov_save_filename + " - " + tentatives + "/" + Settings.max_retry_download + "\n Reason : " + ex.Message);
                                     tentatives++;
                                     success = false;
                                     System.Threading.Thread.SpinWait(500);

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace MapsInMyFolder.Commun
@@ -91,11 +92,11 @@ namespace MapsInMyFolder.Commun
                 }
                 else if (!string.IsNullOrWhiteSpace(Style))
                 {
-                    return "{\"Style\":\"" + System.Text.Json.JsonSerializer.Serialize<string>(Style) + "\"}";
+                    return "{\"Style\":\"" + System.Text.Json.JsonSerializer.Serialize(Style) + "\"}";
                 }
                 else
                 {
-                    return System.Text.Json.JsonSerializer.Serialize<Layers.SpecialsOptions>(this);
+                    return System.Text.Json.JsonSerializer.Serialize(this);
                 }
 
 
@@ -104,7 +105,7 @@ namespace MapsInMyFolder.Commun
 
         public static Layers Empty(int LayerId = -1)
         {
-            return new Layers(LayerId, false, "", "Une erreur s'est produite dans la lecture des données. \n Données de secours fournie par OpenStreetMap.", "", "", "", "http://tile.openstreetmap.org/{z}/{x}/{y}.png", "FALLBACK_URL", "", "", null, null, "jpeg", 256, "function getTile(args){return args;}", "Visible", new SpecialsOptions(), "", 0, true);
+            return new Layers(LayerId, false, "", "An error occurred while reading the data. \n Backup data provided by OpenStreetMap.", "", "", "", "http://tile.openstreetmap.org/{z}/{x}/{y}.png", "FALLBACK_URL", "", "", null, null, "jpeg", 256, "function getTile(args){return args;}", "Visible", new SpecialsOptions(), "", 0, true);
         }
 
         public static class Convert
@@ -120,53 +121,45 @@ namespace MapsInMyFolder.Commun
             }
         }
 
-        public static List<Dictionary<int, Layers>> Layers_Dictionary_List = new List<Dictionary<int, Layers>>();
+        private static Dictionary<int, Layers> LayersDictionary { get; set; } = new Dictionary<int, Layers>();
 
         public static Layers GetLayerById(int id)
         {
-            foreach (Dictionary<int, Layers> layer_dic in Layers_Dictionary_List)
+            if (LayersDictionary.TryGetValue(id, out Layers layer))
             {
-                try
-                {
-                    if (layer_dic.Keys.First() == id)
-                    {
-                        return layer_dic[id];
-                    }
-                }
-                catch (KeyNotFoundException)
-                {
-                    Console.WriteLine("Erreur : l'id de la tache n'existe pas.");
-                }
+                return layer;
             }
             return null;
         }
 
         public static bool RemoveLayerById(int id)
         {
-            foreach (Dictionary<int, Layers> layer_dic in Layers_Dictionary_List)
+            if (LayersDictionary.ContainsKey(id))
             {
-                try
-                {
-                    if (layer_dic.Keys.First() == id)
-                    {
-                        Layers_Dictionary_List.Remove(layer_dic);
-                        return true;
-                    }
-                }
-                catch (KeyNotFoundException)
-                {
-                    Console.WriteLine("Erreur : l'id de la tache n'existe pas.");
-                }
+                LayersDictionary.Remove(id);
+                return true;
             }
             return false;
         }
 
         public static IEnumerable<Layers> GetLayersList()
         {
-            foreach (Dictionary<int, Layers> individualdictionnary in Layers_Dictionary_List)
-            {
-                yield return individualdictionnary.Values.First();
-            }
+            return LayersDictionary.Values;
+        }
+
+        public static void Add(int key, Layers layer)
+        {
+            RemoveLayerById(key);
+            LayersDictionary.Add(key, layer);
+        }
+        public static void Clear()
+        {
+            LayersDictionary.Clear();
+        }
+
+        public static int Count()
+        {
+            return GetLayersList().Count();
         }
     }
 }

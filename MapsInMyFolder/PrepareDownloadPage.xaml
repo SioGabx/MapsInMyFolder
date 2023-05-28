@@ -67,7 +67,7 @@
                             Margin="0,0,0,0"
                             HorizontalAlignment="Left"
                             VerticalAlignment="Top"
-                            Content="Résolution : "
+                            Content="{Binding Source={x:Static commun:Languages.Current}, Path=[prepareSubTitleResolution]}"
                             FontFamily="Segoe UI Light"
                             FontSize="19"
                             Foreground="#FFE2E2E1" />
@@ -93,7 +93,8 @@
 
                         <Grid Background="Transparent">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="195" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="5" />
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
                             <Grid.RowDefinitions>
@@ -112,13 +113,13 @@
                                 Padding="0"
                                 HorizontalAlignment="Left"
                                 VerticalAlignment="Top"
-                                Content="Niveau de zoom (min=5, max=19)"
+                                Content="{Binding Source={x:Static commun:Languages.Current}, Path=[preparePropertyZoomLevelMinMax]}"
                                 FontFamily="Segoe UI"
                                 FontSize="11.8"
                                 Foreground="#888989" />
                             <Label
                                 Grid.Row="0"
-                                Grid.Column="1"
+                                Grid.Column="2"
                                 Width="Auto"
                                 Height="50"
                                 Margin="0,0,0,0"
@@ -126,7 +127,6 @@
                                 HorizontalAlignment="Left"
                                 VerticalAlignment="Top"
                                 Content="{Binding ElementName=ZoomSlider, Path=Value}"
-                                ContentStringFormat=": {0}"
                                 FontFamily="Segoe UI"
                                 FontSize="11.8"
                                 Foreground="#888989" />
@@ -140,14 +140,14 @@
                                 Padding="0"
                                 HorizontalAlignment="Left"
                                 VerticalAlignment="Top"
-                                Content="Nombre de tuiles à télécharger (lxh)"
+                                Content="{Binding Source={x:Static commun:Languages.Current}, Path=[preparePropertyNumberOfTiles]}"
                                 FontFamily="Segoe UI"
                                 FontSize="11.8"
                                 Foreground="#888989" />
                             <Label
                                 x:Name="Label_NbrTiles"
                                 Grid.Row="1"
-                                Grid.Column="1"
+                                Grid.Column="2"
                                 Width="Auto"
                                 Height="50"
                                 Margin="0,0,0,0"
@@ -155,7 +155,6 @@
                                 HorizontalAlignment="Left"
                                 VerticalAlignment="Top"
                                 Content="0 x 0 = 0"
-                                ContentStringFormat=": {0}"
                                 FontFamily="Segoe UI"
                                 FontSize="11.8"
                                 Foreground="#888989" />
@@ -169,25 +168,31 @@
                                 Padding="0"
                                 HorizontalAlignment="Left"
                                 VerticalAlignment="Top"
-                                Content="Taille de l'image (lxh)"
+                                Content="{Binding Source={x:Static commun:Languages.Current}, Path=[preparePropertyImageSize]}"
                                 FontFamily="Segoe UI"
                                 FontSize="11.8"
                                 Foreground="#888989" />
                             <Label
                                 x:Name="Label_ImgSize"
                                 Grid.Row="2"
-                                Grid.Column="1"
+                                Grid.Column="2"
                                 Width="Auto"
                                 Height="50"
                                 Margin="0,0,0,0"
                                 Padding="0"
                                 HorizontalAlignment="Left"
                                 VerticalAlignment="Top"
-                                Content="0 x 0 pixels"
-                                ContentStringFormat=": {0}"
+                                Content="0 x 0"
                                 FontFamily="Segoe UI"
                                 FontSize="11.8"
-                                Foreground="#888989" />
+                                Foreground="#888989">
+                                <Label.ContentStringFormat>
+                                    <MultiBinding StringFormat="{}{0} {1}">
+                                        <Binding ElementName="Label_ImgSize" Path="Content" />
+                                        <Binding Path="[preparePropertyUnitsPixels]" Source="{x:Static commun:Languages.Current}" />
+                                    </MultiBinding>
+                                </Label.ContentStringFormat>
+                            </Label>
 
                             <Label
                                 Grid.Row="3"
@@ -198,22 +203,22 @@
                                 Padding="0"
                                 HorizontalAlignment="Left"
                                 VerticalAlignment="Top"
-                                Content="Taille d'image maximale"
+                                Content="{Binding Source={x:Static commun:Languages.Current}, Path=[preparePropertyImageSizeMax]}"
                                 FontFamily="Segoe UI"
                                 FontSize="11.8"
                                 Foreground="#888989" />
                             <Label
                                 x:Name="Label_ImgSizeMax"
                                 Grid.Row="3"
-                                Grid.Column="1"
+                                Grid.Column="2"
                                 Width="Auto"
                                 Height="50"
                                 Margin="0,0,0,0"
                                 Padding="0"
                                 HorizontalAlignment="Left"
                                 VerticalAlignment="Top"
-                                Content="pixels"
-                                ContentStringFormat=": 65000 x 65000 {0}"
+                                Content="{Binding Source={x:Static commun:Languages.Current}, Path=[preparePropertyUnitsPixels]}"
+                                ContentStringFormat="65000 x 65000 {0}"
                                 FontFamily="Segoe UI"
                                 FontSize="11.8"
                                 Foreground="#888989" />
@@ -227,7 +232,7 @@
                             Margin="0,30,0,0"
                             HorizontalAlignment="Left"
                             VerticalAlignment="Top"
-                            Content="Echelle  : "
+                            Content="{Binding Source={x:Static commun:Languages.Current}, Path=[prepareSubTitleScale]}"
                             FontFamily="Segoe UI Light"
                             FontSize="19"
                             Foreground="#FFE2E2E1" />
@@ -249,7 +254,7 @@
                                     Padding="0"
                                     HorizontalAlignment="Left"
                                     VerticalAlignment="Top"
-                                    Content="Echelle :"
+                                    Content="{Binding Source={x:Static commun:Languages.Current}, Path=[preparePropertyNameScale]}"
                                     FontFamily="Segoe UI"
                                     FontSize="11.8"
                                     Foreground="#888989" />
@@ -297,25 +302,23 @@
                             <CheckBox
                                 x:Name="CheckBoxAddScaleToImage"
                                 Margin="0,5,0,0"
-                                Foreground="#888989">
-                                Ajouter une echelle graphique à l'image
-                            </CheckBox>
+                                Content="{Binding Source={x:Static commun:Languages.Current}, Path=[preparePropertyNameAddScaleBar]}"
+                                Foreground="#888989" />
                         </StackPanel>
-
-
                         <Label
                             Width="Auto"
                             Height="25"
                             Margin="0,30,0,0"
                             HorizontalAlignment="Left"
                             VerticalAlignment="Top"
-                            Content="Redimensionnement  : "
+                            Content="{Binding Source={x:Static commun:Languages.Current}, Path=[prepareSubTitleResize]}"
                             FontFamily="Segoe UI Light"
                             FontSize="19"
                             Foreground="#FFE2E2E1" />
                         <Grid Margin="0,5,0,0" Background="Transparent">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="230" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="5" />
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
                             <Grid.RowDefinitions>
@@ -330,22 +333,20 @@
                                 Padding="0"
                                 HorizontalAlignment="Left"
                                 VerticalAlignment="Top"
-                                Content="Taille de l'image après redimensionnement"
+                                Content="{Binding Source={x:Static commun:Languages.Current}, Path=[preparePropertyResizedImageSize]}"
                                 FontFamily="Segoe UI"
                                 FontSize="11.8"
                                 Foreground="#888989" />
                             <Label
                                 x:Name="Label_ImgSizeF"
                                 Grid.Row="3"
-                                Grid.Column="1"
+                                Grid.Column="2"
                                 Width="Auto"
                                 Height="50"
                                 Margin="0,0,0,0"
                                 Padding="0"
                                 HorizontalAlignment="Left"
                                 VerticalAlignment="Top"
-                                Content="0 x 0 pixels"
-                                ContentStringFormat=": {0}"
                                 FontFamily="Segoe UI"
                                 FontSize="11.8"
                                 Foreground="#888989" />
@@ -362,7 +363,7 @@
                                 Padding="0"
                                 HorizontalAlignment="Left"
                                 VerticalAlignment="Top"
-                                Content="Largeur :"
+                                Content="{Binding Source={x:Static commun:Languages.Current}, Path=[prepareSubTitleResizeWidth]}"
                                 FontFamily="Segoe UI"
                                 FontSize="11.8"
                                 Foreground="#888989" />
@@ -403,8 +404,8 @@
                                         Opacity="1"
                                         SelectedIndex="0"
                                         SelectionChanged="TextBox_Redim_WUnit_SelectionChanged">
-                                        <ComboBoxItem>pixels</ComboBoxItem>
-                                        <ComboBoxItem>pourcentages</ComboBoxItem>
+                                        <ComboBoxItem Content="{Binding Source={x:Static commun:Languages.Current}, Path=[preparePropertyUnitsPixels]}" />
+                                        <ComboBoxItem Content="{Binding Source={x:Static commun:Languages.Current}, Path=[preparePropertyUnitsPourcents]}" />
                                     </ComboBox>
                                 </Grid>
                             </StackPanel>
@@ -422,7 +423,7 @@
                                 Padding="0"
                                 HorizontalAlignment="Left"
                                 VerticalAlignment="Top"
-                                Content="Hauteur :"
+                                Content="{Binding Source={x:Static commun:Languages.Current}, Path=[prepareSubTitleResizeHeight]}"
                                 FontFamily="Segoe UI"
                                 FontSize="11.8"
                                 Foreground="#888989" />
@@ -463,8 +464,8 @@
                                         Opacity="1"
                                         SelectedIndex="0"
                                         SelectionChanged="TextBox_Redim_HUnit_SelectionChanged">
-                                        <ComboBoxItem>pixels</ComboBoxItem>
-                                        <ComboBoxItem>pourcentages</ComboBoxItem>
+                                        <ComboBoxItem Content="{Binding Source={x:Static commun:Languages.Current}, Path=[preparePropertyUnitsPixels]}" />
+                                        <ComboBoxItem Content="{Binding Source={x:Static commun:Languages.Current}, Path=[preparePropertyUnitsPourcents]}" />
                                     </ComboBox>
                                 </Grid>
                             </StackPanel>
@@ -478,7 +479,7 @@
                             Margin="0,30,0,0"
                             HorizontalAlignment="Left"
                             VerticalAlignment="Top"
-                            Content="Qualité  : "
+                            Content="{Binding Source={x:Static commun:Languages.Current}, Path=[prepareSubTitleQuality]}"
                             FontFamily="Segoe UI Light"
                             FontSize="19"
                             Foreground="#FFE2E2E1" />
@@ -505,7 +506,7 @@
                                 Padding="0"
                                 HorizontalAlignment="Left"
                                 VerticalAlignment="Top"
-                                Content="Qualité :"
+                                Content="{Binding Source={x:Static commun:Languages.Current}, Path=[preparePropertyNameQuality]}"
                                 FontFamily="Segoe UI"
                                 FontSize="11.8"
                                 Foreground="#888989" />
@@ -546,11 +547,11 @@
                                         Opacity="1"
                                         SelectedIndex="0"
                                         SelectionChanged="TextBox_quality_name_SelectionChanged">
-                                        <ComboBoxItem>Faible</ComboBoxItem>
-                                        <ComboBoxItem>Moyenne</ComboBoxItem>
-                                        <ComboBoxItem>Elevée</ComboBoxItem>
-                                        <ComboBoxItem>Supérieur</ComboBoxItem>
-                                        <ComboBoxItem>Maximum</ComboBoxItem>
+                                        <ComboBoxItem Content="{Binding Source={x:Static commun:Languages.Current}, Path=[preparePropertyValuesQualityLow]}" />
+                                        <ComboBoxItem Content="{Binding Source={x:Static commun:Languages.Current}, Path=[preparePropertyValuesQualityMedium]}" />
+                                        <ComboBoxItem Content="{Binding Source={x:Static commun:Languages.Current}, Path=[preparePropertyValuesQualityHigh]}" />
+                                        <ComboBoxItem Content="{Binding Source={x:Static commun:Languages.Current}, Path=[preparePropertyValuesQualitySuperior]}" />
+                                        <ComboBoxItem Content="{Binding Source={x:Static commun:Languages.Current}, Path=[preparePropertyValuesQualityMaximum]}" />
                                     </ComboBox>
                                 </Grid>
                             </StackPanel>
@@ -562,7 +563,7 @@
                             Margin="0,30,0,0"
                             HorizontalAlignment="Left"
                             VerticalAlignment="Top"
-                            Content="Couleurs  : "
+                            Content="{Binding Source={x:Static commun:Languages.Current}, Path=[prepareSubTitleColors]}"
                             FontFamily="Segoe UI Light"
                             FontSize="19"
                             Foreground="#FFE2E2E1" />
@@ -573,7 +574,7 @@
                             VerticalAlignment="Center"
                             Background="Transparent">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="200" />
+                                <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition Width="10" />
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
@@ -585,7 +586,7 @@
                                 Padding="0"
                                 HorizontalAlignment="Left"
                                 VerticalAlignment="Top"
-                                Content="Convertir les couleurs de l&#39;image vers :"
+                                Content="{Binding Source={x:Static commun:Languages.Current}, Path=[preparePropertyNameColors]}"
                                 FontFamily="Segoe UI"
                                 FontSize="11.8"
                                 Foreground="#888989" />
@@ -603,10 +604,10 @@
                                 Opacity="1"
                                 SelectedIndex="0"
                                 SelectionChanged="Combobox_color_conversion_SelectionChanged">
-                                <ComboBoxItem Tag="Srgb">Original</ComboBoxItem>
+                                <ComboBoxItem Content="{Binding Source={x:Static commun:Languages.Current}, Path=[preparePropertyValuesColorsOriginal]}" Tag="Srgb" />
                                 <!--<ComboBoxItem Tag="Rgb">RGB</ComboBoxItem>-->
                                 <!--<ComboBoxItem Tag="Rgb">RGB 16 bit</ComboBoxItem>-->
-                                <ComboBoxItem Tag="Bw">Noir &amp; Blanc</ComboBoxItem>
+                                <ComboBoxItem Content="{Binding Source={x:Static commun:Languages.Current}, Path=[preparePropertyValuesColorsBlackAndWhite]}" Tag="Bw" />
                                 <!--<ComboBoxItem Tag="Grey16">Noir &amp; Blanc (16bit)</ComboBoxItem>-->
                             </ComboBox>
                         </Grid>
@@ -619,14 +620,14 @@
 
             <Grid.RowDefinitions>
                 <RowDefinition Height="57" />
-                <RowDefinition />
-                <RowDefinition Height="25" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="0" />
                 <RowDefinition Height="60" />
                 <RowDefinition Height="15" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="265" />
+                <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="15" />
             </Grid.ColumnDefinitions>
 
@@ -634,7 +635,7 @@
                 Grid.Row="0"
                 Grid.Column="0"
                 Grid.ColumnSpan="3"
-                Width="192"
+                Width="Auto"
                 Height="50"
                 Margin="28,10,0,0"
                 HorizontalAlignment="Left"
@@ -657,7 +658,7 @@
                 Cursor="Hand"
                 Foreground="#FFE2E2E1"
                 Style="{DynamicResource IconButton}"
-                ToolTip="{Binding Source={x:Static commun:Languages.Current}, Path=[editorCloseWindow]}">
+                ToolTip="{Binding Source={x:Static commun:Languages.Current}, Path=[tooltipsCloseWindow]}">
                 <Path
                     Width="20"
                     Height="20"
@@ -773,11 +774,10 @@
                         HorizontalAlignment="Right"
                         VerticalAlignment="Bottom"
                         Background="#99000000"
+                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[preparePreviewLoadingIndicator]}"
                         FontFamily="Segoe UI"
                         Foreground="#888989"
-                        Visibility="Visible">
-                        Chargement...
-                    </Label>
+                        Visibility="Visible" />
                     <StackPanel
                         Grid.Row="1"
                         Grid.ColumnSpan="2"
@@ -786,7 +786,8 @@
                         Background="Transparent">
                         <Grid Background="Transparent">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="95" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="5" />
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
                             <Grid.RowDefinitions>
@@ -804,25 +805,30 @@
                                 Padding="0"
                                 HorizontalAlignment="Left"
                                 VerticalAlignment="Top"
-                                Content="Largeur des tuiles"
+                                Content="{Binding Source={x:Static commun:Languages.Current}, Path=[preparePropertyNameLayerTileSize]}"
                                 FontFamily="Segoe UI"
                                 FontSize="11.8"
                                 Foreground="#888989" />
                             <Label
                                 x:Name="Label_LargeurTuile"
                                 Grid.Row="0"
-                                Grid.Column="1"
+                                Grid.Column="2"
                                 Width="Auto"
                                 Height="50"
                                 Margin="0,0,0,0"
                                 Padding="0"
                                 HorizontalAlignment="Left"
                                 VerticalAlignment="Top"
-                                Content="256"
-                                ContentStringFormat=" : {0} pixels"
                                 FontFamily="Segoe UI"
                                 FontSize="11.8"
-                                Foreground="#888989" />
+                                Foreground="#888989">
+                                <Label.ContentStringFormat>
+                                    <MultiBinding StringFormat="{}{0} {1}">
+                                        <Binding ElementName="Label_LargeurTuile" Path="Content" />
+                                        <Binding Path="[preparePropertyUnitsPixels]" Source="{x:Static commun:Languages.Current}" />
+                                    </MultiBinding>
+                                </Label.ContentStringFormat>
+                            </Label>
 
                             <Label
                                 Grid.Row="1"
@@ -833,22 +839,20 @@
                                 Padding="0"
                                 HorizontalAlignment="Left"
                                 VerticalAlignment="Top"
-                                Content="Nom du calque"
+                                Content="{Binding Source={x:Static commun:Languages.Current}, Path=[preparePropertyNameLayerName]}"
                                 FontFamily="Segoe UI"
                                 FontSize="11.8"
                                 Foreground="#888989" />
                             <Label
                                 x:Name="Label_NomCalque"
                                 Grid.Row="1"
-                                Grid.Column="1"
+                                Grid.Column="2"
                                 Width="Auto"
                                 Height="50"
                                 Margin="0,0,0,0"
                                 Padding="0"
                                 HorizontalAlignment="Left"
                                 VerticalAlignment="Top"
-                                Content="Plan IGN"
-                                ContentStringFormat=" : {0}"
                                 FontFamily="Segoe UI"
                                 FontSize="11.8"
                                 Foreground="#888989" />
@@ -862,22 +866,20 @@
                                 Padding="0"
                                 HorizontalAlignment="Left"
                                 VerticalAlignment="Top"
-                                Content="Source"
+                                Content="{Binding Source={x:Static commun:Languages.Current}, Path=[preparePropertyNameLayerSource]}"
                                 FontFamily="Segoe UI"
                                 FontSize="11.8"
                                 Foreground="#888989" />
                             <Label
                                 x:Name="Label_Source"
                                 Grid.Row="2"
-                                Grid.Column="1"
+                                Grid.Column="2"
                                 Width="Auto"
                                 Height="50"
                                 Margin="0,0,0,0"
                                 Padding="0"
                                 HorizontalAlignment="Left"
                                 VerticalAlignment="Top"
-                                Content="geoportail"
-                                ContentStringFormat=" : {0}"
                                 FontFamily="Segoe UI"
                                 FontSize="11.8"
                                 Foreground="#888989" />
@@ -921,6 +923,7 @@
                 Grid.Row="3"
                 Grid.Column="1"
                 Height="45"
+                MinWidth="230"
                 Margin="0,0,15,15"
                 VerticalAlignment="Top"
                 Click="StartDownloadButton_Click"

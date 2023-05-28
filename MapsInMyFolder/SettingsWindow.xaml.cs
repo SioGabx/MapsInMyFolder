@@ -20,7 +20,7 @@ namespace MapsInMyFolder
         public SettingsWindow()
         {
             InitializeComponent();
-            TitleTextBox.Text = this.Title = "MapsInMyFolder - Settings";
+            TitleTextBox.Text = this.Title = "MapsInMyFolder - " + Languages.Current["settingsTitle"];
 
             SetCaretBrush(tileloader_default_script);
             SetCaretBrush(tileloader_template_script);

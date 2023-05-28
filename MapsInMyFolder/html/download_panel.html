@@ -248,7 +248,7 @@
 
         .download_main_div[data-state=cleanup] .button.dossier,
         .download_main_div[data-state=cleanup] .button.poubelle,
-        .download_main_div[data-state=success] .button.dossier, 
+        .download_main_div[data-state=success] .button.dossier,
         .download_main_div[data-state=success] .button.poubelle {
             display: block;
         }
@@ -286,7 +286,7 @@
         }
 
         p.timeline:not(:has(+li)) {
-            display:none;
+            display: none;
         }
 
         body:not(:has(li)) .nodownloadmessage {
@@ -504,7 +504,6 @@
                 font-family: "Segoe UI";
                 color: #888989;
             }
-
     </style>
 </head>
 
@@ -522,7 +521,6 @@
 
 
     <!--  ------------------ CONTEXT MENU ------------------ -->
-
     <div class="context_menu" data-navtype="mouse">
 
         <div class="menu item" id="ouvrir_le_fichier">
@@ -535,7 +533,7 @@
                     </svg>
 
                 </div>
-                <a href="#">Ouvrir le fichier</a>
+                <a href="#">%downloadContextMenuOpenFile%</a>
             </div>
         </div>
 
@@ -547,13 +545,13 @@
                         <path d="M2.24,102.78,16.4,59.54a10.73,10.73,0,0,1,3.77-4.2,12.43,12.43,0,0,1,6.14-1.91c5-.29,43.08-.52,95.4-.44" />
                     </svg>
                 </div>
-                <a href="#">Afficher dans le dossier</a>
+                <a href="#">%downloadContextMenuOpenFolder%</a>
             </div>
         </div>
         <div class="menu item" id="afficher_temp_folder">
             <div class="item-content">
                 <div class="icon">
-                    <svg width="141.73" height="141.73" data-name="Calque 2" version="1.1" viewBox="0 0 141.73 141.73" xmlns="http://www.w3.org/2000/svg">
+                    <svg width="141.73" height="141.73" version="1.1" viewBox="0 0 141.73 141.73" xmlns="http://www.w3.org/2000/svg">
                         <defs>
                             <style>
                                 .path_afficher_temp_folder {
@@ -570,7 +568,7 @@
                         <path class="path_afficher_temp_folder" d="m100.91 100.24 13-6.13" />
                     </svg>
                 </div>
-                <a href="#">Afficher le dossier temporaire</a>
+                <a href="#">%downloadContextMenuOpenTempFolder%</a>
             </div>
         </div>
 
@@ -579,7 +577,7 @@
         <div class="menu item" id="copier_chemin_dacces">
             <div class="item-content">
                 <div class="icon">
-                    <svg width="141.73" height="141.73" data-name="Calque 2" version="1.1" viewBox="0 0 141.73 141.73" xmlns="http://www.w3.org/2000/svg">
+                    <svg width="141.73" height="141.73" version="1.1" viewBox="0 0 141.73 141.73" xmlns="http://www.w3.org/2000/svg">
                         <defs>
                             <style>
                                 .path_copier_chemin_dacces {
@@ -593,13 +591,13 @@
                         <path d="M102.31,25.59a1,1,0,0,1,1,1V136.72a1,1,0,0,1-1,1H15.83a1,1,0,0,1-1-1V26.61a1,1,0,0,1,1-1h86.48m0-4H15.83a5,5,0,0,0-5,5V136.72a5,5,0,0,0,5,5h86.48a5,5,0,0,0,5-5V26.61a5,5,0,0,0-5-5Z" />
                     </svg>
                 </div>
-                <a href="#">Copier le chemin d'accès</a>
+                <a href="#">%downloadContextMenuCopyFilePath%</a>
             </div>
         </div>
         <div class="menu item" id="copier_coordonnees">
             <div class="item-content">
                 <div class="icon">
-                    <svg width="141.73" height="141.73" data-name="Calque 2" version="1.1" viewBox="0 0 141.73 141.73" xmlns="http://www.w3.org/2000/svg">
+                    <svg width="141.73" height="141.73" version="1.1" viewBox="0 0 141.73 141.73" xmlns="http://www.w3.org/2000/svg">
                         <defs>
                             <style>
                                 .path_copier_coordonnees {
@@ -613,7 +611,7 @@
                         <path d="M102.31,25.59a1,1,0,0,1,1,1V136.72a1,1,0,0,1-1,1H15.83a1,1,0,0,1-1-1V26.61a1,1,0,0,1,1-1h86.48m0-4H15.83a5,5,0,0,0-5,5V136.72a5,5,0,0,0,5,5h86.48a5,5,0,0,0,5-5V26.61a5,5,0,0,0-5-5Z" />
                     </svg>
                 </div>
-                <a href="#">Copier les coordonnées</a>
+                <a href="#">%downloadContextMenuCopyBoundingBox%</a>
             </div>
         </div>
 
@@ -622,7 +620,7 @@
         <div class="menu item" id="reselect_area">
             <div class="item-content">
                 <div class="icon">
-                    <svg width="141.73" height="141.73" data-name="Calque 2" version="1.1" viewBox="0 0 141.73 141.73" xmlns="http://www.w3.org/2000/svg">
+                    <svg width="141.73" height="141.73" version="1.1" viewBox="0 0 141.73 141.73" xmlns="http://www.w3.org/2000/svg">
                         <defs>
                             <style>
                                 .path_reselect_area {
@@ -635,7 +633,7 @@
                         <path d="M54.65,53.61l73.9,29.94,2.45,1L100.1,96.13a5,5,0,0,0-2.93,2.93l-6.24,16.62-5,13.3-.36,1L54.65,53.61M49.2,47.16a1,1,0,0,0-.92,1.38l36.48,90.05a1,1,0,0,0,1.86,0l3.07-8.17q5.61-15,11.23-29.93a1,1,0,0,1,.58-.58l38.1-14.3a1,1,0,0,0,0-1.86l-90-36.48a1.08,1.08,0,0,0-.38-.08Z" />
                     </svg>
                 </div>
-                <a href="#">Re-selectionner la zone téléchargé</a>
+                <a href="#">%downloadContextMenuReselectBoundingBox%</a>
             </div>
         </div>
 
@@ -647,7 +645,7 @@
                         <path d="M11.73,67.28l59.35,56.08L130,67.28" />
                     </svg>
                 </div>
-                <a href="#">Rendre le calque télécharger courant</a>
+                <a href="#">%downloadContextMenuMakeLayerActive%</a>
             </div>
         </div>
 
@@ -656,15 +654,14 @@
                 <div class="icon">
                     <svg version="1.2" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 141.7 141.7" overflow="visible" xml:space="preserve">
                     
-                    <g id="Calque_2">
+                    <g>
                     <path d="
 		M135.5,61.9c5.2,36.9-20.5,71-57.4,76.2c-0.4,0-0.7,0.1-1.1,0.1C39.9,140.5,7.9,112.2,5.7,75c-0.1-1.8-0.1-3.5-0.1-5.3
 		C6.9,33.8,35.5,5,71.3,3.4c21.2,0.6,41,10.8,53.8,27.8l2.9,4.4H95.9" />
                         </g>
                     </svg>
-
                 </div>
-                <a href="#">Retélécharger la carte</a>
+                <a href="#">%downloadContextMenuReDownloadMap%</a>
             </div>
         </div>
 
@@ -673,9 +670,7 @@
         <div class="menu item" id="supprimer_fichier">
             <div class="item-content">
                 <div class="icon">
-
-
-                    <svg width="141.73" height="141.73" data-name="Calque 2" version="1.1" viewBox="0 0 141.73 141.73" xmlns="http://www.w3.org/2000/svg">
+                    <svg width="141.73" height="141.73" version="1.1" viewBox="0 0 141.73 141.73" xmlns="http://www.w3.org/2000/svg">
                         <defs>
                             <style>
                                 .path_supprimer_fichier {
@@ -688,14 +683,14 @@
                         <path class="path_supprimer_fichier" d="m83.41 49.35v63.92" />
                     </svg>
                 </div>
-                <a href="#">Supprimer le fichier</a>
+                <a href="#">%downloadContextMenuDeleteFile%</a>
             </div>
         </div>
 
         <div class="menu item" id="supprimer_liste">
             <div class="item-content">
                 <div class="icon">
-                    <svg width="141.73" height="141.73" data-name="Calque 2" version="1.1" viewBox="0 0 141.73 141.73" xmlns="http://www.w3.org/2000/svg">
+                    <svg width="141.73" height="141.73" version="1.1" viewBox="0 0 141.73 141.73" xmlns="http://www.w3.org/2000/svg">
                         <defs>
                             <style>
                                 .path_supprimer_liste-1,
@@ -708,7 +703,6 @@
                                 }
                             </style>
                         </defs>
-                        <title>iconPlan de travail 2 copie128</title>
                         <path class="path_supprimer_liste-1" d="m5.83 25.48h130" />
                         <path class="path_supprimer_liste-1" d="M7.2,86.17H71" />
                         <path class="path_supprimer_liste-1" d="m7.2 55.82h130" />
@@ -717,7 +711,7 @@
                         <path class="path_supprimer_liste-2" d="m129.07 116.51-39.16-39.16" />
                     </svg>
                 </div>
-                <a href="#">Supprimer de la liste</a>
+                <a href="#">%downloadContextMenuDeleteDownload%</a>
             </div>
         </div>
     </div>
@@ -726,7 +720,7 @@
 
     <script>
         function download_js_start(el, id) {
-            el.parentElement.parentElement.querySelector(".infostxt").innerText = "Reprise...";
+            el.parentElement.parentElement.querySelector(".infostxt").innerText = "%downloadStateRestarting%";
             el.parentElement.parentElement.setAttribute("data-state", "progress");
             download_Csharp_call_from_js.download_restart(parseInt(id));
         }
@@ -797,16 +791,16 @@
 
         function download_js_cancel(id) {
             download_Csharp_call_from_js.download_cancel(parseInt(id));
-            document.getElementById(id).getElementsByClassName("infostxt")[0].textContent = "Annulé...";
+            document.getElementById(id).getElementsByClassName("infostxt")[0].textContent = "%downloadStateCanceled%.";
         }
 
         function download_js_restart(id) {
             download_Csharp_call_from_js.download_restart(parseInt(id));
-            document.getElementById(id).getElementsByClassName("infostxt")[0].textContent = "Reprise...";
+            document.getElementById(id).getElementsByClassName("infostxt")[0].textContent = "%downloadStateRestarting%";
         }
         function download_js_restart_from0(id) {
             download_Csharp_call_from_js.download_restart_from0(parseInt(id));
-            document.getElementById(id).getElementsByClassName("infostxt")[0].textContent = "Reprise...";
+            document.getElementById(id).getElementsByClassName("infostxt")[0].textContent = "%downloadStateRestarting%";
         }
 
         function updateprogress(id, progress) {
@@ -839,7 +833,7 @@
             update_timeline();
             if (timestamp == "recent") {
                 if (document.getElementById("recent") == null) {
-                    document.getElementsByTagName("ul")[0].prepend(new DOMParser().parseFromString("<p class=\"not_parse timeline\" id=\"recent\">Reçent</p>", 'text/html').body.children[0]);
+                    document.getElementsByTagName("ul")[0].prepend(new DOMParser().parseFromString("<p class=\"not_parse timeline\" id=\"recent\">%downloadTimelineSubTitleRecent%</p>", 'text/html').body.children[0]);
                 }
             } else {
                 var argument_date = update_date(date_to_string(timestamp, "000"));
@@ -858,91 +852,82 @@
             }
 
             var download_li = new DOMParser().parseFromString(`<li id="` + id + `">
-                                    <div class="download_main_div" data-state="` + state + `">
-                                        <p class="download_titre" title="` + titre + `">` + titre + `</p>
-                                        <div class="progress"><div class="progress_bar"></div></div>
-                                        <p class="infos"><span class="infostxt">` + statustext + `</span>
-                                            <a href="#" class="openfile" onclick="download_js_openfile(` + id + `)">Ouvrir un fichier</a>
+                                        <div class="download_main_div" data-state="` + state + `">
+                                            <p class="download_titre" title="` + titre + `">` + titre + `</p>
+                                            <div class="progress"><div class="progress_bar"></div></div>
+                                            <p class="infos"><span class="infostxt">` + statustext + `</span>
+                                                <a href="#" class="openfile" onclick="download_js_openfile(` + id + `)">%downloadItemActionOpenFile%</a>
+                                            </p>
+                                            <div class="button_div">
+                                                <div class="button dossier" onclick="download_js_openfolder(` + id + `)" title="%downloadItemActionOpenFolder%">
+                                                    <svg class="dossier" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 16">
+                                                        <path class="svg_dossier" d="M.3,11.76V1.64A1.58,1.58,0,0,1,.72.75,1.51,1.51,0,0,1,1.64.3H5.93A1.52,1.52,0,0,1,7.05.83a4.93,4.93,0,0,0,.51.59,2.06,2.06,0,0,0,.55.41,1.17,1.17,0,0,0,.51.09H14a1.46,1.46,0,0,1,.94.58,1.25,1.25,0,0,1,.21.53V4.74H16a1.66,1.66,0,0,1,1.13.69,1.44,1.44,0,0,1,.23.71L15.4,12.58a1.58,1.58,0,0,1-.58.61,1.64,1.64,0,0,1-.8.21H1.68a1.69,1.69,0,0,1-1-.6A1.64,1.64,0,0,1,.3,11.76Z" />
+                                                        <path class="svg_dossier" d="M.3,11.87l2-6.34A1.35,1.35,0,0,1,2.76,5a1.32,1.32,0,0,1,.75-.24l11.62,0" />
+                                                    </svg>
+                                                </div>
 
+                                                <div class="button poubelle" onclick="download_js_delete(` + id + `)" title="%downloadItemActionDeleteFile%">
+                                                    <svg class="poubelle" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 16">
+                                                        <path class="svg_poubelle" d="M1.78,2.65l.74,10.94A2,2,0,0,0,3,14.73a2.13,2.13,0,0,0,1.48.77h6.2a1.78,1.78,0,0,0,1.07-.43,1.87,1.87,0,0,0,.59-1.28L13.1,2.65h-8V1.19A.89.89,0,0,1,5.35.61,1,1,0,0,1,6.06.3H8.92a1,1,0,0,1,.67.23,1,1,0,0,1,.3.56V2.65" />
+                                                        <path class="svg_poubelle" d="M6.06,5.48v7.16" />
+                                                        <path class="svg_poubelle" d="M8.85,5.48v7.16" />
+                                                    </svg>
+                                                </div>
 
-                                        </p>
-                                        <div class="button_div">
+                                                <div class="button start" onclick="download_js_start(this,` + id + `)" title="%downloadItemActionResume%">
+                                                    <svg class="start" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 16">
+                                                        <path class="svg_start" d="M11.69,6.44,1.2.38A.6.6,0,0,0,.3.9V13a.6.6,0,0,0,.9.52l10.49-6A.6.6,0,0,0,11.69,6.44Z" />
+                                                    </svg>
+                                                </div>
 
-                                            <div class="button dossier" onclick="download_js_openfolder(` + id + `)">
-                                                <svg class="dossier" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 16">
-                                                    <path class="svg_dossier" d="M.3,11.76V1.64A1.58,1.58,0,0,1,.72.75,1.51,1.51,0,0,1,1.64.3H5.93A1.52,1.52,0,0,1,7.05.83a4.93,4.93,0,0,0,.51.59,2.06,2.06,0,0,0,.55.41,1.17,1.17,0,0,0,.51.09H14a1.46,1.46,0,0,1,.94.58,1.25,1.25,0,0,1,.21.53V4.74H16a1.66,1.66,0,0,1,1.13.69,1.44,1.44,0,0,1,.23.71L15.4,12.58a1.58,1.58,0,0,1-.58.61,1.64,1.64,0,0,1-.8.21H1.68a1.69,1.69,0,0,1-1-.6A1.64,1.64,0,0,1,.3,11.76Z" />
-                                                    <path class="svg_dossier" d="M.3,11.87l2-6.34A1.35,1.35,0,0,1,2.76,5a1.32,1.32,0,0,1,.75-.24l11.62,0" />
-                                                </svg>
+                                                <div class="button pause" onclick="download_js_stop(` + id + `)" title="%downloadItemActionStop%">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 8.41 13.59">
+                                                        <path d="M10.83,13.51V.52" transform="translate(-2.72 -0.22)" />
+                                                        <path d="M3,13.51V.52" transform="translate(-2.72 -0.22)" />
+                                                    </svg>
+                                                </div>
+
+                                                <div class="button croix" onclick="download_js_cancel(` + id + `)" title="%downloadItemActionCancel%">
+                                                    <svg class="croix" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 16">
+                                                        <path class="svg_croix" d="M.3.3,6.93,6.93.3,13.56,13.56.3,6.93,6.93l6.63,6.63" />
+                                                    </svg>
+                                                </div>
+
+                                                <div class="button restart" onclick="download_js_restart(` + id + `)" title="%downloadItemActionRetry%">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12.2 12.75">
+                                                        <path class="svg_restart" d="M12.63,6.21A6,6,0,0,1,7.43,13a6,6,0,0,1-6.36-6.1A6.13,6.13,0,0,1,6.92,1a6.24,6.24,0,0,1,4.79,2.47l.26.39v0H9.11" transform="translate(-0.77 -0.52)" />
+                                                    </svg>
+                                                </div>
+
+                                                <div class="button deleteliste" onclick="download_js_delete_db(` + id + `)" title="%downloadItemActionDeleteDownload%"
+                                                    <svg version="1.2" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 12.2 12.8" overflow="visible" xml:space="preserve">
+                                                        <path d="M0.1,2.2h11.8"/>
+                                                        <path d="M0.3,7.8h5.8"/>
+                                                        <path d="M0.3,5h11.8"/>
+                                                        <path d="M0.3,10.5h5.8"/>
+                                                        <path d="M7.8,10.5L11.3,7"/>
+                                                        <path d="M11.3,10.5L7.8,7"/>
+                                                    </svg>
+                                                </div>
                                             </div>
-
-                                            <div class="button poubelle" onclick="download_js_delete(` + id + `)">
-                                                <svg class="poubelle" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 16">
-                                                    <path class="svg_poubelle" d="M1.78,2.65l.74,10.94A2,2,0,0,0,3,14.73a2.13,2.13,0,0,0,1.48.77h6.2a1.78,1.78,0,0,0,1.07-.43,1.87,1.87,0,0,0,.59-1.28L13.1,2.65h-8V1.19A.89.89,0,0,1,5.35.61,1,1,0,0,1,6.06.3H8.92a1,1,0,0,1,.67.23,1,1,0,0,1,.3.56V2.65" />
-                                                    <path class="svg_poubelle" d="M6.06,5.48v7.16" />
-                                                    <path class="svg_poubelle" d="M8.85,5.48v7.16" />
-                                                </svg>
-                                            </div>
-
-                                            <div class="button start" onclick="download_js_start(this,` + id + `)">
-                                                <svg class="start" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 16">
-                                                    <path class="svg_start" d="M11.69,6.44,1.2.38A.6.6,0,0,0,.3.9V13a.6.6,0,0,0,.9.52l10.49-6A.6.6,0,0,0,11.69,6.44Z" />
-                                                </svg>
-                                            </div>
-
-                                            <div class="button pause" onclick="download_js_stop(` + id + `)">
-                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 8.41 13.59">
-                                                    <path d="M10.83,13.51V.52" transform="translate(-2.72 -0.22)" />
-                                                    <path d="M3,13.51V.52" transform="translate(-2.72 -0.22)" />
-                                                </svg>
-                                            </div>
-
-                                            <div class="button croix" onclick="download_js_cancel(` + id + `)">
-                                                <svg class="croix" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 16">
-                                                    <path class="svg_croix" d="M.3.3,6.93,6.93.3,13.56,13.56.3,6.93,6.93l6.63,6.63" />
-                                                </svg>
-                                            </div>
-
-                                            <div class="button restart" onclick="download_js_restart(` + id + `)">
-                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12.2 12.75">
-                                                    <path class="svg_restart" d="M12.63,6.21A6,6,0,0,1,7.43,13a6,6,0,0,1-6.36-6.1A6.13,6.13,0,0,1,6.92,1a6.24,6.24,0,0,1,4.79,2.47l.26.39v0H9.11" transform="translate(-0.77 -0.52)" />
-                                                </svg>
-                                            </div>
-
-                                            <div class="button deleteliste" onclick="download_js_delete_db(` + id + `)">
-
-                                         <svg version="1.2"
-                         xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 12.2 12.8"
-                         overflow="visible" xml:space="preserve">
-<path d="M0.1,2.2h11.8"/>
-<path d="M0.3,7.8h5.8"/>
-<path d="M0.3,5h11.8"/>
-<path d="M0.3,10.5h5.8"/>
-<path d="M7.8,10.5L11.3,7"/>
-<path d="M11.3,10.5L7.8,7"/>
-</svg>
-
-                                            </div>
-
                                         </div>
-                                    </div>
-                                </li>`, 'text/html').body.children[0];
+                                    </li>`, 'text/html').body.children[0];
 
             document.getElementsByClassName("timeline")[0].after(download_li);
         }
 
         function date_to_string(timestamp, ajout = "") {
             function months_to_string(d) {
-                var months = ["Janvier", "Fevrier", "Mars", "Avril", "Mai", "Juin",
-                    "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Decembre"
+                var months = ["%downloadTimelineMonthsJanuary%", "%downloadTimelineMonthsFebruary%", "%downloadTimelineMonthsMarch%", "%downloadTimelineMonthsApril%", "%downloadTimelineMonthsMay%", "%downloadTimelineMonthsJune%",
+                    "%downloadTimelineMonthsJuly%", "%downloadTimelineMonthsAugust%", "%downloadTimelineMonthsSeptember%", "%downloadTimelineMonthsOctober%", "%downloadTimelineMonthsNovember%", "%downloadTimelineMonthsDecember%"
                 ];
                 return months[d.getMonth()];
             }
 
             function days_to_string(d) {
-                var days = ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi",];
+                var days = ["%downloadTimelineDaysSunday%", "%downloadTimelineDaysMonday%", "%downloadTimelineDaysTuesday%", "%downloadTimelineDaysWednesday%", "%downloadTimelineDaysThursday%", "%downloadTimelineDaysFriday%", "%downloadTimelineDaysSaturday%"];
                 return days[d.getDay()];
             }
-            //            console.log('>' + timestamp)
             var date_fonc = new Date(parseInt(timestamp + ajout));
             var date_fonc_string = days_to_string(date_fonc) + " " + date_fonc.getDate() + " " + months_to_string(date_fonc) + " " + date_fonc.getFullYear();
             return date_fonc_string;
@@ -953,10 +938,10 @@
             var date_yesterday_string = date_to_string(Date.now() - 864e5);
             var date_element = datetxt;
             if (date_element == date_today_string) {
-                date_element = "Aujourd'hui - " + date_element;
+                date_element = "%downloadTimelineToday% - " + date_element;
             }
             if (date_element == date_yesterday_string) {
-                date_element = "Hier - " + date_element;
+                date_element = "%downloadTimelineYesterday% - " + date_element;
             }
             return date_element;
         }
@@ -1328,7 +1313,7 @@
                 //on lance l'action
                 let id = get_context_menu_element().getAttribute("data-download_binding");
                 let action = item.closest(".item").getAttribute("id");
-                console.log("Vous avez cliqué sur : " + item.closest(".item").querySelector("a").innerText + " element id = " + id);
+                //console.log("Vous avez cliqué sur : " + item.closest(".item").querySelector("a").innerText + " element id = " + id);
                 /*
 
                 ouvrir_le_fichier

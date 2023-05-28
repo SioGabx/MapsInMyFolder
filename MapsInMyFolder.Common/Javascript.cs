@@ -295,7 +295,7 @@ namespace MapsInMyFolder.Commun
             {
                 if (scriptIsOld(ScriptTimestamp))
                 {
-                    Functions.PrintError("L'éxécution de la function à été annulée car sa date de démarrage est trop ancienne et/ou à été révoquée");
+                    Functions.PrintError("Execution of the function has been canceled because its start date is too old and/or has been revoked.");
                     return null;
                 }
 
@@ -316,7 +316,7 @@ namespace MapsInMyFolder.Commun
                     Debug.WriteLine(ex.Message);
                     if (ex.Message == "Can only invoke functions")
                     {
-                        Functions.PrintError("La fonction " + InvokeFunctionString + " n'as pas été trouvé dans le script. Faite help() pour obtenir de l'aide sur cette commande.");
+                        Functions.PrintError(InvokeFunctionString + "=> " + ex.Message);
                     }
                     else
                     {

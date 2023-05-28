@@ -115,7 +115,7 @@ namespace MapsInMyFolder
         public int id;
         public int dbid;
         public int layerid;
-        public List<TilesUrl> urls;
+        public IEnumerable<TilesUrl> urls;
         public CancellationTokenSource cancellation_token_source;
         public CancellationToken cancellation_token;
         public string format;
@@ -147,7 +147,7 @@ namespace MapsInMyFolder
         public DownloadSettings(int id,
                                           int dbid,
                                           int layerid,
-                                          List<TilesUrl> urls,
+                                          IEnumerable<TilesUrl> urls,
                                           CancellationTokenSource cancellation_token_source,
                                           CancellationToken cancellation_token,
                                           string format,
@@ -199,8 +199,8 @@ namespace MapsInMyFolder
                 this.scaleInfo = scaleInfo;
 
                 SkippedPanelUpdate = 0;
-                last_command = String.Empty;
-                last_command_non_important = String.Empty;
+                last_command = string.Empty;
+                last_command_non_important = string.Empty;
             }
         }
 
@@ -209,8 +209,19 @@ namespace MapsInMyFolder
 
         public static int Add(DownloadSettings engine, int id)
         {
+            Remove(id);
             DownloadEngineDictionnary.Add(id, engine);
             return DownloadEngineDictionnary.Count;
+        }
+
+        public static bool Remove(int id)
+        {
+            if (DownloadEngineDictionnary.ContainsKey(id))
+            {
+                DownloadEngineDictionnary.Remove(id);
+                return true;
+            }
+            return false;
         }
 
         public static void Clear()
@@ -223,9 +234,9 @@ namespace MapsInMyFolder
             return DownloadEngineDictionnary.Count + 1;
         }
 
-        public static DownloadSettings[] GetEngineList()
+        public static IEnumerable<DownloadSettings> GetEngineList()
         {
-            return DownloadEngineDictionnary.Values.ToArray();
+            return DownloadEngineDictionnary.Values;
         }
 
         public static DownloadSettings GetEngineById(int id)
@@ -234,11 +245,7 @@ namespace MapsInMyFolder
             {
                 return engine;
             }
-            else
-            {
-                Console.WriteLine("Erreur : l'ID de la tâche n'existe pas.");
-                return null;
-            }
+            return null;
         }
 
     }
@@ -255,11 +262,7 @@ namespace MapsInMyFolder
                 }
                 else
                 {
-                    int nbr_engine_progress = 0;
-                    foreach (var _ in DownloadSettings.GetEngineList().Where(engine => !(engine.state == Status.cancel || engine.state == Status.pause || engine.state == Status.error || engine.state == Status.success || engine.state == Status.deleted)))
-                    {
-                        nbr_engine_progress++;
-                    }
+                    int nbr_engine_progress = DownloadSettings.GetEngineList().Where(engine => !(engine.state == Status.cancel || engine.state == Status.pause || engine.state == Status.error || engine.state == Status.success || engine.state == Status.deleted)).Count();
 
                     if (nbr_engine_progress > 1 && TaskbarItemInfo.ProgressState != System.Windows.Shell.TaskbarItemProgressState.Indeterminate)
                     {
@@ -300,13 +303,13 @@ namespace MapsInMyFolder
                 {
                     if (Network.IsNetworkAvailable())
                     {
+                        //start download
                         _instance.RestartDownload(engine.id);
-                        Debug.WriteLine("Start " + engine.id);
                         numDownloadsStarted++;
                     }
                     else
                     {
-                        DebugMode.WriteLine("Aucune connexion internet");
+                        //No internet connection available.
                         UpdateDownloadPanel(engine.id, Languages.Current["downloadPanelStateInfoFileInternetConnexionWaiting"], "", true, Status.progress);
                     }
                 }
@@ -369,7 +372,7 @@ namespace MapsInMyFolder
 
                 if (latTileNumber * tileSize >= 65500 || longTileNumber * tileSize >= 65500)
                 {
-                    Message.NoReturnBoxAsync("Impossible de télécharger la zone, l'image générée ne peut pas faire plus de 65000 pixels de largeur / hauteur", "Erreur");
+                    Message.NoReturnBoxAsync("Unable to download the area, the generated image cannot exceed 65000 pixels in width/height.", Languages.Current["dialogTitleOperationFailed"]);
                     return;
                 }
 
@@ -381,7 +384,7 @@ namespace MapsInMyFolder
                     { "SE_Longitude", download_Options.SE_PIN_Location.Longitude }
                 };
 
-                List<TilesUrl> urls = Collectif.GetUrl.GetListOfUrlFromLocation(location, zoom, urlbase, Layers.Current.class_id, downloadId);
+                IEnumerable<TilesUrl> urls = Collectif.GetUrl.GetListOfUrlFromLocation(location, zoom, urlbase, Layers.Current.class_id, downloadId);
                 CancellationTokenSource tokenSource2 = new CancellationTokenSource();
                 CancellationToken ct = tokenSource2.Token;
                 string timestamp = Convert.ToString(new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds());
@@ -468,13 +471,16 @@ namespace MapsInMyFolder
             string info = $"{engine.nbr_of_tiles - engine.nbr_of_tiles_waiting_for_downloading}/{engine.nbr_of_tiles}";
             UpdateDownloadPanel(engineId, $"{Languages.Current["downloadPanelStateInfoFileRestarting"]} ({info})", "", true, Status.progress);
 
-            if (engine.urls is null || engine.urls.Count == 0)
+            if (engine.urls is null || engine.urls.Count() == 0)
             {
                 UpdateDownloadPanel(engineId, Languages.Current["downloadPanelStateInfoFileGeneratingURL"], "", true, Status.progress);
                 engine.urls = Collectif.GetUrl.GetListOfUrlFromLocation(engine.location, engine.zoom, engine.urlbase, engine.layerid, engine.id);
             }
 
-            engine.urls.ForEach(url => url.status = Status.waitfordownloading);
+            foreach (var url in engine.urls)
+            {
+                url.status = Status.waitfordownloading;
+            }
             if (engine.cancellation_token_source != null)
             {
                 engine.cancellation_token_source.Cancel();
@@ -587,7 +593,7 @@ namespace MapsInMyFolder
 
         private async Task ParallelDownloadTilesTask(DownloadSettings downloadEngineClass)
         {
-            List<TilesUrl> urls = downloadEngineClass.urls;
+            IEnumerable<TilesUrl> urls = downloadEngineClass.urls;
             CancellationTokenSource cancellationTokenSource = downloadEngineClass.cancellation_token_source;
             CancellationToken cancellationToken = downloadEngineClass.cancellation_token;
             try
@@ -666,7 +672,7 @@ namespace MapsInMyFolder
                 currentEngine.state = Status.success;
             }
 
-            currentEngine.urls.Clear();
+            currentEngine.urls = null;
             currentEngine.SkippedPanelUpdate = 0;
             currentEngine.last_command = null;
             currentEngine.last_command_non_important = null;
@@ -891,7 +897,7 @@ namespace MapsInMyFolder
             }
             catch (Exception)
             {
-                UpdateDownloadPanel(currentEngine.id, "Erreur redimensionnement du fichier", "", true, Status.error);
+                UpdateDownloadPanel(currentEngine.id, Languages.Current["downloadStateResizingError"], "", true, Status.error);
             }
             return imageRogner;
         }
@@ -1266,7 +1272,7 @@ namespace MapsInMyFolder
             {
                 Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
                 {
-                    Message.NoReturnBoxAsync("Une erreur fatale est survenue lors de l'assemblage du fichier \"" + saveFilename + "\"", "Erreur");
+                    Message.NoReturnBoxAsync(Languages.GetWithArguments("downloadMessageErrorTempFolderNotFound", saveFilename), Languages.Current["dialogTitleOperationFailed"]);
                 }, null);
             }
         }
