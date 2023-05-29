@@ -347,7 +347,7 @@ namespace MapsInMyFolder.Commun
             }
             using (SQLiteCommand sqlite_cmd = sqlite_conn.CreateCommand())
             {
-                const string commande_arg = "'ID' INTEGER UNIQUE, 'NOM' TEXT DEFAULT '', 'DESCRIPTION' TEXT DEFAULT '', 'CATEGORIE' TEXT DEFAULT '','PAYS' TEXT DEFAULT '', 'IDENTIFIANT' TEXT DEFAULT '', 'TILE_URL' TEXT DEFAULT '','TILE_FALLBACK_URL' TEXT DEFAULT '', 'MIN_ZOOM' INTEGER DEFAULT '', 'MAX_ZOOM' INTEGER DEFAULT '', 'FORMAT' TEXT DEFAULT '', 'SITE' TEXT DEFAULT '', 'SITE_URL' TEXT DEFAULT '', 'TILE_SIZE' INTEGER DEFAULT '', 'FAVORITE' INTEGER DEFAULT 0, 'TILECOMPUTATIONSCRIPT' TEXT DEFAULT '','VISIBILITY' TEXT DEFAULT '' ,'SPECIALSOPTIONS' TEXT DEFAULT '','RECTANGLES' TEXT DEFAULT '', 'VERSION' INTEGER DEFAULT 1, 'HAS_SCALE' INTEGER DEFAULT 1";
+                const string commande_arg = "'ID' INTEGER UNIQUE, 'NAME' TEXT DEFAULT '', 'DESCRIPTION' TEXT DEFAULT '', 'CATEGORY' TEXT DEFAULT '','COUNTRY' TEXT DEFAULT '', 'IDENTIFIER' TEXT DEFAULT '', 'TILE_URL' TEXT DEFAULT '', 'MIN_ZOOM' INTEGER DEFAULT '', 'MAX_ZOOM' INTEGER DEFAULT '', 'FORMAT' TEXT DEFAULT '', 'SITE' TEXT DEFAULT '', 'SITE_URL' TEXT DEFAULT '', 'TILE_SIZE' INTEGER DEFAULT '', 'FAVORITE' INTEGER DEFAULT 0, 'SCRIPT' TEXT DEFAULT '','VISIBILITY' TEXT DEFAULT '' ,'SPECIALSOPTIONS' TEXT DEFAULT '','RECTANGLES' TEXT DEFAULT '', 'VERSION' INTEGER DEFAULT 1, 'HAS_SCALE' INTEGER DEFAULT 1";
                 sqlite_cmd.CommandText = $@"
                 CREATE TABLE IF NOT EXISTS 'CUSTOMSLAYERS' ({commande_arg});
                 CREATE TABLE IF NOT EXISTS 'LAYERS' ({commande_arg},PRIMARY KEY('ID' AUTOINCREMENT));
@@ -361,7 +361,7 @@ namespace MapsInMyFolder.Commun
         {
             try
             {
-                return ExecuteNonQuerySQLCommand("CREATE TABLE IF NOT EXISTS 'DOWNLOADS' ('ID' INTEGER NOT NULL UNIQUE,'STATE' TEXT,'INFOS' TEXT,'FILE_NAME' TEXT,'NBR_TILES' INTEGER,'ZOOM' INTEGER,'NO_LAT' REAL,'NO_LONG' REAL,'SE_LAT' REAL,'SE_LONG' REAL,'LAYER_ID' INTEGER,'TEMP_DIRECTORY' TEXT,'SAVE_DIRECTORY' TEXT,'TIMESTAMP' TEXT,'QUALITY' INTEGER,'REDIMWIDTH' INTEGER,'REDIMHEIGHT' INTEGER,'COLORINTERPRETATION' TEXT,'SCALEINFO' TEXT,PRIMARY KEY('ID' AUTOINCREMENT));");
+                return ExecuteNonQuerySQLCommand("CREATE TABLE IF NOT EXISTS 'DOWNLOADS' ('ID' INTEGER NOT NULL UNIQUE,'STATE' TEXT,'INFOS' TEXT,'FILE_NAME' TEXT,'NBR_TILES' INTEGER,'ZOOM' INTEGER,'NO_LAT' REAL,'NO_LONG' REAL,'SE_LAT' REAL,'SE_LONG' REAL,'LAYER_ID' INTEGER,'TEMP_DIRECTORY' TEXT,'SAVE_DIRECTORY' TEXT,'TIMESTAMP' TEXT,'QUALITY' INTEGER,'RESIZEWIDTH' INTEGER,'RESIZEHEIGHT' INTEGER,'COLORINTERPRETATION' TEXT,'SCALEINFO' TEXT,PRIMARY KEY('ID' AUTOINCREMENT));");
             }
             catch (Exception e)
             {
@@ -370,7 +370,7 @@ namespace MapsInMyFolder.Commun
             }
         }
 
-        public static int DB_Download_Write(Status STATE, string FILE_NAME, int NBR_TILES, int ZOOM, double NO_LAT, double NO_LONG, double SE_LAT, double SE_LONG, int LAYER_ID, string TEMP_DIRECTORY, string SAVE_DIRECTORY, string TIMESTAMP, int QUALITY, int REDIMWIDTH, int REDIMHEIGHT, string COLORINTERPRETATION, string SCALEINFO)
+        public static int DB_Download_Write(Status STATE, string FILE_NAME, int NBR_TILES, int ZOOM, double NO_LAT, double NO_LONG, double SE_LAT, double SE_LONG, int LAYER_ID, string TEMP_DIRECTORY, string SAVE_DIRECTORY, string TIMESTAMP, int QUALITY, int RESIZEWIDTH, int RESIZEHEIGHT, string COLORINTERPRETATION, string SCALEINFO)
         {
             if (DB_Download_Init() == -1)
             {
@@ -379,7 +379,7 @@ namespace MapsInMyFolder.Commun
 
 
 
-            string InsertCommandText = $"INSERT INTO 'DOWNLOADS'('STATE','INFOS', 'FILE_NAME', 'NBR_TILES', 'ZOOM', 'NO_LAT', 'NO_LONG', 'SE_LAT', 'SE_LONG', 'LAYER_ID', 'TEMP_DIRECTORY', 'SAVE_DIRECTORY','TIMESTAMP','QUALITY','REDIMWIDTH','REDIMHEIGHT', 'COLORINTERPRETATION', 'SCALEINFO') VALUES('{STATE}','','{FILE_NAME}','{NBR_TILES}','{ZOOM}','{NO_LAT}','{NO_LONG}','{SE_LAT}','{SE_LONG}','{LAYER_ID}','{TEMP_DIRECTORY}','{SAVE_DIRECTORY}','{TIMESTAMP}','{QUALITY}','{REDIMWIDTH}','{REDIMHEIGHT}','{COLORINTERPRETATION}','{SCALEINFO}');";
+            string InsertCommandText = $"INSERT INTO 'DOWNLOADS'('STATE','INFOS', 'FILE_NAME', 'NBR_TILES', 'ZOOM', 'NO_LAT', 'NO_LONG', 'SE_LAT', 'SE_LONG', 'LAYER_ID', 'TEMP_DIRECTORY', 'SAVE_DIRECTORY','TIMESTAMP','QUALITY','RESIZEWIDTH','RESIZEHEIGHT', 'COLORINTERPRETATION', 'SCALEINFO') VALUES('{STATE}','','{FILE_NAME}','{NBR_TILES}','{ZOOM}','{NO_LAT}','{NO_LONG}','{SE_LAT}','{SE_LONG}','{LAYER_ID}','{TEMP_DIRECTORY}','{SAVE_DIRECTORY}','{TIMESTAMP}','{QUALITY}','{RESIZEWIDTH}','{RESIZEHEIGHT}','{COLORINTERPRETATION}','{SCALEINFO}');";
             //Make sur that select last_insert_rowid() is launch just after insert
             var DatabaseConnexion = DB_Connection();
             ExecuteNonQuerySQLCommand(DatabaseConnexion, InsertCommandText);
@@ -553,23 +553,23 @@ namespace MapsInMyFolder.Commun
                 {
                     int DB_Layer_ID = (int)editedlayers_sqlite_datareader.GetIntFromOrdinal("ID");
                     int EditedDB_VERSION = editedlayers_sqlite_datareader.GetIntFromOrdinal("VERSION") ?? 0;
-                    string EditedDB_TILECOMPUTATIONSCRIPT = editedlayers_sqlite_datareader.GetStringFromOrdinal("TILECOMPUTATIONSCRIPT");
+                    string EditedDB_SCRIPT = editedlayers_sqlite_datareader.GetStringFromOrdinal("SCRIPT");
                     string EditedDB_TILE_URL = editedlayers_sqlite_datareader.GetStringFromOrdinal("TILE_URL");
 
                     using (SQLiteDataReader layers_sqlite_datareader = ExecuteExecuteReaderSQLCommand($"SELECT * FROM 'LAYERS' WHERE ID = {DB_Layer_ID}"))
                     {
                         layers_sqlite_datareader.Read();
                         int LastDB_VERSION = layers_sqlite_datareader.GetIntFromOrdinal("VERSION") ?? 0;
-                        string LastDB_TILECOMPUTATIONSCRIPT = layers_sqlite_datareader.GetStringFromOrdinal("TILECOMPUTATIONSCRIPT");
+                        string LastDB_SCRIPT = layers_sqlite_datareader.GetStringFromOrdinal("SCRIPT");
                         string LastDB_TILE_URL = layers_sqlite_datareader.GetStringFromOrdinal("TILE_URL");
                         bool VersionCanBeUpdated = true;
                         if (LastDB_VERSION <= EditedDB_VERSION)
                         {
                             VersionCanBeUpdated = false;
                         }
-                        else if (LastDB_TILECOMPUTATIONSCRIPT != EditedDB_TILECOMPUTATIONSCRIPT && LastDB_TILE_URL != EditedDB_TILE_URL)
+                        else if (LastDB_SCRIPT != EditedDB_SCRIPT && LastDB_TILE_URL != EditedDB_TILE_URL)
                         {
-                            if (string.IsNullOrWhiteSpace(EditedDB_TILECOMPUTATIONSCRIPT) && string.IsNullOrWhiteSpace(EditedDB_TILE_URL))
+                            if (string.IsNullOrWhiteSpace(EditedDB_SCRIPT) && string.IsNullOrWhiteSpace(EditedDB_TILE_URL))
                             {
                                 VersionCanBeUpdated = true;
                             }

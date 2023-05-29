@@ -670,28 +670,28 @@ namespace MapsInMyFolder
         }
         (int width, int height) GetResizedImageSize()
         {
-            int RedimWidth = -1;
-            int RedimHeight = -1;
+            int ResizeWidth = -1;
+            int ResizeHeight = -1;
             RognageInfo rognage_info = GetOriginalImageSize();
 
             if (TextBox_Redim_HUnit.SelectedIndex == 0)
             {
-                RedimHeight = Convert.ToInt32(TextBox_Redim_Height.Text);
+                ResizeHeight = Convert.ToInt32(TextBox_Redim_Height.Text);
             }
             else if (TextBox_Redim_HUnit.SelectedIndex == 1)
             {
-                RedimHeight = (int)Math.Round(rognage_info.height * (Convert.ToDouble(TextBox_Redim_Height.Text) / 100));
+                ResizeHeight = (int)Math.Round(rognage_info.height * (Convert.ToDouble(TextBox_Redim_Height.Text) / 100));
             }
 
             if (TextBox_Redim_WUnit.SelectedIndex == 0)
             {
-                RedimWidth = Convert.ToInt32(TextBox_Redim_Width.Text);
+                ResizeWidth = Convert.ToInt32(TextBox_Redim_Width.Text);
             }
             else if (TextBox_Redim_WUnit.SelectedIndex == 1)
             {
-                RedimWidth = (int)Math.Round(rognage_info.width * (Convert.ToDouble(TextBox_Redim_Width.Text) / 100));
+                ResizeWidth = (int)Math.Round(rognage_info.width * (Convert.ToDouble(TextBox_Redim_Width.Text) / 100));
             }
-            return (RedimWidth, RedimHeight);
+            return (ResizeWidth, ResizeHeight);
         }
         private void TextBox_quality_number_TextChanged(object sender, TextChangedEventArgs e)
         {
@@ -1021,27 +1021,27 @@ namespace MapsInMyFolder
         public (int Width, int Height) GetSizeAfterRedim()
         {
             var rognage_info = GetOriginalImageSize();
-            int RedimWidth = -1;
-            int RedimHeight = -1;
+            int ResizeWidth = -1;
+            int ResizeHeight = -1;
             if (TextBox_Redim_WUnit.SelectedIndex == 0)
             {
-                RedimWidth = Convert.ToInt32(TextBox_Redim_Width.Text);
+                ResizeWidth = Convert.ToInt32(TextBox_Redim_Width.Text);
             }
             else if (TextBox_Redim_WUnit.SelectedIndex == 1)
             {
-                RedimWidth = Math.Max(10, (int)Math.Round(rognage_info.width * (Convert.ToDouble(TextBox_Redim_Width.Text) / 100)));
+                ResizeWidth = Math.Max(10, (int)Math.Round(rognage_info.width * (Convert.ToDouble(TextBox_Redim_Width.Text) / 100)));
             }
 
             if (TextBox_Redim_HUnit.SelectedIndex == 0)
             {
-                RedimHeight = Convert.ToInt32(TextBox_Redim_Height.Text);
+                ResizeHeight = Convert.ToInt32(TextBox_Redim_Height.Text);
             }
             else if (TextBox_Redim_HUnit.SelectedIndex == 1)
             {
-                RedimHeight = Math.Max(10, (int)Math.Round(rognage_info.height * (Convert.ToDouble(TextBox_Redim_Height.Text) / 100)));
+                ResizeHeight = Math.Max(10, (int)Math.Round(rognage_info.height * (Convert.ToDouble(TextBox_Redim_Height.Text) / 100)));
             }
 
-            return (RedimWidth, RedimHeight);
+            return (ResizeWidth, ResizeHeight);
         }
 
         private void StartDownloadButton_Click(object sender, RoutedEventArgs e)
@@ -1107,19 +1107,19 @@ namespace MapsInMyFolder
 
             int quality = Convert.ToInt32(TextBox_quality_number.Text);
 
-            int redimWidth;
-            int redimHeight;
+            int resizeWidth;
+            int resizeHeight;
             if (!(TextBox_Redim_WUnit.SelectedIndex == 1 && TextBox_Redim_Width.Text == "100") &&
                 !(TextBox_Redim_HUnit.SelectedIndex == 1 && TextBox_Redim_Height.Text == "100"))
             {
-                var redim = GetSizeAfterRedim();
-                redimWidth = redim.Width;
-                redimHeight = redim.Height;
+                var resizeDimension = GetSizeAfterRedim();
+                resizeWidth = resizeDimension.Width;
+                resizeHeight = resizeDimension.Height;
             }
             else
             {
-                redimWidth = -1;
-                redimHeight = -1;
+                resizeWidth = -1;
+                resizeHeight = -1;
             }
 
             NetVips.Enums.Interpretation interpretation = (NetVips.Enums.Interpretation)Enum.Parse(typeof(NetVips.Enums.Interpretation), (Combobox_color_conversion.SelectedItem as ComboBoxItem).Tag as string);
@@ -1131,15 +1131,15 @@ namespace MapsInMyFolder
             }
 
             double distanceInMeterPerPixels = ScaleInfo.GetDistanceInMeterPerPixels(targetScale);
-            var drawScaleInfo = ScaleInfo.SearchOptimalScale(distanceInMeterPerPixels, redimWidth);
+            var drawScaleInfo = ScaleInfo.SearchOptimalScale(distanceInMeterPerPixels, resizeWidth);
             bool drawScale = (CheckBoxAddScaleToImage.IsChecked ?? false) &&
-                             IsEnoughPlaceForScale(redimWidth, redimHeight, drawScaleInfo.Scale) &&
+                             IsEnoughPlaceForScale(resizeWidth, resizeHeight, drawScaleInfo.Scale) &&
                              Layers.Current.class_hasscale;
 
             ScaleInfo scaleInfo = new ScaleInfo(initialScale, targetScale, distanceInMeterPerPixels, drawScale, drawScaleInfo.Scale, drawScaleInfo.PixelLenght);
 
             var selectionLocation = MainPage.mapSelectable.GetRectangleLocation();
-            DownloadOptions downloadOptions = new DownloadOptions(0, saveDirectory, format, filename, "", "", 0, zoom, quality, "", selectionLocation.NO, selectionLocation.SE, redimWidth, redimHeight, interpretation, scaleInfo);
+            DownloadOptions downloadOptions = new DownloadOptions(0, saveDirectory, format, filename, "", "", 0, zoom, quality, "", selectionLocation.NO, selectionLocation.SE, resizeWidth, resizeHeight, interpretation, scaleInfo);
             
             MainWindow._instance.PrepareDownloadBeforeStart(downloadOptions);
             ClosePage();

@@ -263,7 +263,7 @@ namespace MapsInMyFolder.Commun
             }
             if (string.IsNullOrEmpty(script))
             {
-                script = Layers.GetLayerById(LayerId).class_tilecomputationscript;
+                script = Layers.GetLayerById(LayerId).class_script;
             }
             Engine add = EngineGetById(LayerId, script);
 

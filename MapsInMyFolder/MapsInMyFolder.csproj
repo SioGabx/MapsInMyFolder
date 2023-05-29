@@ -50,6 +50,7 @@
     <None Remove="closedhand.cur" />
     <None Remove="download_panel.html" />
     <None Remove="EditorTheme\Json.xshd" />
+    <None Remove="Languages\English.ini" />
     <None Remove="Languages\French.ini" />
     <None Remove="layer_panel.html" />
     <None Remove="ScriptEditorTheme.xshd" />
@@ -66,6 +67,7 @@
    
     <EmbeddedResource Include="HTML\download_panel.html" />
     <EmbeddedResource Include="HTML\layer_panel.html" />
+    <EmbeddedResource Include="Languages\English.ini" />
     
     <EmbeddedResource Include="Languages\French.ini" />
   </ItemGroup>

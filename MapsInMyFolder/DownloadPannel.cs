@@ -34,8 +34,8 @@ namespace MapsInMyFolder
                     int DB_Download_ID = sqlite_datareader.GetInt32(sqlite_datareader.GetOrdinal("ID"));
                     int DB_Download_ZOOM = sqlite_datareader.GetInt32(sqlite_datareader.GetOrdinal("ZOOM"));
                     int DB_Download_NBR_TILES = sqlite_datareader.GetInt32(sqlite_datareader.GetOrdinal("NBR_TILES"));
-                    int REDIMWIDTH = sqlite_datareader.GetInt32(sqlite_datareader.GetOrdinal("REDIMWIDTH"));
-                    int REDIMHEIGHT = sqlite_datareader.GetInt32(sqlite_datareader.GetOrdinal("REDIMHEIGHT"));
+                    int RESIZEWIDTH = sqlite_datareader.GetInt32(sqlite_datareader.GetOrdinal("RESIZEWIDTH"));
+                    int RESIZEHEIGHT = sqlite_datareader.GetInt32(sqlite_datareader.GetOrdinal("RESIZEHEIGHT"));
                     int DB_Download_QUALITY = sqlite_datareader.GetInt32(sqlite_datareader.GetOrdinal("QUALITY"));
                     string DB_Download_TIMESTAMP = sqlite_datareader.GetString(sqlite_datareader.GetOrdinal("TIMESTAMP"));
                     string DB_Download_TEMP_DIRECTORY = sqlite_datareader.GetString(sqlite_datareader.GetOrdinal("TEMP_DIRECTORY"));
@@ -118,7 +118,7 @@ namespace MapsInMyFolder
                             Download_INFOS = Languages.Current["downloadPanelStateInfoFileNotFound"];
                         }
                     }
-                    DownloadSettings engine = new DownloadSettings(downloadid, DB_Download_ID, DB_Download_LAYER_ID, urls, tokenSource2, ct, format, final_saveformat, DB_Download_ZOOM, DB_Download_TEMP_DIRECTORY, DB_Download_SAVE_DIRECTORY, DB_Download_FILE_NAME, filetempname, location, REDIMWIDTH, REDIMHEIGHT, new TileLoader(), COLORINTERPRETATION, SCALEINFO, DB_Download_NBR_TILES, layers.class_tile_url, layers.class_identifiant, engine_status, layers.class_tiles_size, quality: DB_Download_QUALITY);
+                    DownloadSettings engine = new DownloadSettings(downloadid, DB_Download_ID, DB_Download_LAYER_ID, urls, tokenSource2, ct, format, final_saveformat, DB_Download_ZOOM, DB_Download_TEMP_DIRECTORY, DB_Download_SAVE_DIRECTORY, DB_Download_FILE_NAME, filetempname, location, RESIZEWIDTH, RESIZEHEIGHT, new TileLoader(), COLORINTERPRETATION, SCALEINFO, DB_Download_NBR_TILES, layers.class_tile_url, layers.class_identifier, engine_status, layers.class_tiles_size, quality: DB_Download_QUALITY);
                     DownloadSettings.Add(engine, downloadid);
                     string commande_add = "add_download(" + downloadid + @",""" + engine_status.ToString() + @""",""" + DB_Download_FILE_NAME + @""",0," + DB_Download_NBR_TILES + @",""" + Download_INFOS + @""",""" + DB_Download_TIMESTAMP + @""");";
                     if (engine_status == Status.error)
@@ -131,7 +131,7 @@ namespace MapsInMyFolder
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine("fonction DB_Layer_Read : " + ex.Message);
+                    Debug.WriteLine("fonction download DB_Layer_Read : " + ex.Message);
                 }
             }
         }
@@ -212,9 +212,9 @@ namespace MapsInMyFolder
             {
                 var engine = DownloadSettings.GetEngineById(id);
                 if (engine is null) return false;
-                if (System.IO.Directory.Exists(engine.save_directory))
+                if (System.IO.Directory.Exists(engine.saveDirectory))
                 {
-                    if (System.IO.File.Exists(engine.save_directory + engine.file_name))
+                    if (System.IO.File.Exists(engine.saveDirectory + engine.fileName))
                     {
                         return true;
                     }
@@ -225,7 +225,7 @@ namespace MapsInMyFolder
                 }
                 else
                 {
-                    Debug.WriteLine("Le chemin n'existe pas : " + engine.save_directory);
+                    Debug.WriteLine("Le chemin n'existe pas : " + engine.saveDirectory);
                 }
             }
             return false;
@@ -334,7 +334,7 @@ namespace MapsInMyFolder
             {
                 var engine = DownloadSettings.GetEngineById(id_int);
                 if (engine is null) return;
-                Process.Start("explorer.exe", "/select,\"" + engine.save_directory + engine.file_name + "\"");
+                Process.Start("explorer.exe", "/select,\"" + engine.saveDirectory + engine.fileName + "\"");
             }
         }
 
@@ -348,7 +348,7 @@ namespace MapsInMyFolder
                 if (engine is null) return;
                 new Process
                 {
-                    StartInfo = new ProcessStartInfo(engine.save_directory + engine.file_name)
+                    StartInfo = new ProcessStartInfo(engine.saveDirectory + engine.fileName)
                     {
                         UseShellExecute = true
                     }
@@ -364,7 +364,7 @@ namespace MapsInMyFolder
             {
                 var engine = DownloadSettings.GetEngineById(id_int);
                 if (engine is null) return;
-                System.IO.File.Delete(engine.save_directory + engine.file_name);
+                System.IO.File.Delete(engine.saveDirectory + engine.fileName);
 
                 Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
                 {
@@ -394,15 +394,15 @@ namespace MapsInMyFolder
             var engine = DownloadSettings.GetEngineById(id_int);
 
             if (engine is null) return;
-            if (System.IO.Directory.Exists(engine.save_temp_directory))
+            if (System.IO.Directory.Exists(engine.saveTempDirectory))
             {
-                Process.Start("explorer.exe", "\"" + engine.save_temp_directory + "\"");
+                Process.Start("explorer.exe", "\"" + engine.saveTempDirectory + "\"");
             }
             else
             {
                 Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
                 {
-                    Message.NoReturnBoxAsync(Languages.GetWithArguments("downloadMessageErrorTempFolderNotFound", engine.save_temp_directory), Languages.Current["dialogTitleOperationFailed"]);
+                    Message.NoReturnBoxAsync(Languages.GetWithArguments("downloadMessageErrorTempFolderNotFound", engine.saveTempDirectory), Languages.Current["dialogTitleOperationFailed"]);
                 }, null);
             }
         }
@@ -458,7 +458,7 @@ namespace MapsInMyFolder
             {
                 try
                 {
-                    string clipboard_path = engine.save_directory + engine.file_name;
+                    string clipboard_path = engine.saveDirectory + engine.fileName;
                     Clipboard.SetText(clipboard_path);
                 }
                 catch (Exception ex)
@@ -499,7 +499,7 @@ namespace MapsInMyFolder
                 Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)async delegate
                 {
                     Download_stop(id_int);
-                    var result = await Message.SetContentDialog(Languages.GetWithArguments("downloadMessageAskCancelDeleteDownload", engine.file_name), "MapsInMyFolder", MessageDialogButton.YesNo).ShowAsync();
+                    var result = await Message.SetContentDialog(Languages.GetWithArguments("downloadMessageAskCancelDeleteDownload", engine.fileName), "MapsInMyFolder", MessageDialogButton.YesNo).ShowAsync();
                     if (result == ContentDialogResult.Primary)
                     {
                         try

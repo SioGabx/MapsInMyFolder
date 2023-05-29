@@ -111,7 +111,7 @@ namespace MapsInMyFolder.Commun
 
             if (IsUrlStyle(styleValueOrUrlOrPath))
             {
-                string path = GetStyleFilePath(layers.class_name, layers.class_identifiant, styleValueOrUrlOrPath);
+                string path = GetStyleFilePath(layers.class_name, layers.class_identifier, styleValueOrUrlOrPath);
                 if (File.Exists(path))
                 {
                     return File.ReadAllText(path);
@@ -130,10 +130,10 @@ namespace MapsInMyFolder.Commun
             return Uri.IsWellFormedUriString(styleValueOrUrlOrPath, UriKind.Absolute) && Collectif.IsUrlValid(styleValueOrUrlOrPath);
         }
 
-        private static string GetStyleFilePath(string className, string classIdentifiant, string styleValueOrUrlOrPath)
+        private static string GetStyleFilePath(string className, string classIdentifier, string styleValueOrUrlOrPath)
         {
             string fileName = styleValueOrUrlOrPath.GetHashCode().ToString() + ".json";
-            string directoryPath = Path.Combine(Collectif.GetSaveTempDirectory(className, classIdentifiant), "layerstyle");
+            string directoryPath = Path.Combine(Collectif.GetSaveTempDirectory(className, classIdentifier), "layerstyle");
             return Path.Combine(directoryPath, fileName);
         }
 

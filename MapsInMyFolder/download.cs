@@ -76,7 +76,7 @@ namespace MapsInMyFolder
         public string save_path;
         public string format;
         public string filename;
-        public string identifiant;
+        public string identifier;
         public string name;
         public int tile_size;
         public int quality;
@@ -84,18 +84,18 @@ namespace MapsInMyFolder
         public string urlbase;
         public MapControl.Location NO_PIN_Location;
         public MapControl.Location SE_PIN_Location;
-        public int RedimWidth;
-        public int RedimHeignt;
+        public int resizeWidth;
+        public int resizeHeignt;
         public Enums.Interpretation interpretation;
         public ScaleInfo scaleInfo;
 
-        public DownloadOptions(int id_layer, string save_path, string format, string filename, string identifiant, string name, int tile_size, int zoom, int quality, string urlbase, MapControl.Location NO_PIN_Location, MapControl.Location SE_PIN_Location, int RedimWidth, int RedimHeignt, Enums.Interpretation interpretation, ScaleInfo scaleInfo)
+        public DownloadOptions(int id_layer, string save_path, string format, string filename, string identifier, string name, int tile_size, int zoom, int quality, string urlbase, MapControl.Location NO_PIN_Location, MapControl.Location SE_PIN_Location, int resizeWidth, int resizeHeignt, Enums.Interpretation interpretation, ScaleInfo scaleInfo)
         {
             this.id_layer = id_layer;
             this.save_path = save_path;
             this.format = format;
             this.filename = filename;
-            this.identifiant = identifiant;
+            this.identifier = identifier;
             this.name = name;
             this.tile_size = tile_size;
             this.zoom = zoom;
@@ -103,8 +103,8 @@ namespace MapsInMyFolder
             this.urlbase = urlbase;
             this.NO_PIN_Location = NO_PIN_Location;
             this.SE_PIN_Location = SE_PIN_Location;
-            this.RedimWidth = RedimWidth;
-            this.RedimHeignt = RedimHeignt;
+            this.resizeWidth = resizeWidth;
+            this.resizeHeignt = resizeHeignt;
             this.interpretation = interpretation;
             this.scaleInfo = scaleInfo;
         }
@@ -116,91 +116,91 @@ namespace MapsInMyFolder
         public int dbid;
         public int layerid;
         public IEnumerable<TilesUrl> urls;
-        public CancellationTokenSource cancellation_token_source;
-        public CancellationToken cancellation_token;
+        public CancellationTokenSource cancellationTokenSource;
+        public CancellationToken cancellationToken;
         public string format;
-        public string final_saveformat;
+        public string finalSaveFormat;
         public int zoom;
         public Status state;
-        public int nbr_of_tiles;
-        public int nbr_of_tiles_waiting_for_downloading;
-        public string urlbase;
-        public string identifiant;
-        public string save_temp_directory;
-        public string save_directory;
-        public string file_name;
-        public string file_temp_name;
-        public int tile_size;
+        public int nbrOfTiles;
+        public int nbrOfTilesWaitingForDownloading;
+        public string urlBase;
+        public string identifier;
+        public string saveTempDirectory;
+        public string saveDirectory;
+        public string fileName;
+        public string fileTempName;
+        public int tileSize;
         public int quality;
         public Dictionary<string, double> location;
-        public int RedimWidth;
-        public int RedimHeignt;
-        public TileLoader TileLoader;
+        public int resizeWidth;
+        public int resizeHeignt;
+        public TileLoader tileLoader;
         public Enums.Interpretation interpretation;
         public ScaleInfo scaleInfo;
 
-        public int SkippedPanelUpdate;
-        public string last_command;
-        public string last_command_non_important;
+        public int skippedPanelUpdate;
+        public string lastCommand;
+        public string lastCommandNotImportant;
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1068:Les paramètres CancellationToken doivent venir en dernier", Justification = "it is safe to suppress a warning from this rule to avoid a breaking change and it more readible")]
         public DownloadSettings(int id,
                                           int dbid,
                                           int layerid,
                                           IEnumerable<TilesUrl> urls,
-                                          CancellationTokenSource cancellation_token_source,
-                                          CancellationToken cancellation_token,
+                                          CancellationTokenSource cancellationTokenSource,
+                                          CancellationToken cancellationToken,
                                           string format,
-                                          string final_saveformat,
+                                          string finalSaveFormat,
                                           int zoom,
-                                          string save_temp_directory,
-                                          string save_directory,
-                                          string file_name,
-                                          string file_temp_name,
+                                          string saveTempDirectory,
+                                          string saveDirectory,
+                                          string fileName,
+                                          string fileTempName,
                                           Dictionary<string, double> location,
-                                          int RedimWidth, int RedimHeignt, TileLoader TileLoaderGenerator,
+                                          int resizeWidth, int resizeHeignt, TileLoader tileLoaderGenerator,
                                           Enums.Interpretation interpretation,
                                           ScaleInfo scaleInfo,
-                                          int nbr_of_tiles = 0,
-                                          string urlbase = "",
-                                          string identifiant = "",
+                                          int nbrOfTiles = 0,
+                                          string urlBase = "",
+                                          string identifier = "",
                                           Status state = Status.waitfordownloading,
-                                          int? tile_size = null,
-                                          int nbr_of_tiles_waiting_for_downloading = 0,
+                                          int? tileSize = null,
+                                          int nbrOfTilesWaitingForDownloading = 0,
                                           int quality = 100)
         {
             if (id != 0)
             {
-                this.file_temp_name = file_temp_name;
-                this.file_name = file_name;
+                this.fileTempName = fileTempName;
+                this.fileName = fileName;
                 this.state = state;
-                this.save_temp_directory = save_temp_directory;
-                this.save_directory = save_directory;
+                this.saveTempDirectory = saveTempDirectory;
+                this.saveDirectory = saveDirectory;
                 this.format = format;
-                this.final_saveformat = final_saveformat;
+                this.finalSaveFormat = finalSaveFormat;
                 this.zoom = zoom;
                 this.id = id;
                 this.layerid = layerid;
                 this.dbid = dbid;
                 this.urls = urls;
-                this.cancellation_token_source = cancellation_token_source;
-                this.cancellation_token = cancellation_token;
-                this.nbr_of_tiles = nbr_of_tiles;
-                this.nbr_of_tiles_waiting_for_downloading = nbr_of_tiles_waiting_for_downloading;
-                this.urlbase = urlbase;
-                this.identifiant = identifiant;
+                this.cancellationTokenSource = cancellationTokenSource;
+                this.cancellationToken = cancellationToken;
+                this.nbrOfTiles = nbrOfTiles;
+                this.nbrOfTilesWaitingForDownloading = nbrOfTilesWaitingForDownloading;
+                this.urlBase = urlBase;
+                this.identifier = identifier;
                 this.location = location;
-                this.tile_size = tile_size ?? 256;
+                this.tileSize = tileSize ?? 256;
                 this.quality = quality;
-                this.RedimWidth = RedimWidth;
-                this.RedimHeignt = RedimHeignt;
-                this.TileLoader = TileLoaderGenerator;
+                this.resizeWidth = resizeWidth;
+                this.resizeHeignt = resizeHeignt;
+                this.tileLoader = tileLoaderGenerator;
                 this.interpretation = interpretation;
                 this.scaleInfo = scaleInfo;
 
-                SkippedPanelUpdate = 0;
-                last_command = string.Empty;
-                last_command_non_important = string.Empty;
+                skippedPanelUpdate = 0;
+                lastCommand = string.Empty;
+                lastCommandNotImportant = string.Empty;
             }
         }
 
@@ -340,7 +340,7 @@ namespace MapsInMyFolder
             MainPage.download_panel_browser?.ExecuteScriptAsync("document.getElementById(\"main\").scrollIntoView({ behavior: \"smooth\", block: \"start\", inline: \"nearest\"})");
             DownloadOptions download_Options_edited = download_Options;
             download_Options_edited.id_layer = Layers.Current.class_id;
-            download_Options_edited.identifiant = Layers.Current.class_identifiant;
+            download_Options_edited.identifier = Layers.Current.class_identifier;
             download_Options_edited.name = Layers.Current.class_name;
             download_Options_edited.tile_size = Layers.Current.class_tiles_size ?? 256;
             download_Options_edited.urlbase = Layers.Current.class_tile_url;
@@ -356,10 +356,10 @@ namespace MapsInMyFolder
             string fileTempName = "file_id=" + downloadId + "." + finalSaveFormat;
             string filename = Path.HasExtension(download_Options.filename) ? download_Options.filename : download_Options.filename + "." + finalSaveFormat;
             string saveDirectory = download_Options.save_path.Replace(filename, "");
-            string identifiant = download_Options.identifiant;
+            string identifier = download_Options.identifier;
             string layername = download_Options.name;
             int tileSize = download_Options.tile_size;
-            string saveTempDirectory = Collectif.GetSaveTempDirectory(layername, identifiant, zoom, Settings.temp_folder);
+            string saveTempDirectory = Collectif.GetSaveTempDirectory(layername, identifier, zoom, Settings.temp_folder);
             string urlbase = download_Options.urlbase;
 
             if (urlbase.Trim() != "" && tileSize != 0)
@@ -390,8 +390,8 @@ namespace MapsInMyFolder
                 string timestamp = Convert.ToString(new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds());
 
                 string jsonScaleInfo = Newtonsoft.Json.JsonConvert.SerializeObject(download_Options.scaleInfo);
-                int dbid = Database.DB_Download_Write(Status.waitfordownloading, filename, nbrOfTiles, zoom, download_Options.NO_PIN_Location.Latitude, download_Options.NO_PIN_Location.Longitude, download_Options.SE_PIN_Location.Latitude, download_Options.SE_PIN_Location.Longitude, download_Options.id_layer, saveTempDirectory, saveDirectory, timestamp, quality, download_Options.RedimWidth, download_Options.RedimHeignt, download_Options.interpretation.ToString(), jsonScaleInfo);
-                DownloadSettings engine = new DownloadSettings(downloadId, dbid, Layers.Current.class_id, urls, tokenSource2, ct, format, finalSaveFormat, zoom, saveTempDirectory, saveDirectory, filename, fileTempName, location, download_Options.RedimWidth, download_Options.RedimHeignt, new TileLoader(), download_Options.interpretation, download_Options.scaleInfo, nbrOfTiles, urlbase, identifiant, Status.waitfordownloading, tileSize, nbrOfTiles, quality);
+                int dbid = Database.DB_Download_Write(Status.waitfordownloading, filename, nbrOfTiles, zoom, download_Options.NO_PIN_Location.Latitude, download_Options.NO_PIN_Location.Longitude, download_Options.SE_PIN_Location.Latitude, download_Options.SE_PIN_Location.Longitude, download_Options.id_layer, saveTempDirectory, saveDirectory, timestamp, quality, download_Options.resizeWidth, download_Options.resizeHeignt, download_Options.interpretation.ToString(), jsonScaleInfo);
+                DownloadSettings engine = new DownloadSettings(downloadId, dbid, Layers.Current.class_id, urls, tokenSource2, ct, format, finalSaveFormat, zoom, saveTempDirectory, saveDirectory, filename, fileTempName, location, download_Options.resizeWidth, download_Options.resizeHeignt, new TileLoader(), download_Options.interpretation, download_Options.scaleInfo, nbrOfTiles, urlbase, identifier, Status.waitfordownloading, tileSize, nbrOfTiles, quality);
                 DownloadSettings.Add(engine, downloadId);
 
                 Status status;
@@ -422,7 +422,7 @@ namespace MapsInMyFolder
         public static void AbordAndCancelWithTokenDownload(int engineId)
         {
             DownloadSettings engine = DownloadSettings.GetEngineById(engineId);
-            CancellationTokenSource canceltocken = engine.cancellation_token_source;
+            CancellationTokenSource canceltocken = engine.cancellationTokenSource;
             canceltocken.Cancel();
             CheckIfReadyToStartDownload();
         }
@@ -430,7 +430,7 @@ namespace MapsInMyFolder
         public static void StopingDownload(int engineId)
         {
             DownloadSettings engine = DownloadSettings.GetEngineById(engineId);
-            string info = $"{engine.nbr_of_tiles - engine.nbr_of_tiles_waiting_for_downloading}/{engine.nbr_of_tiles}";
+            string info = $"{engine.nbrOfTiles - engine.nbrOfTilesWaitingForDownloading}/{engine.nbrOfTiles}";
             UpdateDownloadPanel(engineId, $"{Languages.Current["downloadPanelStateInfoFilePaused"]} ({info})", "", true, Status.pause);
             engine.state = Status.pause;
             AbordAndCancelWithTokenDownload(engineId);
@@ -447,7 +447,7 @@ namespace MapsInMyFolder
         public void RestartDownloadFromZero(int engineId)
         {
             DownloadSettings engine = DownloadSettings.GetEngineById(engineId);
-            engine.nbr_of_tiles_waiting_for_downloading = engine.nbr_of_tiles;
+            engine.nbrOfTilesWaitingForDownloading = engine.nbrOfTiles;
             RestartDownload(engineId);
         }
 
@@ -468,27 +468,27 @@ namespace MapsInMyFolder
             engine.state = Status.waitfordownloading;
             CheckifMultipleDownloadInProgress();
 
-            string info = $"{engine.nbr_of_tiles - engine.nbr_of_tiles_waiting_for_downloading}/{engine.nbr_of_tiles}";
+            string info = $"{engine.nbrOfTiles - engine.nbrOfTilesWaitingForDownloading}/{engine.nbrOfTiles}";
             UpdateDownloadPanel(engineId, $"{Languages.Current["downloadPanelStateInfoFileRestarting"]} ({info})", "", true, Status.progress);
 
             if (engine.urls is null || engine.urls.Count() == 0)
             {
                 UpdateDownloadPanel(engineId, Languages.Current["downloadPanelStateInfoFileGeneratingURL"], "", true, Status.progress);
-                engine.urls = Collectif.GetUrl.GetListOfUrlFromLocation(engine.location, engine.zoom, engine.urlbase, engine.layerid, engine.id);
+                engine.urls = Collectif.GetUrl.GetListOfUrlFromLocation(engine.location, engine.zoom, engine.urlBase, engine.layerid, engine.id);
             }
 
             foreach (var url in engine.urls)
             {
                 url.status = Status.waitfordownloading;
             }
-            if (engine.cancellation_token_source != null)
+            if (engine.cancellationTokenSource != null)
             {
-                engine.cancellation_token_source.Cancel();
-                engine.cancellation_token_source.Dispose();
+                engine.cancellationTokenSource.Cancel();
+                engine.cancellationTokenSource.Dispose();
             }
 
-            engine.cancellation_token_source = new CancellationTokenSource();
-            engine.cancellation_token = engine.cancellation_token_source.Token;
+            engine.cancellationTokenSource = new CancellationTokenSource();
+            engine.cancellationToken = engine.cancellationTokenSource.Token;
 
             if (DownloadSettings.CurrentNumberOfDownload < Settings.max_download_project_in_parralele && CheckNetworkAvailable(engineId))
             {
@@ -551,8 +551,8 @@ namespace MapsInMyFolder
 
         private bool WaitForInternet(DownloadSettings downloadEngineClass)
         {
-            CancellationTokenSource cancellationTokenSource = downloadEngineClass.cancellation_token_source;
-            CancellationToken cancellationToken = downloadEngineClass.cancellation_token;
+            CancellationTokenSource cancellationTokenSource = downloadEngineClass.cancellationTokenSource;
+            CancellationToken cancellationToken = downloadEngineClass.cancellationToken;
 
             bool isNetworkAvailable;
             do
@@ -594,8 +594,8 @@ namespace MapsInMyFolder
         private async Task ParallelDownloadTilesTask(DownloadSettings downloadEngineClass)
         {
             IEnumerable<TilesUrl> urls = downloadEngineClass.urls;
-            CancellationTokenSource cancellationTokenSource = downloadEngineClass.cancellation_token_source;
-            CancellationToken cancellationToken = downloadEngineClass.cancellation_token;
+            CancellationTokenSource cancellationTokenSource = downloadEngineClass.cancellationTokenSource;
+            CancellationToken cancellationToken = downloadEngineClass.cancellationToken;
             try
             {
                 await Task.Run(() =>
@@ -615,9 +615,9 @@ namespace MapsInMyFolder
 
         static private int CheckDownloadIsComplete(DownloadSettings downloadEngineClass)
         {
-            if (downloadEngineClass.nbr_of_tiles_waiting_for_downloading != 0)
+            if (downloadEngineClass.nbrOfTilesWaitingForDownloading != 0)
             {
-                return downloadEngineClass.nbr_of_tiles_waiting_for_downloading;
+                return downloadEngineClass.nbrOfTilesWaitingForDownloading;
             }
 
             UpdateDownloadPanel(downloadEngineClass.id, Languages.Current["downloadPanelStateInfoFileDownloadCheck"], "0", true, Status.progress);
@@ -638,7 +638,7 @@ namespace MapsInMyFolder
                         {
                             numberOfUrlClassWaitingForDownloading++;
                         }
-                        string filename = $"{downloadEngineClass.save_temp_directory}{urlClass.x}_{urlClass.y}.{downloadEngineClass.format}";
+                        string filename = $"{downloadEngineClass.saveTempDirectory}{urlClass.x}_{urlClass.y}.{downloadEngineClass.format}";
 
                         if (File.Exists(filename))
                         {
@@ -660,7 +660,7 @@ namespace MapsInMyFolder
                 }
             }
 
-            downloadEngineClass.nbr_of_tiles_waiting_for_downloading = numberOfUrlClassWaitingForDownloading;
+            downloadEngineClass.nbrOfTilesWaitingForDownloading = numberOfUrlClassWaitingForDownloading;
             return numberOfUrlClassWaitingForDownloading;
         }
 
@@ -673,11 +673,11 @@ namespace MapsInMyFolder
             }
 
             currentEngine.urls = null;
-            currentEngine.SkippedPanelUpdate = 0;
-            currentEngine.last_command = null;
-            currentEngine.last_command_non_important = null;
-            currentEngine.cancellation_token_source.Dispose();
-            currentEngine.cancellation_token_source = null;
+            currentEngine.skippedPanelUpdate = 0;
+            currentEngine.lastCommand = null;
+            currentEngine.lastCommandNotImportant = null;
+            currentEngine.cancellationTokenSource.Dispose();
+            currentEngine.cancellationTokenSource = null;
             Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
             {
                 UpdateDownloadPanel(id, Languages.Current["downloadPanelStateInfoFileCompleted"], "100", true, Status.success);
@@ -727,7 +727,7 @@ namespace MapsInMyFolder
                 commandExecuted += $"updateprogress({id}, \"100\");";
             }
 
-            engine.SkippedPanelUpdate++;
+            engine.skippedPanelUpdate++;
             int updateRate = (int)Math.Floor(Math.Pow(Settings.max_download_tiles_in_parralele / 10, 1.5));
 
             if (updateRate < 1)
@@ -740,24 +740,24 @@ namespace MapsInMyFolder
                 updateRate = Settings.max_download_tiles_in_parralele;
             }
 
-            if (state == Status.no_data && engine.SkippedPanelUpdate != updateRate)
+            if (state == Status.no_data && engine.skippedPanelUpdate != updateRate)
             {
                 return;
             }
 
-            engine.SkippedPanelUpdate--;
+            engine.skippedPanelUpdate--;
 
-            if (!string.IsNullOrEmpty(commandExecuted) && commandExecuted != engine.last_command && commandExecuted != engine.last_command_non_important)
+            if (!string.IsNullOrEmpty(commandExecuted) && commandExecuted != engine.lastCommand && commandExecuted != engine.lastCommandNotImportant)
             {
-                engine.SkippedPanelUpdate = 0;
+                engine.skippedPanelUpdate = 0;
 
                 await Task.Run(async () =>
                 {
-                    engine.last_command = commandExecuted;
+                    engine.lastCommand = commandExecuted;
 
                     if (!isImportant)
                     {
-                        engine.last_command_non_important = commandExecuted;
+                        engine.lastCommandNotImportant = commandExecuted;
                     }
                     await _instance?.MainPage?.download_panel_browser?.EvaluateScriptAsync(commandExecuted);
 
@@ -811,10 +811,10 @@ namespace MapsInMyFolder
             UpdateDownloadPanel(id, $"{Languages.Current["downloadPanelStateInfoFileAssembly"]}  1/2", "0", true, Status.assemblage);
             DownloadSettings currentEngine = DownloadSettings.GetEngineById(id);
             string format = currentEngine.format;
-            string saveDirectory = currentEngine.save_directory;
-            string saveTempFilename = currentEngine.file_temp_name;
-            string saveFilename = currentEngine.file_name;
-            int tileSize = currentEngine.tile_size;
+            string saveDirectory = currentEngine.saveDirectory;
+            string saveTempFilename = currentEngine.fileTempName;
+            string saveFilename = currentEngine.fileName;
+            int tileSize = currentEngine.tileSize;
 
             var rognageInfo = RognageInfo.GetRognageValue(
                 currentEngine.location["NO_Latitude"],
@@ -877,13 +877,13 @@ namespace MapsInMyFolder
         {
             try
             {
-                if (currentEngine.RedimWidth != -1 && currentEngine.RedimHeignt != -1)
+                if (currentEngine.resizeWidth != -1 && currentEngine.resizeHeignt != -1)
                 {
                     UpdateDownloadPanel(currentEngine.id, Languages.Current["downloadPanelStateInfoFileResizing"], "0", true, Status.rognage);
-                    double hrink = currentEngine.RedimHeignt / height;
-                    double Vrink = currentEngine.RedimWidth / width;
+                    double hrink = currentEngine.resizeHeignt / height;
+                    double Vrink = currentEngine.resizeWidth / width;
 
-                    if (currentEngine.RedimHeignt == Math.Round(height * Vrink) || currentEngine.RedimWidth == Math.Round(width * hrink))
+                    if (currentEngine.resizeHeignt == Math.Round(height * Vrink) || currentEngine.resizeWidth == Math.Round(width * hrink))
                     {
                         DebugMode.WriteLine("Uniform resizing");
                         return imageRogner.Resize(hrink);
@@ -891,7 +891,7 @@ namespace MapsInMyFolder
                     else
                     {
                         DebugMode.WriteLine("Deform resizing");
-                        return imageRogner.ThumbnailImage(currentEngine.RedimWidth, currentEngine.RedimHeignt, size: Enums.Size.Force);
+                        return imageRogner.ThumbnailImage(currentEngine.resizeWidth, currentEngine.resizeHeignt, size: Enums.Size.Force);
                     }
                 }
             }
@@ -905,11 +905,11 @@ namespace MapsInMyFolder
         private Image EngineTilesToSingleImage(DownloadSettings curent_engine)
         {
             string format = curent_engine.format;
-            string save_temp_directory = curent_engine.save_temp_directory;
-            string save_directory = curent_engine.save_directory;
-            string save_temp_filename = curent_engine.file_temp_name;
-            string save_filename = curent_engine.file_name;
-            int tile_size = curent_engine.tile_size;
+            string save_temp_directory = curent_engine.saveTempDirectory;
+            string save_directory = curent_engine.saveDirectory;
+            string save_temp_filename = curent_engine.fileTempName;
+            string save_filename = curent_engine.fileName;
+            int tile_size = curent_engine.tileSize;
 
             var NO_tile = Collectif.CoordonneesToTile(curent_engine.location["NO_Latitude"], curent_engine.location["NO_Longitude"], curent_engine.zoom);
             var SE_tile = Collectif.CoordonneesToTile(curent_engine.location["SE_Latitude"], curent_engine.location["SE_Longitude"], curent_engine.zoom);
@@ -1084,8 +1084,8 @@ namespace MapsInMyFolder
                     number_of_url_class_waiting_for_downloading++;
                 }
             }
-            download_engine.nbr_of_tiles_waiting_for_downloading = number_of_url_class_waiting_for_downloading;
-            double progress = (download_engine.nbr_of_tiles - number_of_url_class_waiting_for_downloading) / (double)download_engine.nbr_of_tiles;
+            download_engine.nbrOfTilesWaitingForDownloading = number_of_url_class_waiting_for_downloading;
+            double progress = (download_engine.nbrOfTiles - number_of_url_class_waiting_for_downloading) / (double)download_engine.nbrOfTiles;
             if (number_of_url_class_waiting_for_downloading == 0)
             {
                 progress = 100;
@@ -1113,7 +1113,7 @@ namespace MapsInMyFolder
 
             Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
             {
-                string info = download_engine.nbr_of_tiles - number_of_url_class_waiting_for_downloading + "/" + download_engine.nbr_of_tiles;
+                string info = download_engine.nbrOfTiles - number_of_url_class_waiting_for_downloading + "/" + download_engine.nbrOfTiles;
                 double progresstxt = (double)progress * 100;
                 if (progresstxt > 100)
                 {
@@ -1129,7 +1129,7 @@ namespace MapsInMyFolder
             DownloadSettings download_engine = DownloadSettings.GetEngineById(url.downloadid);
             int z = download_engine.zoom;
             string format = download_engine.format;
-            string save_temp_directory = download_engine.save_temp_directory;
+            string save_temp_directory = download_engine.saveTempDirectory;
             string filename = url.x + "_" + url.y + "." + format;
             bool do_download_this_tile = Collectif.CheckIfDownloadIsNeededOrCached(save_temp_directory, filename, Settings.tiles_cache_expire_after_x_days);
             Thread.CurrentThread.Priority = ThreadPriority.Highest;
@@ -1145,7 +1145,7 @@ namespace MapsInMyFolder
             }
             try
             {
-                HttpResponse httpResponse = await Tiles.Loader.GetImageAsync(download_engine.urlbase, url.x, url.y, url.z, download_engine.layerid, download_engine.format, save_temp_directory).ConfigureAwait(false);
+                HttpResponse httpResponse = await Tiles.Loader.GetImageAsync(download_engine.urlBase, url.x, url.y, url.z, download_engine.layerid, download_engine.format, save_temp_directory).ConfigureAwait(false);
                 if (httpResponse?.ResponseMessage?.IsSuccessStatusCode == true)
                 {
                     using var contentStream = Collectif.ByteArrayToStream(httpResponse.Buffer);
@@ -1192,7 +1192,7 @@ namespace MapsInMyFolder
             finally
             {
                 InternalUpdateProgressBar(download_engine);
-                if (Settings.waiting_before_start_another_tile_download > 0 && download_engine.nbr_of_tiles_waiting_for_downloading > 0)
+                if (Settings.waiting_before_start_another_tile_download > 0 && download_engine.nbrOfTilesWaitingForDownloading > 0)
                 {
                     Thread.Sleep(Settings.waiting_before_start_another_tile_download);
                 }
@@ -1202,11 +1202,11 @@ namespace MapsInMyFolder
 
         private void SaveImage(DownloadSettings currentEngine, NetVips.Image imageRogner)
         {
-            int tileSize = currentEngine.tile_size;
-            string saveTempDirectory = currentEngine.save_temp_directory;
-            string saveDirectory = currentEngine.save_directory;
-            string saveTempFilename = currentEngine.file_temp_name;
-            string saveFilename = currentEngine.file_name;
+            int tileSize = currentEngine.tileSize;
+            string saveTempDirectory = currentEngine.saveTempDirectory;
+            string saveDirectory = currentEngine.saveDirectory;
+            string saveTempFilename = currentEngine.fileTempName;
+            string saveFilename = currentEngine.fileName;
 
             UpdateDownloadPanel(currentEngine.id, Languages.Current["downloadPanelStateInfoFileSaving"], "0", true, Status.enregistrement);
             Thread.Sleep(500);
@@ -1228,7 +1228,7 @@ namespace MapsInMyFolder
 
             try
             {
-                imageRogner.WriteToFile(imageTempsAssemblagePath, Collectif.getSaveVOption(currentEngine.final_saveformat, currentEngine.quality, tileSize));
+                imageRogner.WriteToFile(imageTempsAssemblagePath, Collectif.getSaveVOption(currentEngine.finalSaveFormat, currentEngine.quality, tileSize));
             }
             catch (Exception ex)
             {
@@ -1245,7 +1245,7 @@ namespace MapsInMyFolder
                         File.Delete(targetFilePath);
                         foreach (DownloadSettings eng in DownloadSettings.GetEngineList())
                         {
-                            string engineFilePath = Path.Combine(eng.save_directory, eng.file_name);
+                            string engineFilePath = Path.Combine(eng.saveDirectory, eng.fileName);
                             if (eng.state == Status.success && engineFilePath == targetFilePath)
                             {
                                 UpdateDownloadPanel(eng.id, Languages.Current["downloadPanelStateInfoFileReplaced"], "0", true, Status.deleted);
@@ -1272,7 +1272,7 @@ namespace MapsInMyFolder
             {
                 Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
                 {
-                    Message.NoReturnBoxAsync(Languages.GetWithArguments("downloadMessageErrorTempFolderNotFound", saveFilename), Languages.Current["dialogTitleOperationFailed"]);
+                    Message.NoReturnBoxAsync(Languages.GetWithArguments("downloadMessageErrorTileAssembly", saveFilename), Languages.Current["dialogTitleOperationFailed"]);
                 }, null);
             }
         }

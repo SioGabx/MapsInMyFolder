@@ -62,7 +62,8 @@ namespace MapsInMyFolder.Commun
         public enum Language
         {
             French,
-            English
+            English,
+            None
         }
 
         private static LanguageDictionaryWrapper<string, string> _current = new LanguageDictionaryWrapper<string, string>(new Dictionary<string, string>());
@@ -74,7 +75,7 @@ namespace MapsInMyFolder.Commun
 
         static Languages()
         {
-            Load(Language.French);
+            Load(Language.English);
         }
 
         public static void Load(Language language)

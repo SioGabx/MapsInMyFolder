@@ -130,7 +130,7 @@
                             Content="{Binding Source={x:Static commun:Languages.Current}, Path=[editorPropertyNameDescription]}"
                             Foreground="#888989" />
                         <TextBox
-                            x:Name="TextboxLayerDescriptif"
+                            x:Name="TextboxLayerDescription"
                             Grid.Row="1"
                             Height="Auto"
                             MinHeight="80"
@@ -157,7 +157,7 @@
                             Content="{Binding Source={x:Static commun:Languages.Current}, Path=[editorPropertyNameCategory]}"
                             Foreground="#888989" />
                         <ComboBox
-                            x:Name="TextboxLayerCategories"
+                            x:Name="TextboxLayerCategory"
                             Grid.Row="1"
                             Width="Auto"
                             Height="21"
@@ -189,7 +189,7 @@
                             Foreground="#888989" />
 
                         <cbcontrols:MultiSelectCombobox
-                            x:Name="PaysComboBox"
+                            x:Name="CountryComboBox"
                             Grid.Row="1"
                             Height="Auto"
                             MinHeight="16"
@@ -210,7 +210,7 @@
                             Content="{Binding Source={x:Static commun:Languages.Current}, Path=[editorPropertyNameIdentifier]}"
                             Foreground="#888989" />
                         <TextBox
-                            x:Name="TextboxLayerIdentifiant"
+                            x:Name="TextboxLayerIdentifier"
                             Grid.Row="1"
                             HorizontalAlignment="Stretch"
                             SpellCheck.IsEnabled="False"
@@ -773,7 +773,7 @@
                     Margin="0,10,0,0"
                     HorizontalAlignment="Left"
                     VerticalAlignment="Top"
-                    Content="{Binding Source={x:Static commun:Languages.Current}, Path=[consoleSubTitle]}"
+                    Content="{Binding Source={x:Static commun:Languages.Current}, Path=[editorSubTitleConsole]}"
                     FontFamily="Segoe UI Semilight"
                     FontSize="16.5"
                     Foreground="#FFE2E2E1" />

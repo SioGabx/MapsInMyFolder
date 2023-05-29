@@ -58,7 +58,7 @@ namespace MapsInMyFolder.Commun
         {
             public enum InvokeFunction { getTile, getPreview, getPreviewFallback }
 
-            public static (Dictionary<string, object> DefaultCallValue, Dictionary<string, string> ResultCallValue) CallFunctionAndGetResult(string urlbase, string TileComputationScript, int Tilex, int Tiley, int z, int LayerID, InvokeFunction InvokeFunction)
+            public static (Dictionary<string, object> DefaultCallValue, Dictionary<string, string> ResultCallValue) CallFunctionAndGetResult(string urlbase, string Script, int Tilex, int Tiley, int z, int LayerID, InvokeFunction InvokeFunction)
             {
                 if (LayerID == -1)
                 {
@@ -88,12 +88,12 @@ namespace MapsInMyFolder.Commun
                 };
 
 
-                if (!string.IsNullOrEmpty(TileComputationScript))
+                if (!string.IsNullOrEmpty(Script))
                 {
                     Jint.Native.JsValue JavascriptMainResult = null;
                     try
                     {
-                        JavascriptMainResult = Javascript.ExecuteScript(TileComputationScript, new Dictionary<string, object>(argument), LayerID, InvokeFunction);
+                        JavascriptMainResult = Javascript.ExecuteScript(Script, new Dictionary<string, object>(argument), LayerID, InvokeFunction);
                     }
                     catch (Exception ex)
                     {
@@ -122,8 +122,8 @@ namespace MapsInMyFolder.Commun
                 {
                     return string.Empty;
                 }
-                string TileComputationScript = calque.class_tilecomputationscript;
-                var ValuesDictionnary = CallFunctionAndGetResult(urlbase, TileComputationScript, Tilex, Tiley, z, LayerID, InvokeFunction);
+                string Script = calque.class_script;
+                var ValuesDictionnary = CallFunctionAndGetResult(urlbase, Script, Tilex, Tiley, z, LayerID, InvokeFunction);
                 if (ValuesDictionnary.ResultCallValue is null)
                 {
                     return string.Empty;
@@ -400,7 +400,7 @@ namespace MapsInMyFolder.Commun
 
         }
 
-        public static string GetSaveTempDirectory(string nom, string identifiant, int zoom = -1, string temp_folder = "")
+        public static string GetSaveTempDirectory(string nom, string identifier, int zoom = -1, string temp_folder = "")
         {
             string settings_temp_folder;
             if (string.IsNullOrEmpty(temp_folder))
@@ -413,7 +413,7 @@ namespace MapsInMyFolder.Commun
             }
 
             string nom_charclean = string.Concat(nom.Split(Path.GetInvalidFileNameChars()));
-            string chemin = Path.Combine(settings_temp_folder, "layers", nom_charclean + "_" + identifiant + "\\");
+            string chemin = Path.Combine(settings_temp_folder, "layers", nom_charclean + "_" + identifier + "\\");
             if (zoom != -1)
             {
                 chemin += zoom + "\\";

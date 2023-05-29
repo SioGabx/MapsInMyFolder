@@ -97,26 +97,26 @@ namespace MapsInMyFolder.Commun
                          ShowButtonPrimary(dialogButtonOK);
                          break;
                      case MessageDialogButton.OKCancel:
-                         ShowButtonPrimary(dialogButtonYes);
+                         ShowButtonPrimary(dialogButtonOK);
                          ShowButtonCancel(dialogButtonCancel);
                          break;
                      case MessageDialogButton.YesNo:
                          ShowButtonPrimary(dialogButtonYes);
-                         ShowButtonSecondary(dialogButtonYes);
+                         ShowButtonSecondary(dialogButtonNo);
                          break;
                      case MessageDialogButton.YesNoCancel:
                          ShowButtonPrimary(dialogButtonYes);
-                         ShowButtonSecondary(dialogButtonYes);
+                         ShowButtonSecondary(dialogButtonNo);
                          ShowButtonCancel(dialogButtonCancel);
                          break;
                      case MessageDialogButton.YesNoRetry:
                          ShowButtonPrimary(dialogButtonYes);
-                         ShowButtonSecondary(dialogButtonYes);
-                         ShowButtonCancel(dialogButtonCancel);
+                         ShowButtonSecondary(dialogButtonNo);
+                         ShowButtonCancel(dialogButtonRetry);
                          break;
                      case MessageDialogButton.YesCancel:
                          ShowButtonPrimary(dialogButtonYes);
-                         ShowButtonCancel(dialogButtonRetry);
+                         ShowButtonCancel(dialogButtonCancel);
                          break;
                      case MessageDialogButton.YesRetry:
                          ShowButtonPrimary(dialogButtonYes);

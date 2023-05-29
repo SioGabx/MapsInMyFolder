@@ -32,8 +32,6 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="RessourcesDictionnary.xaml" />
-
-
                 <ResourceDictionary>
                     <Style x:Key="GridSelectNormalStyle" TargetType="{x:Type Grid}">
                         <Style.Triggers>
@@ -104,7 +102,6 @@
                     <RowDefinition Height="65" />
                     <RowDefinition />
                 </Grid.RowDefinitions>
-
                 <Label
                     Grid.Row="0"
                     Width="192"
@@ -112,17 +109,15 @@
                     Margin="28,10,0,0"
                     HorizontalAlignment="Left"
                     VerticalAlignment="Top"
-                    Content="Catégories"
+                    Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsTitleCategory]}"
                     FontFamily="Segoe UI Light"
                     FontSize="30"
                     Foreground="#FFE2E2E1" />
-
                 <StackPanel
                     Grid.Row="1"
                     Height="Auto"
                     Margin="10,-5,5,0"
                     VerticalAlignment="Stretch">
-
                     <Grid
                         x:Name="MenuItem_Calque"
                         Height="35"
@@ -133,7 +128,9 @@
                             Grid.Column="1"
                             Margin="10,0,0,0"
                             VerticalAlignment="Center"
-                            FontSize="15"><Run Text="Calques" /></TextBlock>
+                            FontSize="15">
+                            <Run Text="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsSubTitleLayers]}" />
+                        </TextBlock>
                     </Grid>
                     <Grid
                         x:Name="MenuItem_Telechargement"
@@ -145,7 +142,9 @@
                             Grid.Column="1"
                             Margin="10,0,0,0"
                             VerticalAlignment="Center"
-                            FontSize="15"><Run Text="Téléchargement" /></TextBlock>
+                            FontSize="15">
+                            <Run Text="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsSubTitleDownloads]}" />
+                        </TextBlock>
                     </Grid>
 
                     <Grid
@@ -158,7 +157,9 @@
                             Grid.Column="1"
                             Margin="10,0,0,0"
                             VerticalAlignment="Center"
-                            FontSize="15"><Run Text="Carte" /></TextBlock>
+                            FontSize="15">
+                            <Run Text="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsSubTitleMaps]}" />
+                        </TextBlock>
                     </Grid>
                     <Grid
                         x:Name="MenuItem_Avance"
@@ -170,7 +171,9 @@
                             Grid.Column="1"
                             Margin="10,0,0,0"
                             VerticalAlignment="Center"
-                            FontSize="15"><Run Text="Option avancée" /></TextBlock>
+                            FontSize="15">
+                            <Run Text="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsSubTitleAdvancedOptions]}" />
+                        </TextBlock>
                     </Grid>
 
                     <Grid
@@ -183,7 +186,9 @@
                             Grid.Column="1"
                             Margin="10,0,0,0"
                             VerticalAlignment="Center"
-                            FontSize="15"><Run Text="Mises à jour" /></TextBlock>
+                            FontSize="15">
+                            <Run Text="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsSubTitleUpdates]}" />
+                        </TextBlock>
                     </Grid>
 
                     <Grid
@@ -196,7 +201,9 @@
                             Grid.Column="1"
                             Margin="10,0,0,0"
                             VerticalAlignment="Center"
-                            FontSize="15"><Run Text="A propos" /></TextBlock>
+                            FontSize="15">
+                            <Run Text="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsSubTitleAbout]}" />
+                        </TextBlock>
                     </Grid>
                 </StackPanel>
             </Grid>
@@ -215,7 +222,7 @@
                     Margin="28,10,0,0"
                     HorizontalAlignment="Left"
                     VerticalAlignment="Top"
-                    Content="Paramètres"
+                    Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsTitle]}"
                     FontFamily="Segoe UI Light"
                     FontSize="30"
                     Foreground="#FFE2E2E1" />
@@ -242,7 +249,8 @@
                                     Margin="0,0,0,0"
                                     HorizontalAlignment="Left"
                                     VerticalAlignment="Top"
-                                    Content="Calques : "
+                                    Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsSubTitleLayers]}"
+                                    ContentStringFormat="{}{0} :"
                                     FontFamily="Segoe UI Semilight"
                                     FontSize="16.5"
                                     Foreground="#FFE2E2E1" />
@@ -253,7 +261,7 @@
                                     </Grid.RowDefinitions>
                                     <Label
                                         Grid.Row="0"
-                                        Content="Calque de démarage (seul les calques au format JPEG sont accepté) :"
+                                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameStartupLayer]}"
                                         Foreground="#888989" />
                                     <ComboBox
                                         x:Name="layer_startup_id"
@@ -289,7 +297,7 @@
                                     </Grid.Resources>
                                     <Label
                                         Grid.Row="0"
-                                        Content="Critère de trie des calques :"
+                                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameLayerSort]}"
                                         Foreground="#888989" />
                                     <cbcontrols:MultiSelectCombobox
                                         x:Name="layersSort"
@@ -310,7 +318,7 @@
                                     <CheckBox
                                         x:Name="layerpanel_put_non_letter_layername_at_the_end"
                                         Grid.Row="0"
-                                        Content="Afficher les calques commençant par des caractères spéciaux à la fin (ex : %, -, #)"
+                                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameLayersStartingWithSpecialCharactersToEnd]}"
                                         Foreground="#888989" />
                                 </Grid>
 
@@ -322,7 +330,7 @@
                                     <CheckBox
                                         x:Name="layerpanel_favorite_at_top"
                                         Grid.Row="0"
-                                        Content="Afficher les calques favoris en haut"
+                                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameFavoriteLayersAtTop]}"
                                         Foreground="#888989" />
                                 </Grid>
 
@@ -334,11 +342,11 @@
                                     </Grid.RowDefinitions>
                                     <Label
                                         Grid.Row="0"
-                                        Content="Masquer les calques qui ne correspondent pas au pays suivants :"
+                                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameCountryFilter]}"
                                         Foreground="#888989" />
 
                                     <cbcontrols:MultiSelectCombobox
-                                        x:Name="PaysComboBox"
+                                        x:Name="CountryComboBox"
                                         Grid.Row="1"
                                         Height="Auto"
                                         MinHeight="16"
@@ -355,7 +363,7 @@
                                     </Grid.RowDefinitions>
                                     <Label
                                         Grid.Row="0"
-                                        Content="Type d'affichage des calques :"
+                                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameLayerDisplayType]}"
                                         Foreground="#888989" />
                                     <ComboBox
                                         x:Name="layerpanel_displaystyle"
@@ -383,7 +391,7 @@
                                     </Grid.RowDefinitions>
                                     <Label
                                         Grid.Row="0"
-                                        Content="Script par défault pour le calcul des tuiles :"
+                                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameDefaultScript]}"
                                         Foreground="#888989" />
                                     <avalonEdit:TextEditor
                                         x:Name="tileloader_default_script"
@@ -415,7 +423,7 @@
                                     </Grid.RowDefinitions>
                                     <Label
                                         Grid.Row="0"
-                                        Content="Script template pour le calcul des tuiles (clic droit lors de l'edition du script) :"
+                                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameScriptTemplate]}"
                                         Foreground="#888989" />
                                     <avalonEdit:TextEditor
                                         x:Name="tileloader_template_script"
@@ -437,13 +445,6 @@
                                         </avalonEdit:TextEditor.ContextMenu>
                                     </avalonEdit:TextEditor>
                                 </Grid>
-
-                                <Button
-                                    x:Name="openAvancedEditor"
-                                    Margin="0,10,0,0"
-                                    Click="openAvancedEditor_Click"
-                                    Content="Ouvrir l'éditeur de base de donnée avancée (beta)"
-                                    Foreground="#BCBCBC" />
                             </StackPanel>
 
                             <StackPanel x:Name="TelechargementSettings">
@@ -454,7 +455,8 @@
                                     Margin="0,20,0,0"
                                     HorizontalAlignment="Left"
                                     VerticalAlignment="Top"
-                                    Content="Téléchargements : "
+                                    Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsSubTitleDownloads]}"
+                                    ContentStringFormat="{}{0} :"
                                     FontFamily="Segoe UI Semilight"
                                     FontSize="16.5"
                                     Foreground="#FFE2E2E1" />
@@ -466,7 +468,7 @@
                                     </Grid.RowDefinitions>
                                     <Label
                                         Grid.Row="0"
-                                        Content="Chemin de travail"
+                                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameWorkPath]}"
                                         Foreground="#888989" />
                                     <TextBox
                                         x:Name="working_folder"
@@ -485,7 +487,7 @@
                                     </Grid.RowDefinitions>
                                     <Label
                                         Grid.Row="0"
-                                        Content="Chemin temporaire"
+                                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameTempPath]}"
                                         Foreground="#888989" />
                                     <TextBox
                                         x:Name="temp_folder"
@@ -504,7 +506,7 @@
                                     </Grid.RowDefinitions>
                                     <Label
                                         Grid.Row="0"
-                                        Content="Nombre de réessai maximum après échec"
+                                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameMaxDownloadRetry]}"
                                         Foreground="#888989" />
                                     <TextBox
                                         x:Name="max_retry_download"
@@ -524,7 +526,7 @@
                                     </Grid.RowDefinitions>
                                     <Label
                                         Grid.Row="0"
-                                        Content="Nombre maximum de redirection"
+                                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameMaxNumberRedirects]}"
                                         Foreground="#888989" />
                                     <TextBox
                                         x:Name="max_redirection_download_tile"
@@ -544,7 +546,7 @@
                                     </Grid.RowDefinitions>
                                     <Label
                                         Grid.Row="0"
-                                        Content="Secondes d'attente jusqu'à l'expiration des demandes (timeout) - Redémarrage requis"
+                                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameRequestTimeOut]}"
                                         Foreground="#888989" />
                                     <TextBox
                                         x:Name="http_client_timeout_in_seconds"
@@ -564,7 +566,7 @@
                                     </Grid.RowDefinitions>
                                     <Label
                                         Grid.Row="0"
-                                        Content="Durée du cache (en jours)"
+                                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameCacheExpirationTimeInDays]}"
                                         Foreground="#888989" />
                                     <TextBox
                                         x:Name="tiles_cache_expire_after_x_days"
@@ -584,7 +586,7 @@
                                     </Grid.RowDefinitions>
                                     <Label
                                         Grid.Row="0"
-                                        Content="Nombre maximum de téléchargelent en paralele"
+                                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameMaxNumberSimultaneousDownloads]}"
                                         Foreground="#888989" />
                                     <TextBox
                                         x:Name="max_download_project_in_parralele"
@@ -604,7 +606,7 @@
                                     </Grid.RowDefinitions>
                                     <Label
                                         Grid.Row="0"
-                                        Content="Nombre maximum en paralele de requêtes (par téléchargement)"
+                                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameMaxNumberRequestsProcessedSimultaneouslyPerDownload]}"
                                         Foreground="#888989" />
                                     <TextBox
                                         x:Name="max_download_tiles_in_parralele"
@@ -624,7 +626,7 @@
                                     </Grid.RowDefinitions>
                                     <Label
                                         Grid.Row="0"
-                                        Content="Temps d'attente entre chaque nouvelle requête (en milisecondes)"
+                                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameDelayBetweenTwoConsecutiveRequestsInMilliseconds]}"
                                         Foreground="#888989" />
                                     <TextBox
                                         x:Name="waiting_before_start_another_tile_download"
@@ -644,7 +646,7 @@
                                     </Grid.RowDefinitions>
                                     <Label
                                         Grid.Row="0"
-                                        Content="User-Agent"
+                                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameUserAgent]}"
                                         Foreground="#888989" />
                                     <TextBox
                                         x:Name="user_agent"
@@ -663,15 +665,15 @@
                                     </Grid.RowDefinitions>
                                     <Label
                                         Grid.Row="0"
-                                        Content="Générer des tuiles transparentes en cas d'erreurs"
+                                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameGenerateTransparentTilesInCaseOfErrors]}"
                                         Foreground="#888989" />
                                     <ui:RadioButtons
                                         x:Name="Options"
                                         Grid.Row="1"
                                         Width="Auto">
-                                        <RadioButton x:Name="generate_transparent_tiles_on_error" Content="Toutes les erreurs (400, 403, 404, 429, ...)" />
-                                        <RadioButton x:Name="generate_transparent_tiles_on_404" Content="En cas d'erreur 404 (recommandée)" />
-                                        <RadioButton x:Name="generate_transparent_tiles_never" Content="Jamais (causera l'echec du téléchargement)" />
+                                        <RadioButton x:Name="generate_transparent_tiles_on_error" Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyValuesGenerateTransparentTilesInCaseOfErrorsAll]}" />
+                                        <RadioButton x:Name="generate_transparent_tiles_on_404" Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyValuesGenerateTransparentTilesInCaseOfErrorsNotFound]}" />
+                                        <RadioButton x:Name="generate_transparent_tiles_never" Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyValuesGenerateTransparentTilesInCaseOfErrorsNever]}" />
                                     </ui:RadioButtons>
                                 </Grid>
                             </StackPanel>
@@ -684,7 +686,8 @@
                                     Margin="0,20,0,0"
                                     HorizontalAlignment="Left"
                                     VerticalAlignment="Top"
-                                    Content="Carte : "
+                                    Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsSubTitleMaps]}"
+                                    ContentStringFormat="{}{0} :"
                                     FontFamily="Segoe UI Semilight"
                                     FontSize="16.5"
                                     Foreground="#FFE2E2E1" />
@@ -697,7 +700,7 @@
                                     </Grid.RowDefinitions>
                                     <Label
                                         Grid.Row="0"
-                                        Content="Couleur d'arrière plan (valeur HEX)"
+                                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameBackgroundColorHexValue]}"
                                         Foreground="#888989" />
                                     <TextBox
                                         x:Name="background_layer_color"
@@ -716,7 +719,7 @@
                                     </Grid.RowDefinitions>
                                     <Label
                                         Grid.Row="0"
-                                        Content="Opacitée du calque d'arrière plan (en pourcentage)"
+                                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameBackgroundLayerOpacityInPercentage]}"
                                         Foreground="#888989" />
                                     <TextBox
                                         x:Name="background_layer_opacity"
@@ -742,7 +745,7 @@
                                         Grid.Row="0"
                                         Grid.Column="0"
                                         Grid.ColumnSpan="3"
-                                        Content="Coordonnées Nord-Ouest du cadre de séléction au démarage (latitude / longitude)"
+                                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameSelectionNorthwestCoordinatesAtStartup]}"
                                         Foreground="#888989" />
                                     <TextBox
                                         x:Name="NO_PIN_starting_location_latitude"
@@ -777,7 +780,7 @@
                                         Grid.Row="0"
                                         Grid.Column="0"
                                         Grid.ColumnSpan="3"
-                                        Content="Coordonnées Sud-Est du cadre de séléction au démarage (latitude / longitude)"
+                                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameSelectionSoutheastCoordinatesAtStartup]}"
                                         Foreground="#888989" />
                                     <TextBox
                                         x:Name="SE_PIN_starting_location_latitude"
@@ -805,7 +808,7 @@
                                     <CheckBox
                                         x:Name="visibility_pins"
                                         Grid.Row="0"
-                                        Content="Afficher les coordonnées des coins du cadre de séléction"
+                                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameDisplayCornerSelectionCoordinates]}"
                                         Foreground="#888989" />
                                 </Grid>
 
@@ -817,7 +820,7 @@
                                     </Grid.RowDefinitions>
                                     <Label
                                         Grid.Row="0"
-                                        Content="Zoom par défaut au démarage"
+                                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameDefaultZoomAtStartup]}"
                                         Foreground="#888989" />
                                     <TextBox
                                         x:Name="map_defaut_zoom_level"
@@ -837,7 +840,7 @@
                                     <CheckBox
                                         x:Name="zoom_limite_taille_carte"
                                         Grid.Row="0"
-                                        Content="Limiter le zoom de la carte au zoom minimum du calque"
+                                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameLimitMapZoomToMinimumLayerZoom]}"
                                         Foreground="#888989" />
                                 </Grid>
 
@@ -849,7 +852,7 @@
                                     <CheckBox
                                         x:Name="map_show_tile_border"
                                         Grid.Row="0"
-                                        Content="Afficher les bordures de tuiles"
+                                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameDisplayTileBorders]}"
                                         Foreground="#888989" />
                                 </Grid>
 
@@ -860,7 +863,7 @@
                                     </Grid.RowDefinitions>
                                     <Label
                                         Grid.Row="0"
-                                        Content="Moteur de recherche :"
+                                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameSearchEngine]}"
                                         Foreground="#888989" />
                                     <ComboBox
                                         x:Name="search_engine"
@@ -890,7 +893,8 @@
                                     Margin="0,20,0,0"
                                     HorizontalAlignment="Left"
                                     VerticalAlignment="Top"
-                                    Content="Options avancée : "
+                                    Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsSubTitleAdvancedOptions]}"
+                                    ContentStringFormat="{}{0} :"
                                     FontFamily="Segoe UI Semilight"
                                     FontSize="16.5"
                                     Foreground="#FFE2E2E1" />
@@ -903,7 +907,7 @@
                                     </Grid.RowDefinitions>
                                     <Label
                                         Grid.Row="0"
-                                        Content="Nom du fichier de base de donnée"
+                                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameDatabaseFileName]}"
                                         Foreground="#888989" />
                                     <TextBox
                                         x:Name="database_pathname"
@@ -921,7 +925,7 @@
                                     </Grid.RowDefinitions>
                                     <Label
                                         Grid.Row="0"
-                                        Content="selection_rectangle_resize_tblr_gap"
+                                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameSelectionRectangleResizeMargin]}"
                                         Foreground="#888989" />
                                     <TextBox
                                         x:Name="selection_rectangle_resize_tblr_gap"
@@ -941,7 +945,7 @@
                                     </Grid.RowDefinitions>
                                     <Label
                                         Grid.Row="0"
-                                        Content="selection_rectangle_resize_angle_gap"
+                                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameSelectionRectangleAngularResizeMargin]}"
                                         Foreground="#888989" />
                                     <TextBox
                                         x:Name="selection_rectangle_resize_angle_gap"
@@ -961,7 +965,7 @@
                                     <CheckBox
                                         x:Name="is_in_debug_mode"
                                         Grid.Row="0"
-                                        Content="Activer le débuggage"
+                                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameEnableDebugging]}"
                                         Foreground="#888989" />
                                 </Grid>
 
@@ -973,7 +977,7 @@
                                     <CheckBox
                                         x:Name="show_layer_devtool"
                                         Grid.Row="0"
-                                        Content="Afficher les devtool pour le panneau &quot;Calques&quot;"
+                                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameDisplayDevToolsForLayersPanel]}"
                                         Foreground="#888989" />
                                 </Grid>
 
@@ -985,7 +989,7 @@
                                     <CheckBox
                                         x:Name="show_download_devtool"
                                         Grid.Row="0"
-                                        Content="Afficher les devtool pour le panneau &quot;Téléchargements&quot;"
+                                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameDisplayDevToolsForDownloadsPanel]}"
                                         Foreground="#888989" />
                                 </Grid>
 
@@ -997,7 +1001,7 @@
                                     <CheckBox
                                         x:Name="nettoyer_cache_browser_au_demarrage"
                                         Grid.Row="0"
-                                        Content="Supprimer le cache des panneaux au démarrage"
+                                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameClearPanelsCacheAtStartup]}"
                                         Foreground="#888989" />
                                 </Grid>
 
@@ -1009,14 +1013,14 @@
                                     <CheckBox
                                         x:Name="nettoyer_cache_layers_au_demarrage"
                                         Grid.Row="0"
-                                        Content="Supprimer le cache des tuiles au démarrage"
+                                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameClearTilesCacheAtStartup]}"
                                         Foreground="#888989" />
                                 </Grid>
                                 <Button
                                     x:Name="resetSettings"
                                     Margin="0,10,0,0"
                                     Click="ResetSettings_Click"
-                                    Content="Restaurer les paramètres par défaut"
+                                    Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameResetToDefaultSettings]}"
                                     Foreground="#BCBCBC" />
                             </StackPanel>
 
@@ -1028,7 +1032,8 @@
                                     Margin="0,20,0,0"
                                     HorizontalAlignment="Left"
                                     VerticalAlignment="Top"
-                                    Content="Mises à jour : "
+                                    Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsSubTitleUpdates]}"
+                                    ContentStringFormat="{}{0} :"
                                     FontFamily="Segoe UI Semilight"
                                     FontSize="16.5"
                                     Foreground="#FFE2E2E1" />
@@ -1042,7 +1047,7 @@
                                     </Grid.RowDefinitions>
                                     <Label
                                         Grid.Row="0"
-                                        Content="Github repository URL"
+                                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameGitHubRepositoryURL]}"
                                         Foreground="#888989" />
                                     <TextBox
                                         x:Name="github_repository_url"
@@ -1060,7 +1065,7 @@
                                     </Grid.RowDefinitions>
                                     <Label
                                         Grid.Row="0"
-                                        Content="Nom du fichier database sur github"
+                                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameDatabaseFileNameInGitHubRepository]}"
                                         Foreground="#888989" />
                                     <TextBox
                                         x:Name="github_database_name"
@@ -1079,7 +1084,7 @@
                                     <CheckBox
                                         x:Name="search_application_update_on_startup"
                                         Grid.Row="0"
-                                        Content="Rechercher les mises à jour de l'application au démarage du logiciel"
+                                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameCheckForApplicationUpdatesOnSoftwareLaunch]}"
                                         Foreground="#888989" />
                                 </Grid>
                                 <Grid Margin="0,10,0,0">
@@ -1090,7 +1095,7 @@
                                     <CheckBox
                                         x:Name="search_database_update_on_startup"
                                         Grid.Row="0"
-                                        Content="Rechercher les mises à jour de la base de donnée au démarage du logiciel"
+                                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameCheckDatabaseUpdatesOnSoftwareLaunch]}"
                                         Foreground="#888989" />
                                 </Grid>
 
@@ -1098,19 +1103,25 @@
                                     x:Name="databaseExport"
                                     Margin="0,10,0,0"
                                     Click="databaseExport_Click"
-                                    Content="Exporter la base de donnée"
+                                    Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameExportDatabase]}"
                                     Foreground="#BCBCBC" />
                                 <Button
                                     x:Name="searchForUpdates"
                                     Margin="0,10,0,0"
                                     Click="searchForUpdates_Click"
-                                    Content="Rechercher des mises à jours"
+                                    Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameCheckApplicationUpdates]}"
                                     Foreground="#BCBCBC" />
                                 <Label
                                     x:Name="searchForUpdatesLastUpdateCheck"
-                                    Content="01/01/1970"
-                                    ContentStringFormat="Dernière verification : {0}"
-                                    Foreground="#888989" />
+                                    Content="Unknown"
+                                    Foreground="#888989">
+                                    <Label.ContentStringFormat>
+                                        <MultiBinding StringFormat="{}{0} {1}">
+                                            <Binding Path="[settingsPropertyNameLastApplicationUpdatesCheck]" Source="{x:Static commun:Languages.Current}" />
+                                            <Binding ElementName="searchForUpdatesLastUpdateCheck" Path="Content" />
+                                        </MultiBinding>
+                                    </Label.ContentStringFormat>
+                                </Label>
                             </StackPanel>
 
                             <StackPanel x:Name="AProposSettings">
@@ -1121,7 +1132,8 @@
                                     Margin="0,20,0,0"
                                     HorizontalAlignment="Left"
                                     VerticalAlignment="Top"
-                                    Content="A propos : "
+                                    Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsSubTitleAbout]}"
+                                    ContentStringFormat="{}{0} :"
                                     FontFamily="Segoe UI Semilight"
                                     FontSize="16.5"
                                     Foreground="#FFE2E2E1" />
@@ -1139,7 +1151,8 @@
                                 <ui:HyperlinkButton Content="https://siogabx.fr/" NavigateUri="https://siogabx.fr/" />
                                 <StackPanel Margin="0,10,0,0">
                                     <WrapPanel>
-                                        <Label Content="Credits (merci à eux " Foreground="#888989" />
+                                        <Label Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameCredits]}" Foreground="#888989" />
+                                        <Label Content=" (merci à eux " Foreground="#888989" />
                                         <Label Content="♥" Foreground="#F18712" />
                                         <Label Content="):" Foreground="#888989" />
                                     </WrapPanel>
@@ -1156,15 +1169,27 @@
                                             <Label Content="- AliFlux : " Foreground="#888989" />
                                             <ui:HyperlinkButton Content="VectorTileRenderer" NavigateUri="https://github.com/AliFlux/VectorTileRenderer" />
                                         </WrapPanel>
+
                                         <WrapPanel VerticalAlignment="Center">
-                                            <Label Content="- CefSharp community : " Foreground="#888989" />
-                                            <ui:HyperlinkButton Content="CefSharp" NavigateUri="https://github.com/cefsharp/CefSharp" />
+                                            <Label Content="- SQLite Development Team : " Foreground="#888989" />
+                                            <ui:HyperlinkButton
+                                                Content="SQLite Database"
+                                                Cursor="Hand"
+                                                NavigateUri="https://system.data.sqlite.org/" />
                                         </WrapPanel>
                                         <WrapPanel VerticalAlignment="Center">
                                             <Label Content="- Libvips community &amp; kleisauke : " Foreground="#888989" />
                                             <ui:HyperlinkButton Content="libvips" NavigateUri="https://github.com/libvips/libvips" />
                                             <Label Content=" / " Foreground="#888989" />
                                             <ui:HyperlinkButton Content="net-vips" NavigateUri="https://github.com/kleisauke/net-vips" />
+                                        </WrapPanel>
+                                        <WrapPanel VerticalAlignment="Center">
+                                            <Label Content="- CefSharp community : " Foreground="#888989" />
+                                            <ui:HyperlinkButton Content="CefSharp" NavigateUri="https://github.com/cefsharp/CefSharp" />
+                                        </WrapPanel>
+                                        <WrapPanel VerticalAlignment="Center">
+                                            <Label Content="- AvalonEdit Contributors : " Foreground="#888989" />
+                                            <ui:HyperlinkButton Content="AvalonEdit" NavigateUri="http://avalonedit.net/" />
                                         </WrapPanel>
                                         <StackPanel Height="125" />
                                     </StackPanel>

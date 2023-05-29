@@ -29,8 +29,8 @@ namespace MapsInMyFolder
             SetFixMouseWheelBehavior(tileloader_default_script);
             SetFixMouseWheelBehavior(tileloader_template_script);
 
-            AddContextMenuItems(tileloader_default_script, "Indenter");
-            AddContextMenuItems(tileloader_template_script, "Indenter");
+            AddContextMenuItems(tileloader_default_script, Languages.Current["editorContextMenuIndent"]);
+            AddContextMenuItems(tileloader_template_script, Languages.Current["editorContextMenuIndent"]);
 
             SetTextAreaOptions(tileloader_default_script, true, 4);
             SetTextAreaOptions(tileloader_template_script, true, 4);
@@ -77,11 +77,11 @@ namespace MapsInMyFolder
             void indenterMenuItem_Unloaded(object sender, EventArgs e)
             {
                 indenterMenuItem.Click -= indenterMenuItem_Click;
-                indenterMenuItem.Unloaded -= indenterMenuItem_Unloaded;
+                textEditor.Unloaded -= indenterMenuItem_Unloaded;
             }
 
             indenterMenuItem.Click += indenterMenuItem_Click;
-            indenterMenuItem.Unloaded += indenterMenuItem_Unloaded;
+            textEditor.Unloaded += indenterMenuItem_Unloaded;
             textEditor.ContextMenu.Items.Add(indenterMenuItem);
         }
 
@@ -154,18 +154,18 @@ namespace MapsInMyFolder
             {
                 "ID ASC",
                 "ID DESC",
-                "NOM ASC",
-                "NOM DESC",
+                "NAME ASC",
+                "NAME DESC",
                 "DESCRIPTION ASC",
                 "DESCRIPTION DESC",
-                "CATEGORIE ASC",
-                "CATEGORIE DESC",
+                "CATEGORY ASC",
+                "CATEGORY DESC",
                 "FORMAT ASC",
                 "FORMAT DESC",
                 "SITE ASC",
                 "SITE DESC",
-                "PAYS ASC",
-                "PAYS DESC"
+                "COUNTRY ASC",
+                "COUNTRY DESC"
             };
             layersSort.SelectedItems = Settings.layers_Sort.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList();
 
@@ -239,8 +239,8 @@ namespace MapsInMyFolder
             nettoyer_cache_layers_au_demarrage.IsChecked = Settings.nettoyer_cache_layers_au_demarrage;
             search_application_update_on_startup.IsChecked = Settings.search_application_update_on_startup;
             search_database_update_on_startup.IsChecked = Settings.search_database_update_on_startup;
-            PaysComboBox.ItemSource = Country.getList();
-            PaysComboBox.SelectedItems = Country.getListFromEnglishName(Settings.filter_layers_based_on_country.Split(';', StringSplitOptions.RemoveEmptyEntries));
+            CountryComboBox.ItemSource = Country.getList();
+            CountryComboBox.SelectedItems = Country.getListFromEnglishName(Settings.filter_layers_based_on_country.Split(';', StringSplitOptions.RemoveEmptyEntries));
 
             DefaultValuesHachCode = Collectif.CheckIfInputValueHaveChange(SettingsScrollViewer);
             SettingsVersionInformation.Content = Update.GetActualProductVersionFormatedString();
@@ -258,7 +258,7 @@ namespace MapsInMyFolder
             {
                 long tick = Convert.ToInt64(lastUpdateCheckDateTimeTick);
                 DateTime lastUpdateCheckDateTime = new DateTime(tick);
-                lastUpdateCheckDate = lastUpdateCheckDateTime.ToString("dd MMMM yyyy à H:mm:ss", CultureInfo.InstalledUICulture);
+                lastUpdateCheckDate = lastUpdateCheckDateTime.ToString("dd MMMM yyyy - H:mm:ss", CultureInfo.InstalledUICulture);
             }
 
             Debug.WriteLine(lastUpdateCheckDateTimeTick);
@@ -268,7 +268,7 @@ namespace MapsInMyFolder
 
         private async void ResetSettings_Click(object sender, RoutedEventArgs e)
         {
-            var confirmDialog = Message.SetContentDialog("Voulez-vous vraiment restaurer les paramètres par défaut ? Cette action est irréversible et entraînera un redémarrage de l'application!", "Confirmer", MessageDialogButton.YesCancel);
+            var confirmDialog = Message.SetContentDialog(Languages.Current["settingsMessageResetApplicationSettings"], Languages.Current["dialogTitleOperationConfirm"], MessageDialogButton.YesCancel);
             ContentDialogResult result = await confirmDialog.ShowAsync();
 
             if (result == ContentDialogResult.Primary)
@@ -284,14 +284,14 @@ namespace MapsInMyFolder
                 }
                 catch (Exception ex)
                 {
-                    var errorDialog = Message.SetContentDialog("Échec de la suppression du fichier de paramètres. Erreur : " + ex.Message, "Erreur", MessageDialogButton.OK);
+                    var errorDialog = Message.SetContentDialog(Languages.GetWithArguments("settingsMessageErrorResetApplicationSettings", ex.Message), Languages.Current["dialogTitleOperationFailed"], MessageDialogButton.OK);
                     await errorDialog.ShowAsync();
                     return;
                 }
 
                 DefaultValuesHachCode = Collectif.CheckIfInputValueHaveChange(SettingsScrollViewer);
 
-                var infoDialog = Message.SetContentDialog("MapsInMyFolder nécessite de redémarrer...\nFermeture de l'application.", "Information", MessageDialogButton.OK);
+                var infoDialog = Message.SetContentDialog(Languages.Current["settingsMessageRestartRequire"], Languages.Current["dialogTitleOperationInfo"], MessageDialogButton.OK);
                 await infoDialog.ShowAsync();
 
                 Collectif.RestartApplication();
@@ -337,7 +337,7 @@ namespace MapsInMyFolder
             Settings.nettoyer_cache_layers_au_demarrage = nettoyer_cache_layers_au_demarrage.IsChecked ?? false;
             Settings.layerpanel_put_non_letter_layername_at_the_end = layerpanel_put_non_letter_layername_at_the_end.IsChecked ?? false;
             Settings.layerpanel_favorite_at_top = layerpanel_favorite_at_top.IsChecked ?? false;
-            Settings.filter_layers_based_on_country = string.Join(';', PaysComboBox.SelectedValues("EnglishName"));
+            Settings.filter_layers_based_on_country = string.Join(';', CountryComboBox.SelectedValues("EnglishName"));
 
             string layerpanelDisplayStyleValue = layerpanel_displaystyle.SelectedValue.ToString().ToUpperInvariant();
             Settings.layerpanel_displaystyle = (ListDisplayType)Enum.Parse(typeof(ListDisplayType), layerpanelDisplayStyleValue);
@@ -388,7 +388,7 @@ namespace MapsInMyFolder
             if (DefaultValuesHachCode != valuesHashCode)
             {
                 e.Cancel = true;
-                var dialog = Message.SetContentDialog("Voulez-vous enregistrer vos modifications ? Les modifications non enregistrées seront perdues.", "Confirmer", MessageDialogButton.YesNo);
+                var dialog = Message.SetContentDialog(Languages.Current["settingsMessageLeaveWithoutSaving"], Languages.Current["dialogTitleOperationConfirm"], MessageDialogButton.YesNo);
 
                 try
                 {
@@ -406,7 +406,7 @@ namespace MapsInMyFolder
                 SaveSettings();
 
                 // Redémarrer ?
-                var dialog = Message.SetContentDialog("Un redémarrage de l'application est recommandé. Voulez-vous redémarrer MapsInMyFolder ?\nSans redémarrage, la redéfinition de certains paramètres peut entraîner certaines instabilités.", "Information", MessageDialogButton.YesNo);
+                var dialog = Message.SetContentDialog(Languages.Current["settingsMessageAskForRestart"], Languages.Current["dialogTitleOperationConfirm"], MessageDialogButton.YesNo);
                 ContentDialogResult result2 = await dialog.ShowAsync();
 
                 if (result2 == ContentDialogResult.Primary)
@@ -458,7 +458,7 @@ namespace MapsInMyFolder
         private async void searchForUpdates_Click(object sender, RoutedEventArgs e)
         {
             searchForUpdates.IsEnabled = false;
-            searchForUpdatesLastUpdateCheck.Content = "Recherche en cours...";
+            searchForUpdatesLastUpdateCheck.Content = Languages.Current["settingsPropertyNameLastApplicationUpdatesCheckInProgress"];
             bool isNewerDatabaseVersionAvailableOnGithub = await Database.CheckIfNewerVersionAvailable();
             bool isNewerApplicationVersionAvailableOnGithub = await Update.CheckIfNewerVersionAvailableOnGithub();
             searchForUpdates.IsEnabled = true;
@@ -514,7 +514,7 @@ namespace MapsInMyFolder
                 AddExtension = true,
                 RestoreDirectory = true,
                 ValidateNames = true,
-                Title = "Export de la base de donnée"
+                Title = Languages.Current["saveFileDialogSelectSaveLocation"]
             };
 
             if (DatabasesaveFileDialog.ShowDialog() == true)
@@ -523,23 +523,14 @@ namespace MapsInMyFolder
                 {
                     Database.Export(DatabasesaveFileDialog.FileName);
                     Process.Start("explorer.exe", "/select,\"" + DatabasesaveFileDialog.FileName + "\"");
+                    return;
                 }
                 catch (Exception ex)
                 {
-                    Message.NoReturnBoxAsync("Une erreur s'est produite lors de l'export du fichier. " + ex.Message, "Erreur");
+                    Message.NoReturnBoxAsync(Languages.Current["settingsMessageErrorDatabaseExport"] + " " + ex.Message, Languages.Current["dialogTitleOperationFailed"]);
                 }
             }
-            else
-            {
-                Message.NoReturnBoxAsync("Une erreur inconnue s'est produite lors de l'export du fichier", "Erreur");
-            }
+            
         }
-
-        private void openAvancedEditor_Click(object sender, RoutedEventArgs e)
-        {
-            DataGridEditor DataGridEditor = new DataGridEditor();
-            DataGridEditor.Show();
-        }
-
     }
 }

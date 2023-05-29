@@ -116,14 +116,13 @@ namespace MapsInMyFolder
                     }
 
                     int? DB_Layer_ID = GetIntFromOrdinal("ID");
-                    string DB_Layer_NOM = GetStringFromOrdinal("NOM").RemoveNewLineChar();
+                    string DB_Layer_NAME = GetStringFromOrdinal("NAME").RemoveNewLineChar();
                     bool DB_Layer_FAVORITE = Convert.ToBoolean(GetIntFromOrdinal("FAVORITE"));
                     string DB_Layer_DESCRIPTION = GetStringFromOrdinal("DESCRIPTION");
-                    string DB_Layer_CATEGORIE = GetStringFromOrdinal("CATEGORIE").RemoveNewLineChar();
-                    string DB_Layer_PAYS = GetStringFromOrdinal("PAYS").RemoveNewLineChar();
-                    string DB_Layer_IDENTIFIANT = GetStringFromOrdinal("IDENTIFIANT").RemoveNewLineChar();
+                    string DB_Layer_CATEGORY = GetStringFromOrdinal("CATEGORY").RemoveNewLineChar();
+                    string DB_Layer_COUNTRY = GetStringFromOrdinal("COUNTRY").RemoveNewLineChar();
+                    string DB_Layer_IDENTIFIER = GetStringFromOrdinal("IDENTIFIER").RemoveNewLineChar();
                     string DB_Layer_TILE_URL = GetStringFromOrdinal("TILE_URL").RemoveNewLineChar();
-                    string DB_Layer_TILE_FALLBACK_URL = GetStringFromOrdinal("TILE_FALLBACK_URL").RemoveNewLineChar();
                     int? DB_Layer_MIN_ZOOM = GetIntFromOrdinal("MIN_ZOOM");
                     int? DB_Layer_MAX_ZOOM = GetIntFromOrdinal("MAX_ZOOM");
                     string DB_Layer_FORMAT = GetStringFromOrdinal("FORMAT");
@@ -131,7 +130,7 @@ namespace MapsInMyFolder
                     string DB_Layer_SITE_URL = GetStringFromOrdinal("SITE_URL").RemoveNewLineChar();
                     string DB_Layer_STYLE = GetStringFromOrdinal("STYLE");
                     int? DB_Layer_TILE_SIZE = GetIntFromOrdinal("TILE_SIZE");
-                    string DB_Layer_TILECOMPUTATIONSCRIPT = GetStringFromOrdinal("TILECOMPUTATIONSCRIPT");
+                    string DB_Layer_SCRIPT = GetStringFromOrdinal("SCRIPT");
                     string DB_Layer_VISIBILITY = GetStringFromOrdinal("VISIBILITY");
                     string DB_Layer_SPECIALSOPTIONS = GetStringFromOrdinal("SPECIALSOPTIONS");
                     string DB_Layer_RECTANGLES = GetStringFromOrdinal("RECTANGLES");
@@ -159,17 +158,17 @@ namespace MapsInMyFolder
                             DeserializeSpecialsOptions = new Layers.SpecialsOptions();
                         }
                     }
-                    if (string.IsNullOrEmpty(DB_Layer_TILECOMPUTATIONSCRIPT))
+                    if (string.IsNullOrEmpty(DB_Layer_SCRIPT))
                     {
-                        DB_Layer_TILECOMPUTATIONSCRIPT = Settings.tileloader_default_script;
+                        DB_Layer_SCRIPT = Settings.tileloader_default_script;
                     }
                     if (string.IsNullOrEmpty(DB_Layer_VISIBILITY))
                     {
                         DB_Layer_VISIBILITY = "Visible";
                     }
 
-                    DB_Layer_TILECOMPUTATIONSCRIPT = Collectif.HTMLEntities(DB_Layer_TILECOMPUTATIONSCRIPT, true);
-                    Layers calque = new Layers((int)DB_Layer_ID, DB_Layer_FAVORITE, DB_Layer_NOM, DB_Layer_DESCRIPTION, DB_Layer_CATEGORIE, DB_Layer_PAYS, DB_Layer_IDENTIFIANT, DB_Layer_TILE_URL, DB_Layer_TILE_FALLBACK_URL, DB_Layer_SITE, DB_Layer_SITE_URL, DB_Layer_MIN_ZOOM, DB_Layer_MAX_ZOOM, DB_Layer_FORMAT, DB_Layer_TILE_SIZE, DB_Layer_TILECOMPUTATIONSCRIPT, DB_Layer_VISIBILITY, DeserializeSpecialsOptions, DB_Layer_RECTANGLES, DB_Layer_VERSION, DB_Layer_HAS_SCALE);
+                    DB_Layer_SCRIPT = Collectif.HTMLEntities(DB_Layer_SCRIPT, true);
+                    Layers calque = new Layers((int)DB_Layer_ID, DB_Layer_FAVORITE, DB_Layer_NAME, DB_Layer_DESCRIPTION, DB_Layer_CATEGORY, DB_Layer_COUNTRY, DB_Layer_IDENTIFIER, DB_Layer_TILE_URL, DB_Layer_SITE, DB_Layer_SITE_URL, DB_Layer_MIN_ZOOM, DB_Layer_MAX_ZOOM, DB_Layer_FORMAT, DB_Layer_TILE_SIZE, DB_Layer_SCRIPT, DB_Layer_VISIBILITY, DeserializeSpecialsOptions, DB_Layer_RECTANGLES, DB_Layer_VERSION, DB_Layer_HAS_SCALE);
                     if (DB_Layer_FAVORITE && Settings.layerpanel_favorite_at_top)
                     {
                         layersFavorite.Add(calque);
@@ -298,11 +297,11 @@ namespace MapsInMyFolder
                     }
                     else
                     {
-                        if (string.IsNullOrWhiteSpace(LayerWithReplacement.class_pays))
+                        if (string.IsNullOrWhiteSpace(LayerWithReplacement.class_country))
                         {
                             CountryFilterThisLayer = false;
                         }
-                        string[] layer_country = LayerWithReplacement.class_pays.Split(';', StringSplitOptions.RemoveEmptyEntries);
+                        string[] layer_country = LayerWithReplacement.class_country.Split(';', StringSplitOptions.RemoveEmptyEntries);
                         if (layer_country.ContainsOneOrMore(layer_country_to_keep) || layer_country.Length == 0 || layer_country.Contains("Invariant Country") || layer_country.Contains("World") || layer_country.Contains("*"))
                         {
                             CountryFilterThisLayer = false;
@@ -351,12 +350,12 @@ namespace MapsInMyFolder
                 <li class=""inview {visibility}"" id=""{LayerWithReplacement.class_id}"">
                     <div class=""layer_main_div"" style=""background-image:url({imgbase64.Trim()});{overideBackgroundColor}"">
                         <div class=""layer_main_div_background_image""></div>
-                        <div class=""layer_content"" data-layer=""{LayerWithReplacement.class_identifiant}"" title=""{Collectif.HTMLEntities(LayerWithReplacement.class_description)}"">
+                        <div class=""layer_content"" data-layer=""{LayerWithReplacement.class_identifier}"" title=""{Collectif.HTMLEntities(LayerWithReplacement.class_description)}"">
                             <div class=""layer_texte"">
                                 <p class=""display_name"">{Collectif.HTMLEntities(LayerWithReplacement.class_name)}</p>
                                 <p class=""zoom"">[{LayerWithReplacement.class_min_zoom}-{LayerWithReplacement.class_max_zoom}] - {LayerWithReplacement.class_site}</p>
                                 <p class=""layer_website{supplement_class}"">{LayerWithReplacement.class_site}</p>
-                                <p class=""layer_categorie{supplement_class}"">{LayerWithReplacement.class_categorie}</p>
+                                <p class=""layer_category{supplement_class}"">{LayerWithReplacement.class_category}</p>
                             </div>
                             <div {orangestar} onclick=""ajouter_aux_favoris(event, this, {LayerWithReplacement.class_id})""></div>
                             <div {orangelayervisibility} onclick=""change_visibility(event, this, {LayerWithReplacement.class_id})""></div>
@@ -425,7 +424,7 @@ namespace MapsInMyFolder
                         MapTileLayer_Transparent.TileSource = new TileSource { UriFormat = layer.class_tile_url, LayerID = layer.class_id };
                         MapTileLayer_Transparent.Opacity = 1;
 
-                        if ((!listoftransparentformat.Contains(last_format)) && !string.IsNullOrWhiteSpace(last_format) && layer.class_identifiant is not null)
+                        if ((!listoftransparentformat.Contains(last_format)) && !string.IsNullOrWhiteSpace(last_format) && layer.class_identifier is not null)
                         {
                             try
                             {
@@ -435,7 +434,7 @@ namespace MapsInMyFolder
                                     UIElement basemap = new MapTileLayer
                                     {
                                         TileSource = new TileSource { UriFormat = StartupLayer?.class_tile_url, LayerID = layer_startup_id },
-                                        SourceName = StartupLayer.class_identifiant + new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds(),
+                                        SourceName = StartupLayer.class_identifier + new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds(),
                                         MaxZoomLevel = StartupLayer.class_max_zoom ?? 0,
                                         MinZoomLevel = StartupLayer.class_min_zoom ?? 0,
                                         Description = ""
@@ -456,7 +455,7 @@ namespace MapsInMyFolder
                         UIElement layer_uielement = new MapTileLayer
                         {
                             TileSource = new TileSource { UriFormat = layer.class_tile_url, LayerID = layer.class_id },
-                            SourceName = layer.class_identifiant + new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds(),
+                            SourceName = layer.class_identifier + new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds(),
                             MaxZoomLevel = layer.class_max_zoom ?? 0,
                             MinZoomLevel = layer.class_min_zoom ?? 0,
                             Description = layer.class_description
@@ -507,7 +506,7 @@ namespace MapsInMyFolder
             try
             {
                 Javascript.EngineDeleteById(id);
-                string temp_dir = Collectif.GetSaveTempDirectory(layers.class_name, layers.class_identifiant);
+                string temp_dir = Collectif.GetSaveTempDirectory(layers.class_name, layers.class_identifier);
                 if (Directory.Exists(temp_dir))
                 {
                     DirectorySize = Collectif.GetDirectorySize(temp_dir);
@@ -535,14 +534,14 @@ namespace MapsInMyFolder
                 }
 
                 int EditedDB_VERSION = editedlayers_sqlite_datareader.GetIntFromOrdinal("VERSION") ?? 0;
-                string EditedDB_TILECOMPUTATIONSCRIPT = editedlayers_sqlite_datareader.GetStringFromOrdinal("TILECOMPUTATIONSCRIPT");
+                string EditedDB_SCRIPT = editedlayers_sqlite_datareader.GetStringFromOrdinal("SCRIPT");
                 string EditedDB_TILE_URL = editedlayers_sqlite_datareader.GetStringFromOrdinal("TILE_URL");
 
                 using (SQLiteDataReader layers_sqlite_datareader = Database.ExecuteExecuteReaderSQLCommand($"SELECT * FROM 'LAYERS' WHERE ID = {id}"))
                 {
                     layers_sqlite_datareader.Read();
                     int LastDB_VERSION = layers_sqlite_datareader.GetIntFromOrdinal("VERSION") ?? 0;
-                    string LastDB_TILECOMPUTATIONSCRIPT = layers_sqlite_datareader.GetStringFromOrdinal("TILECOMPUTATIONSCRIPT");
+                    string LastDB_SCRIPT = layers_sqlite_datareader.GetStringFromOrdinal("SCRIPT");
                     string LastDB_TILE_URL = layers_sqlite_datareader.GetStringFromOrdinal("TILE_URL");
 
                     if (EditedDB_VERSION != LastDB_VERSION)
@@ -550,14 +549,14 @@ namespace MapsInMyFolder
                         StackPanel AskMsg = new StackPanel();
                         string RemoveSQL = "";
 
-                        if (EditedDB_TILECOMPUTATIONSCRIPT != LastDB_TILECOMPUTATIONSCRIPT && !string.IsNullOrWhiteSpace(EditedDB_TILECOMPUTATIONSCRIPT))
+                        if (EditedDB_SCRIPT != LastDB_SCRIPT && !string.IsNullOrWhiteSpace(EditedDB_SCRIPT))
                         {
                             TextBlock textBlock = new TextBlock();
-                            textBlock.Text = Languages.Current["layerMessageErrorUpdateTileComputationScriptChanged"];
+                            textBlock.Text = Languages.Current["layerMessageErrorUpdateScriptChanged"];
                             textBlock.TextWrapping = TextWrapping.Wrap;
                             AskMsg.Children.Add(textBlock);
-                            AskMsg.Children.Add(Collectif.FormatDiffGetScrollViewer(EditedDB_TILECOMPUTATIONSCRIPT, LastDB_TILECOMPUTATIONSCRIPT));
-                            RemoveSQL += $",'TILECOMPUTATIONSCRIPT'=NULL";
+                            AskMsg.Children.Add(Collectif.FormatDiffGetScrollViewer(EditedDB_SCRIPT, LastDB_SCRIPT));
+                            RemoveSQL += $",'SCRIPT'=NULL";
                         }
 
                         if (EditedDB_TILE_URL != LastDB_TILE_URL && !string.IsNullOrWhiteSpace(EditedDB_TILE_URL))

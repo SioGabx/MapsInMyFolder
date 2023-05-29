@@ -284,7 +284,7 @@ namespace MapsInMyFolder.Commun
                         string NotificationId = "LayerId_" + LayerId + "_" + notifId ?? "single";
                         Action callback = () =>
                         {
-                            ExecuteScript(Layers.GetLayerById(LayerId).class_tilecomputationscript, null, LayerId, javascriptCallback?.ToString());
+                            ExecuteScript(Layers.GetLayerById(LayerId).class_script, null, LayerId, javascriptCallback?.ToString());
                         };
 
                         notification = new NText(texte.ToString(), caption?.ToString(), "MainPage", callback);
