@@ -23,18 +23,6 @@ using System.Windows.Media.Imaging;
 
 namespace MapsInMyFolder.Commun
 {
-    public static class DebugMode
-    {
-        public static void WriteLine(object text)
-        {
-            if (Settings.is_in_debug_mode)
-            {
-                Debug.WriteLine(text.ToString());
-            }
-        }
-    }
-
-
     public class NameHiddenIdValue
     {
         public int Id { get; }
@@ -86,7 +74,6 @@ namespace MapsInMyFolder.Commun
                       { "layerid",  LayerID.ToString() },
                       { "url",  urlbase },
                 };
-
 
                 if (!string.IsNullOrEmpty(Script))
                 {
@@ -226,7 +213,6 @@ namespace MapsInMyFolder.Commun
             }
         }
 
-
         public static DoubleAnimation GetOpacityAnimation(int toValue, double durationMultiplicator = 1)
         {
             return new DoubleAnimation(toValue, TimeSpan.FromMilliseconds((long)(Settings.animations_duration_millisecond * durationMultiplicator)))
@@ -288,7 +274,6 @@ namespace MapsInMyFolder.Commun
             };
 
             process.Start();
-
             Application.Current.Shutdown();
         }
 
@@ -345,7 +330,6 @@ namespace MapsInMyFolder.Commun
             ScrollViewerElement.Content = ScrollViewerElementContent;
             return ScrollViewerElement;
         }
-
 
         public static TextBlock FormatDiff(string texteBase, string texteModif)
         {
@@ -424,16 +408,16 @@ namespace MapsInMyFolder.Commun
         public static MemoryStream ByteArrayToStream(byte[] input)
         {
             if (input == null) { return null; }
-            MemoryStream ms = new MemoryStream(input);
-            return ms;
+            return new MemoryStream(input);
         }
 
         public static byte[] GetBytesFromBitmapSource(BitmapSource bmp)
         {
-            PngBitmapEncoder encoder = new PngBitmapEncoder();
             using (MemoryStream stream = new MemoryStream())
             {
-                encoder.Frames.Add(BitmapFrame.Create(bmp));
+                BitmapFrame bitmap = BitmapFrame.Create(bmp);
+                PngBitmapEncoder encoder = new PngBitmapEncoder();
+                encoder.Frames.Add(bitmap);
                 encoder.Save(stream);
                 byte[] bit = stream.ToArray();
                 stream.Close();
@@ -526,6 +510,7 @@ namespace MapsInMyFolder.Commun
             DirectoryInfo di = new DirectoryInfo(folderPath);
             return di.EnumerateFiles("*.*", SearchOption.AllDirectories).Sum(fi => fi.Length);
         }
+
         public static string FormatBytes(long bytes)
         {
             string[] Suffix = { "octets", "Ko", "Mo", "Go", "To" };
@@ -536,7 +521,7 @@ namespace MapsInMyFolder.Commun
                 dblSByte = bytes / 1024.0;
             }
 
-            return String.Format("{0:0} {1}", dblSByte, Suffix[i]);
+            return string.Format("{0:0} {1}", dblSByte, Suffix[i]);
         }
 
         public static VOption getSaveVOption(string final_saveformat, int quality, int? tile_size)
@@ -550,8 +535,7 @@ namespace MapsInMyFolder.Commun
             if (final_saveformat == "png")
             {
                 saving_options = new VOption {
-                    { "Q", quality },
-                    { "compression", 100 },
+                    { "compression", quality },
                     { "interlace", true },
                     { "strip", true },
                 };
@@ -612,7 +596,6 @@ namespace MapsInMyFolder.Commun
                     {
                         if (responseMessage is null)
                         {
-                            DebugMode.WriteLine("Error null response");
                             return response;
                         }
 
@@ -625,13 +608,11 @@ namespace MapsInMyFolder.Commun
                         {
                             // Redirect found (autodetect)  System.Net.HttpStatusCode.Found
                             Uri new_location = responseMessage.Headers.Location;
-                            DebugMode.WriteLine($"DownloadByteUrl Retry : {parsing_url} to {new_location}: {(int)responseMessage.StatusCode} {responseMessage.ReasonPhrase}");
                             doNeedToRetry = true;
                             parsing_url = new_location;
                         }
                         else
                         {
-                            DebugMode.WriteLine($"DownloadByteUrl: {parsing_url}: {(int)responseMessage.StatusCode} {responseMessage.ReasonPhrase}");
                             if (LayerId == -2)
                             {
                                 Javascript.Functions.PrintError($"DownloadUrl - Error {(int)responseMessage.StatusCode} : {responseMessage.ReasonPhrase}. Url : {parsing_url}");
@@ -660,7 +641,7 @@ namespace MapsInMyFolder.Commun
                 {
                     if (ex.InnerException is System.Net.Sockets.SocketException socketException && socketException.SocketErrorCode == System.Net.Sockets.SocketError.HostNotFound)
                     {
-                        // Check si internet lorsque l'hôte est inconnu
+                        // Check for internet connectivity when the host is unknown.
                         Network.IsNetworkAvailable();
                     }
                     Debug.WriteLine($"DownloadByteUrl catch: {url}: {ex.Message}");
@@ -796,13 +777,6 @@ namespace MapsInMyFolder.Commun
             }
         }
 
-        public static void LockPreviousUndo(RichTextBox uIElement)
-        {
-            int undo_limit = uIElement.UndoLimit;
-            uIElement.UndoLimit = 0;
-            uIElement.UndoLimit = undo_limit;
-        }
-
         public static void LockPreviousUndo(TextBox uIElement)
         {
             int undo_limit = uIElement.UndoLimit;
@@ -830,18 +804,15 @@ namespace MapsInMyFolder.Commun
         {
             if (Mouse.LeftButton == MouseButtonState.Pressed) { return; }
             double Margin = 40;
-
             double TextboxLayerScriptTopPosition = textEditor.TranslatePoint(new Point(0, 0), grid).Y;
             double TextboxLayerScriptCaretTopPosition = textEditor.TextArea.Caret.CalculateCaretRectangle().Top + TextboxLayerScriptTopPosition;
             if (TextboxLayerScriptCaretTopPosition > (grid.ActualHeight - Margin))
             {
                 scrollViewer.ScrollToVerticalOffset(scrollViewer.VerticalOffset + (TextboxLayerScriptCaretTopPosition - (grid.ActualHeight - Margin)));
-                return;
             }
             else if (TextboxLayerScriptCaretTopPosition < MarginTop)
             {
                 scrollViewer.ScrollToVerticalOffset(scrollViewer.VerticalOffset - Math.Abs((MarginTop) - TextboxLayerScriptCaretTopPosition));
-                return;
             }
         }
 
@@ -995,7 +966,7 @@ namespace MapsInMyFolder.Commun
 
             List<UIElement> ListOfisualChildren = FindVisualChildren(SourcePanel, TypeOfSearchElement);
 
-            string strHachCode = String.Empty;
+            string strHachCode = string.Empty;
             ListOfisualChildren.ForEach(element =>
             {
                 if (TypeOfSearchElement.Contains(element.GetType()))
@@ -1004,7 +975,7 @@ namespace MapsInMyFolder.Commun
                     if (!string.IsNullOrEmpty(elementXName))
                     {
                         int hachCode = 0;
-                        System.Type type = element.GetType();
+                        Type type = element.GetType();
                         if (type == typeof(TextBox))
                         {
                             TextBox TextBox = (TextBox)element;
@@ -1058,7 +1029,7 @@ namespace MapsInMyFolder.Commun
                         }
                         else
                         {
-                            throw new System.NotSupportedException("The type " + type.Name + " is not supported by the function");
+                            throw new NotSupportedException("The type " + type.Name + " is not supported by the function");
                         }
                         strHachCode += hachCode.ToString();
                     }
@@ -1124,7 +1095,6 @@ namespace MapsInMyFolder.Commun
                     return_texte = return_texte.Replace(Entities.Key, Entities.Value);
                 }
             }
-
             return return_texte;
         }
 
@@ -1133,20 +1103,6 @@ namespace MapsInMyFolder.Commun
             const string pattern = @"(http|https|ftp|)\:\/\/[0-9a-zA-Z]([-.\w]*[0-9a-zA-Z])*(:(0-9)*)*(\/?)([a-zA-Z0-9\-\.\?\,\'\/\\\+&%\$#_]*)?([a-zA-Z0-9\-\?\,\'\/\+&%\$#_]+)";
             Regex reg = new Regex(pattern, RegexOptions.Compiled | RegexOptions.IgnoreCase);
             return reg.IsMatch(url);
-        }
-
-        public static void SetRichTextBoxText(RichTextBox textBox, string text)
-        {
-            Stream SM = new MemoryStream(Encoding.UTF8.GetBytes(text));
-            TextRange range = new TextRange(textBox.Document.ContentStart, textBox.Document.ContentEnd);
-            range.Load(SM, DataFormats.Text);
-            SM.Close();
-        }
-
-        public static string GetRichTextBoxText(RichTextBox textBox)
-        {
-            TextRange textRange = new TextRange(textBox.Document.ContentStart, textBox.Document.ContentEnd);
-            return textRange.Text;
         }
 
         public static bool FilterDigitOnlyWhileWritingInTextBox(TextBox textbElement, List<char> char_supplementaire = null, bool onlyOnePoint = true, bool limitLenght = true)
@@ -1193,7 +1149,6 @@ namespace MapsInMyFolder.Commun
 
         public static string FilterDigitOnly(string origin, List<char> char_supplementaire, bool onlyOnePoint = true, bool limitLenght = true)
         {
-            //string str = new string((from c in origin where char.IsDigit(c) select c).ToArray());
             if (string.IsNullOrEmpty(origin)) { return String.Empty; }
             string str = "";
             foreach (char caractere in origin.ToCharArray())
@@ -1265,7 +1220,6 @@ namespace MapsInMyFolder.Commun
                     return -1;
             }
         }
-
 
         public static (double Latitude, double Longitude) GetCenterBetweenTwoPoints((double Latitude, double Longitude) PointA, (double Latitude, double Longitude) PointB)
         {
@@ -1401,51 +1355,33 @@ namespace MapsInMyFolder.Commun
             }
             return sb.ToString();
         }
-
     }
 
     public static class ScrollViewerHelper
     {
         //from https://stackoverflow.com/questions/8932720/listview-inside-of-scrollviewer-prevents-scrollviewer-scroll/61092700#61092700
-        // Attached property boilerplate
-        public static bool GetFixMouseWheel(ScrollViewer scrollViewer) => (bool)scrollViewer?.GetValue(FixMouseWheelProperty);
-        public static void SetFixMouseWheel(ScrollViewer scrollViewer, bool value) => scrollViewer?.SetValue(FixMouseWheelProperty, value);
-        public static readonly DependencyProperty FixMouseWheelProperty =
-            DependencyProperty.RegisterAttached("FixMouseWheel", typeof(bool), typeof(ScrollViewerHelper),
-                new PropertyMetadata(OnFixMouseWheelChanged));
-        // End attached property boilerplate
 
-        static void OnFixMouseWheelChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        public static void SetScrollViewerMouseWheelFix(ScrollViewer scrollViewer)
         {
-            var scrollViewer = d as ScrollViewer;
             if (scrollViewer == null) return;
 
-            //void FixMouseWheel_PreviewMouseWheel(object sender, MouseWheelEventArgs e2)
-            //{
-            //    var parent = scrollViewer.Parent as UIElement;
-            //    if (parent is null) return;
+            scrollViewer.PreviewMouseWheel += FixMouseWheel_PreviewMouseWheel;
+            scrollViewer.Unloaded += FixMouseWheel_Unloaded;
 
-            //    var argsCopy = Copy(e2);
-            //    parent.RaiseEvent(argsCopy);
-            //}
-
-            //scrollViewer.PreviewMouseWheel += FixMouseWheel_PreviewMouseWheel;
-            //scrollViewer.Unloaded += FixMouseWheel_Unloaded;
-
-            //void FixMouseWheel_Unloaded(object sender, EventArgs e2)
-            //{
-            //    scrollViewer.PreviewMouseWheel -= FixMouseWheel_PreviewMouseWheel;
-            //    scrollViewer.Unloaded -= FixMouseWheel_Unloaded;
-            //}
-
-            scrollViewer.PreviewMouseWheel += (s2, e2) =>
+            void FixMouseWheel_PreviewMouseWheel(object sender, MouseWheelEventArgs e2)
             {
                 var parent = scrollViewer.Parent as UIElement;
                 if (parent is null) return;
 
                 var argsCopy = Copy(e2);
                 parent.RaiseEvent(argsCopy);
-            };
+            }
+
+            void FixMouseWheel_Unloaded(object sender, EventArgs e2)
+            {
+                scrollViewer.PreviewMouseWheel -= FixMouseWheel_PreviewMouseWheel;
+                scrollViewer.Unloaded -= FixMouseWheel_Unloaded;
+            }
         }
 
         static MouseWheelEventArgs Copy(MouseWheelEventArgs e) => new MouseWheelEventArgs(e.MouseDevice, e.Timestamp, e.Delta)

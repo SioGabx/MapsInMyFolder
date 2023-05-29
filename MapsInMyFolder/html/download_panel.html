@@ -509,7 +509,7 @@
 
 <body>
     <div class="nodownloadmessage">
-        <p>Aucun téléchargement à afficher</p>
+        <p>%downloadMessageNoDataToShow%</p>
     </div>
     <div class="overflow_main">
         <div id="main">
@@ -826,6 +826,9 @@
 
         }
 
+        function updatetooltips(id, tooltips) {
+            document.getElementById(id).getElementsByClassName("infos")[0].title = tooltips;
+        }
 
         //add_download(5,"progress","testy",5,5545,"prog","1634077140")
 
@@ -899,7 +902,7 @@
                                                     </svg>
                                                 </div>
 
-                                                <div class="button deleteliste" onclick="download_js_delete_db(` + id + `)" title="%downloadItemActionDeleteDownload%"
+                                                <div class="button deleteliste" onclick="download_js_delete_db(` + id + `)" title="%downloadItemActionDeleteDownload%">
                                                     <svg version="1.2" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 12.2 12.8" overflow="visible" xml:space="preserve">
                                                         <path d="M0.1,2.2h11.8"/>
                                                         <path d="M0.3,7.8h5.8"/>

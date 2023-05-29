@@ -42,7 +42,7 @@ namespace MapsInMyFolder.Commun
                 else
                 {
                     //if PBFRenderingTask take more thant 30 seconds
-                    DebugMode.WriteLine("PBFRenderingTask have take more than 30 seconds to complete. Task abord");
+                    Debug.WriteLine("PBFRenderingTask have take more than 30 seconds to complete. Task abord");
                 }
             }
             catch (Exception ex)
@@ -57,8 +57,6 @@ namespace MapsInMyFolder.Commun
         static readonly object PBF_SetProviders_Locker = new object();
         public async Task<HttpResponse> PBFRenderingAsync(int tache, int LayerID, string urlBase, int TileX, int TileY, int zoom, string save_temp_directory, int render_tile_size, int TextSizeMultiplicateur, double OverflowTextCorrectingValue, bool pbfdisableadjacent = false)
         {
-            //System.Threading.Thread.CurrentThread.Priority = System.Threading.ThreadPriority.Highest;
-            DebugMode.WriteLine("Function PBFrender LayerId:" + LayerID + " for tache " + tache);
             int settings_max_tiles_cache_days = Settings.tiles_cache_expire_after_x_days;
             if (LayerID <= 0)
             {
@@ -84,10 +82,6 @@ namespace MapsInMyFolder.Commun
                         cache_tile = true;
                         do_download_this_tile = Collectif.CheckIfDownloadIsNeededOrCached(save_temp_directory_rawBPF, filename, settings_max_tiles_cache_days);
                     }
-                }
-                else
-                {
-                    DebugMode.WriteLine("Save temp dir est vide, le cache est désactivé" + save_temp_directory);
                 }
 
                 Stream StreamPBFFile;
@@ -206,7 +200,7 @@ namespace MapsInMyFolder.Commun
                     Debug.WriteLine("Error : providers[1][1] was null");
                     return HttpResponse.HttpResponseError;
                 }
-                DebugMode.WriteLine("Colistion number " + ListOfEntitiesCollisions.CollisionEntity.Count);
+
                 if (!pbfdisableadjacent)
                 {
                     for (int i = 2; i > -1; i--)
@@ -269,11 +263,11 @@ namespace MapsInMyFolder.Commun
                     }
                     else
                     {
-                        DebugMode.WriteLine("pdfTileSource not define");
+                        //pdfTileSource not define
                         return new Renderer.ICanvasCollisions(collisions, bitmapf, null);
                     }
                 }
-                DebugMode.WriteLine("Tache n°" + tache + " : FinishDraw");
+
                 SkiaCanvas skiaCanvas = new SkiaCanvas();
                 BitmapSource img = bitmap.FinishDrawing();
                 img.Freeze();
@@ -382,6 +376,7 @@ namespace MapsInMyFolder.Commun
                                     tentatives++;
                                     success = false;
                                     System.Threading.Thread.SpinWait(500);
+                                    Debug.WriteLine(ex.Message);
                                 }
                                 if (success)
                                 {

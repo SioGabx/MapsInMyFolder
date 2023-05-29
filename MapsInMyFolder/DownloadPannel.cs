@@ -16,7 +16,7 @@ namespace MapsInMyFolder
     {
         void DB_Download_Load()
         {
-            DebugMode.WriteLine("Loading downloads");
+            Debug.WriteLine("Loading downloads");
             if (Database.DB_Download_Init() == -1)
             {
                 return;
@@ -70,7 +70,7 @@ namespace MapsInMyFolder
                     CancellationTokenSource tokenSource2 = new CancellationTokenSource();
                     CancellationToken ct = tokenSource2.Token;
                     Status engine_status;
-                    string Download_INFOS = Languages.Current["downloadPanelStateInfoFileCanceled"];
+                    string Download_INFOS = Languages.Current["downloadStateCanceled"];
                     switch (DB_Download_STATE)
                     {
                         case "error":
@@ -88,7 +88,7 @@ namespace MapsInMyFolder
                         case "success":
                         case "cleanup":
                             engine_status = Status.success;
-                            Download_INFOS = Languages.Current["downloadPanelStateInfoFileDownloaded"];
+                            Download_INFOS = Languages.Current["downloadStateDownloaded"];
                             break;
                         case "no_data":
                             engine_status = Status.no_data;
@@ -98,7 +98,7 @@ namespace MapsInMyFolder
                             engine_status = Status.deleted;
                             if (string.IsNullOrEmpty(DB_Download_INFOS))
                             {
-                                Download_INFOS = Languages.Current["downloadPanelStateInfoFileDeleted"];
+                                Download_INFOS = Languages.Current["downloadStateDeleted"];
                             }
                             else
                             {
@@ -115,7 +115,7 @@ namespace MapsInMyFolder
                         if (!System.IO.File.Exists(DB_Download_SAVE_DIRECTORY + DB_Download_FILE_NAME))
                         {
                             engine_status = Status.deleted;
-                            Download_INFOS = Languages.Current["downloadPanelStateInfoFileNotFound"];
+                            Download_INFOS = Languages.Current["downloadStateNotFound"];
                         }
                     }
                     DownloadSettings engine = new DownloadSettings(downloadid, DB_Download_ID, DB_Download_LAYER_ID, urls, tokenSource2, ct, format, final_saveformat, DB_Download_ZOOM, DB_Download_TEMP_DIRECTORY, DB_Download_SAVE_DIRECTORY, DB_Download_FILE_NAME, filetempname, location, RESIZEWIDTH, RESIZEHEIGHT, new TileLoader(), COLORINTERPRETATION, SCALEINFO, DB_Download_NBR_TILES, layers.class_tile_url, layers.class_identifier, engine_status, layers.class_tiles_size, quality: DB_Download_QUALITY);
@@ -127,7 +127,6 @@ namespace MapsInMyFolder
                     }
 
                     download_panel_browser.ExecuteScriptAsyncWhenPageLoaded(commande_add);
-                    DebugMode.WriteLine(commande_add);
                 }
                 catch (Exception ex)
                 {
@@ -148,7 +147,7 @@ namespace MapsInMyFolder
             }
             catch (Exception ex)
             {
-                DebugMode.WriteLine(ex.Message);
+                Debug.WriteLine(ex.Message);
             }
 
             try
@@ -220,7 +219,7 @@ namespace MapsInMyFolder
                     }
                     else if (engine.state == Status.success)
                     {
-                        MainWindow.UpdateDownloadPanel(id, Languages.Current["downloadPanelStateInfoFileNotFound"], isImportant: true, state: Status.deleted);
+                        MainWindow.UpdateDownloadPanel(id, Languages.Current["downloadStateNotFound"], isImportant: true, state: Status.deleted);
                     }
                 }
                 else

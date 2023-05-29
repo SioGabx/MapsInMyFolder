@@ -1152,7 +1152,7 @@
                                 <StackPanel Margin="0,10,0,0">
                                     <WrapPanel>
                                         <Label Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameCredits]}" Foreground="#888989" />
-                                        <Label Content=" (merci à eux " Foreground="#888989" />
+                                        <Label Content=" (merci à eux pour leurs librairies " Foreground="#888989" />
                                         <Label Content="♥" Foreground="#F18712" />
                                         <Label Content="):" Foreground="#888989" />
                                     </WrapPanel>

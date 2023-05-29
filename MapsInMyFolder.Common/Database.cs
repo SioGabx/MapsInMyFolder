@@ -377,8 +377,6 @@ namespace MapsInMyFolder.Commun
                 return -1;
             }
 
-
-
             string InsertCommandText = $"INSERT INTO 'DOWNLOADS'('STATE','INFOS', 'FILE_NAME', 'NBR_TILES', 'ZOOM', 'NO_LAT', 'NO_LONG', 'SE_LAT', 'SE_LONG', 'LAYER_ID', 'TEMP_DIRECTORY', 'SAVE_DIRECTORY','TIMESTAMP','QUALITY','RESIZEWIDTH','RESIZEHEIGHT', 'COLORINTERPRETATION', 'SCALEINFO') VALUES('{STATE}','','{FILE_NAME}','{NBR_TILES}','{ZOOM}','{NO_LAT}','{NO_LONG}','{SE_LAT}','{SE_LONG}','{LAYER_ID}','{TEMP_DIRECTORY}','{SAVE_DIRECTORY}','{TIMESTAMP}','{QUALITY}','{RESIZEWIDTH}','{RESIZEHEIGHT}','{COLORINTERPRETATION}','{SCALEINFO}');";
             //Make sur that select last_insert_rowid() is launch just after insert
             var DatabaseConnexion = DB_Connection();
@@ -653,7 +651,6 @@ namespace MapsInMyFolder.Commun
                             }
                         }
                     }
-
                 }
             }
             SQLExecute.Append("COMMIT;");
@@ -684,7 +681,6 @@ namespace MapsInMyFolder.Commun
 
             foreach (string Table in new string[2] { "LAYERS", "CUSTOMSLAYERS" })
             {
-
                 using (SQLiteDataReader LayersTables = ExecuteExecuteReaderSQLCommand($"SELECT * FROM '{Table}';"))
                 {
                     while (LayersTables.Read())

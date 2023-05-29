@@ -107,7 +107,7 @@ namespace MapsInMyFolder
             }
         }
 
-        private void Layer_searchbar_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        private void Layer_searchbar_TextChanged(object sender, TextChangedEventArgs e)
         {
             SearchLayerStart();
         }

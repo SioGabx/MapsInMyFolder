@@ -57,7 +57,7 @@ namespace MapsInMyFolder.MapControl
 
             if (buffer?.Length > 0)
             {
-                DebugMode.WriteLine("Loading LoadCachedTile image LayerId=" + LayerId);
+                //Loading LoadCachedTile
                 var image = await ImageLoader.LoadImageAsync(buffer).ConfigureAwait(false);
                 await tile.Image.Dispatcher.InvokeAsync(() => tile.SetImage(image));
             }

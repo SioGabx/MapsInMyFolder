@@ -61,7 +61,7 @@ namespace MapsInMyFolder
 
         private void SetFixMouseWheelBehavior(TextEditor textEditor)
         {
-            ScrollViewerHelper.SetFixMouseWheel(Collectif.GetDescendantByType(textEditor, typeof(ScrollViewer)) as ScrollViewer, true);
+            ScrollViewerHelper.SetScrollViewerMouseWheelFix(Collectif.GetDescendantByType(textEditor, typeof(ScrollViewer)) as ScrollViewer);
         }
 
         private void AddContextMenuItems(TextEditor textEditor, string header)

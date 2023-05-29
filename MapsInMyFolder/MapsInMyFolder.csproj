@@ -33,8 +33,7 @@
     <Version>0.4.4-alpha</Version>
     <AllowUnsafeBlocks>False</AllowUnsafeBlocks>
 
-    <!--<DisableXamlDesignTimeDataWarnings>true</DisableXamlDesignTimeDataWarnings>-->
-
+    <DisabledWarnings>CS8002</DisabledWarnings>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -87,7 +86,7 @@
     <PackageReference Include="NetVips.Native.win-x64" Version="8.14.2" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="System.Data.SQLite" Version="1.0.117" />
-    <PackageReference Include="System.Text.Json" Version="7.0.2" />
+    <PackageReference Include="System.Text.Json" Version="6.0.0" />
     <PackageReference Include="wix" Version="3.11.2" />
   </ItemGroup>
 

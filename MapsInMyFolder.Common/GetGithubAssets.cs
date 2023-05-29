@@ -116,7 +116,6 @@ namespace MapsInMyFolder.Commun
         public string Html { get; set; }
     }
 
-
     public static class GetGithubAssets
     {
         public static (RootObject Release, Asset FileAsset) GetReleaseAssetsFromGithub(string githubUrl, string filename)
@@ -151,8 +150,6 @@ namespace MapsInMyFolder.Commun
                         Debug.WriteLine("asset.Name : " + asset.Name);
                         if (asset.Name == filename)
                         {
-                            //string AssetSerializeObject = JsonConvert.SerializeObject(asset);
-                            //XMLParser.Write("GithubAsset_" + filename, AssetSerializeObject);
                             return (release, asset);
                         }
 
@@ -207,14 +204,12 @@ namespace MapsInMyFolder.Commun
         {
             //$"https://api.github.com/repos/SioGabx/MapsInMyFolder/releases/latest"
             //$"https://api.github.com/repos/SioGabx/MapsInMyFolder/contents/MapsInMyFolder/cursors/
-
-            Debug.WriteLine(url);
             string ETag = XMLParser.Cache.Read("ETag_" + filename);
             if (!string.IsNullOrEmpty(ETag))
             {
                 Tiles.HttpClient.DefaultRequestHeaders.Add("If-None-Match", ETag);
             }
-            Commun.HttpResponse HttpResponse = Collectif.ByteDownloadUri(new Uri(url), 0, true)?.Result;
+            HttpResponse HttpResponse = Collectif.ByteDownloadUri(new Uri(url), 0, true)?.Result;
             if (Tiles.HttpClient.DefaultRequestHeaders.Contains("If-None-Match"))
             {
                 Tiles.HttpClient.DefaultRequestHeaders.Remove("If-None-Match");
@@ -227,10 +222,9 @@ namespace MapsInMyFolder.Commun
             }
             else
             {
-                Debug.WriteLine(HttpResponse?.ResponseMessage?.StatusCode);
                 //if 301 not modified, then we have a cache version inside Settings.xml, else we try to fetch and give back null if not
+                Debug.WriteLine(HttpResponse?.ResponseMessage?.StatusCode);
                 return XMLParser.Cache.Read("GithubAsset_" + filename);
-
             }
             string ResponseMsg = Collectif.ByteArrayToString(HttpResponse.Buffer);
             XMLParser.Cache.Write("GithubAsset_" + filename, ResponseMsg);

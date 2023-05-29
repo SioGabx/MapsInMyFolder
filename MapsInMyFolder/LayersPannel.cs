@@ -61,7 +61,7 @@ namespace MapsInMyFolder
             }
             catch (Exception ex)
             {
-                DebugMode.WriteLine(ex.Message);
+                Debug.WriteLine(ex.Message);
             }
             try
             {
@@ -70,7 +70,7 @@ namespace MapsInMyFolder
             }
             catch (Exception ex)
             {
-                DebugMode.WriteLine(ex.Message);
+                Debug.WriteLine(ex.Message);
             }
         }
 
@@ -722,7 +722,7 @@ namespace MapsInMyFolder
                     DirectorySize += MainPage.ClearCache(id_int, false);
 
                 }, null);
-                DebugMode.WriteLine("Clear_cache layer " + id_int);
+                Debug.WriteLine("Clear_cache layer " + id_int);
             }
 
             string memoryFreed = Collectif.FormatBytes(DirectorySize);

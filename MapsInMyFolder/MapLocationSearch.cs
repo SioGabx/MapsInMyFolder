@@ -132,11 +132,10 @@ namespace MapsInMyFolder
                     }
                     else
                     {
-
                         //Aucun résultat
                         SearchEngineResult.ClearSearchResults();
                         mapSearchbarSuggestion.Height = 35;
-                        mapSearchbarSuggestion.ItemsSource = new List<string> { Languages.Current["mapPanelSearchResultNone"] };
+                        mapSearchbarSuggestion.ItemsSource = new List<string> { Languages.Current["searchMapResultNone"] };
                         mapSearchbarSuggestion.Foreground = (System.Windows.Media.SolidColorBrush)new System.Windows.Media.BrushConverter().ConvertFromString("#5A5A5A");
                     }
                 }
@@ -170,6 +169,7 @@ namespace MapsInMyFolder
                                                                Convert.ToDouble(boundingBox[3])));
 
                         LayerTilePreview_RequestUpdate();
+                        mapviewer.Cursor = Cursors.Arrow;
                     }
                 }
             }
@@ -237,10 +237,10 @@ namespace MapsInMyFolder
 
         public static SearchEngineResult GetResultById(int id)
         {
-                if (SearchResultList.TryGetValue(id, out SearchEngineResult result))
-                {
-                    return result;
-                }
+            if (SearchResultList.TryGetValue(id, out SearchEngineResult result))
+            {
+                return result;
+            }
 
             return null;
         }

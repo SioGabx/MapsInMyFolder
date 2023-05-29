@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Globalization;
 using System.Windows.Data;
 
@@ -33,6 +34,7 @@ namespace MapsInMyFolder.Commun
                 }
                 else if (!EqualityComparer<TKey>.Default.Equals(key, default(TKey)))
                 {
+                    Debug.WriteLine($"Languages : Key {key} not found");
                     return (TValue)(object)$"%{key}%";
                 }
                 else
@@ -43,6 +45,20 @@ namespace MapsInMyFolder.Commun
             set
             {
                 _dictionary[key] = value;
+            }
+        }
+
+        public string this[TKey key, params object[] args]
+        {
+            get
+            {
+                string RawValue = this[key].ToString();
+
+                foreach (var arg in args)
+                {
+                    RawValue = RawValue.ReplaceSingle("{%s}", arg.ToString());
+                }
+                return RawValue;
             }
         }
 
@@ -90,13 +106,14 @@ namespace MapsInMyFolder.Commun
 
         public static string GetWithArguments(string key, params object[] args)
         {
-            string RawValue = Current[key];
-            
-            foreach (var arg in args)
-            {
-                RawValue = RawValue.ReplaceSingle("{%s}", arg.ToString());
-            }
-            return RawValue;
+            return Current[key, args];
+            //string RawValue = Current[key];
+
+            //foreach (var arg in args)
+            //{
+            //    RawValue = RawValue.ReplaceSingle("{%s}", arg.ToString());
+            //}
+            //return RawValue;
         }
 
         public static string ReplaceInString(string texte)

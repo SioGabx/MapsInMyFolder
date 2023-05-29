@@ -8,4 +8,3 @@ using System.Diagnostics.CodeAnalysis;
 [assembly: SuppressMessage("Style", "IDE0090:Utiliser 'new(...)'", Justification = "More readable to use old version", Scope = "module")]
 [assembly: SuppressMessage("Style", "IDE0063:Utiliser une instruction 'using' simple", Justification = "More readable ", Scope = "module")]
 [assembly: SuppressMessage("Style", "IDE0063:Utiliser une instruction 'using' simple", Justification = "More readable ", Scope = "module")]
-[assembly: SuppressMessage("XDG0062", "XDG0062:Value cannot be null. (Parameter 'stream')", Justification = "Suppressed XDG0062 error", Scope = "module")]

@@ -87,8 +87,8 @@ namespace MapsInMyFolder
 
         void FixTextEditorScrollIssues()
         {
-            ScrollViewerHelper.SetFixMouseWheel(Collectif.GetDescendantByType(TextboxLayerScript, typeof(ScrollViewer)) as ScrollViewer, true);
-            ScrollViewerHelper.SetFixMouseWheel(Collectif.GetDescendantByType(TextboxRectangles, typeof(ScrollViewer)) as ScrollViewer, true);
+            ScrollViewerHelper.SetScrollViewerMouseWheelFix(Collectif.GetDescendantByType(TextboxLayerScript, typeof(ScrollViewer)) as ScrollViewer);
+            ScrollViewerHelper.SetScrollViewerMouseWheelFix(Collectif.GetDescendantByType(TextboxRectangles, typeof(ScrollViewer)) as ScrollViewer);
         }
 
         void SetContextMenu()
@@ -429,7 +429,7 @@ namespace MapsInMyFolder
             catch (Exception ex)
             {
                 basemap = new MapTileLayer();
-                DebugMode.WriteLine(ex.Message);
+                Debug.WriteLine(ex.Message);
             }
             basemap.Opacity = Settings.background_layer_opacity;
             map.MapLayer = basemap;
@@ -566,7 +566,6 @@ namespace MapsInMyFolder
         private void SaveLayer()
         {
             UpdateMoinsUnLayer();
-            DebugMode.WriteLine("Saving...");
 
             Layers layers = Layers.GetLayerById(-2);
             if (layers is null)
@@ -954,7 +953,7 @@ namespace MapsInMyFolder
             }
             catch (Exception ex)
             {
-                DebugMode.WriteLine(ex.Message);
+                Debug.WriteLine(ex.Message);
             }
         }
 
@@ -1005,7 +1004,6 @@ namespace MapsInMyFolder
 
         private void TextboxSpecialOptionBackgroundColor_KeyUp(object sender, KeyEventArgs e)
         {
-
             DoWeNeedToUpdateMoinsUnLayer();
             Collectif.setBackgroundOnUIElement(mapviewerappercu, TextboxSpecialOptionBackgroundColor.Text);
         }
@@ -1062,12 +1060,12 @@ namespace MapsInMyFolder
 
         private void BackgroundSwitch_Toggle(object sender, RoutedEventArgs e)
         {
-            SetBackgroundMap(mapviewerappercu);//SetAppercuLayers();
+            SetBackgroundMap(mapviewerappercu);
         }
 
         private void AutoUpdateLayer_Checked(object sender, RoutedEventArgs e)
         {
-            SetBackgroundMap(mapviewerappercu);// SetAppercuLayers();
+            SetBackgroundMap(mapviewerappercu);
             Settings.editor_autoupdatelayer = true;
             Settings.SaveIndividualSettings("editor_autoupdatelayer", true);
         }
@@ -1221,7 +1219,7 @@ namespace MapsInMyFolder
 
         private void IsInDebugModeSwitch_Toggle(object sender, RoutedEventArgs e)
         {
-            if (IsInDebugModeSwitch.IsChecked == true)
+            if (IsInDebugModeSwitch?.IsChecked == true)
             {
                 Settings.is_in_debug_mode = true;
             }
@@ -1231,7 +1229,6 @@ namespace MapsInMyFolder
             }
             SetAppercuLayers(forceUpdate: true);
         }
-
 
         private void PrintUrl_Click(object sender, RoutedEventArgs e)
         {
@@ -1312,6 +1309,7 @@ namespace MapsInMyFolder
             string FiguresJsonString = TextboxRectangles.Text;
             MapFigures.DrawFigureOnMapItemsControlFromJsonString(mapviewerRectangles, FiguresJsonString, mapviewerappercu.ZoomLevel); ;
         }
+
         private void TextboxRectangles_KeyUp(object sender, KeyEventArgs e)
         {
             if (TextboxRectangles.Text.IsJson())
@@ -1327,7 +1325,6 @@ namespace MapsInMyFolder
 
                 DoWeNeedToUpdateMoinsUnLayer();
             }
-
         }
 
         private void mapviewerappercu_MouseWheel(object sender, MouseWheelEventArgs e)

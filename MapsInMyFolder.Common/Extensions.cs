@@ -7,10 +7,9 @@ using System.Windows.Media;
 
 namespace MapsInMyFolder.Commun
 {
-
     public static class Extensions
     {
-        public static bool Contains(this String str, String substring, StringComparison comp)
+        public static bool Contains(this string str, string substring, StringComparison comp)
         {
             if (substring == null)
             {
@@ -132,7 +131,6 @@ namespace MapsInMyFolder.Commun
             }
         }
 
-
         public static int IndexOf<T>(this IEnumerable<T> enumerable, T element, IEqualityComparer<T> comparer = null)
         {
             int i = 0;
@@ -147,7 +145,6 @@ namespace MapsInMyFolder.Commun
             }
             return -1;
         }
-
 
         public static IEnumerable<string> SelectedValues(this BlackPearl.Controls.CoreLibrary.MultiSelectCombobox MultiSelectCombobox, string DisplayMemberPath = null)
         {
@@ -167,7 +164,6 @@ namespace MapsInMyFolder.Commun
                     {
                         yield return ele.GetType().GetProperty(DisplayMemberPath).GetValue(ele).ToString().Trim();
                     }
-
                 }
             }
         }
@@ -187,7 +183,6 @@ namespace MapsInMyFolder.Commun
             return false;
         }
 
-
         public static bool Contains(this string[] array, string value)
         {
             for (int i = 0; i < array.Length; i++)
@@ -199,7 +194,6 @@ namespace MapsInMyFolder.Commun
             }
             return false;
         }
-
 
         public static string Replace(this string Texte, IEnumerable<char> oldCharArray, string newString)
         {
@@ -236,6 +230,5 @@ namespace MapsInMyFolder.Commun
                 item.Dispose();
             }
         }
-
     }
 }

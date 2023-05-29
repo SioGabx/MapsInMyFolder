@@ -47,7 +47,6 @@ namespace MapsInMyFolder
             try
             {
                 Thread.CurrentThread.CurrentCulture = new CultureInfo("en");
-                //Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
 
                 var settings = new CefSharp.Wpf.CefSettings();
                 string BrowserSubprocessPathPath = Path.GetFullPath("CefSharp.BrowserSubprocess.exe");
@@ -67,7 +66,7 @@ namespace MapsInMyFolder
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine("Impossible de nettoyer le cache" + cefsharpTempFolderPath + "\n" + ex.Message);
+                        Debug.WriteLine("Unable to clear the cache." + cefsharpTempFolderPath + "\n" + ex.Message);
                     }
                 }
                 string layersTempFolderPath = Path.Combine(Settings.temp_folder, "layers");
@@ -82,7 +81,7 @@ namespace MapsInMyFolder
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine("Impossible de nettoyer le cache" + layersTempFolderPath + "\n" + ex.Message);
+                        Debug.WriteLine("Unable to clear the cache." + layersTempFolderPath + "\n" + ex.Message);
                     }
                 }
                 Directory.CreateDirectory(cefsharpTempFolderPath);
@@ -108,9 +107,9 @@ namespace MapsInMyFolder
                     {
                         Directory.CreateDirectory(Settings.working_folder);
                     }
-                    catch (Exception)
+                    catch (Exception ex)
                     {
-                        DebugMode.WriteLine("Erreur creation du dossier working_folder : " + Settings.working_folder);
+                       Debug.WriteLine(ex.ToString());
                     }
                 }
 
@@ -138,9 +137,7 @@ namespace MapsInMyFolder
             }
             catch (Exception ex)
             {
-                //MessageBox.Show("Erreur de lancement : " + ex.Message + "\n\n StackTrace :  \n" + ex.StackTrace + "\n\n InnerException :  \n" + ex.InnerException);
-                //MessageBox.Show(ex.ToString(), "Erreur de lancement", MessageBoxButton.OK, MessageBoxImage.Error);
-                Message.NoReturnBoxAsync(ex.ToString(), "Erreur");
+                Message.NoReturnBoxAsync(ex.ToString(), "Error");
                 Collectif.RestartApplication();
             }
         }
@@ -168,8 +165,7 @@ namespace MapsInMyFolder
                     "\nException.StackTrace :\n" + e.Exception.StackTrace +
                     "\n\nException.String :\n" + e.Exception.ToString(), System.Text.Encoding.UTF8);
 
-                MessageBox.Show("Une erreur s'est produite, l'application est desormais instable. Il est fortement recommandé de relancer l'application ! \n\n" + e.Exception.Message, "Erreur fatale");
-                //Message.NoReturnBoxAsync("Une erreur innatendu s'est produite, l'application va devoir se fermer", "Erreur");
+                MessageBox.Show("An error occurred, the application is now unstable. It is strongly recommended to restart the application!\n\n" + e.Exception.Message, "Fatal error.");
             }
             catch (Exception ex)
             {
