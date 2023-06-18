@@ -151,14 +151,17 @@ namespace MapsInMyFolder.VectorTileRenderer
 
             dynamic jObject = JObject.Parse(json);
 
-            if (jObject["metadata"] != null)
+            if (jObject["metadata"] != null && jObject.metadata != null)
             {
-                Metadata = jObject.metadata.ToObject<Dictionary<string, object>>();
+                Metadata = jObject?.metadata?.ToObject<Dictionary<string, object>>();
             }
-
+            if (Metadata is null)
+            {
+                return;
+            }
             //List<string> fontNames = new List<string>();
 
-            foreach (JProperty jSource in jObject.sources)
+            foreach (JProperty jSource in jObject?.sources)
             {
                 var source = new Source();
 

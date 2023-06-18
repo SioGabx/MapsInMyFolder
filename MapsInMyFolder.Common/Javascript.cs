@@ -7,6 +7,9 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
+using System.Threading.Tasks;
+using System.Windows;
+using static MapsInMyFolder.Commun.Javascript;
 
 namespace MapsInMyFolder.Commun
 {
@@ -17,7 +20,7 @@ namespace MapsInMyFolder.Commun
 
         #region logs
         //Register logger to the CustomOrEditPage
-        public static Javascript JavascriptInstance = new Javascript();
+        public static Javascript instance = new Javascript();
         private string _logs;
         public class LogsEventArgs : EventArgs
         {
@@ -69,12 +72,11 @@ namespace MapsInMyFolder.Commun
         }
 
         public static long OldScriptTimestamp;
+        public static bool IsWaitingUserAction;
         public static readonly TimeSpan ScriptTimeOut = new TimeSpan(0, 0, 4);
-
 
         private static Engine SetupEngine(int LayerId)
         {
-            Debug.WriteLine("New Settup Engine for layer" + LayerId);
             CancellationTokenSource JsCancelToken = new CancellationTokenSource();
 
             if (JsListCancelTocken.TryGetValue(LayerId, out CancellationTokenSource cancelTockenToDispose))
@@ -111,7 +113,7 @@ namespace MapsInMyFolder.Commun
             engine.SetValue("getSelection", (Func<object>)(() => Functions.GetSelection()));
             engine.SetValue("alert", (Action<object, object>)((texte, caption) => Functions.Alert(LayerId, texte, caption)));
             engine.SetValue("inputbox", (Func<object, object, object>)((texte, caption) => Functions.InputBox(LayerId, texte, caption)));
-            engine.SetValue("sendNotification", (Func<object, object, object, object, object>)((texte, caption, callback, notifId) =>
+            engine.SetValue("notification", (Func<object, object, object, object, object>)((texte, caption, callback, notifId) =>
                 Functions.SendNotification(LayerId, texte, caption, callback, notifId)));
             engine.SetValue("refreshMap", (Func<object>)(() =>
             {
@@ -119,6 +121,10 @@ namespace MapsInMyFolder.Commun
                 return null;
             }));
             engine.SetValue("getStyle", (Func<object>)(() => Tiles.Loader.GetStyle(LayerId)));
+            engine.SetValue("transformLocation", (Func<object, object, object, object, object>)((OriginWkt, TargetWkt, ProjX, ProjY) =>
+         Functions.TransformLocation(OriginWkt, TargetWkt, ProjX, ProjY)));
+            engine.SetValue("transformLocationFromWGS84", (Func<object, object, object, object>)((TargetWkt, ProjX, ProjY) =>
+         Functions.TransformLocationFromWGS84(TargetWkt, ProjX, ProjY)));
             return engine;
         }
 
@@ -128,10 +134,9 @@ namespace MapsInMyFolder.Commun
 
         public static void EngineStopAll()
         {
-            setOldScriptTimestamp();
+            SetOldScriptTimestamp();
             foreach (KeyValuePair<int, CancellationTokenSource> tockensource in JsListCancelTocken)
             {
-                Debug.WriteLine("Revoking" + tockensource.Key);
                 CancelTokenSource(tockensource.Value);
             }
         }
@@ -165,23 +170,20 @@ namespace MapsInMyFolder.Commun
                 try
                 {
                     add = add.Execute(script);
-                    if (CheckIfFunctionExist(add, Collectif.GetUrl.InvokeFunction.getTile.ToString()))
+                    if (CheckIfFunctionExist(add, nameof(Collectif.GetUrl.InvokeFunction.getTile)))
                     {
                         return add;
                     }
                     else
                     {
-                        add = add.Execute(Settings.tileloader_default_script);
-                        return add;
+                        return add.Execute(Settings.tileloader_default_script);
                     }
-
                 }
                 catch (Exception ex)
                 {
                     Debug.WriteLine(ex.Message);
                     Functions.PrintError(ex.Message);
                 }
-
             }
             return null;
         }
@@ -208,7 +210,7 @@ namespace MapsInMyFolder.Commun
 
         public static void EngineClearList()
         {
-            setOldScriptTimestamp();
+            SetOldScriptTimestamp();
             ListOfEngines.Values.DisposeItems();
             ListOfEngines.Clear();
             JsListCancelTocken.Values.DisposeItems();
@@ -254,6 +256,25 @@ namespace MapsInMyFolder.Commun
             JsValue evaluateValue = add.Evaluate("typeof " + functionName + " === 'function'");
             return evaluateValue.AsBoolean();
         }
+        private static string ConvertJSObjectToString(object supposedString)
+        {
+            string returnString = supposedString?.ToString();
+
+            if (returnString != null &&
+                (supposedString.GetType() == typeof(object) ||
+                supposedString.GetType() == typeof(object[]) ||
+                supposedString.GetType() == typeof(System.Dynamic.ExpandoObject) ||
+                supposedString.GetType() == typeof(Dictionary<string, string>) ||
+                supposedString.GetType() == typeof(Dictionary<string, int>) ||
+                supposedString.GetType() == typeof(Dictionary<string, double>) ||
+                supposedString.GetType() == typeof(Dictionary<string, object>))
+            && (supposedString.GetType().FullName != "Jint.Runtime.Interop.DelegateWrapper"))
+            {
+                returnString = JsonConvert.SerializeObject(supposedString);
+            }
+
+            return returnString;
+        }
 
         public static bool CheckIfFunctionExist(int LayerId, string functionName, string script = null)
         {
@@ -267,21 +288,20 @@ namespace MapsInMyFolder.Commun
             }
             Engine add = EngineGetById(LayerId, script);
 
-            if (add == null || string.IsNullOrEmpty(functionName))
+            if (add is null || string.IsNullOrEmpty(functionName))
             {
                 return false;
             }
             try
             {
-                JsValue evaluateValue = add?.Evaluate("typeof " + functionName + " === 'function'") ?? false;
-                return evaluateValue.AsBoolean();
+                JsValue evaluateValue = add?.Evaluate($"typeof {functionName} === 'function'");
+                return evaluateValue?.AsBoolean() ?? false;
             }
             catch (Exception ex)
             {
                 Debug.WriteLine(ex.Message);
                 return false;
             }
-
         }
         public static JsValue ExecuteScript(string script, Dictionary<string, object> arguments, int LayerId, Collectif.GetUrl.InvokeFunction InvokeFunction)
         {
@@ -291,13 +311,29 @@ namespace MapsInMyFolder.Commun
         public static JsValue ExecuteScript(string script, Dictionary<string, object> arguments, int LayerId, string InvokeFunctionString)
         {
             long ScriptTimestamp = GetTimestamp();
-            lock (ExecuteScriptLocker)
+            try
             {
-                if (scriptIsOld(ScriptTimestamp))
+                Monitor.Enter(ExecuteScriptLocker);
+            
+                if (ScriptIsOld(ScriptTimestamp))
                 {
                     Functions.PrintError("Execution of the function has been canceled because its start date is too old and/or has been revoked.");
                     return null;
                 }
+                bool executedSuccessfully = false;
+
+                var task = Task.Run(async () =>
+                {
+                    await Task.Delay(10000); // Délai de 10 secondes
+
+                    if (!executedSuccessfully && !IsWaitingUserAction)
+                    {
+                        Functions.PrintError("The execution of the function has been canceled as it took too long to respond."); 
+                        Monitor.Exit(ExecuteScriptLocker);
+                        return;
+                    }
+                    //The task has been successfully executed!
+                });
 
                 Engine add = EngineGetById(LayerId, script);
 
@@ -313,7 +349,7 @@ namespace MapsInMyFolder.Commun
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine(ex.Message);
+                    Debug.WriteLine("ExecuteScript " + ex.Message);
                     if (ex.Message == "Can only invoke functions")
                     {
                         Functions.PrintError(InvokeFunctionString + "=> " + ex.Message);
@@ -326,12 +362,21 @@ namespace MapsInMyFolder.Commun
                 }
                 finally
                 {
+                    executedSuccessfully = true;
                     EngineUpdate(add, LayerId);
                 }
 
                 return jsValue;
             }
-        }
+            finally
+            {
+                if (Monitor.IsEntered(ExecuteScriptLocker))
+                {
+                    Monitor.Exit(ExecuteScriptLocker);
+                }
+            }
+    }
+
 
 
         public static long GetTimestamp()
@@ -339,16 +384,15 @@ namespace MapsInMyFolder.Commun
             return DateTime.Now.Ticks;
         }
 
-        public static void setOldScriptTimestamp()
+        public static void SetOldScriptTimestamp()
         {
             OldScriptTimestamp = GetTimestamp() + 10;
         }
 
-        public static bool scriptIsOld(long scriptTimestamp)
+        public static bool ScriptIsOld(long scriptTimestamp)
         {
             return (scriptTimestamp < OldScriptTimestamp) || (scriptTimestamp + ScriptTimeOut.Ticks < GetTimestamp());
         }
-
 
         public static void ExecuteCommand(string command, int LayerId)
         {
@@ -369,7 +413,6 @@ namespace MapsInMyFolder.Commun
                     {
                         evaluateResultString = "\"" + evaluateResultString + "\"";
                     }
-
                 }
                 if (!string.IsNullOrEmpty(evaluateResultString) && evaluateResultString != "null")
                 {

@@ -55,7 +55,7 @@
                 KeyDown="Layer_searchbar_KeyDown"
                 LostFocus="Layer_searchbar_LostFocus"
                 Style="{DynamicResource TextBoxCleanStyle_16}"
-                Text="{Binding Source={x:Static commun:Languages.Current}, Path=[searchLayerPlaceholder]}"
+                Text="{Binding Source={x:Static commun:Languages.Current}, Mode=OneWay, Path=[searchLayerPlaceholder]}"
                 TextChanged="Layer_searchbar_TextChanged" />
 
             <Border
@@ -110,7 +110,7 @@
                     KeyDown="MapSearchbar_KeyDown"
                     LostFocus="MapSearchbar_LostFocus"
                     Style="{DynamicResource TextBoxCleanStyle_16}"
-                    Text="{Binding Source={x:Static commun:Languages.Current}, Path=[searchMapPlaceholder]}"
+                    Text="{Binding Source={x:Static commun:Languages.Current}, Mode=OneWay, Path=[searchMapPlaceholder]}"
                     TextChanged="MapSearchbar_TextChanged" />
 
                 <Rectangle

@@ -1,41 +1,47 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-    <PropertyGroup>
-        <TargetFrameworks>net6.0-windows</TargetFrameworks>
-        <UseWPF>true</UseWPF>
-        <RootNamespace>MapsInMyFolder.MapControl</RootNamespace>
-        <AssemblyTitle>XAML Map Control Library for WPF</AssemblyTitle>
-        <Product>XAML Map Control</Product>
-        <Version>7.2.0</Version>
-        <Authors>Clemens Fischer - SioGabx</Authors>
-        <Copyright>Copyright © 2022 Clemens Fischer - SioGabx</Copyright>
-        <SignAssembly>true</SignAssembly>
-        <AssemblyOriginatorKeyFile>MapControl.snk</AssemblyOriginatorKeyFile>
-        <DelaySign>false</DelaySign>
-        <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-        <PackageId>XAML.MapControl</PackageId>
-        <DefineConstants></DefineConstants>
-        <Platforms>AnyCPU;x64</Platforms>
+	<PropertyGroup>
+		<TargetFrameworks>net6.0-windows</TargetFrameworks>
+		<UseWPF>true</UseWPF>
+		<RootNamespace>MapsInMyFolder.MapControl</RootNamespace>
+		<AssemblyTitle>XAML Map Control Library for WPF</AssemblyTitle>
+		<Product>XAML Map Control</Product>
+		<Version>7.2.0</Version>
+		<Authors>Clemens Fischer - SioGabx</Authors>
+		<Copyright>Copyright © 2023 Clemens Fischer - SioGabx</Copyright>
+		<SignAssembly>False</SignAssembly>
+		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+		<PackageId>XAML.MapControl</PackageId>
+		<DefineConstants></DefineConstants>
+		<Platforms>AnyCPU;x64</Platforms>
 		<LangVersion>8.0</LangVersion>
 		<ApplicationIcon>icone_v2.ico</ApplicationIcon>
-    </PropertyGroup>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net6.0-windows|AnyCPU'">
+	  <WarningLevel>4</WarningLevel>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net6.0-windows|x64'">
+	  <WarningLevel>4</WarningLevel>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net6.0-windows|AnyCPU'">
+	  <WarningLevel>4</WarningLevel>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net6.0-windows|x64'">
+	  <WarningLevel>4</WarningLevel>
+	</PropertyGroup>
 
-    <ItemGroup>
-        <None Include="MapControl.snk" />
-    </ItemGroup>
+	<ItemGroup>
+		<Compile Include="\*.cs" />
+	</ItemGroup>
 
-    <ItemGroup>
-        <Compile Include="\*.cs" />
-    </ItemGroup>
+	<ItemGroup Condition="'$(TargetFramework)'=='net6.0-windows'">
+		<PackageReference Include="System.Runtime.Caching" Version="7.0.0" />
+	</ItemGroup>
 
-    <ItemGroup Condition="'$(TargetFramework)'=='net6.0-windows'">
-        <PackageReference Include="System.Runtime.Caching" Version="7.0.0" />
-    </ItemGroup>
+	<ItemGroup>
+		<Content Include="icone_v2.ico" />
+	</ItemGroup>
 
-    <ItemGroup>
-      <Content Include="icone_v2.ico" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <ProjectReference Include="..\..\MapsInMyFolder.Common\MapsInMyFolder.Commun.csproj" />
-    </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\..\MapsInMyFolder.Common\MapsInMyFolder.Commun.csproj" />
+	</ItemGroup>
 </Project>

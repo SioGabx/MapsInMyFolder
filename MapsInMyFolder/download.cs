@@ -69,7 +69,6 @@ namespace MapsInMyFolder
         }
     }
 
-
     public class DownloadOptions
     {
         public int id_layer;
@@ -538,11 +537,11 @@ namespace MapsInMyFolder
             }
             else if (nbrPass == settingsMaxRetryDownload)
             {
-                UpdateDownloadPanel(downloadEngineClassArgs.id, Languages.GetWithArguments("downloadStateErrorsAttempt", nbrPass,settingsMaxRetryDownload), "100", true, Status.error,"Number of tiles missing = " + nbrOfTilesWaitingForDownloading);
+                UpdateDownloadPanel(downloadEngineClassArgs.id, Languages.GetWithArguments("downloadStateErrorsAttempt", nbrPass, settingsMaxRetryDownload), "100", true, Status.error, "Number of tiles missing = " + nbrOfTilesWaitingForDownloading);
                 downloadEngineClassArgs.state = Status.error;
             }
 
-            DownloadSettings.CurrentNumberOfDownload--;   
+            DownloadSettings.CurrentNumberOfDownload--;
             await Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
             {
                 TaskbarItemInfo.ProgressValue = 0;
@@ -598,21 +597,23 @@ namespace MapsInMyFolder
             IEnumerable<TilesUrl> urls = downloadEngineClass.urls;
             CancellationTokenSource cancellationTokenSource = downloadEngineClass.cancellationTokenSource;
             CancellationToken cancellationToken = downloadEngineClass.cancellationToken;
-            try
+
+            await Task.Run(() =>
             {
-                await Task.Run(() =>
+                try
                 {
                     Parallel.ForEach(urls, new ParallelOptions { MaxDegreeOfParallelism = Settings.max_download_tiles_in_parralele, CancellationToken = cancellationToken }, url =>
-                    {
-                        WaitForInternet(downloadEngineClass);
-                        DownloadUrlAsync(url).Wait();
-                    });
-                }, cancellationTokenSource.Token);
-            }
-            catch (OperationCanceledException)
-            {
+                        {
+                    WaitForInternet(downloadEngineClass);
+                    DownloadUrlAsync(url).Wait();
+                });
+                }
+                catch (OperationCanceledException ex)
+                {
+                    Debug.WriteLine(ex.Message);
+                }
+            }, cancellationTokenSource.Token);
 
-            }
         }
 
         static private int CheckDownloadIsComplete(DownloadSettings downloadEngineClass)
@@ -713,7 +714,7 @@ namespace MapsInMyFolder
             {
                 commandExecuted += $"updateprogress({id}, \"{progress}\");";
             }
-            
+
             if (!string.IsNullOrEmpty(tooltips))
             {
                 commandExecuted += $"updatetooltips({id}, \"{tooltips}\");";
@@ -1234,7 +1235,7 @@ namespace MapsInMyFolder
 
             try
             {
-                imageRogner.WriteToFile(imageTempsAssemblagePath, Collectif.getSaveVOption(currentEngine.finalSaveFormat, currentEngine.quality, tileSize));
+                imageRogner.WriteToFile(imageTempsAssemblagePath, Collectif.GetSaveVOption(currentEngine.finalSaveFormat, currentEngine.quality, tileSize));
             }
             catch (Exception ex)
             {

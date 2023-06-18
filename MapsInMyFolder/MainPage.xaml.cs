@@ -1,4 +1,5 @@
-﻿using MapsInMyFolder.Commun;
+﻿using CefSharp;
+using MapsInMyFolder.Commun;
 using MapsInMyFolder.MapControl;
 using System;
 using System.Collections.Generic;
@@ -7,24 +8,26 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media.Animation;
+using TextBox = System.Windows.Controls.TextBox;
 
 namespace MapsInMyFolder
 {
     /// <summary>
     /// Logique d'interaction pour MainPage.xaml
     /// </summary>
-    public partial class MainPage : Page
+    public partial class MainPage : System.Windows.Controls.Page
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2211:Les champs non constants ne doivent pas être visibles", Justification = "for access everywhere")]
         public static MainPage _instance;
         bool isInitialised = false;
-        public static MapSelectable mapSelectable;
-        public static MapFigures MapFigures;
+        public static MapSelectable MapSelectable;
+        private static MapFigures MapFigures;
         public MainPage()
         {
             _instance = this;
-            MapFigures = new MapFigures();
             InitializeComponent();
+            var requestHandler = new CustomRequestHandler();
+            layer_browser.RequestHandler = requestHandler;
         }
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
@@ -34,9 +37,12 @@ namespace MapsInMyFolder
                 Location NO_PIN_starting_location = new Location(Settings.NO_PIN_starting_location_latitude, Settings.NO_PIN_starting_location_longitude);
                 Location SE_PIN_starting_location = new Location(Settings.SE_PIN_starting_location_latitude, Settings.SE_PIN_starting_location_longitude);
 
-                mapSelectable = new MapSelectable(mapviewer, NO_PIN_starting_location, SE_PIN_starting_location, this);
-                //Disable event dispose on navigate beceause this is the main page
-                mapSelectable.DisposeElementsOnUnload = false;
+                MapSelectable = new MapSelectable(mapviewer, NO_PIN_starting_location, SE_PIN_starting_location, this)
+                {
+                    //Disable event dispose on navigate beceause this is the main page
+                    DisposeElementsOnUnload = false
+                };
+                MapFigures = new MapFigures();
                 Preload();
                 Init();
             }
@@ -50,21 +56,109 @@ namespace MapsInMyFolder
 
         void Init()
         {
-            Debug.WriteLine("Init MainPage");
             Init_download_panel();
             Init_layer_panel();
             isInitialised = true;
             Notification.UpdateNotification += UpdateNotification;
             layer_browser.ToolTipOpening += (o, e) => e.Handled = true;
         }
-        private void Map_panel_open_location_panel_Click(object sender, RoutedEventArgs e)
+
+        private async void Map_panel_open_location_panel_Click(object sender, RoutedEventArgs e)
         {
-            Message.NoReturnBoxAsync(Languages.Current["updateErrorFeatureNotAvailable"], Languages.Current["dialogTitleOperationFailed"]);
+            (TextBox LeftTextBox, TextBox RightTextBox) setDoubleColumnTextBox(Grid grid, string leftLabelText, string rightLabelText)
+            {
+                grid.Margin = new Thickness(0, 20, 0, 0);
+                TextBox GetTextBox(object content, int column)
+                {
+                    Label label = new Label()
+                    {
+                        Content = content,
+                    };
+                    Grid.SetRow(label, 0);
+                    Grid.SetColumn(label, column);
+                    TextBox textbox = new TextBox
+                    {
+                        Width = 225,
+                        Height = 25,
+                        Foreground = Collectif.HexValueToSolidColorBrush("#BCBCBC"),
+                        Style = TryFindResource("TextBoxCleanStyleDefault") as Style
+                    };
+                    Grid.SetRow(textbox, 2);
+                    Grid.SetColumn(textbox, column);
+                    grid.Children.Add(label);
+                    grid.Children.Add(textbox);
+                    return textbox;
+                }
+
+                TextBox leftTextbox = GetTextBox(leftLabelText, 0);
+                TextBox rightTextbox = GetTextBox(rightLabelText, 2);
+                return (leftTextbox, rightTextbox);
+            }
+
+            Grid getGrid()
+            {
+                Grid contentGrid = new Grid();
+                contentGrid.RowDefinitions.Add(new RowDefinition()
+                {
+                    Height = new GridLength(17)
+                });
+                contentGrid.RowDefinitions.Add(new RowDefinition()
+                {
+                    Height = new GridLength(3)
+                });
+                contentGrid.RowDefinitions.Add(new RowDefinition());
+                contentGrid.ColumnDefinitions.Add(new ColumnDefinition());
+                contentGrid.ColumnDefinitions.Add(new ColumnDefinition()
+                {
+                    Width = new GridLength(10)
+                });
+                contentGrid.ColumnDefinitions.Add(new ColumnDefinition());
+                return contentGrid;
+            }
+
+            StackPanel stackPanel = new StackPanel()
+            {
+                Margin = new Thickness(10, 10, 5, 20),
+            };
+
+            stackPanel.Children.Add(new Label()
+            {
+                Content = Languages.Current["mapSpecifySelectionCoordinates"],
+            });
+            Grid nordOuestGrid = getGrid();
+            var nordOuestTextBox = setDoubleColumnTextBox(nordOuestGrid, Languages.Current["editorSelectionsPropertyNameNorthwestLatitude"], Languages.Current["editorSelectionsPropertyNameNorthwestLongitude"]);
+            stackPanel.Children.Add(nordOuestGrid);
+            var NOLatitudeTextBox = nordOuestTextBox.LeftTextBox;
+            var NOLongitudeTextBox = nordOuestTextBox.RightTextBox;
+            NOLatitudeTextBox.Text = Commun.Map.CurentSelection.NO_Latitude.ToString();
+            NOLongitudeTextBox.Text = Commun.Map.CurentSelection.NO_Longitude.ToString();
+
+
+            Grid sudEstGrid = getGrid();
+            var sudEstTextBox = setDoubleColumnTextBox(sudEstGrid, Languages.Current["editorSelectionsPropertyNameSoutheastLatitude"], Languages.Current["editorSelectionsPropertyNameSoutheastLongitude"]);
+            stackPanel.Children.Add(sudEstGrid);
+            var SELatitudeTextBox = sudEstTextBox.LeftTextBox;
+            var SELongitudeTextBox = sudEstTextBox.RightTextBox;
+            SELatitudeTextBox.Text = Commun.Map.CurentSelection.SE_Latitude.ToString();
+            SELongitudeTextBox.Text = Commun.Map.CurentSelection.SE_Longitude.ToString();
+
+            var result = await Message.SetContentDialog(stackPanel, "MapsInMyFolder", MessageDialogButton.OKCancel).ShowAsync();
+            if (result == ModernWpf.Controls.ContentDialogResult.Primary)
+            {
+                if (double.TryParse(NOLatitudeTextBox.Text, out double NO_Lat) &&
+                double.TryParse(NOLongitudeTextBox.Text, out double NO_Long) &&
+                double.TryParse(SELatitudeTextBox.Text, out double SE_Lat) &&
+                double.TryParse(SELongitudeTextBox.Text, out double SE_Long))
+                {
+                    Javascript.Functions.SetSelection(NO_Lat, NO_Long, SE_Lat, SE_Long, true, Layers.Current.class_id);
+                }
+            }
         }
 
         private void Download_panel_close_button_Click(object sender, RoutedEventArgs e)
         {
-            Download_panel_close();
+            Debug.WriteLine(Languages.Current["searchLayerPlaceholder"]);
+            //Download_panel_close();
         }
 
         private void Layer_searchbar_GotFocus(object sender, RoutedEventArgs e)
@@ -164,7 +258,9 @@ namespace MapsInMyFolder
             {
                 mapviewer.Center = new Location((Settings.NO_PIN_starting_location_latitude + Settings.SE_PIN_starting_location_latitude) / 2, (Settings.NO_PIN_starting_location_longitude + Settings.SE_PIN_starting_location_longitude) / 2);
                 mapviewer.ZoomLevel = Settings.map_defaut_zoom_level;
-                mapSelectable.OnLocationUpdated += OnLocationUpdated;
+                MapSelectable.OnLocationUpdated += OnLocationUpdated;
+                MapSelectable.RequestedPreviewUpdate += (o, e) => LayerTilePreview_RequestUpdate();
+
             }
             mapviewer.Background = new System.Windows.Media.SolidColorBrush(
                 System.Windows.Media.Color.FromArgb(255,
@@ -178,7 +274,7 @@ namespace MapsInMyFolder
 
         private void OnLocationUpdated(object sender = null, MapPolygon e = null)
         {
-            var ActiveRectangleSelection = mapSelectable.GetRectangleLocation();
+            var ActiveRectangleSelection = MapSelectable.GetRectangleLocation();
             NO_PIN.Location = ActiveRectangleSelection.NO;
             SE_PIN.Location = ActiveRectangleSelection.SE;
             Commun.Map.CurentSelection.NO_Latitude = ActiveRectangleSelection.NO.Latitude;
@@ -194,21 +290,21 @@ namespace MapsInMyFolder
 
         public void MapViewerSetSelection(Dictionary<string, double> locations, bool ZoomToNewLocation = true)
         {
-            var ActiveRectangleSelection = mapSelectable.GetRectangleLocation();
-            if (ActiveRectangleSelection.NO.Latitude != locations["NO_Latitude"] &&
-                ActiveRectangleSelection.NO.Longitude != locations["NO_Longitude"] &&
-                ActiveRectangleSelection.SE.Latitude != locations["SE_Latitude"] &&
+            var ActiveRectangleSelection = MapSelectable.GetRectangleLocation();
+            if (ActiveRectangleSelection.NO.Latitude != locations["NO_Latitude"] ||
+                ActiveRectangleSelection.NO.Longitude != locations["NO_Longitude"] ||
+                ActiveRectangleSelection.SE.Latitude != locations["SE_Latitude"] ||
                 ActiveRectangleSelection.SE.Longitude != locations["SE_Longitude"])
             {
                 ActiveRectangleSelection.NO = new Location(locations["NO_Latitude"], locations["NO_Longitude"]);
                 ActiveRectangleSelection.SE = new Location(locations["SE_Latitude"], locations["SE_Longitude"]);
-                mapSelectable.SetRectangleLocation(ActiveRectangleSelection.NO, ActiveRectangleSelection.SE);
+                MapSelectable.SetRectangleLocation(ActiveRectangleSelection.NO, ActiveRectangleSelection.SE);
             }
 
 
             if (ZoomToNewLocation)
             {
-                ActiveRectangleSelection = mapSelectable.GetRectangleLocation();
+                ActiveRectangleSelection = MapSelectable.GetRectangleLocation();
                 double pourcentage_Lat = Math.Abs((ActiveRectangleSelection.NO.Latitude - ActiveRectangleSelection.SE.Latitude) / 2);
                 double pourcentage_Lng = Math.Abs((ActiveRectangleSelection.NO.Latitude - ActiveRectangleSelection.SE.Latitude) / 2);
                 Location NO_Location_Bounds = new Location(ActiveRectangleSelection.NO.Latitude - pourcentage_Lat, ActiveRectangleSelection.NO.Longitude - pourcentage_Lng);
@@ -278,7 +374,7 @@ namespace MapsInMyFolder
 
         private void Start_Download_Click(object sender, RoutedEventArgs e)
         {
-            mapSelectable.CleanRectangleLocations();
+            MapSelectable.CleanRectangleLocations();
             MainWindow._instance.FrameLoad_PrepareDownload();
         }
     }

@@ -179,10 +179,8 @@ namespace MapsInMyFolder.Commun
 
         static public int ExecuteScalarSQLCommand(string querry)
         {
-            using (SQLiteConnection conn = DB_Connection())
-            {
-                return ExecuteScalarSQLCommand(conn, querry);
-            }
+            using SQLiteConnection conn = DB_Connection();
+            return ExecuteScalarSQLCommand(conn, querry);
         }
 
         static public int ExecuteScalarSQLCommand(SQLiteConnection conn, string querry)
@@ -212,10 +210,8 @@ namespace MapsInMyFolder.Commun
 
         static public int ExecuteNonQuerySQLCommand(string querry)
         {
-            using (SQLiteConnection conn = DB_Connection())
-            {
-                return ExecuteNonQuerySQLCommand(conn, querry);
-            }
+            using SQLiteConnection conn = DB_Connection();
+            return ExecuteNonQuerySQLCommand(conn, querry);
         }
 
         static public int ExecuteNonQuerySQLCommand(SQLiteConnection conn, string querry)
@@ -253,11 +249,11 @@ namespace MapsInMyFolder.Commun
                 int ordinal = GetOrdinal(sqlite_datareader, name);
                 if (ordinal == -1)
                 {
-                    return "";
+                    return null;
                 }
                 if (sqlite_datareader.IsDBNull(ordinal))
                 {
-                    return "";
+                    return null;
                 }
                 var get_setring = sqlite_datareader.GetString(ordinal);
                 if (string.IsNullOrEmpty(get_setring))
@@ -272,7 +268,7 @@ namespace MapsInMyFolder.Commun
             catch (Exception ex)
             {
                 Debug.WriteLine("Get : " + name + " - Erreur : " + ex.ToString());
-                return "";
+                return null;
             }
         }
 
@@ -347,7 +343,7 @@ namespace MapsInMyFolder.Commun
             }
             using (SQLiteCommand sqlite_cmd = sqlite_conn.CreateCommand())
             {
-                const string commande_arg = "'ID' INTEGER UNIQUE, 'NAME' TEXT DEFAULT '', 'DESCRIPTION' TEXT DEFAULT '', 'CATEGORY' TEXT DEFAULT '','COUNTRY' TEXT DEFAULT '', 'IDENTIFIER' TEXT DEFAULT '', 'TILE_URL' TEXT DEFAULT '', 'MIN_ZOOM' INTEGER DEFAULT '', 'MAX_ZOOM' INTEGER DEFAULT '', 'FORMAT' TEXT DEFAULT '', 'SITE' TEXT DEFAULT '', 'SITE_URL' TEXT DEFAULT '', 'TILE_SIZE' INTEGER DEFAULT '', 'FAVORITE' INTEGER DEFAULT 0, 'SCRIPT' TEXT DEFAULT '','VISIBILITY' TEXT DEFAULT '' ,'SPECIALSOPTIONS' TEXT DEFAULT '','RECTANGLES' TEXT DEFAULT '', 'VERSION' INTEGER DEFAULT 1, 'HAS_SCALE' INTEGER DEFAULT 1";
+                const string commande_arg = "'ID' INTEGER UNIQUE, 'NAME' TEXT DEFAULT '', 'DESCRIPTION' TEXT DEFAULT '', 'CATEGORY' TEXT DEFAULT '','COUNTRY' TEXT DEFAULT '', 'IDENTIFIER' TEXT DEFAULT '', 'TILE_URL' TEXT DEFAULT '', 'MIN_ZOOM' INTEGER DEFAULT '', 'MAX_ZOOM' INTEGER DEFAULT '', 'FORMAT' TEXT DEFAULT '', 'SITE' TEXT DEFAULT '', 'SITE_URL' TEXT DEFAULT '', 'STYLE' TEXT DEFAULT '', 'TILE_SIZE' INTEGER DEFAULT '', 'FAVORITE' INTEGER DEFAULT 0, 'SCRIPT' TEXT DEFAULT '','VISIBILITY' TEXT DEFAULT '' ,'SPECIALSOPTIONS' TEXT DEFAULT '','RECTANGLES' TEXT DEFAULT '', 'VERSION' INTEGER DEFAULT 1, 'HAS_SCALE' INTEGER DEFAULT 1";
                 sqlite_cmd.CommandText = $@"
                 CREATE TABLE IF NOT EXISTS 'CUSTOMSLAYERS' ({commande_arg});
                 CREATE TABLE IF NOT EXISTS 'LAYERS' ({commande_arg},PRIMARY KEY('ID' AUTOINCREMENT));
@@ -529,7 +525,7 @@ namespace MapsInMyFolder.Commun
                     using (sqlite_datareader = sqlite_cmd.ExecuteReader())
                     {
                         sqlite_datareader.Read();
-                        Sql.Append(sqlite_datareader.GetString(0) + ";");
+                        Sql.Append(string.Concat(sqlite_datareader.GetString(0), ";"));
                     }
                 }
             }
@@ -567,14 +563,7 @@ namespace MapsInMyFolder.Commun
                         }
                         else if (LastDB_SCRIPT != EditedDB_SCRIPT && LastDB_TILE_URL != EditedDB_TILE_URL)
                         {
-                            if (string.IsNullOrWhiteSpace(EditedDB_SCRIPT) && string.IsNullOrWhiteSpace(EditedDB_TILE_URL))
-                            {
-                                VersionCanBeUpdated = true;
-                            }
-                            else
-                            {
-                                VersionCanBeUpdated = false;
-                            }
+                            VersionCanBeUpdated = string.IsNullOrWhiteSpace(EditedDB_SCRIPT) && string.IsNullOrWhiteSpace(EditedDB_TILE_URL);
                         }
 
                         if (VersionCanBeUpdated)
@@ -591,10 +580,12 @@ namespace MapsInMyFolder.Commun
         public static void CheckForMissingCollumns()
         {
             Debug.WriteLine("Check for missing collums");
-            Dictionary<string, List<string>> map = new Dictionary<string, List<string>>();
-            map.Add("LAYERS", new List<string>());
-            map.Add("EDITEDLAYERS", new List<string>());
-            map.Add("CUSTOMSLAYERS", new List<string>());
+            Dictionary<string, List<string>> map = new Dictionary<string, List<string>>
+            {
+                { "LAYERS", new List<string>() },
+                { "EDITEDLAYERS", new List<string>() },
+                { "CUSTOMSLAYERS", new List<string>() }
+            };
 
             foreach (string key in map.Keys)
             {
@@ -665,7 +656,7 @@ namespace MapsInMyFolder.Commun
             using (SQLiteDataReader sqlite_datareader = ExecuteExecuteReaderSQLCommand("SELECT sql FROM 'main'.'sqlite_master' WHERE name = 'LAYERS';"))
             {
                 sqlite_datareader.Read();
-                SQLExecute.AppendLine(sqlite_datareader.GetString(0) + ";");
+                SQLExecute.AppendLine(string.Concat(sqlite_datareader.GetString(0) + ";"));
             }
 
             Dictionary<string, string> TableCollumsNames = new Dictionary<string, string>();

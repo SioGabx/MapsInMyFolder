@@ -9,7 +9,8 @@ namespace MapsInMyFolder.Commun
     public enum SearchEngines
     {
         OpenStreetMap,
-        BingMaps
+        BingMaps,
+        ArcGIS
     }
 
     public static class Settings
@@ -121,7 +122,7 @@ namespace MapsInMyFolder.Commun
                 string value = XMLParser.Settings.Read(fieldName);
                 bool IsErrorOnConvert = false;
 
-                if (!(value is null))
+                if (value is not null)
                 {
                     object ConvertedValue;
                     Type value_type = fieldValue.GetType();
@@ -160,7 +161,6 @@ namespace MapsInMyFolder.Commun
                     type.GetField(fieldName).SetValue(null, ConvertedValue);
                 }
             }
-
         }
 
         public static void SaveSettings()

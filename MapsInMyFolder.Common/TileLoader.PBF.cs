@@ -164,6 +164,7 @@ namespace MapsInMyFolder.Commun
 
                 void SetProviders(int ArrayX, int ArrayY, int ComputedTileX, int ComputedTileY)
                 {
+                    try {
                     VectorTileRenderer.Sources.PbfTileSource pbfTileSource = GetProviderFromXYZ(LayerID, urlBase, ComputedTileX, ComputedTileY, zoom, cache_tile, save_temp_directory_rawBPF, save_temp_directory, filename, settings_max_tiles_cache_days).Result;
                     lock (PBF_SetProviders_Locker)
                     {
@@ -175,12 +176,17 @@ namespace MapsInMyFolder.Commun
                         {
                             Debug.WriteLine("Erreur set providers :" + ex.Message);
                         }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine("Erreur set PbfTileSource :" + ex.Message);
                     }
                 }
 
                 ICanvas bitmap = new SkiaCanvas();
-                MapsInMyFolder.VectorTileRenderer.Renderer.ICanvasCollisions ReturnCanvasAndCollisions;
-                MapsInMyFolder.VectorTileRenderer.Renderer.Collisions ListOfEntitiesCollisions = new MapsInMyFolder.VectorTileRenderer.Renderer.Collisions();
+                Renderer.ICanvasCollisions ReturnCanvasAndCollisions;
+                Renderer.Collisions ListOfEntitiesCollisions = new MapsInMyFolder.VectorTileRenderer.Renderer.Collisions();
                 Renderer.ROptions Roptions = null;
                 if (!(providers[1][1] is null))
                 {

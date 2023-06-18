@@ -17,22 +17,21 @@ namespace MapsInMyFolder.Commun
             _dictionary = dictionary;
         }
 
-        public TValue NullKeyValue => default(TValue);
+        public TValue NullKeyValue => default;
 
         public TValue this[TKey key]
         {
             get
             {
-                TValue value;
                 if (_dictionary is null)
                 {
                     return NullKeyValue;
                 }
-                if (_dictionary.TryGetValue(key, out value) && !EqualityComparer<TValue>.Default.Equals(value, default(TValue)))
+                if (_dictionary.TryGetValue(key, out TValue value) && !EqualityComparer<TValue>.Default.Equals(value, default))
                 {
                     return value;
                 }
-                else if (!EqualityComparer<TKey>.Default.Equals(key, default(TKey)))
+                else if (!EqualityComparer<TKey>.Default.Equals(key, default))
                 {
                     Debug.WriteLine($"Languages : Key {key} not found");
                     return (TValue)(object)$"%{key}%";
@@ -77,9 +76,12 @@ namespace MapsInMyFolder.Commun
     {
         public enum Language
         {
+            [UserFriendlyString("%settingsPropertyValuesLanguageUseSystemLanguage%")]
+            SystemLanguage,
+            [UserFriendlyString("Français")]
             French,
+            [UserFriendlyString("English")]
             English,
-            None
         }
 
         private static LanguageDictionaryWrapper<string, string> _current = new LanguageDictionaryWrapper<string, string>(new Dictionary<string, string>());
@@ -91,29 +93,37 @@ namespace MapsInMyFolder.Commun
 
         static Languages()
         {
-            Load(Language.English);
+            Language SelectedLanguage = Settings.application_languages;
+            if (SelectedLanguage == Language.SystemLanguage)
+            {
+                SelectedLanguage = DetectSystemLanguage();
+            }
+            Load(SelectedLanguage);
+        }
+
+        private static Language DetectSystemLanguage()
+        {
+            CultureInfo culture = CultureInfo.CurrentUICulture;
+            if (Enum.TryParse(culture.Parent.EnglishName, true, out Language SystemLanguage))
+            {
+                return SystemLanguage;
+            }
+            else
+            {
+                return Language.English;
+            }
         }
 
         public static void Load(Language language)
         {
             var languageIniValues = Collectif.ReadResourceString($"Languages/{language}.ini");
             var dictionary = IniFileReader.ReadString(languageIniValues);
-
-
             _current = new LanguageDictionaryWrapper<string, string>(dictionary);
         }
-
 
         public static string GetWithArguments(string key, params object[] args)
         {
             return Current[key, args];
-            //string RawValue = Current[key];
-
-            //foreach (var arg in args)
-            //{
-            //    RawValue = RawValue.ReplaceSingle("{%s}", arg.ToString());
-            //}
-            //return RawValue;
         }
 
         public static string ReplaceInString(string texte)

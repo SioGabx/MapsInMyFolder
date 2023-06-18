@@ -2,12 +2,15 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Threading;
+using System.Xml.Serialization;
 
 namespace MapsInMyFolder.Commun
 {
@@ -75,7 +78,7 @@ namespace MapsInMyFolder.Commun
 
             static public bool ClearVar(int LayerId, object variablename = null)
             {
-                if (ReferenceEquals(null, variablename))
+                if (variablename is null)
                 {
                     if (DictionnaryOfVariablesKeyLayerId.ContainsKey(LayerId))
                     {
@@ -115,13 +118,13 @@ namespace MapsInMyFolder.Commun
             {
                 if (Layers.Current.class_id == LayerId)
                 {
-                    JavascriptInstance.Location = new Dictionary<string, double>(){
+                    instance.Location = new Dictionary<string, double>(){
                         {"SE_Latitude",SE_Latitude },
                         {"SE_Longitude",SE_Longitude },
                         {"NO_Latitude",NO_Latitude },
                         {"NO_Longitude",NO_Longitude }
                     };
-                    JavascriptInstance.ZoomToNewLocation = ZoomToNewLocation;
+                    instance.ZoomToNewLocation = ZoomToNewLocation;
                 }
                 else
                 {
@@ -148,15 +151,30 @@ namespace MapsInMyFolder.Commun
                 };
             }
 
-            public static Dictionary<string, int> CoordonneesToTile(object latitude, object longitude, object zoom)
+            public static Dictionary<string, int> CoordonneesToTile(object objLatitude, object objLongitude, object objZoom)
             {
-                int Intzoom = Convert.ToInt32(zoom);
-                var TilesNumber = Collectif.CoordonneesToTile((double)latitude, (double)longitude, Intzoom);
+                if (!(int.TryParse(objZoom?.ToString(), out int Zoom)))
+                {
+                    PrintError($"Unable to convert zoom \"{objZoom}\" to integer");
+                    return null;
+                }
+                if (!(double.TryParse(objLatitude?.ToString(), out double latitude)))
+                {
+                    PrintError($"Unable to convert latitude \"{objLatitude}\" to double");
+                    return null;
+                }
+                if (!(double.TryParse(objLongitude?.ToString(), out double longitude)))
+                {
+                    PrintError($"Unable to convert longitude \"{objLongitude}\" to double");
+                    return null;
+                }
+
+                var (X, Y) = Collectif.CoordonneesToTile(latitude, longitude, Zoom);
                 return new Dictionary<string, int>()
                 {
-                    { "x",  TilesNumber.X },
-                    { "y",  TilesNumber.Y },
-                    { "z",  Intzoom }
+                    { "x",  X },
+                    { "y",  Y },
+                    { "z",  Zoom }
                 };
             }
             public static Dictionary<string, double> TileToCoordonnees(object TileX, object TileY, object zoom)
@@ -171,24 +189,51 @@ namespace MapsInMyFolder.Commun
                 };
             }
 
-            private static string ConvertJSObjectToString(object supposedString)
+            public static double[] TransformLocationFromWGS84(object TargetWkt, object oLatitude, object oLongitude)
             {
-                string returnString = supposedString?.ToString();
-
-                if (returnString != null &&
-                    (supposedString.GetType() == typeof(object) ||
-                    supposedString.GetType() == typeof(object[]) ||
-                    supposedString.GetType() == typeof(System.Dynamic.ExpandoObject) ||
-                    supposedString.GetType() == typeof(Dictionary<string, string>) ||
-                    supposedString.GetType() == typeof(Dictionary<string, object>))
-                && (supposedString.GetType().FullName != "Jint.Runtime.Interop.DelegateWrapper"))
+                if (!(double.TryParse(oLatitude?.ToString(), out double latitude)))
                 {
-                    returnString = JsonConvert.SerializeObject(supposedString);
+                    PrintError($"Unable to convert latitude \"{oLatitude}\" to double");
+                    return null;
                 }
-
-                return returnString;
+                if (!(double.TryParse(oLongitude?.ToString(), out double longitude)))
+                {
+                    PrintError($"Unable to convert longitude \"{oLongitude}\" to double");
+                    return null;
+                }
+                if (string.IsNullOrEmpty(TargetWkt?.ToString()))
+                {
+                    PrintError($"TargetWkt is not defined");
+                    return null;
+                }
+                return TileLocationCalculator.TransformLocationFromWGS84(TargetWkt.ToString(), latitude, longitude);
             }
 
+            public static double[] TransformLocation(object OriginWkt, object TargetWkt, object oProjX, object oProjY)
+            {
+                if (!(double.TryParse(oProjX?.ToString(), out double latitude)))
+                {
+                    PrintError($"Unable to convert latitude \"{oProjX}\" to double");
+                    return null;
+                }
+                if (!(double.TryParse(oProjY?.ToString(), out double longitude)))
+                {
+                    PrintError($"Unable to convert longitude \"{oProjY}\" to double");
+                    return null;
+                }
+                if (string.IsNullOrEmpty(OriginWkt?.ToString()))
+                {
+                    PrintError($"OriginWkt is not defined");
+                    return null;
+                }
+                if (string.IsNullOrEmpty(TargetWkt?.ToString()))
+                {
+                    PrintError($"TargetWkt is not defined");
+                    return null;
+                }
+                return TileLocationCalculator.TransformLocation(OriginWkt.ToString(), TargetWkt.ToString(), latitude, longitude);
+            }
+   
             public static void Print(object print, int LayerId = 0)
             {
                 string printString = ConvertJSObjectToString(print);
@@ -196,7 +241,7 @@ namespace MapsInMyFolder.Commun
                 {
                     if (LayerId == -2 && Tiles.AcceptJavascriptPrint)
                     {
-                        JavascriptInstance.Logs = string.Concat(JavascriptInstance.Logs, "\n", printString);
+                        instance.Logs = string.Concat(instance.Logs, "\n", printString);
                     }
                 }
             }
@@ -205,15 +250,16 @@ namespace MapsInMyFolder.Commun
             {
                 if (Tiles.AcceptJavascriptPrint)
                 {
-                    JavascriptInstance.Logs = String.Empty;
+                    instance.Logs = String.Empty;
                 }
             }
 
-            static readonly object JSLocker = new object();
             static public string InputBox(int LayerId, object texte, object caption = null)
             {
-                lock (JSLocker)
+                try
                 {
+                    IsWaitingUserAction = true;
+
                     //alert("pos");
                     if (string.IsNullOrEmpty(caption?.ToString()))
                     {
@@ -237,13 +283,20 @@ namespace MapsInMyFolder.Commun
                     }));
                     Dispatcher.PushFrame(frame);
                     return Application.Current.Dispatcher.Invoke(new Func<string>(() => TextBox.Text));
+
+                }
+                finally
+                {
+                    IsWaitingUserAction = false;
                 }
             }
 
             static public void Alert(int LayerId, object texte, object caption = null)
             {
-                lock (JSLocker)
+                try
                 {
+                    IsWaitingUserAction = true;
+
                     //alert("pos");
                     if (string.IsNullOrEmpty(caption?.ToString()))
                     {
@@ -265,6 +318,10 @@ namespace MapsInMyFolder.Commun
                     }));
                     Dispatcher.PushFrame(frame);
                 }
+                finally
+                {
+                    IsWaitingUserAction = false;
+                }
             }
 
 
@@ -282,13 +339,16 @@ namespace MapsInMyFolder.Commun
                     if (Thread.CurrentThread.GetApartmentState() == ApartmentState.STA)
                     {
                         string NotificationId = "LayerId_" + LayerId + "_" + notifId ?? "single";
-                        Action callback = () =>
+                        
+                        void callback()
                         {
                             ExecuteScript(Layers.GetLayerById(LayerId).class_script, null, LayerId, javascriptCallback?.ToString());
-                        };
+                        }
 
-                        notification = new NText(texte.ToString(), caption?.ToString(), "MainPage", callback);
-                        notification.NotificationId = NotificationId;
+                        notification = new NText(texte.ToString(), caption?.ToString(), "MainPage", callback)
+                        {
+                            NotificationId = NotificationId
+                        };
                         notification.Register();
                     }
                 }
@@ -324,9 +384,11 @@ namespace MapsInMyFolder.Commun
                 stringBuilder.AppendLine(" - getSelection() : Obtient les coordonnées de la sélection courante");
                 stringBuilder.AppendLine(" - alert(\"message\", \"caption\") : Affiche un message à l'écran");
                 stringBuilder.AppendLine(" - inputbox(\"message\", \"caption\") : Demande une saisie à l'utilisateur");
-                stringBuilder.AppendLine(" - sendNotification(\"message\", \"caption\", \"callback\", \"notificationId\") : Envoie une notification à l'écran. Un callback peut être attaché et appelé lors du clic sur celle-ci");
+                stringBuilder.AppendLine(" - notification(\"message\", \"caption\", \"callback\", \"notificationId\") : Envoie une notification à l'écran. Un callback peut être attaché et appelé lors du clic sur celle-ci");
                 stringBuilder.AppendLine(" - refreshMap() : Rafraîchit la carte à l'écran");
                 stringBuilder.AppendLine(" - getStyle() : Obtient la valeur du style");
+                stringBuilder.AppendLine(" - transformLocation(OriginWkt, TargetWkt, projX, projY) : Convertir la position X, Y d'un système de coordonnées vers un autre système (utilise Well Known Text definition)");
+                stringBuilder.AppendLine(" - transformLocationFromWGS84(TargetWkt, Latitude, Longitude) : Convertir les coordonnées vers un autre système de coordonnées (utilise Well Known Text definition)");
 
                 Print(stringBuilder.ToString(), LayerId);
             }

@@ -20,6 +20,7 @@ namespace MapsInMyFolder.Commun
         public int? class_min_zoom { get; set; }
         public int? class_max_zoom { get; set; }
         public string class_format { get; set; }
+        public string class_style { get; set; }
         public int? class_tiles_size { get; set; }
         public string class_script { get; set; }
         public string class_visibility { get; set; }
@@ -29,7 +30,7 @@ namespace MapsInMyFolder.Commun
         public bool class_hasscale { get; set; }
 
 
-        public Layers(int class_id, bool class_favorite, string class_name, string class_description, string class_category, string class_country, string class_identifier, string class_tile_url, string class_site, string class_site_url, int? class_min_zoom, int? class_max_zoom, string class_format, int? class_tiles_size, string class_script, string class_visibility, SpecialsOptions class_specialsoptions, string class_rectangles, int class_version, bool class_hasscale)
+        public Layers(int class_id, bool class_favorite, string class_name, string class_description, string class_category, string class_country, string class_identifier, string class_tile_url, string class_site, string class_site_url, int? class_min_zoom, int? class_max_zoom, string class_format, string class_style, int? class_tiles_size, string class_script, string class_visibility, SpecialsOptions class_specialsoptions, string class_rectangles, int class_version, bool class_hasscale)
         {
             this.class_id = class_id;
             this.class_favorite = class_favorite;
@@ -44,6 +45,7 @@ namespace MapsInMyFolder.Commun
             this.class_min_zoom = class_min_zoom;
             this.class_max_zoom = class_max_zoom;
             this.class_format = class_format;
+            this.class_style = class_style;
             this.class_tiles_size = class_tiles_size;
             this.class_script = class_script;
             this.class_visibility = class_visibility;
@@ -76,34 +78,15 @@ namespace MapsInMyFolder.Commun
                     }
                 }
             }
-            public string Style { get; set; }
-
             public override string ToString()
             {
-                if (string.IsNullOrWhiteSpace(BackgroundColor) && string.IsNullOrWhiteSpace(Style))
-                {
-                    return string.Empty;
-                }
-                else if (!string.IsNullOrWhiteSpace(BackgroundColor))
-                {
-                    return "{\"BackgroundColor\":\"" + BackgroundColor + "\"}";
-                }
-                else if (!string.IsNullOrWhiteSpace(Style))
-                {
-                    return "{\"Style\":\"" + System.Text.Json.JsonSerializer.Serialize(Style) + "\"}";
-                }
-                else
-                {
-                    return System.Text.Json.JsonSerializer.Serialize(this);
-                }
-
-
+                return System.Text.Json.JsonSerializer.Serialize(this);
             }
         }
 
         public static Layers Empty(int LayerId = -1)
         {
-            return new Layers(LayerId, false, "", "An error occurred while reading the data. \n Backup data provided by OpenStreetMap.", "", "", "", "http://tile.openstreetmap.org/{z}/{x}/{y}.png", "", "", null, null, "jpeg", 256, "function getTile(args){return args;}", "Visible", new SpecialsOptions(), "", 0, true);
+            return new Layers(LayerId, false, "", "An error occurred while reading the data. \n Backup data provided by OpenStreetMap.", "", "", "", "http://tile.openstreetmap.org/{z}/{x}/{y}.png", "", "", null, null, "jpeg", "", 256, "function getTile(args){return args;}", "Visible", new SpecialsOptions(), "", 0, true);
         }
 
         public static class Convert

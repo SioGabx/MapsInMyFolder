@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -47,6 +48,10 @@ namespace MapsInMyFolder.Commun
 
     public static class Tiles
     {
+        static Tiles(){
+            System.Net.ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
+        }
+
         public static bool AcceptJavascriptPrint { get; set; }
 
         public static HttpClientHandler handler = new HttpClientHandler
@@ -80,7 +85,7 @@ namespace MapsInMyFolder.Commun
             {
                 case "pbf":
                     const int TileSize = 1;
-                    return await GetTilePBF(layerID, urlBase, TileX, TileY, TileZoom, save_temp_directory, (Layer.class_tiles_size ?? 0) * TileSize, TileSize, 0.5, pbfdisableadjacent).ConfigureAwait(false);
+                    return await GetTilePBF(layerID, urlBase, TileX, TileY, TileZoom, save_temp_directory, (int)Math.Floor((double)(Layer.class_tiles_size ?? 0) * TileSize), TileSize, 0.5, pbfdisableadjacent).ConfigureAwait(false);
 
                 default:
                     return await GetTile(layerID, urlBase, TileX, TileY, TileZoom).ConfigureAwait(false);
@@ -95,7 +100,7 @@ namespace MapsInMyFolder.Commun
 
             try
             {
-                styleValueOrUrlOrPath = layers?.class_specialsoptions?.Style;
+                styleValueOrUrlOrPath = layers?.class_style;
             }
             catch (Exception ex)
             {

@@ -45,8 +45,7 @@
                 Content="{Binding Source={x:Static commun:Languages.Current}, Path=[prepareTitleDownload]}"
                 FontFamily="Segoe UI Light"
                 FontSize="30"
-                Foreground="#FFE2E2E1"
-                MouseUp="Label_MouseUp" />
+                Foreground="#FFE2E2E1"/>
             <ScrollViewer
                 Grid.Row="1"
                 Grid.Column="0"

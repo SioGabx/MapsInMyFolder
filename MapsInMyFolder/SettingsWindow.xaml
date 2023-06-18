@@ -119,6 +119,20 @@
                     Margin="10,-5,5,0"
                     VerticalAlignment="Stretch">
                     <Grid
+                        x:Name="MenuItem_LanguagesSettings"
+                        Height="35"
+                        Margin="0,5,0,0"
+                        MouseUp="ScrollMenuItem_Languages"
+                        Style="{StaticResource GridSelectNormalStyle}">
+                        <TextBlock
+                            Grid.Column="1"
+                            Margin="10,0,0,0"
+                            VerticalAlignment="Center"
+                            FontSize="15">
+                            <Run Text="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsSubTitleLanguages]}" />
+                        </TextBlock>
+                    </Grid>  
+                    <Grid
                         x:Name="MenuItem_Calque"
                         Height="35"
                         Margin="0,5,0,0"
@@ -241,12 +255,56 @@
                         VerticalScrollBarVisibility="Auto"
                         VirtualizingPanel.ScrollUnit="Pixel">
                         <StackPanel>
+                            
+                            <StackPanel x:Name="LanguagesSettings">
+                                <Label
+                                    x:Name="LanguagesSettingsLabel"
+                                    Width="Auto"
+                                    Height="25"
+                                    Margin="0,0,0,0"
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Top"
+                                    Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsSubTitleLanguages]}"
+                                    ContentStringFormat="{}{0} :"
+                                    FontFamily="Segoe UI Semilight"
+                                    FontSize="16.5"
+                                    Foreground="#FFE2E2E1" />
+                                <Grid Margin="0,10,0,0">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="20" />
+                                        <RowDefinition Height="*" />
+                                    </Grid.RowDefinitions>
+                                    <Label
+                                        Grid.Row="0"
+                                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameLanguage]}"
+                                        Foreground="#888989" />
+                                    <ComboBox
+                                        x:Name="ApplicationLanguage"
+                                        Grid.Row="1"
+                                        Width="Auto"
+                                        Height="21"
+                                        Padding="5,0,0,1"
+                                        HorizontalAlignment="Stretch"
+                                        VerticalContentAlignment="Stretch"
+                                        Cursor="Arrow"
+                                        Foreground="#BCBCBC"
+                                        SelectedIndex="0">
+                                        <ComboBox.Resources>
+                                            <Style BasedOn="{StaticResource {x:Type ScrollBar}}" TargetType="{x:Type ScrollBar}">
+                                                <Setter Property="Margin" Value="0,0,-5,0" />
+                                            </Style>
+                                        </ComboBox.Resources>
+                                    </ComboBox>
+                                </Grid>
+
+                            </StackPanel>
+
                             <StackPanel x:Name="CalqueSettings">
                                 <Label
                                     x:Name="CalqueSettingsLabel"
                                     Width="Auto"
                                     Height="25"
-                                    Margin="0,0,0,0"
+                                    Margin="0,20,0,0"
                                     HorizontalAlignment="Left"
                                     VerticalAlignment="Top"
                                     Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsSubTitleLayers]}"
@@ -696,6 +754,34 @@
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="20" />
                                         <RowDefinition Height="*" />
+                                    </Grid.RowDefinitions>
+                                    <Label
+                                        Grid.Row="0"
+                                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameSearchEngine]}"
+                                        Foreground="#888989" />
+                                    <ComboBox
+                                        x:Name="search_engine"
+                                        Grid.Row="1"
+                                        Width="Auto"
+                                        Height="21"
+                                        Padding="5,0,0,1"
+                                        HorizontalAlignment="Stretch"
+                                        VerticalContentAlignment="Stretch"
+                                        Cursor="Arrow"
+                                        Foreground="#BCBCBC"
+                                        SelectedIndex="4">
+                                        <ComboBox.Resources>
+                                            <Style BasedOn="{StaticResource {x:Type ScrollBar}}" TargetType="{x:Type ScrollBar}">
+                                                <Setter Property="Margin" Value="0,0,-5,0" />
+                                            </Style>
+                                        </ComboBox.Resources>
+                                    </ComboBox>
+                                </Grid>
+
+                                <Grid Margin="0,10,0,0">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="20" />
+                                        <RowDefinition Height="*" />
                                         <RowDefinition />
                                     </Grid.RowDefinitions>
                                     <Label
@@ -855,35 +941,6 @@
                                         Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameDisplayTileBorders]}"
                                         Foreground="#888989" />
                                 </Grid>
-
-                                <Grid Margin="0,10,0,0">
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="20" />
-                                        <RowDefinition Height="*" />
-                                    </Grid.RowDefinitions>
-                                    <Label
-                                        Grid.Row="0"
-                                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameSearchEngine]}"
-                                        Foreground="#888989" />
-                                    <ComboBox
-                                        x:Name="search_engine"
-                                        Grid.Row="1"
-                                        Width="Auto"
-                                        Height="21"
-                                        Padding="5,0,0,1"
-                                        HorizontalAlignment="Stretch"
-                                        VerticalContentAlignment="Stretch"
-                                        Cursor="Arrow"
-                                        Foreground="#BCBCBC"
-                                        SelectedIndex="4">
-                                        <ComboBox.Resources>
-                                            <Style BasedOn="{StaticResource {x:Type ScrollBar}}" TargetType="{x:Type ScrollBar}">
-                                                <Setter Property="Margin" Value="0,0,-5,0" />
-                                            </Style>
-                                        </ComboBox.Resources>
-                                    </ComboBox>
-                                </Grid>
-
                             </StackPanel>
                             <StackPanel x:Name="AvanceSettings">
                                 <Label
@@ -1102,13 +1159,13 @@
                                 <Button
                                     x:Name="databaseExport"
                                     Margin="0,10,0,0"
-                                    Click="databaseExport_Click"
+                                    Click="DatabaseExport_Click"
                                     Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameExportDatabase]}"
                                     Foreground="#BCBCBC" />
                                 <Button
                                     x:Name="searchForUpdates"
                                     Margin="0,10,0,0"
-                                    Click="searchForUpdates_Click"
+                                    Click="SearchForUpdates_Click"
                                     Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameCheckApplicationUpdates]}"
                                     Foreground="#BCBCBC" />
                                 <Label

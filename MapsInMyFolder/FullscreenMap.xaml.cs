@@ -11,7 +11,7 @@ namespace MapsInMyFolder
 {
     public class SelectionRectangle
     {
-        public MapSelectable mapSelectable;
+        public MapSelectable MapSelectable { get; set; }
         public MapPolygon Rectangle;
         public Border PropertiesDisplayElement;
         public TextBox NameTextBox;
@@ -107,28 +107,24 @@ namespace MapsInMyFolder
             (TextBox LeftTextBox, TextBox RightTextBox) setDoubleColumnTextBox(Grid grid, string leftLabelText, string rightLabelText)
             {
                 grid.Margin = new Thickness(0, 20, 0, 0);
-                Label leftLabel = new Label()
+                TextBox GetTextBox(object content, int column)
                 {
-                    Content = leftLabelText,
-                };
-                Grid.SetRow(leftLabel, 0);
-                Grid.SetColumn(leftLabel, 0);
-                TextBox leftTextbox = new TextBox();
-                Grid.SetRow(leftTextbox, 1);
-                Grid.SetColumn(leftTextbox, 0);
-                grid.Children.Add(leftLabel);
-                grid.Children.Add(leftTextbox);
-                Label rightLabel = new Label()
-                {
-                    Content = rightLabelText,
-                };
-                Grid.SetRow(rightLabel, 0);
-                Grid.SetColumn(rightLabel, 2);
-                TextBox rightTextbox = new TextBox();
-                Grid.SetRow(rightTextbox, 1);
-                Grid.SetColumn(rightTextbox, 2);
-                grid.Children.Add(rightLabel);
-                grid.Children.Add(rightTextbox);
+                    Label label = new Label()
+                    {
+                        Content = content,
+                    };
+                    Grid.SetRow(label, 0);
+                    Grid.SetColumn(label, column);
+                    TextBox textbox = new TextBox();
+                    Grid.SetRow(textbox, 1);
+                    Grid.SetColumn(textbox, column);
+                    grid.Children.Add(label);
+                    grid.Children.Add(textbox);
+                    return textbox;
+                }
+
+                TextBox leftTextbox = GetTextBox(leftLabelText, 0);
+                TextBox rightTextbox = GetTextBox(rightLabelText, 2);
                 return (leftTextbox, rightTextbox);
             }
 
@@ -198,12 +194,11 @@ namespace MapsInMyFolder
             MaxZoomTextBox.TextChanged += FilterZoomOnTextChanged;
             StrokeThicknessTextBox.TextChanged += FilterStrokeThicknessOnTextChanged;
 
-
             return PropertiesDisplayElement;
 
             string getTextIfInfinity(string texteValue)
             {
-                if (string.IsNullOrWhiteSpace(texteValue) || texteValue == "-1" || texteValue.ToLowerInvariant() == "infinity")
+                if (string.IsNullOrWhiteSpace(texteValue) || texteValue == "-1" || string.Equals(texteValue, "infinity", StringComparison.InvariantCultureIgnoreCase))
                 {
                     return "∞";
                 }
@@ -251,13 +246,13 @@ namespace MapsInMyFolder
 
         private void PropertiesDisplayElement_GotFocus(object sender, RoutedEventArgs e)
         {
-            mapSelectable?.SetRectangleAsActive(Rectangle);
+            MapSelectable?.SetRectangleAsActive(Rectangle);
             PropertiesDisplayElementGotFocus?.Invoke(sender, e);
         }
 
         private void PropertiesDisplayElement_IsKeyboardFocusWithinChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            mapSelectable?.SetRectangleAsActive(Rectangle);
+            MapSelectable?.SetRectangleAsActive(Rectangle);
             PropertiesDisplayElementGotFocus?.Invoke(sender, null);
         }
 
@@ -284,7 +279,7 @@ namespace MapsInMyFolder
                 textBoxSender.Text = longitude.ToString();
                 textBoxSender.SelectionStart = selectStartAt;
             }
-            mapSelectable.SetRectangleLocation(new Location(latitude, longitude), null, Rectangle);
+            MapSelectable.SetRectangleLocation(new Location(latitude, longitude), null, Rectangle);
         }
 
         public void UpdateLocation_SE(object sender, TextChangedEventArgs e)
@@ -311,7 +306,7 @@ namespace MapsInMyFolder
                 textBoxSender.SelectionStart = selectStartAt;
             }
 
-            mapSelectable.SetRectangleLocation(null, new Location(latitude, longitude), Rectangle);
+            MapSelectable.SetRectangleLocation(null, new Location(latitude, longitude), Rectangle);
         }
     }
 
@@ -374,7 +369,7 @@ namespace MapsInMyFolder
 
         private void MapSelectable_OnLocationUpdated(object sender, MapPolygon e)
         {
-            void SetValue(TextBox textBoxElement, string value, System.Windows.Controls.TextChangedEventHandler action)
+            static void SetValue(TextBox textBoxElement, string value, System.Windows.Controls.TextChangedEventHandler action)
             {
                 if (textBoxElement.Text != value && !textBoxElement.IsKeyboardFocused)
                 {
@@ -448,7 +443,7 @@ namespace MapsInMyFolder
             FocusRectangle(e);
         }
 
-        public void FocusRectangle(MapPolygon e)
+        private static void FocusRectangle(MapPolygon e)
         {
             SelectionRectangle selectionRectangle = SelectionRectangle.GetSelectionRectangleFromRectangle(e);
             selectionRectangle?.Focus(true);
@@ -463,14 +458,10 @@ namespace MapsInMyFolder
         public void AddNewSelection(MapPolygon NewRectangle = null, string Nom = null, string MinZoom = null, string MaxZoom = null, string Color = null, string StrokeThickness = null)
         {
             DeleteUnusedRectangles();
-            if (NewRectangle == null)
-            {
-                NewRectangle = mapSelectable.AddRectangle(new Location(0, 0), new Location(0, 0));
-            }
+            NewRectangle ??= mapSelectable.AddRectangle(new Location(0, 0), new Location(0, 0));
             SelectionRectangle selectionRectangle = new SelectionRectangle(NewRectangle, Nom, MinZoom, MaxZoom, Color, StrokeThickness)
             {
-
-                mapSelectable = mapSelectable
+                MapSelectable = mapSelectable
             };
 
             SelectionRectangle.Rectangles.Add(selectionRectangle);
@@ -507,6 +498,11 @@ namespace MapsInMyFolder
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
             PageDispose();
+        }
+
+        private void MapViewer_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            MapViewer.Focus();
         }
     }
 }

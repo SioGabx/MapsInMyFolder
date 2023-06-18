@@ -21,29 +21,15 @@ namespace MapsInMyFolder
         {
             InitializeComponent();
             TitleTextBox.Text = this.Title = "MapsInMyFolder - " + Languages.Current["settingsTitle"];
-
-            SetCaretBrush(tileloader_default_script);
-            SetCaretBrush(tileloader_template_script);
-            SetTextEditorPositionChangedHandler(tileloader_default_script, 100);
-            SetTextEditorPositionChangedHandler(tileloader_template_script, 100);
-            SetFixMouseWheelBehavior(tileloader_default_script);
-            SetFixMouseWheelBehavior(tileloader_template_script);
-
-            AddContextMenuItems(tileloader_default_script, Languages.Current["editorContextMenuIndent"]);
-            AddContextMenuItems(tileloader_template_script, Languages.Current["editorContextMenuIndent"]);
-
-            SetTextAreaOptions(tileloader_default_script, true, 4);
-            SetTextAreaOptions(tileloader_template_script, true, 4);
         }
 
-        private void SetCaretBrush(TextEditor textEditor)
+        private static void SetCaretBrush(TextEditor textEditor)
         {
             textEditor.TextArea.Caret.CaretBrush = Collectif.HexValueToSolidColorBrush("#f18712");
         }
 
         private void SetTextEditorPositionChangedHandler(TextEditor textEditor, int scrollOffset)
         {
-
             void textEditor_PositionChanged(object sender, EventArgs e)
             {
                 Collectif.TextEditorCursorPositionChanged(textEditor, SettingsGrid, SettingsScrollViewer, scrollOffset);
@@ -59,16 +45,18 @@ namespace MapsInMyFolder
             textEditor.Unloaded += textEditor_Unloaded;
         }
 
-        private void SetFixMouseWheelBehavior(TextEditor textEditor)
+        private static void SetFixMouseWheelBehavior(TextEditor textEditor)
         {
             ScrollViewerHelper.SetScrollViewerMouseWheelFix(Collectif.GetDescendantByType(textEditor, typeof(ScrollViewer)) as ScrollViewer);
         }
 
         private void AddContextMenuItems(TextEditor textEditor, string header)
         {
-            MenuItem indenterMenuItem = new MenuItem();
-            indenterMenuItem.Header = header;
-            indenterMenuItem.Icon = new ModernWpf.Controls.FontIcon() { Glyph = "\uE12F", Foreground = Collectif.HexValueToSolidColorBrush("#888989") };
+            MenuItem indenterMenuItem = new MenuItem
+            {
+                Header = header,
+                Icon = new FontIcon() { Glyph = "\uE12F", Foreground = Collectif.HexValueToSolidColorBrush("#888989") }
+            };
             void indenterMenuItem_Click(object sender, EventArgs e)
             {
                 Collectif.IndenterCode(sender, e, textEditor);
@@ -85,7 +73,7 @@ namespace MapsInMyFolder
             textEditor.ContextMenu.Items.Add(indenterMenuItem);
         }
 
-        private void SetTextAreaOptions(TextEditor textEditor, bool convertTabsToSpaces, int indentationSize)
+        private static void SetTextAreaOptions(TextEditor textEditor, bool convertTabsToSpaces, int indentationSize)
         {
             textEditor.TextArea.Options.ConvertTabsToSpaces = convertTabsToSpaces;
             textEditor.TextArea.Options.IndentationSize = indentationSize;
@@ -94,7 +82,7 @@ namespace MapsInMyFolder
         int DefaultValuesHachCode;
         void DoIScrollToElement(UIElement element, System.Windows.Input.MouseButtonEventArgs e)
         {
-            if (e.LeftButton == System.Windows.Input.MouseButtonState.Released)
+            if (IsLoaded && e.LeftButton == System.Windows.Input.MouseButtonState.Released)
             {
                 SettingsScrollViewer.ScrollToElement(element);
             }
@@ -114,6 +102,10 @@ namespace MapsInMyFolder
         {
             DoIScrollToElement(CarteSettingsLabel, e);
         }
+        private void ScrollMenuItem_Languages(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            DoIScrollToElement(LanguagesSettings, e);
+        }
 
         private void ScrollMenuItem_Avance(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
@@ -132,11 +124,35 @@ namespace MapsInMyFolder
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            SetCaretBrush(tileloader_default_script);
+            SetCaretBrush(tileloader_template_script);
+            SetTextEditorPositionChangedHandler(tileloader_default_script, 100);
+            SetTextEditorPositionChangedHandler(tileloader_template_script, 100);
+            SetFixMouseWheelBehavior(tileloader_default_script);
+            SetFixMouseWheelBehavior(tileloader_template_script);
+
+            AddContextMenuItems(tileloader_default_script, Languages.Current["editorContextMenuIndent"]);
+            AddContextMenuItems(tileloader_template_script, Languages.Current["editorContextMenuIndent"]);
+
+            SetTextAreaOptions(tileloader_default_script, true, 4);
+            SetTextAreaOptions(tileloader_template_script, true, 4);
+
             InitSettingsWindow();
         }
 
         void InitSettingsWindow()
         {
+            //Language
+            foreach (Languages.Language language in Enum.GetValues(typeof(Languages.Language)))
+            {
+                string userFriendlyString = Languages.ReplaceInString(language.GetUserFriendlyString());
+                int index = ApplicationLanguage.Items.Add(new NameHiddenIdValue(language, userFriendlyString));
+                if (language == Settings.application_languages)
+                {
+                    ApplicationLanguage.SelectedIndex = index;
+                }
+            }
+
             foreach (Layers layer in Layers.GetLayersList())
             {
                 if (layer.class_id != -1 && string.Equals(layer.class_format, "JPEG", StringComparison.InvariantCultureIgnoreCase))
@@ -265,7 +281,6 @@ namespace MapsInMyFolder
             searchForUpdatesLastUpdateCheck.Content = lastUpdateCheckDate;
         }
 
-
         private async void ResetSettings_Click(object sender, RoutedEventArgs e)
         {
             var confirmDialog = Message.SetContentDialog(Languages.Current["settingsMessageResetApplicationSettings"], Languages.Current["dialogTitleOperationConfirm"], MessageDialogButton.YesCancel);
@@ -300,10 +315,16 @@ namespace MapsInMyFolder
 
         public void SaveSettings()
         {
+            NameHiddenIdValue LanguageEnumSelectedItem = (NameHiddenIdValue)ApplicationLanguage.SelectedItem;
+            if (LanguageEnumSelectedItem != null)
+            {
+                Settings.application_languages = (Languages.Language)LanguageEnumSelectedItem.Id;
+            }
+
             NameHiddenIdValue layerStartupIdSelectedItem = (NameHiddenIdValue)layer_startup_id.SelectedItem;
             if (layerStartupIdSelectedItem != null)
             {
-                Settings.layer_startup_id = layerStartupIdSelectedItem.Id;
+                Settings.layer_startup_id = (int)layerStartupIdSelectedItem.Id;
             }
 
             Settings.background_layer_opacity = Convert.ToDouble(background_layer_opacity.Text.Replace("%", "").Trim()) / 100;
@@ -350,7 +371,6 @@ namespace MapsInMyFolder
 
             string selectedSearchEngine = search_engine.SelectedValue.ToString();
             Settings.search_engine = (SearchEngines)Enum.Parse(typeof(SearchEngines), selectedSearchEngine);
-
 
             Settings.tileloader_default_script = tileloader_default_script.Text;
             Settings.tileloader_template_script = tileloader_template_script.Text;
@@ -455,7 +475,7 @@ namespace MapsInMyFolder
             }
         }
 
-        private async void searchForUpdates_Click(object sender, RoutedEventArgs e)
+        private async void SearchForUpdates_Click(object sender, RoutedEventArgs e)
         {
             searchForUpdates.IsEnabled = false;
             searchForUpdatesLastUpdateCheck.Content = Languages.Current["settingsPropertyNameLastApplicationUpdatesCheckInProgress"];
@@ -483,6 +503,7 @@ namespace MapsInMyFolder
 
             List<(StackPanel SettingsPanel, Grid MenuLabel)> ListOfSubMenu = new List<(StackPanel, Grid)>()
     {
+        (LanguagesSettings, MenuItem_LanguagesSettings),
         (CalqueSettings, MenuItem_Calque),
         (TelechargementSettings, MenuItem_Telechargement),
         (CarteSettings, MenuItem_Carte),
@@ -491,19 +512,22 @@ namespace MapsInMyFolder
         (AProposSettings, MenuItem_APropos)
     };
 
-            const int Margin = 100;
-            foreach ((StackPanel SettingsPanel, Grid MenuLabel) item in ListOfSubMenu)
+            const int Margin = 50;
+            foreach ((StackPanel SettingsPanel, Grid MenuLabel) in ListOfSubMenu)
             {
-                var UIElementPosition = item.SettingsPanel.TranslatePoint(new Point(0, 0), SettingsScrollViewer).Y;
-
-                if (UIElementPosition - Margin <= 0 && UIElementPosition > -(item.SettingsPanel.ActualHeight - Margin))
-                    item.MenuLabel.Style = (Style)this.Resources["GridInViewNormalStyle"];
+                var UIElementPosition = SettingsPanel.TranslatePoint(new Point(0, 0), SettingsScrollViewer).Y;
+                 if (UIElementPosition - Margin <= 0 && UIElementPosition > -(SettingsPanel.ActualHeight - Margin))
+                {
+                    MenuLabel.Style = (Style)this.Resources["GridInViewNormalStyle"];
+                }
                 else
-                    item.MenuLabel.Style = (Style)this.Resources["GridSelectNormalStyle"];
+                {
+                    MenuLabel.Style = (Style)this.Resources["GridSelectNormalStyle"];
+                }
             }
         }
 
-        private void databaseExport_Click(object sender, RoutedEventArgs e)
+        private void DatabaseExport_Click(object sender, RoutedEventArgs e)
         {
             SaveFileDialog DatabasesaveFileDialog = new SaveFileDialog
             {
@@ -530,7 +554,6 @@ namespace MapsInMyFolder
                     Message.NoReturnBoxAsync(Languages.Current["settingsMessageErrorDatabaseExport"] + " " + ex.Message, Languages.Current["dialogTitleOperationFailed"]);
                 }
             }
-            
         }
     }
 }

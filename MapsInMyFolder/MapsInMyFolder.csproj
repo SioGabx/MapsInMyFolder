@@ -1,24 +1,24 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-<!-- dotnet publish - -runtime win-x64 -c Release - -self-contained -->
-  
-    
-<PropertyGroup>
+  <!-- dotnet publish - -runtime win-x64 -c Release - -self-contained -->
+
+
+  <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFrameworks>net6.0-windows</TargetFrameworks>
     <TargetFramework>net6.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
     <Platforms>x64</Platforms>
-   <PlatformTarget>x64</PlatformTarget>
-  <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
-  <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <PlatformTarget>x64</PlatformTarget>
+    <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
   </PropertyGroup>
 
   <PropertyGroup>
     <SatelliteResourceLanguages>fr</SatelliteResourceLanguages>
     <CefSharpAnyCpuSupport>true</CefSharpAnyCpuSupport>
     <CefSharpBuildAction>Content</CefSharpBuildAction>
-<ProduceReferenceAssembly>True</ProduceReferenceAssembly>
-    
+    <ProduceReferenceAssembly>True</ProduceReferenceAssembly>
+
     <Prefer32Bit>false</Prefer32Bit>
     <ErrorReport>prompt</ErrorReport>
     <SignAssembly>False</SignAssembly>
@@ -26,21 +26,22 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <NoWarn>CS8002,NU1701,XDG0062</NoWarn>
+    <NoWarn>NU1701</NoWarn>
     <ApplicationIcon>icone\icone_v2.ico</ApplicationIcon>
     <RepositoryUrl>https://github.com/SioGabx/MapsInMyFolder</RepositoryUrl>
     <Copyright>SioGabx</Copyright>
-    <Version>0.4.4-alpha</Version>
-    <AllowUnsafeBlocks>False</AllowUnsafeBlocks>
-
+    <Version>0.5.0-alpha</Version>
+    
     <DisabledWarnings>CS8002</DisabledWarnings>
+    <AnalysisLevel>6.0</AnalysisLevel>
+    <PackageProjectUrl>https://github.com/SioGabx/MapsInMyFolder</PackageProjectUrl>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <DefineConstants>TRACE</DefineConstants>
     <Optimize>False</Optimize>
   </PropertyGroup>
-  
+
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Optimize>False</Optimize>
   </PropertyGroup>
@@ -63,18 +64,16 @@
 
   <ItemGroup>
     <EmbeddedResource Include="Cursors\closedhand.cur" />
-   
     <EmbeddedResource Include="HTML\download_panel.html" />
     <EmbeddedResource Include="HTML\layer_panel.html" />
+
     <EmbeddedResource Include="Languages\English.ini" />
-    
     <EmbeddedResource Include="Languages\French.ini" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="AvalonEdit" Version="6.3.0.90" />
     <PackageReference Include="BlackPearl.Controls.CoreLibrary" Version="2.1.1" />
-      <!--https://github.com/SioGabx/BlackPearl-->
     <PackageReference Include="cef.redist.x64" Version="107.1.12" />
     <PackageReference Include="CefSharp.Common" Version="107.1.120" />
     <PackageReference Include="CefSharp.Common.NETCore" Version="107.1.120" />
@@ -85,6 +84,7 @@
     <PackageReference Include="NetVips.Native" Version="8.14.2" />
     <PackageReference Include="NetVips.Native.win-x64" Version="8.14.2" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="ProjNet" Version="2.0.0" />
     <PackageReference Include="System.Data.SQLite" Version="1.0.117" />
     <PackageReference Include="System.Text.Json" Version="6.0.0" />
     <PackageReference Include="wix" Version="3.11.2" />

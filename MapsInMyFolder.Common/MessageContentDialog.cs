@@ -10,42 +10,42 @@ namespace MapsInMyFolder.Commun
 
     public static class Message
     {
-        public static async Task<ContentDialogResult> ShowContentDialogAsync(ContentDialog dialog)
-        {
-            try
-            {
-                return await dialog.ShowAsync().ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine("Erreur affichage ContentDialog : " + ex.ToString());
-                return ContentDialogResult.None;
-            }
-        }
-
         public static (TextBox textBox, ContentDialog dialog) SetInputBoxDialog(object text, object caption = null, MessageDialogButton messageBoxButton = MessageDialogButton.OK)
         {
-            ContentDialog dialog = SetContentDialog(text, caption, messageBoxButton);
-            StackPanel stackPanel = new StackPanel();
-            TextBlock textBlock = new TextBlock();
-            if (!string.IsNullOrEmpty(text?.ToString()))
+
+            if (string.IsNullOrEmpty(text?.ToString()))
             {
-                textBlock.Text = text.ToString();
-                textBlock.TextWrapping = TextWrapping.Wrap;
+                text = "";
             }
+            
+            if (string.IsNullOrEmpty(caption?.ToString()))
+            {
+                caption = "MapsInMyFolder";
+            }
+
+            TextBlock textBlock = new TextBlock
+            {
+                Text = text.ToString(),
+                TextWrapping = TextWrapping.Wrap
+            };
+
             TextBox textBox = new TextBox
             {
-                Style = (Style)Application.Current.Resources["TextBoxCleanStyle_13"],
+                Style = (Style)Application.Current.Resources["TextBoxCleanStyleDefault"],
                 HorizontalAlignment = HorizontalAlignment.Stretch,
-                Margin = new Thickness(0, 10, 0, 0)
+                Margin = new Thickness(0, 10, 0, 0),
+                        Height = 25,
             };
+            MessageContentDialogHelpers.FocusSenderOnLoad(textBox);
+            StackPanel stackPanel = new StackPanel();
             stackPanel.Children.Add(textBlock);
             stackPanel.Children.Add(textBox);
-            dialog.Content = stackPanel;
+
+            ContentDialog dialog = SetContentDialog(stackPanel, caption, messageBoxButton);
             return (textBox, dialog);
         }
 
-        public static ContentDialog SetContentDialog(object text, object caption = null, MessageDialogButton messageBoxButton = MessageDialogButton.OK, bool showTextbox = false)
+        public static ContentDialog SetContentDialog(object text, object caption = null, MessageDialogButton messageBoxButton = MessageDialogButton.OK)
         {
             return Application.Current.Dispatcher.Invoke(delegate
              {
@@ -62,29 +62,6 @@ namespace MapsInMyFolder.Commun
                      Background = Collectif.HexValueToSolidColorBrush("#171719")
                  };
 
-                 if (showTextbox)
-                 {
-                     //alert("Veuillez indiquer l'adresse URL du panorama à télécharger :","Google Maps")
-                     StackPanel stackPanel = new StackPanel();
-                     TextBlock textBlock = new TextBlock();
-                     if (!string.IsNullOrEmpty(text?.ToString()))
-                     {
-                         textBlock.Text = text.ToString();
-                         textBlock.TextWrapping = TextWrapping.Wrap;
-                     }
-                     TextBox textBox = new TextBox
-                     {
-                         Style = (Style)Application.Current.Resources["TextBoxCleanStyle_13"],
-                         HorizontalAlignment = HorizontalAlignment.Stretch,
-                         Margin = new Thickness(0, 10, 0, 0)
-                     };
-                     stackPanel.Children.Add(textBlock);
-                     stackPanel.Children.Add(textBox);
-                     dialog.Content = stackPanel;
-                 }
-
-
-                 Debug.WriteLine("DialogMsg" + text);
                  string dialogButtonOK = Languages.Current["dialogButtonOK"];
                  string dialogButtonCancel = Languages.Current["dialogButtonCancel"];
                  string dialogButtonYes = Languages.Current["dialogButtonYes"];

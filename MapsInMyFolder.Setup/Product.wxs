@@ -5,8 +5,8 @@
  <?include $(sys.CURRENTDIR)Files.wxi ?>
 
 <!--DONT FORGET TO CHANGE THE VERSION NUMER HERE AND IN MAPSINMYFOLDER.CSPROJ-->
-  <Product Id="*" Name="MapsInMyFolder" Language="1033" Version="0.4.4" Manufacturer="SioGabx" UpgradeCode="091b4d98-0e03-441f-8e40-acb9706db235">
-    <Package InstallerVersion="200" Compressed="yes"  InstallPrivileges="elevated" AdminImage="yes" Manufacturer="SioGabx" Description="Ce programme permet l'installation de MapsInMyFolder" Comments="Ce programme permet l'installation de MapsInMyFolder" /><!--InstallScope="perUser"-->
+  <Product Id="*" Name="MapsInMyFolder" Language="1033" Version="0.5.0" Manufacturer="SioGabx" UpgradeCode="091b4d98-0e03-441f-8e40-acb9706db235">
+    <Package InstallerVersion="200" Compressed="yes"  InstallPrivileges="elevated" AdminImage="yes" Manufacturer="SioGabx" Description="This program provides the functionality to install MapsInMyFolder." Comments="This program provides the functionality to install MapsInMyFolder. See https://github.com/SioGabx/MapsInMyFolder" /><!--InstallScope="perUser"-->
     <Media Id="1" Cabinet="MyCabFile.cab" EmbedCab="yes"/>
     
     <MajorUpgrade AllowDowngrades="no" AllowSameVersionUpgrades="no" IgnoreRemoveFailure="no" Schedule="afterInstallInitialize" DowngradeErrorMessage="A newer version of [ProductName] is already installed." />

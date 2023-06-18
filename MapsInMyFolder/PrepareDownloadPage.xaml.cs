@@ -49,7 +49,8 @@ namespace MapsInMyFolder
             int minimumZoom = Layers.Current.class_min_zoom ?? 0;
             int maximumZoom = Layers.Current.class_max_zoom ?? 0;
             ZoomSlider.Value = Math.Min(Math.Max(ZoomSlider.Value, minimumZoom), maximumZoom);
-            Update_Labels();
+
+            
             if (IsInitialized && TextBoxScaleIsLock())
             {
                 if (!double.TryParse(TextBox_Scale.Text, out double CurrentTextBoxTargetScale))
@@ -63,6 +64,7 @@ namespace MapsInMyFolder
             {
                 SetTextBoxRedimDimension();
             }
+            Update_Labels();
         }
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
@@ -80,8 +82,8 @@ namespace MapsInMyFolder
                 Label_ImgSize.Content = $"{rognageInfo.width} x {rognageInfo.height}";
                 if (TextBox_Redim_HUnit.SelectedIndex == 0 && TextBox_Redim_HUnit.SelectedIndex == 0)
                 {
-                    TextBox_Redim_Width.SetText(rognageInfo.width.ToString());
-                    TextBox_Redim_Height.SetText(rognageInfo.height.ToString());
+                    TextBox_Redim_Width.SetText(rognageInfo.width.ToString(), TextBox_Redim_Width_TextChanged);
+                    TextBox_Redim_Height.SetText(rognageInfo.height.ToString(), TextBox_Redim_Height_TextChanged);
                 }
             }
         }
@@ -137,12 +139,12 @@ namespace MapsInMyFolder
             lastRequestZoom = ZoomSlider.Value;
             int layerID = Layers.Current.class_id;
 
-            if (MainPage.mapSelectable is null)
+            if (MainPage.MapSelectable is null)
             {
                 return;
             }
 
-            var selectionLocation = MainPage.mapSelectable.GetRectangleLocation();
+            var selectionLocation = MainPage.MapSelectable.GetRectangleLocation();
             var noPinLocation = (selectionLocation.NO.Latitude, selectionLocation.NO.Longitude);
             var sePinLocation = (selectionLocation.SE.Latitude, selectionLocation.SE.Longitude);
             var locaMillieux = Collectif.GetCenterBetweenTwoPoints(noPinLocation, sePinLocation);
@@ -201,7 +203,7 @@ namespace MapsInMyFolder
                         }
                         else
                         {
-                            bitmapImageArray[url.index_x, url.index_y] = Collectif.GetEmptyImageBufferFromText(httpResponse, "jpeg");
+                            bitmapImageArray[url.index_x, url.index_y] = Collectif.GetEmptyImageBufferFromText(httpResponse,layerID, "jpeg");
                         }
                     });
                 }, updateMigniatureParraleleToken);
@@ -228,7 +230,7 @@ namespace MapsInMyFolder
                     format = "jpeg";
                 }
 
-                NetVips.VOption saveVOption = Collectif.getSaveVOption(format, qualityInt, Layers.Current.class_tiles_size);
+                NetVips.VOption saveVOption = Collectif.GetSaveVOption(format, qualityInt, Layers.Current.class_tiles_size);
 
                 BitmapSource ApplyEffectOnImageFromBuffer(byte[] imgArray)
                 {
@@ -340,7 +342,7 @@ namespace MapsInMyFolder
 
         MapControl.Location GetSelectionCenterLocation()
         {
-            var SelectionLocation = MainPage.mapSelectable.GetRectangleLocation();
+            var SelectionLocation = MainPage.MapSelectable.GetRectangleLocation();
             var NO_PIN_Location = (SelectionLocation.NO.Latitude, SelectionLocation.NO.Longitude);
             var SE_PIN_Location = (SelectionLocation.SE.Latitude, SelectionLocation.SE.Longitude);
             var LocaMillieux = Collectif.GetCenterBetweenTwoPoints(NO_PIN_Location, SE_PIN_Location);
@@ -424,7 +426,7 @@ namespace MapsInMyFolder
 
             RognageInfo rognage_info = GetOriginalImageSize();
 
-            var SelectionLocation = MainPage.mapSelectable.GetRectangleLocation();
+            var SelectionLocation = MainPage.MapSelectable.GetRectangleLocation();
             double NO_PIN_Latitude = SelectionLocation.NO.Latitude;
             double NO_PIN_Longitude = SelectionLocation.NO.Longitude;
             double SE_PIN_Latitude = SelectionLocation.SE.Latitude;
@@ -547,20 +549,21 @@ namespace MapsInMyFolder
             {
                 if (!TextBox_Scale.IsFocused && !TextBoxScaleIsLock())
                 {
-                    TextBox_Scale.SetText(Math.Round(GetScale().Scale, 0).ToString());
+                    TextBox_Scale.Text=Math.Round(GetScale().Scale, 0).ToString();
                     UpdateScaleInformation();
                 }
             }
 
             Update_Label_NbrTiles();
-            Update_Label_Label_ImgSizeF();
             Update_Label_TileSize();
             Update_Label_TileSource();
             Update_Label_LayerName();
+            
             UpdateScale();
             LockRedimTextBox(false);
             UpdateScaleInformation();
             Update_CheckIfSizeInf65000();
+            Update_Label_Label_ImgSizeF();
         }
 
         (double Resolution, double Scale) GetScale()
@@ -660,7 +663,7 @@ namespace MapsInMyFolder
         {
             if (!IsInitialized) { return null; }
 
-            var SelectionLocation = MainPage.mapSelectable.GetRectangleLocation();
+            var SelectionLocation = MainPage.MapSelectable.GetRectangleLocation();
             double NO_PIN_Latitude = SelectionLocation.NO.Latitude;
             double NO_PIN_Longitude = SelectionLocation.NO.Longitude;
             double SE_PIN_Latitude = SelectionLocation.SE.Latitude;
@@ -698,7 +701,7 @@ namespace MapsInMyFolder
             if (!IsInitialized) { return; }
             string filteredString = Collectif.FilterDigitOnly(TextBox_quality_number.Text, null);
             int cursorPosition = TextBox_quality_number.SelectionStart;
-            TextBox_quality_number.SetText(filteredString);
+            TextBox_quality_number.Text =filteredString;
             TextBox_quality_number.SelectionStart = cursorPosition;
             if (string.IsNullOrEmpty(filteredString.Trim())) { return; }
             int quality = Convert.ToInt32(filteredString);
@@ -745,28 +748,28 @@ namespace MapsInMyFolder
             }
             if (TextBox_quality_name.SelectedIndex == 0 && (quality < 0 || quality >= 30))
             {
-                TextBox_quality_number.SetText("10");
+                TextBox_quality_number.Text="10";
             }
             else if (TextBox_quality_name.SelectedIndex == 1 && (quality < 30 || quality >= 60))
             {
-                TextBox_quality_number.SetText("30");
+                TextBox_quality_number.Text = "30";
             }
             else if (TextBox_quality_name.SelectedIndex == 2 && (quality < 60 || quality >= 80))
             {
-                TextBox_quality_number.SetText("60");
+                TextBox_quality_number.Text = "60";
             }
             else if (TextBox_quality_name.SelectedIndex == 3 && (quality < 80 || quality >= 100))
             {
-                TextBox_quality_number.SetText("80");
+                TextBox_quality_number.Text = "80";
             }
             else if (TextBox_quality_name.SelectedIndex == 4 && quality < 100)
             {
-                TextBox_quality_number.SetText("100");
+                TextBox_quality_number.Text = "100";
             }
             UpdateMigniatureParralele(true);
         }
 
-        void TextBoxRedimDimensionChanged(TextBox AttachedTextbox, ComboBox AttachedComboBoxUnit, TextBox OpositeTextbox, string SourcePropertyName)
+        void TextBoxRedimDimensionChanged(TextBox AttachedTextbox, ComboBox AttachedComboBoxUnit, TextBox OpositeTextbox, string SourcePropertyName, TextChangedEventHandler OpositeTextChangedEvent)
         {
             if (!IsInitialized)
             {
@@ -774,7 +777,7 @@ namespace MapsInMyFolder
             }
             if (string.IsNullOrWhiteSpace(AttachedTextbox.Text))
             {
-                OpositeTextbox.SetText("");
+                OpositeTextbox.Text = "";
                 return;
             }
             RognageInfo rognage_info = GetOriginalImageSize();
@@ -809,14 +812,14 @@ namespace MapsInMyFolder
                 }
                 else
                 {
-                    OpositeTextbox.SetText(value.ToString());
-                    OpositeTextbox.SelectionStart = OpositeTextbox.Text.Length;
+                    OpositeTextbox.SetText(value.ToString(), OpositeTextChangedEvent);
+                   OpositeTextbox.SelectionStart = OpositeTextbox.Text.Length;
                 }
             }
             else if (AttachedComboBoxUnit.SelectedIndex == 1)
             {
                 Collectif.FilterDigitOnlyWhileWritingInTextBoxWithMaxValue(AttachedTextbox, 65000, new List<char>() { '.' });
-                OpositeTextbox.SetText(AttachedTextbox.Text);
+                OpositeTextbox.SetText(AttachedTextbox.Text, OpositeTextChangedEvent);
                 OpositeTextbox.SelectionStart = OpositeTextbox.Text.Length;
                 AttachedTextbox.SelectionStart = AttachedTextbox.Text.Length;
             }
@@ -838,19 +841,19 @@ namespace MapsInMyFolder
                 }
                 double ScaleShrink = (double)SourcePropertyAttachedRognageDimension / SizeInPixel;
                 Debug.WriteLine("ScaleShrink " + ScaleShrink);
-                TextBox_Scale.SetText(Math.Round(GetScale().Scale * ScaleShrink).ToString());
+                TextBox_Scale.Text = Math.Round(GetScale().Scale * ScaleShrink).ToString();
                 UpdateScaleInformation();
             }
         }
 
         private void TextBox_Redim_Height_TextChanged(object sender, TextChangedEventArgs e)
         {
-            TextBoxRedimDimensionChanged(TextBox_Redim_Height, TextBox_Redim_HUnit, TextBox_Redim_Width, "height");
+            TextBoxRedimDimensionChanged(TextBox_Redim_Height, TextBox_Redim_HUnit, TextBox_Redim_Width, "height", TextBox_Redim_Width_TextChanged );
         }
 
         private void TextBox_Redim_Width_TextChanged(object sender, TextChangedEventArgs e)
         {
-            TextBoxRedimDimensionChanged(TextBox_Redim_Width, TextBox_Redim_WUnit, TextBox_Redim_Height, "width");
+            TextBoxRedimDimensionChanged(TextBox_Redim_Width, TextBox_Redim_WUnit, TextBox_Redim_Height, "width", TextBox_Redim_Height_TextChanged);
         }
 
         void SetDefaultRedimTextBoxValue(TextBox AttachedTextbox, ComboBox AttachedComboBoxUnit, string SourcePropertyName)
@@ -874,11 +877,11 @@ namespace MapsInMyFolder
             {
                 if (AttachedComboBoxUnit.SelectedIndex == 0)
                 {
-                    AttachedTextbox.SetText(SourcePropertyRognageDimension.ToString());
+                    AttachedTextbox.Text = SourcePropertyRognageDimension.ToString();
                 }
                 else if (AttachedComboBoxUnit.SelectedIndex == 1)
                 {
-                    AttachedTextbox.SetText("100");
+                    AttachedTextbox.Text = "100";
                 }
             }
         }
@@ -933,14 +936,14 @@ namespace MapsInMyFolder
             {
                 GetLastRedimTypeUnit(1);
                 OpositeComboBoxUnit.SelectedIndex = 1;
-                AttachedTextbox.SetText(Math.Round((double)txtBValue / (double)SourcePropertyRognageDimension * 100, 1).ToString());
+                AttachedTextbox.Text = (Math.Round((double)txtBValue / (double)SourcePropertyRognageDimension * 100, 1).ToString());
 
             }
             else if (AttachedComboBoxUnit.SelectedIndex == 0 && GetLastRedimTypeUnit() == 1)
             {
                 GetLastRedimTypeUnit(0);
                 OpositeComboBoxUnit.SelectedIndex = 0;
-                AttachedTextbox.SetText(Math.Round(SourcePropertyRognageDimension * ((double)txtBValue / 100)).ToString());
+                AttachedTextbox.Text = (Math.Round(SourcePropertyRognageDimension * ((double)txtBValue / 100)).ToString());
             }
         }
 
@@ -1138,7 +1141,7 @@ namespace MapsInMyFolder
 
             ScaleInfo scaleInfo = new ScaleInfo(initialScale, targetScale, distanceInMeterPerPixels, drawScale, drawScaleInfo.Scale, drawScaleInfo.PixelLenght);
 
-            var selectionLocation = MainPage.mapSelectable.GetRectangleLocation();
+            var selectionLocation = MainPage.MapSelectable.GetRectangleLocation();
             DownloadOptions downloadOptions = new DownloadOptions(0, saveDirectory, format, filename, "", "", 0, zoom, quality, "", selectionLocation.NO, selectionLocation.SE, resizeWidth, resizeHeight, interpretation, scaleInfo);
             
             MainWindow._instance.PrepareDownloadBeforeStart(downloadOptions);
@@ -1197,12 +1200,6 @@ namespace MapsInMyFolder
         {
             UpdateMigniatureParralele(true);
         }
-
-        private void Label_MouseUp(object sender, MouseButtonEventArgs e)
-        {
-
-        }
-
         private void TextBox_Scale_TextChanged(object sender, TextChangedEventArgs e)
         {
             if (!IsInitialized || !TextBox_Scale.IsFocused)

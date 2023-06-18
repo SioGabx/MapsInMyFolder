@@ -30,6 +30,20 @@ namespace MapsInMyFolder
                 Name = name;
                 Color = color;
             }
+
+
+            public bool Contains(Location OtherNO, Location OtherSE)
+            {
+                if (OtherNO.Latitude >= NO.Latitude &&
+                    OtherNO.Longitude >= NO.Longitude &&
+                    OtherSE.Latitude <= SE.Latitude &&
+                    OtherSE.Longitude <= SE.Longitude)
+                {
+                    return true;
+                }
+
+                return false;
+            }
         }
 
         public void DrawFigure(MapItemsControl map, Figure figure)

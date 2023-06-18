@@ -86,7 +86,6 @@ namespace MapsInMyFolder
                 }
                 Directory.CreateDirectory(cefsharpTempFolderPath);
                 settings.CachePath = cefsharpTempFolderPath;
-
                 if (!Directory.Exists(Settings.working_folder))
                 {
                     try
@@ -125,9 +124,18 @@ namespace MapsInMyFolder
                         defaultPage: "index.html" // will default to index.html
                     )
                 });
+
+                //settings.RegisterScheme(new CefCustomScheme
+                //{
+                //    SchemeName = "mapsinmyfolder",
+                //    DomainName = "get",
+                //    SchemeHandlerFactory = new CustomSchemeLoadFromApplicationHandlerFactory()
+                //});
+
+                
+
                 settings.CefCommandLineArgs.Add("ignore-certificate-errors"); //cf https://stackoverflow.com/a/35564187/9947331
-
-
+                //CefSharpSettings.ConcurrentTaskExecution = true;
                 if (!Cef.IsInitialized)
                 {
                     //Perform dependency check to make sure all relevant resources are in our output directory.

@@ -60,14 +60,14 @@
             border-bottom: 1px solid #794915;
         }
 
-            .inSelectionHighlight .layer_main_div::before {
-                position: absolute;
-                content: "";
-                width: 100%;
-                height: 100%;
-                background-color: rgb(160, 100, 30);
-                mix-blend-mode: color;
-            }
+        .inSelectionHighlight .layer_main_div::before {
+            position: absolute;
+            content: "";
+            width: 100%;
+            height: 100%;
+            background-color: rgb(160, 100, 30);
+            mix-blend-mode: color;
+        }
 
         .layerHidden.inSelectionHighlight .layer_main_div::before {
             background-color: rgb(212 162 103);
@@ -147,9 +147,9 @@
             border-radius: 10px;
         }
 
-            ::-webkit-scrollbar-thumb:hover {
-                background: #62626B;
-            }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #62626B;
+        }
 
         ul,
         li,
@@ -164,10 +164,10 @@
             font-size: 16.5px;
         }
 
-            p + p {
-                margin-top: 0px;
-                font-size: 12px;
-            }
+        p+p {
+            margin-top: 0px;
+            font-size: 12px;
+        }
 
         .layer_texte {
             color: #E2E2E1;
@@ -202,11 +202,11 @@
             right: 0;
         }
 
-            .star.orange {
-                opacity: 0.8;
-                background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNDEuNzMiIGhlaWdodD0iMTQxLjczIiB2aWV3Qm94PSIwIDAgMTQxLjczIDE0MS43MyI+PHRpdGxlPnBpY3RvZ3JhbW1lczwvdGl0bGU+PHBhdGggZD0iTTcwLjg3LDU5Ljk0QTEwLjkzLDEwLjkzLDAsMSwwLDgxLjc5LDcwLjg3LDEwLjk0LDEwLjk0LDAsMCwwLDcwLjg3LDU5Ljk0WiIgc3R5bGU9ImZpbGw6IzAxMDEwMSIvPjxwYXRoIGQ9Ik03MC44Nyw5LjM3bDE1LDQ3aDUwbC00MCwyOSwxNSw0Ny00MC0yOS00MCwyOSwxNS00Ny00MC0yOWg1MFoiIHN0eWxlPSJmaWxsOiNmMTg3MTM7c3Ryb2tlOiMwMDA7c3Ryb2tlLXdpZHRoOjJweCIvPjwvc3ZnPg==");
-                background-size: contain;
-            }
+        .star.orange {
+            opacity: 0.8;
+            background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNDEuNzMiIGhlaWdodD0iMTQxLjczIiB2aWV3Qm94PSIwIDAgMTQxLjczIDE0MS43MyI+PHRpdGxlPnBpY3RvZ3JhbW1lczwvdGl0bGU+PHBhdGggZD0iTTcwLjg3LDU5Ljk0QTEwLjkzLDEwLjkzLDAsMSwwLDgxLjc5LDcwLjg3LDEwLjk0LDEwLjk0LDAsMCwwLDcwLjg3LDU5Ljk0WiIgc3R5bGU9ImZpbGw6IzAxMDEwMSIvPjxwYXRoIGQ9Ik03MC44Nyw5LjM3bDE1LDQ3aDUwbC00MCwyOSwxNSw0Ny00MC0yOS00MCwyOSwxNS00Ny00MC0yOWg1MFoiIHN0eWxlPSJmaWxsOiNmMTg3MTM7c3Ryb2tlOiMwMDA7c3Ryb2tlLXdpZHRoOjJweCIvPjwvc3ZnPg==");
+            background-size: contain;
+        }
 
         .star {
             opacity: 0.6;
@@ -214,14 +214,14 @@
             background-size: contain;
         }
 
-            .star:not(.orange):hover {
-                opacity: 0.7;
-            }
+        .star:not(.orange):hover {
+            opacity: 0.7;
+        }
 
-            .star:hover {
-                opacity: 1;
-                filter: brightness(1.1)
-            }
+        .star:hover {
+            opacity: 1;
+            filter: brightness(1.1)
+        }
 
 
 
@@ -235,14 +235,14 @@
             transition: opacity 150ms;
         }
 
-            .eye.orange {
-                opacity: 0;
-                /*            background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNDEuNzMiIGhlaWdodD0iMTQxLjczIiB2aWV3Qm94PSIwIDAgMTQxLjczIDE0MS43MyI+PHRpdGxlPnBpY3RvZ3JhbW1lczwvdGl0bGU+PHBhdGggZD0iTTcwLjg3LDU5Ljk0QTEwLjkzLDEwLjkzLDAsMSwwLDgxLjc5LDcwLjg3LDEwLjk0LDEwLjk0LDAsMCwwLDcwLjg3LDU5Ljk0WiIgc3R5bGU9ImZpbGw6I2YxODcxMztzdHJva2U6IzAwMDtzdHJva2Utd2lkdGg6MnB4Ii8+PHBhdGggZD0iTTEzNy42LDY3LjhhMTIxLjIsMTIxLjIsMCwwLDAtMTkuMzQtMTcuNjljLTE1Ljc3LTExLjY0LTMyLjE1LTE3LjgtNDcuMzktMTcuOHMtMzEuNjMsNi4xNi00Ny40LDE3LjhBMTIxLjc0LDEyMS43NCwwLDAsMCw0LjEzLDY3LjhhNC44MSw0LjgxLDAsMCwwLDAsNi4xM0ExMjEuMiwxMjEuMiwwLDAsMCwyMy40Nyw5MS42MmMxNS43NywxMS42NSwzMi4xNiwxNy44LDQ3LjQsMTcuOHMzMS42Mi02LjE1LDQ3LjM5LTE3LjhBMTIwLjY3LDEyMC42NywwLDAsMCwxMzcuNiw3My45Myw0LjgxLDQuODEsMCwwLDAsMTM3LjYsNjcuOFpNNzAuODcsOTUuODdhMjUsMjUsMCwxLDEsMjUtMjVBMjUsMjUsMCwwLDEsNzAuODcsOTUuODdaIiBzdHlsZT0iZmlsbDojZjE4NzEzO3N0cm9rZTojMDAwO3N0cm9rZS13aWR0aDoycHgiLz48L3N2Zz4=");  */
-                /*            background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNDEuNzMiIGhlaWdodD0iMTQxLjczIiB2aWV3Qm94PSIwIDAgMTQxLjczIDE0MS43MyI+PGRlZnM+PHN0eWxlPi5he2ZpbGw6bm9uZTtzdHJva2U6IzAxMDEwMTtzdHJva2UtbWl0ZXJsaW1pdDoxMDtzdHJva2Utd2lkdGg6NHB4O308L3N0eWxlPjwvZGVmcz48dGl0bGU+cGljdG9ncmFtbWVzPC90aXRsZT48cGF0aCBjbGFzcz0iYSIgZD0iTTcwLjg3LDU5Ljk0QTEwLjkzLDEwLjkzLDAsMSwwLDgxLjc5LDcwLjg3LDEwLjk0LDEwLjk0LDAsMCwwLDcwLjg3LDU5Ljk0WiIvPjxwYXRoIGNsYXNzPSJhIiBkPSJNMTM3LjYsNjcuOGExMjEuMiwxMjEuMiwwLDAsMC0xOS4zNC0xNy42OWMtMTUuNzctMTEuNjQtMzIuMTUtMTcuOC00Ny4zOS0xNy44cy0zMS42Myw2LjE2LTQ3LjQsMTcuOEExMjEuNzQsMTIxLjc0LDAsMCwwLDQuMTMsNjcuOGE0LjgxLDQuODEsMCwwLDAsMCw2LjEzQTEyMS4yLDEyMS4yLDAsMCwwLDIzLjQ3LDkxLjYyYzE1Ljc3LDExLjY1LDMyLjE2LDE3LjgsNDcuNCwxNy44czMxLjYyLTYuMTUsNDcuMzktMTcuOEExMjAuNjcsMTIwLjY3LDAsMCwwLDEzNy42LDczLjkzLDQuODEsNC44MSwwLDAsMCwxMzcuNiw2Ny44Wk03MC44Nyw5NS44N2EyNSwyNSwwLDEsMSwyNS0yNUEyNSwyNSwwLDAsMSw3MC44Nyw5NS44N1oiLz48cGF0aCBjbGFzcz0iYSIgZD0iTTgsMTMwLjg0LDEzMy43OCwxMC44OSIvPjwvc3ZnPg==");    */
-                background-image: url("data:image/svg+xml;base64,PHN2ZyBpZD0iQ2FscXVlXzIiIGRhdGEtbmFtZT0iQ2FscXVlIDIiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjE0MS43MyIgaGVpZ2h0PSIxNDEuNzMiIHZpZXdCb3g9IjAgMCAxNDEuNzMgMTQxLjczIj48ZGVmcz48c3R5bGU+LmNscy0xe2ZpbGw6IzAxMDEwMTtzdHJva2U6Izc1NzU3ODtzdHJva2Utd2lkdGg6MnB4O308L3N0eWxlPjwvZGVmcz48dGl0bGU+cGljdG9ncmFtbWVzPC90aXRsZT48cGF0aCBjbGFzcz0iY2xzLTEiIGQ9Ik03MC44Nyw1OS45NEExMC45MywxMC45MywwLDEsMCw4MS43OSw3MC44NywxMC45NCwxMC45NCwwLDAsMCw3MC44Nyw1OS45NFoiLz48cGF0aCBjbGFzcz0iY2xzLTEiIGQ9Ik0xMzcuNiw2Ny44YTEyMS4yLDEyMS4yLDAsMCwwLTE5LjM0LTE3LjY5Yy0xNS43Ny0xMS42NC0zMi4xNS0xNy44LTQ3LjM5LTE3LjhzLTMxLjYzLDYuMTYtNDcuNCwxNy44QTEyMS43NCwxMjEuNzQsMCwwLDAsNC4xMyw2Ny44YTQuODEsNC44MSwwLDAsMCwwLDYuMTNBMTIxLjIsMTIxLjIsMCwwLDAsMjMuNDcsOTEuNjJjMTUuNzcsMTEuNjUsMzIuMTYsMTcuOCw0Ny40LDE3LjhzMzEuNjItNi4xNSw0Ny4zOS0xNy44QTEyMC42NywxMjAuNjcsMCwwLDAsMTM3LjYsNzMuOTMsNC44MSw0LjgxLDAsMCwwLDEzNy42LDY3LjhaTTcwLjg3LDk1Ljg3YTI1LDI1LDAsMSwxLDI1LTI1QTI1LDI1LDAsMCwxLDcwLjg3LDk1Ljg3WiIvPjwvc3ZnPg==");
-                /*            background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNDEuNzMiIGhlaWdodD0iMTQxLjczIiB2aWV3Qm94PSIwIDAgMTQxLjczIDE0MS43MyI+PGRlZnM+PHN0eWxlPi5he2ZpbGw6I2YxODcxMztzdHJva2U6IzAwMDtzdHJva2Utd2lkdGg6MnB4O308L3N0eWxlPjwvZGVmcz48dGl0bGU+cGljdG9ncmFtbWVzPC90aXRsZT48cGF0aCBjbGFzcz0iYSIgZD0iTTcwLjg3LDU5Ljk0QTEwLjkzLDEwLjkzLDAsMSwwLDgxLjc5LDcwLjg3LDEwLjk0LDEwLjk0LDAsMCwwLDcwLjg3LDU5Ljk0WiIvPjxwYXRoIGNsYXNzPSJhIiBkPSJNMTM3LjYsNjcuOGExMjEuMiwxMjEuMiwwLDAsMC0xOS4zNC0xNy42OWMtMTUuNzctMTEuNjQtMzIuMTUtMTcuOC00Ny4zOS0xNy44cy0zMS42Myw2LjE2LTQ3LjQsMTcuOEExMjEuNzQsMTIxLjc0LDAsMCwwLDQuMTMsNjcuOGE0LjgxLDQuODEsMCwwLDAsMCw2LjEzQTEyMS4yLDEyMS4yLDAsMCwwLDIzLjQ3LDkxLjYyYzE1Ljc3LDExLjY1LDMyLjE2LDE3LjgsNDcuNCwxNy44czMxLjYyLTYuMTUsNDcuMzktMTcuOEExMjAuNjcsMTIwLjY3LDAsMCwwLDEzNy42LDczLjkzLDQuODEsNC44MSwwLDAsMCwxMzcuNiw2Ny44Wk03MC44Nyw5NS44N2EyNSwyNSwwLDEsMSwyNS0yNUEyNSwyNSwwLDAsMSw3MC44Nyw5NS44N1oiLz48L3N2Zz4=");*/
-                background-size: contain;
-            }
+        .eye.orange {
+            opacity: 0;
+            /*            background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNDEuNzMiIGhlaWdodD0iMTQxLjczIiB2aWV3Qm94PSIwIDAgMTQxLjczIDE0MS43MyI+PHRpdGxlPnBpY3RvZ3JhbW1lczwvdGl0bGU+PHBhdGggZD0iTTcwLjg3LDU5Ljk0QTEwLjkzLDEwLjkzLDAsMSwwLDgxLjc5LDcwLjg3LDEwLjk0LDEwLjk0LDAsMCwwLDcwLjg3LDU5Ljk0WiIgc3R5bGU9ImZpbGw6I2YxODcxMztzdHJva2U6IzAwMDtzdHJva2Utd2lkdGg6MnB4Ii8+PHBhdGggZD0iTTEzNy42LDY3LjhhMTIxLjIsMTIxLjIsMCwwLDAtMTkuMzQtMTcuNjljLTE1Ljc3LTExLjY0LTMyLjE1LTE3LjgtNDcuMzktMTcuOHMtMzEuNjMsNi4xNi00Ny40LDE3LjhBMTIxLjc0LDEyMS43NCwwLDAsMCw0LjEzLDY3LjhhNC44MSw0LjgxLDAsMCwwLDAsNi4xM0ExMjEuMiwxMjEuMiwwLDAsMCwyMy40Nyw5MS42MmMxNS43NywxMS42NSwzMi4xNiwxNy44LDQ3LjQsMTcuOHMzMS42Mi02LjE1LDQ3LjM5LTE3LjhBMTIwLjY3LDEyMC42NywwLDAsMCwxMzcuNiw3My45Myw0LjgxLDQuODEsMCwwLDAsMTM3LjYsNjcuOFpNNzAuODcsOTUuODdhMjUsMjUsMCwxLDEsMjUtMjVBMjUsMjUsMCwwLDEsNzAuODcsOTUuODdaIiBzdHlsZT0iZmlsbDojZjE4NzEzO3N0cm9rZTojMDAwO3N0cm9rZS13aWR0aDoycHgiLz48L3N2Zz4=");  */
+            /*            background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNDEuNzMiIGhlaWdodD0iMTQxLjczIiB2aWV3Qm94PSIwIDAgMTQxLjczIDE0MS43MyI+PGRlZnM+PHN0eWxlPi5he2ZpbGw6bm9uZTtzdHJva2U6IzAxMDEwMTtzdHJva2UtbWl0ZXJsaW1pdDoxMDtzdHJva2Utd2lkdGg6NHB4O308L3N0eWxlPjwvZGVmcz48dGl0bGU+cGljdG9ncmFtbWVzPC90aXRsZT48cGF0aCBjbGFzcz0iYSIgZD0iTTcwLjg3LDU5Ljk0QTEwLjkzLDEwLjkzLDAsMSwwLDgxLjc5LDcwLjg3LDEwLjk0LDEwLjk0LDAsMCwwLDcwLjg3LDU5Ljk0WiIvPjxwYXRoIGNsYXNzPSJhIiBkPSJNMTM3LjYsNjcuOGExMjEuMiwxMjEuMiwwLDAsMC0xOS4zNC0xNy42OWMtMTUuNzctMTEuNjQtMzIuMTUtMTcuOC00Ny4zOS0xNy44cy0zMS42Myw2LjE2LTQ3LjQsMTcuOEExMjEuNzQsMTIxLjc0LDAsMCwwLDQuMTMsNjcuOGE0LjgxLDQuODEsMCwwLDAsMCw2LjEzQTEyMS4yLDEyMS4yLDAsMCwwLDIzLjQ3LDkxLjYyYzE1Ljc3LDExLjY1LDMyLjE2LDE3LjgsNDcuNCwxNy44czMxLjYyLTYuMTUsNDcuMzktMTcuOEExMjAuNjcsMTIwLjY3LDAsMCwwLDEzNy42LDczLjkzLDQuODEsNC44MSwwLDAsMCwxMzcuNiw2Ny44Wk03MC44Nyw5NS44N2EyNSwyNSwwLDEsMSwyNS0yNUEyNSwyNSwwLDAsMSw3MC44Nyw5NS44N1oiLz48cGF0aCBjbGFzcz0iYSIgZD0iTTgsMTMwLjg0LDEzMy43OCwxMC44OSIvPjwvc3ZnPg==");    */
+            background-image: url("data:image/svg+xml;base64,PHN2ZyBpZD0iQ2FscXVlXzIiIGRhdGEtbmFtZT0iQ2FscXVlIDIiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjE0MS43MyIgaGVpZ2h0PSIxNDEuNzMiIHZpZXdCb3g9IjAgMCAxNDEuNzMgMTQxLjczIj48ZGVmcz48c3R5bGU+LmNscy0xe2ZpbGw6IzAxMDEwMTtzdHJva2U6Izc1NzU3ODtzdHJva2Utd2lkdGg6MnB4O308L3N0eWxlPjwvZGVmcz48dGl0bGU+cGljdG9ncmFtbWVzPC90aXRsZT48cGF0aCBjbGFzcz0iY2xzLTEiIGQ9Ik03MC44Nyw1OS45NEExMC45MywxMC45MywwLDEsMCw4MS43OSw3MC44NywxMC45NCwxMC45NCwwLDAsMCw3MC44Nyw1OS45NFoiLz48cGF0aCBjbGFzcz0iY2xzLTEiIGQ9Ik0xMzcuNiw2Ny44YTEyMS4yLDEyMS4yLDAsMCwwLTE5LjM0LTE3LjY5Yy0xNS43Ny0xMS42NC0zMi4xNS0xNy44LTQ3LjM5LTE3LjhzLTMxLjYzLDYuMTYtNDcuNCwxNy44QTEyMS43NCwxMjEuNzQsMCwwLDAsNC4xMyw2Ny44YTQuODEsNC44MSwwLDAsMCwwLDYuMTNBMTIxLjIsMTIxLjIsMCwwLDAsMjMuNDcsOTEuNjJjMTUuNzcsMTEuNjUsMzIuMTYsMTcuOCw0Ny40LDE3LjhzMzEuNjItNi4xNSw0Ny4zOS0xNy44QTEyMC42NywxMjAuNjcsMCwwLDAsMTM3LjYsNzMuOTMsNC44MSw0LjgxLDAsMCwwLDEzNy42LDY3LjhaTTcwLjg3LDk1Ljg3YTI1LDI1LDAsMSwxLDI1LTI1QTI1LDI1LDAsMCwxLDcwLjg3LDk1Ljg3WiIvPjwvc3ZnPg==");
+            /*            background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNDEuNzMiIGhlaWdodD0iMTQxLjczIiB2aWV3Qm94PSIwIDAgMTQxLjczIDE0MS43MyI+PGRlZnM+PHN0eWxlPi5he2ZpbGw6I2YxODcxMztzdHJva2U6IzAwMDtzdHJva2Utd2lkdGg6MnB4O308L3N0eWxlPjwvZGVmcz48dGl0bGU+cGljdG9ncmFtbWVzPC90aXRsZT48cGF0aCBjbGFzcz0iYSIgZD0iTTcwLjg3LDU5Ljk0QTEwLjkzLDEwLjkzLDAsMSwwLDgxLjc5LDcwLjg3LDEwLjk0LDEwLjk0LDAsMCwwLDcwLjg3LDU5Ljk0WiIvPjxwYXRoIGNsYXNzPSJhIiBkPSJNMTM3LjYsNjcuOGExMjEuMiwxMjEuMiwwLDAsMC0xOS4zNC0xNy42OWMtMTUuNzctMTEuNjQtMzIuMTUtMTcuOC00Ny4zOS0xNy44cy0zMS42Myw2LjE2LTQ3LjQsMTcuOEExMjEuNzQsMTIxLjc0LDAsMCwwLDQuMTMsNjcuOGE0LjgxLDQuODEsMCwwLDAsMCw2LjEzQTEyMS4yLDEyMS4yLDAsMCwwLDIzLjQ3LDkxLjYyYzE1Ljc3LDExLjY1LDMyLjE2LDE3LjgsNDcuNCwxNy44czMxLjYyLTYuMTUsNDcuMzktMTcuOEExMjAuNjcsMTIwLjY3LDAsMCwwLDEzNy42LDczLjkzLDQuODEsNC44MSwwLDAsMCwxMzcuNiw2Ny44Wk03MC44Nyw5NS44N2EyNSwyNSwwLDEsMSwyNS0yNUEyNSwyNSwwLDAsMSw3MC44Nyw5NS44N1oiLz48L3N2Zz4=");*/
+            background-size: contain;
+        }
 
         .eye {
             background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNDEuNzMiIGhlaWdodD0iMTQxLjczIiB2aWV3Qm94PSIwIDAgMTQxLjczIDE0MS43MyI+PGRlZnM+PHN0eWxlPi5he2ZpbGw6IzAxMDEwMTt9LmJ7ZmlsbDpub25lO3N0cm9rZTojMDEwMTAxO3N0cm9rZS1taXRlcmxpbWl0OjEwO3N0cm9rZS13aWR0aDoxNnB4O308L3N0eWxlPjwvZGVmcz48dGl0bGU+cGljdG9ncmFtbWVzPC90aXRsZT48cGF0aCBjbGFzcz0iYSIgZD0iTTcwLjg3LDU5Ljk0QTEwLjkzLDEwLjkzLDAsMSwwLDgxLjc5LDcwLjg3LDEwLjk0LDEwLjk0LDAsMCwwLDcwLjg3LDU5Ljk0WiIvPjxwYXRoIGQ9Ik0xMzcuNiw2Ny44YTEyMS4yLDEyMS4yLDAsMCwwLTE5LjM0LTE3LjY5Yy0xNS43Ny0xMS42NC0zMi4xNS0xNy44LTQ3LjM5LTE3LjhzLTMxLjYzLDYuMTYtNDcuNCwxNy44QTEyMS43NCwxMjEuNzQsMCwwLDAsNC4xMyw2Ny44YTQuODEsNC44MSwwLDAsMCwwLDYuMTNBMTIxLjIsMTIxLjIsMCwwLDAsMjMuNDcsOTEuNjJjMTUuNzcsMTEuNjUsMzIuMTYsMTcuOCw0Ny40LDE3LjhzMzEuNjItNi4xNSw0Ny4zOS0xNy44QTEyMC42NywxMjAuNjcsMCwwLDAsMTM3LjYsNzMuOTMsNC44MSw0LjgxLDAsMCwwLDEzNy42LDY3LjhaTTcwLjg3LDk1Ljg3YTI1LDI1LDAsMSwxLDI1LTI1QTI1LDI1LDAsMCwxLDcwLjg3LDk1Ljg3WiIvPjxwYXRoIGNsYXNzPSJiIiBkPSJNMTYsMTIzLjE0LDEyNS43MSwxOC41OSIvPjwvc3ZnPg==");
@@ -347,13 +347,13 @@
             z-index: 9999;
         }
 
-            .context_menu .context_menu {
-                transform: scale(1);
-                position: absolute;
-                left: 100%;
-                top: -6px;
-                box-shadow: rgb(0 0 0 / 8%) 5px 2px 20px 0, rgb(0 0 0 / 10%) 0px 5px 11px;
-            }
+        .context_menu .context_menu {
+            transform: scale(1);
+            position: absolute;
+            left: 100%;
+            top: -6px;
+            box-shadow: rgb(0 0 0 / 8%) 5px 2px 20px 0, rgb(0 0 0 / 10%) 0px 5px 11px;
+        }
 
         .item {
             padding: 7px 48px;
@@ -362,24 +362,24 @@
             transition: background-color ease 125ms;
         }
 
-            /*  [data-navtype="keyboard"] [data-navtype="mouse"] */
-            .context_menu[data-navtype="mouse"] .item:hover,
-            .item:focus-within,
-            .context_menu[data-navtype="keyboard"] .item.selected {
-                background-color: #303031;
-                --background-menu-color: #303031;
-            }
+        /*  [data-navtype="keyboard"] [data-navtype="mouse"] */
+        .context_menu[data-navtype="mouse"] .item:hover,
+        .item:focus-within,
+        .context_menu[data-navtype="keyboard"] .item.selected {
+            background-color: #303031;
+            --background-menu-color: #303031;
+        }
 
-            .item .sous-menu {
-                display: none;
-                width: 100%;
-            }
+        .item .sous-menu {
+            display: none;
+            width: 100%;
+        }
 
-            .context_menu[data-navtype="mouse"] .item:hover .sous-menu,
-            .item:focus-within .sous-menu,
-            .context_menu[data-navtype="keyboard"] .item.selected .sous-menu {
-                display: block;
-            }
+        .context_menu[data-navtype="mouse"] .item:hover .sous-menu,
+        .item:focus-within .sous-menu,
+        .context_menu[data-navtype="keyboard"] .item.selected .sous-menu {
+            display: block;
+        }
 
         .item-content {
             align-items: center;
@@ -500,11 +500,11 @@
             display: none;
         }
 
-            .nolayermessage p {
-                font-size: 14px;
-                font-family: "Segoe UI";
-                color: #888989;
-            }
+        .nolayermessage p {
+            font-size: 14px;
+            font-family: "Segoe UI";
+            color: #888989;
+        }
 
         body:has(ul:empty) .nolayermessage {
             display: block;
@@ -561,9 +561,9 @@
             margin-left: 15px;
         }
 
-            ul.list_alternat li:nth-child(even) {
-                background-color: #313131;
-            }
+        ul.list_alternat li:nth-child(even) {
+            background-color: #313131;
+        }
 
         ul.list .zoom,
         ul.list_alternat .zoom {
@@ -582,6 +582,7 @@
         .context_menu.shiftkeydown:not([data-layer_binding="0"]) .menu.item.shiftkeydownrequired {
             display: block;
         }
+
     </style>
 </head>
 
@@ -734,8 +735,8 @@
             <div class="item-content">
                 <div class="icon">
                     <svg version="1.2" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 141.7 141.7" overflow="visible" xml:space="preserve">
-                    <g id="Calque_2">
-                    <path d="
+                        <g id="Calque_2">
+                            <path d="
 		M135.5,61.9c5.2,36.9-20.5,71-57.4,76.2c-0.4,0-0.7,0.1-1.1,0.1C39.9,140.5,7.9,112.2,5.7,75c-0.1-1.8-0.1-3.5-0.1-5.3
 		C6.9,33.8,35.5,5,71.3,3.4c21.2,0.6,41,10.8,53.8,27.8l2.9,4.4H95.9" />
                         </g>
@@ -829,7 +830,6 @@
                     from = Math.min(lastIndexClick, Index);
                     to = Math.max(lastIndexClick, Index);
                 } else {
-                    console.log("simple click");
                     from = Index;
                     to = Index;
                     lastIndexClick = Index;
@@ -837,7 +837,7 @@
                     if (!event.ctrlKey || eventTarget.parentElement.querySelectorAll("." + selectedItemClass).length == 0)
                         //Add select class to the click if it is simple (no CTRL + no SHIFT key press)
                         try {
-                            document.querySelectorAll('.select').forEach(function (layer) {
+                            document.querySelectorAll('.select').forEach(function(layer) {
                                 layer.classList.remove("select");
                                 lastelement = layer;
                             });
@@ -872,7 +872,7 @@
             if (eventTarget.parentElement.querySelectorAll("." + selectedItemClass).length <= 1) {
                 return;
             } else {
-                eventTarget.parentElement.querySelectorAll("." + selectedItemClass).forEach(function (element) {
+                eventTarget.parentElement.querySelectorAll("." + selectedItemClass).forEach(function(element) {
                     element.classList.add(selectedHighlightItemClass);
                 });
             }
@@ -881,7 +881,7 @@
 
         function getSelectedElements() {
             let listOfSelectedElements = [];
-            document.querySelectorAll('.' + selectedItemClass).forEach(function (element) {
+            document.querySelectorAll('.' + selectedItemClass).forEach(function(element) {
                 if (element.clientHeight > 0) {
                     listOfSelectedElements.push(element);
                 }
@@ -907,7 +907,7 @@
             }
 
             if (getSelectedElements().length > 1 && eye.closest("li").classList.contains(selectedItemClass)) {
-                getSelectedElements().forEach(function (element) {
+                getSelectedElements().forEach(function(element) {
                     internal_change_visibility(element.querySelector(".eye"), element.id, isAddingAction);
                 });
             } else {
@@ -947,13 +947,11 @@
                 eye.title = "%layerContextMenuShowLayer%";
 
                 if (liElement.classList.contains("layerHiddenStateProgress")) {
-                    setTimeout(function () {
+                    setTimeout(function() {
                         liElement.classList.add("layerHidden");
                         liElement.classList.remove("layerHiddenStateProgress");
                     }, 150);
                 }
-
-
             }
         }
 
@@ -978,7 +976,7 @@
             }
 
             if (getSelectedElements().length > 1) {
-                getSelectedElements().forEach(function (element) {
+                getSelectedElements().forEach(function(element) {
                     internal_ajouter_aux_favoris(element.querySelector(".star"), element.id, isAddingAction);
                 });
             } else {
@@ -1006,10 +1004,10 @@
 
         function selectionner_calque_by_id(id, scroll = true) {
             console.log("selectionner_calque_by_id" + id);
-            document.querySelectorAll('.select').forEach(function (layer) {
+            document.querySelectorAll('.select').forEach(function(layer) {
                 layer.classList.remove("select");
             });
-            document.querySelectorAll('.inSelection').forEach(function (layer) {
+            document.querySelectorAll('.inSelection').forEach(function(layer) {
                 layer.classList.remove(selectedItemClass);
                 layer.classList.remove(referenceItemClass);
                 layer.classList.remove(selectedHighlightItemClass);
@@ -1021,7 +1019,7 @@
 
             if (scroll && document.body.getBoundingClientRect().y == 0) {
                 element.scrollIntoView({
-                    block: 'start',
+                    block: 'center',
                     behavior: 'smooth'
                 });
             }
@@ -1034,6 +1032,12 @@
 
     </script>
     <script>
+        function searchAndUpdatePreview(originalSearchedText) {
+            search(originalSearchedText);
+            checkVisibility();
+            UpdatePreview();
+        }
+
         function search(originalSearchedText) {
             let searchedText = originalSearchedText;
             console.log("originalSearchedText : " + originalSearchedText)
@@ -1054,8 +1058,8 @@
             let filteredLayers = searchWithSpecifier(searchClasses, searchArguments);
 
             //delete non query terms
-            searchArguments.slice().forEach(function (argument) {
-                searchClasses.forEach(function (item) {
+            searchArguments.slice().forEach(function(argument) {
+                searchClasses.forEach(function(item) {
                     let specifier = item[0];
                     let SpecifierIdentifier = specifier + ":";
                     if (argument.startsWith(SpecifierIdentifier)) {
@@ -1071,14 +1075,14 @@
 
             //regular search
             let li = document.getElementsByTagName('li');
-            Array.prototype.forEach.call(li, function (liElement) {
+            Array.prototype.forEach.call(li, function(liElement) {
                 let isVisible = true;
                 if (filteredLayers.includes(liElement.id)) {
                     paragraphe = liElement.getElementsByTagName("p");
-                    Array.prototype.forEach.call(searchArguments, function (searchArgument) {
+                    Array.prototype.forEach.call(searchArguments, function(searchArgument) {
                         let decodedSearchArgument = decodeURI(searchArgument);
                         let isFound = false;
-                        Array.prototype.forEach.call(paragraphe, function (pElement) {
+                        Array.prototype.forEach.call(paragraphe, function(pElement) {
                             if (contains(pElement.innerText, removeStartAndEndQuotes(decodedSearchArgument))) {
                                 isFound = true;
                             }
@@ -1101,7 +1105,7 @@
 
         function applySearch(filteredLayers) {
             let li = document.getElementsByTagName('li');
-            Array.prototype.forEach.call(li, function (liElement) {
+            Array.prototype.forEach.call(li, function(liElement) {
                 let ID = liElement.id;
                 if (filteredLayers.includes(ID)) {
                     showLi(liElement);
@@ -1114,12 +1118,12 @@
         function searchWithSpecifier(searchClasses, searchArguments) {
             let filteredLi = [];
             let li = document.getElementsByTagName('li');
-            Array.prototype.forEach.call(li, function (liElement) {
+            Array.prototype.forEach.call(li, function(liElement) {
                 // code pour manipuler chaque élément li ici
 
                 let HasFoundSomething = true;
-                Array.prototype.forEach.call(searchArguments, function (searchArgument) {
-                    searchClasses.forEach(function (item) {
+                Array.prototype.forEach.call(searchArguments, function(searchArgument) {
+                    searchClasses.forEach(function(item) {
                         let specifier = item[0];
                         let classToSearch = item[1];
 
@@ -1131,7 +1135,7 @@
                             let specifierSelector = liElement.getElementsByClassName(classToSearch);
 
                             // Bouclez à travers tous les éléments sélectionnés
-                            Array.prototype.forEach.call(specifierSelector, function (specifierElement) {
+                            Array.prototype.forEach.call(specifierSelector, function(specifierElement) {
                                 // Faites quelque chose avec chaque élément ici
                                 let decodedSearchArgument = decodeURI(searchArgument);
                                 if (!contains(specifierElement.innerHTML, removeStartAndEndQuotes(decodedSearchArgument))) {
@@ -1150,9 +1154,6 @@
             });
             return filteredLi;
         }
-
-
-
 
         function extractQuotedStrings(texte) {
             let start = -1;
@@ -1255,170 +1256,332 @@
                 return quotedString;
             }
         }
+
     </script>
 
     <script>
-        let isObserving = false;
         function StartObserving() {
-            isObserving = true;
-            let observer = new IntersectionObserver(function (observables) {
-
-                observables.forEach(function (observable) {
-                    try {
-                        let item = observable.target;
-                        if (item == undefined || item.classList == undefined || (item.classList.contains("hidden") || item.classList.contains("displaynone"))) {
-                            return;
-                        }
-                        // L'élément devient visible
-                        if (observable.intersectionRatio > 0) {
-                            item.classList.add('inview');
-
-                            if (item.querySelector(".layer_main_div").style.backgroundImage.includes("R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7")) {
-                                item.querySelector(".layer_main_div").style.backgroundImage = "var(--background-loading)";
-                            }
-                            UpdatePreview();
-                        } else {
-                            item.classList.remove('inview')
-                        }
-
-                    } catch (error) {
-                        console.error(error);
-                    }
-
-
-                })
-            }, {
-                threshold: [0],
-                rootMargin: '100px',
-            });
-
-            // On observe nos éléments
-            let items = document.querySelectorAll("li")
-            items.forEach(function (item) {
-                item.classList.remove('inview')
-                observer.observe(item)
-            });
-
+            checkVisibility();
+            UpdatePreview();
         }
 
-        var visibleY = function (el) {
-            var rect = el.getBoundingClientRect(), top = rect.top, height = rect.height,
-                el = el.parentNode
-            // Check if bottom of the element is off the page
-            if (rect.bottom < 0) return false
-            // Check its within the document viewport
-            if (top > document.documentElement.clientHeight) return false
-            do {
-                rect = el.getBoundingClientRect()
-                if (top <= rect.bottom === false) return false
-                // Check if the element is out of view due to a container scrolling
-                if ((top + height) <= rect.top) return false
-                el = el.parentNode
-            } while (el != document.body)
-            return true
-        };
+        //let isScrolling = false;
+        //let scrollTimeout;
+        //window.addEventListener("scroll", () => {
+        //    clearTimeout(scrollTimeout);
 
+        //    // Set a new scroll timeout
+        //    scrollTimeout = setTimeout(function () {
+        //        isScrolling = false;
+        //        StartObserving();
+        //    }, 200);
 
-        // window.addEventListener("scroll", CheckIfIntersectionObserverHasDetectedEachElements);
-        function CheckIfIntersectionObserverHasDetectedEachElements() {
-            // On observe nos éléments
-            let items = document.querySelectorAll("li")
-            items.forEach(function (item) {
-                if (item.classList.contains("hidden") || item.classList.contains("displaynone")) {
-                    item.classList.remove("inview");
-                } else {
-                    if (visibleY(item)) {
-                        if (!item.classList.contains("inview")) {
+        //});
 
-                            item.classList.add("inview");
-                            UpdatePreview();
-                            //console.log("Elmenet was not update" + item.id);
-                        } else {
-                            item.classList.remove("inview");
-                        }
-                    }
-                }
-            });
-        }
+        let lastScrollTop = 0;
+        let lastTimestamp = Date.now();
+        let scrollSpeed = 0;
+        let scrollTimeout = null;
 
-        function InternalUpdatePreview(element_fiup) {
-            if (document.querySelector("ul").classList.value == "list" || document.querySelector("ul").classList.value == "list_alternat") {
-                return;
+        function measureScrollSpeed() {
+            const currentScrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            const currentTimestamp = Date.now();
+
+            const distance = Math.abs(currentScrollTop - lastScrollTop);
+            const timeElapsed = currentTimestamp - lastTimestamp;
+
+            scrollSpeed = distance / timeElapsed;
+            lastScrollTop = currentScrollTop;
+            lastTimestamp = currentTimestamp;
+            console.log("Vitesse de défilement :", scrollSpeed);
+
+            if (scrollSpeed < 1.8) {
+                clearTimeout(scrollTimeout);
+                StartObserving();
+            } else {
+                clearTimeout(scrollTimeout);
+                scrollTimeout = setTimeout(measureScrollSpeed, 150);
             }
-            if (element_fiup !== null) {
-                if (element_fiup.classList.contains("hidden") || element_fiup.classList.contains("displaynone")) {
-                    return;
-                }
-                let mainDiv = element_fiup.querySelector(".layer_main_div");
-                let id = parseInt(element_fiup.id);
-                layer_Csharp_call_from_js.gettilepreviewurlfromid(id).then(function (urlResult) {
-                    if (element_fiup.classList.contains("hidden") || element_fiup.classList.contains("displaynone")) {
+        }
+
+        window.addEventListener("scroll", function() {
+            measureScrollSpeed();
+        });
+
+        measureScrollSpeed();
+
+        //        function InternalUpdatePreview(element_fiup) {
+        //            if (document.querySelector("ul").classList.value == "list" || document.querySelector("ul").classList.value == "list_alternat") {
+        //                return;
+        //            }
+        //            if (element_fiup !== null) {
+        //                if (element_fiup.classList.contains("hidden") || element_fiup.classList.contains("displaynone")) {
+        //                    return;
+        //                }
+        //                let mainDiv = element_fiup.querySelector(".layer_main_div");
+        //                let id = parseInt(element_fiup.id);
+        //
+        //                layer_Csharp_call_from_js.gettilepreviewurlfromid(id).then(function (urlResultString) {
+        //                    //console.log("urlResult : " + urlResultString);
+        //                    if (element_fiup.classList.contains("hidden") || element_fiup.classList.contains("displaynone")) {
+        //                        return;
+        //                    }
+        //                    let urlResult = JSON.parse(urlResultString);
+        //                    let css_opti = "url(\"" + urlResult.preview.frontImage.url + "\")";
+        //                    if ((mainDiv.style.backgroundImage != css_opti || mainDiv.querySelector(".layer_main_div_background_image").style.backgroundImage == "") && (urlResult != "") && element_fiup.classList.contains("inview")) {
+        //                        let fallbackurl = urlResult.previewFallback.frontImage.url;
+        //                        let fallbackbbackgroundurl = urlResult.previewFallback.frontImage.url;
+        //                        const img = new Image(); // width, height
+        //                        img.src = urlResult.preview.frontImage.url;
+        //                        img.addEventListener('load', function () {
+        //                            //console.log("Preview : " + id + "loaded");
+        //                            mainDiv.style.backgroundImage = "url(" + img.src + ")";
+        //                            if (element_fiup.classList.contains("inview")) {
+        //                                mainDiv.querySelector(".layer_main_div_background_image").style.backgroundImage = "url(" + urlResult.preview.backgroundImage.url + ")";
+        //                                mainDiv.style.setProperty("--opacity_preview_background", "");
+        //                            }
+        //                        });
+        //                        img.addEventListener('error', function () {
+        //                            if (fallbackurl === undefined) {
+        //                                emptyPreview();
+        //                            } else {
+        //                                const fallbackimg = new Image();
+        //                                fallbackimg.src = fallbackurl;
+        //                                fallbackimg.addEventListener('load', function () {
+        //                                    //console.log("Preview : " + id + "loaded");
+        //                                    mainDiv.style.backgroundImage = "url(" + fallbackimg.src + ")";
+        //                                    if (element_fiup.classList.contains("inview")) {
+        //                                        if (fallbackbbackgroundurl !== undefined) {
+        //                                            mainDiv.querySelector(".layer_main_div_background_image").style.backgroundImage = "url(" + fallbackbbackgroundurl + ")";
+        //                                            mainDiv.style.setProperty("--opacity_preview_background", "");
+        //                                        } else {
+        //                                            mainDiv.querySelector(".layer_main_div_background_image").style.backgroundImage = "url(" + urlResult.preview.backgroundImage.url + ")";
+        //                                            mainDiv.style.setProperty("--opacity_preview_background", "1");
+        //                                        }
+        //                                    }
+        //                                });
+        //
+        //                                fallbackimg.addEventListener('error', function () {
+        //                                    console.log("Failed to load fallback image : " + fallbackurl);
+        //                                    emptyPreview();
+        //                                });
+        //                            }
+        //
+        //                            function emptyPreview() {
+        //                                if (element_fiup.classList.contains("inview")) {
+        //                                    //console.log("Preview : " + id + "error");
+        //                                    mainDiv.style.backgroundImage = "url(data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7)"; //transparent 1pixel gif
+        //                                    mainDiv.querySelector(".layer_main_div_background_image").style.backgroundImage = "url(" + urlResult.preview.backgroundImage.url + ")";
+        //                                }
+        //                            }
+        //
+        //                        });
+        //                    }
+        //                });
+        //
+        //            } else {
+        //                console.error("null element ignore");
+        //            }
+        //        }
+
+        
+        
+                     function InternalUpdatePreview(element_fiup) {
+                    if (document.querySelector("ul").classList.value == "list" || document.querySelector("ul").classList.value == "list_alternat") {
                         return;
                     }
-                    let urlResultSplit = urlResult.split(" ");
-                    let css_opti = "url(\"" + urlResultSplit[0] + "\")";
-                    if ((mainDiv.style.backgroundImage != css_opti) && (urlResult != "") && element_fiup.classList.contains("inview")) {
-                        let fallbackurl = undefined;
-                        if (urlResultSplit.length >= 3) {
-                            fallbackurl = urlResultSplit[2];
-                            //console.log("fallbackurl" + fallbackurl);
+                    if (element_fiup !== null) {
+                        if (element_fiup.classList.contains("hidden") || element_fiup.classList.contains("displaynone")) {
+                            return;
                         }
-                        const img = new Image(); // width, height
-                        img.src = urlResultSplit[0];
-                        img.addEventListener('load', function () {
-                            //console.log("Preview : " + id + "loaded");
-                            mainDiv.style.backgroundImage = "url(" + img.src + ")";
-                            if (element_fiup.classList.contains("inview")) {
-                                mainDiv.querySelector(".layer_main_div_background_image").style.backgroundImage = "url(" + urlResultSplit[1] + ")";
-                                mainDiv.style.setProperty("--opacity_preview_background", "");
+                        let mainDiv = element_fiup.querySelector(".layer_main_div");
+                        let id = parseInt(element_fiup.id);
+        
+                        layer_Csharp_call_from_js.gettilepreviewurlfromid(id).then(function (urlResultString) {
+                            console.log("urlResult : " + urlResultString);
+                            if (element_fiup.classList.contains("hidden") || element_fiup.classList.contains("displaynone")) {
+                                return;
                             }
-
-                        });
-                        img.addEventListener('error', function () {
-                            if (fallbackurl === undefined) {
-                                emptyPreview();
-                            } else {
-                                const fallbackimg = new Image();
-                                fallbackimg.src = fallbackurl;
-                                fallbackimg.addEventListener('load', function () {
+                            let urlResult = JSON.parse(urlResultString);
+                            let css_opti = "url(\"" + urlResult.preview.frontImage.url + "\")";
+                            if ((mainDiv.style.backgroundImage != css_opti || mainDiv.querySelector(".layer_main_div_background_image").style.backgroundImage == "") && (urlResult != "") && element_fiup.classList.contains("inview")) {
+                                let fallbackurl = urlResult.previewFallback.frontImage.url;
+                                let fallbackbbackgroundurl = urlResult.previewFallback.backgroundImage.url;
+                                const img = new Image(); // width, height
+                                img.src = urlResult.preview.frontImage.url;
+                                img.addEventListener('load', function () {
                                     //console.log("Preview : " + id + "loaded");
-                                    mainDiv.style.backgroundImage = "url(" + fallbackimg.src + ")";
+                                    mainDiv.style.backgroundImage = "url(" + img.src + ")";
                                     if (element_fiup.classList.contains("inview")) {
-                                        mainDiv.querySelector(".layer_main_div_background_image").style.backgroundImage = "url(" + urlResultSplit[1] + ")";
-                                        mainDiv.style.setProperty("--opacity_preview_background", "1");
+                                        mainDiv.querySelector(".layer_main_div_background_image").style.backgroundImage = "url(" + urlResult.preview.backgroundImage.url + ")";
+                                        mainDiv.style.setProperty("--opacity_preview_background", "");
                                     }
                                 });
-
-                                fallbackimg.addEventListener('error', function () {
-                                    console.log("Failed to load fallback image : " + fallbackurl);
-                                    emptyPreview();
+                                img.addEventListener('error', function () {
+                                    if (fallbackurl === undefined) {
+                                        emptyPreview();
+                                    } else {
+                                        const fallbackimg = new Image();
+                                        fallbackimg.src = fallbackurl;
+                                        fallbackimg.addEventListener('load', function () {
+                                            //console.log("Preview : " + id + "loaded");
+                                            mainDiv.style.backgroundImage = "url(" + fallbackimg.src + ")";
+                                            if (element_fiup.classList.contains("inview")) {
+                                                if (fallbackbbackgroundurl !== undefined) {
+                                                    mainDiv.querySelector(".layer_main_div_background_image").style.backgroundImage = "url(" + fallbackbbackgroundurl + ")";
+                                                    mainDiv.style.setProperty("--opacity_preview_background", "");
+                                                } else {
+                                                    mainDiv.querySelector(".layer_main_div_background_image").style.backgroundImage = "url(" + urlResult.preview.backgroundImage.url + ")";
+                                                    mainDiv.style.setProperty("--opacity_preview_background", "1");
+                                                }
+                                            }
+                                        });
+        
+                                        fallbackimg.addEventListener('error', function () {
+                                            console.log("Failed to load fallback image : " + fallbackurl);
+                                            emptyPreview();
+                                        });
+                                    }
+        
+                                    function emptyPreview() {
+                                        if (element_fiup.classList.contains("inview")) {
+                                            //console.log("Preview : " + id + "error");
+                                            mainDiv.style.backgroundImage = "url(data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7)"; //transparent 1pixel gif
+                                            mainDiv.querySelector(".layer_main_div_background_image").style.backgroundImage = "url(" + urlResult.preview.backgroundImage.url + ")";
+                                        }
+                                    }
+        
                                 });
                             }
-
-
-
-                            function emptyPreview() {
-                                if (element_fiup.classList.contains("inview")) {
-                                    //console.log("Preview : " + id + "error");
-                                    mainDiv.style.backgroundImage = "url(data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7)"; //transparent 1pixel gif
-                                    mainDiv.querySelector(".layer_main_div_background_image").style.backgroundImage = "url(" + urlResultSplit[1] + ")";
-                                }
-                            }
-
                         });
+        
+                    } else {
+                        console.error("null element ignore");
                     }
-                });
+                }
+        
+//        
+//        
+//function InternalUpdatePreview(element_fiup) {
+//    if (document.querySelector("ul").classList.value == "list" || document.querySelector("ul").classList.value == "list_alternat") {
+//        return;
+//    }
+//    if (element_fiup !== null) {
+//        if (element_fiup.classList.contains("hidden") || element_fiup.classList.contains("displaynone")) {
+//            return;
+//        }
+//        let mainDiv = element_fiup.querySelector(".layer_main_div");
+//        let id = parseInt(element_fiup.id);
+//
+//        layer_Csharp_call_from_js.gettilepreviewurlfromid(id).then(function (urlResultString) {
+//            //console.log("urlResult : " + urlResultString);
+//            if (element_fiup.classList.contains("hidden") || element_fiup.classList.contains("displaynone")) {
+//                return;
+//            }
+//            let urlResult = JSON.parse(urlResultString);
+//            let css_opti = "url(\"" + urlResult.preview.frontImage.url + "\")";
+//            if ((mainDiv.style.backgroundImage != css_opti || mainDiv.querySelector(".layer_main_div_background_image").style.backgroundImage == "") && (urlResult != "") && element_fiup.classList.contains("inview")) {
+//                let fallbackurl = urlResult.previewFallback.frontImage.url;
+//                let fallbackbbackgroundurl = urlResult.previewFallback.backgroundImage.url;
+//                const img = new Image(); // width, height
+//                if (urlResult.preview.frontImage.url.startsWith("[base64]")) {
+//                    layer_Csharp_call_from_js.convertimagetobase64(id, urlResult.preview.frontImage.url).then(function (base64Image) {
+//                        img.src = base64Image;
+//                        loadImage(element_fiup, mainDiv, img, urlResult.preview.backgroundImage.url, fallbackurl, fallbackbbackgroundurl);
+//                    });
+//                } else {
+//                    img.src = urlResult.preview.frontImage.url;
+//                    loadImage(element_fiup, mainDiv, img, urlResult.preview.backgroundImage.url, fallbackurl, fallbackbbackgroundurl);
+//                }
+//            }
+//        });
+//    } else {
+//        console.error("null element ignore");
+//    }
+//}
+//
+//function loadImage(element_fiup,mainDiv,img, backgroundUrl, fallbackUrl, fallbackBackgroundUrl) {
+//    img.addEventListener('load', function () {
+//        //console.log("Preview : " + id + "loaded");
+//        mainDiv.style.backgroundImage = "url(" + img.src + ")";
+//        if (element_fiup.classList.contains("inview")) {
+//            mainDiv.querySelector(".layer_main_div_background_image").style.backgroundImage = "url(" + backgroundUrl + ")";
+//            mainDiv.style.setProperty("--opacity_preview_background", "");
+//        }
+//    });
+//    img.addEventListener('error', function () {
+//        if (fallbackUrl === undefined) {
+//            emptyPreview();
+//        } else {
+//            const fallbackimg = new Image();
+//            fallbackimg.src = fallbackUrl;
+//            fallbackimg.addEventListener('load', function () {
+//                //console.log("Preview : " + id + "loaded");
+//                mainDiv.style.backgroundImage = "url(" + fallbackimg.src + ")";
+//                if (element_fiup.classList.contains("inview")) {
+//                    if (fallbackBackgroundUrl !== undefined) {
+//                        mainDiv.querySelector(".layer_main_div_background_image").style.backgroundImage = "url(" + fallbackBackgroundUrl + ")";
+//                        mainDiv.style.setProperty("--opacity_preview_background", "");
+//                    } else {
+//                        mainDiv.querySelector(".layer_main_div_background_image").style.backgroundImage = "url(" + backgroundUrl + ")";
+//                        mainDiv.style.setProperty("--opacity_preview_background", "1");
+//                    }
+//                }
+//            });
+//
+//            fallbackimg.addEventListener('error', function () {
+//                console.log("Failed to load fallback image : " + fallbackUrl);
+//                emptyPreview();
+//            });
+//        }
+//
+//        function emptyPreview() {
+//            if (element_fiup.classList.contains("inview")) {
+//                //console.log("Preview : " + id + "error");
+//                mainDiv.style.backgroundImage = "url(data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7)"; //transparent 1pixel gif
+//                mainDiv.querySelector(".layer_main_div_background_image").style.backgroundImage = "url(" + backgroundUrl + ")";
+//            }
+//        }
+//    });
+//}
 
-            } else {
-                console.error("null element ignore");
-            }
+        function checkVisibility() {
+            let items = document.querySelectorAll("li");
+            items.forEach(function(item) {
+                let isVisible = isElementInViewport(item);
+                if (isVisible) {
+                    item.classList.add('inview');
+                    if (item.querySelector(".layer_main_div").style.backgroundImage.includes("R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7")) {
+                        item.querySelector(".layer_main_div").style.backgroundImage = "var(--background-loading)";
+                    }
+                } else {
+                    item.classList.remove('inview');
+                }
+            });
         }
 
+        function isElementInViewport(element) {
+            if (element == undefined || element.classList == undefined || (element.classList.contains("hidden") || element.classList.contains("displaynone"))) {
+                return false;
+            }
+            let rect = element.getBoundingClientRect();
+            const margin = 150;
+            let windowHeight = window.innerHeight || document.documentElement.clientHeight;
+
+            return (
+                rect.top >= -margin &&
+                rect.bottom <= windowHeight + margin &&
+                rect.left >= 0 &&
+                rect.right <= (window.innerWidth || document.documentElement.clientWidth) &&
+                element.clientWidth > 0
+            );
+        }
 
         function UpdatePreview() {
             try {
+                console.log("UpdatePreview");
                 let inviewelements = document.querySelectorAll(".inview");
-                inviewelements.forEach(function (element_up) {
+                inviewelements.forEach(function(element_up) {
                     InternalUpdatePreview(element_up);
                 });
             } catch (error) {
@@ -1426,10 +1589,7 @@
             }
         }
 
-        if (isObserving == false) {
-            console.log("Starting observing from document");
-            StartObserving();
-        }
+        setTimeout(StartObserving, 500);
 
     </script>
 
@@ -1447,7 +1607,7 @@
         var all_item_element = document.querySelectorAll(".context_menu .item .item-content:not(.have-sous-menu) a");
         //init fonction
         //si la souris bouge sur l'un des item du context menu, alors on passe en mode souris et on enregistre sa position
-        document.querySelectorAll(".context_menu .item").forEach(element_qsaci => element_qsaci.addEventListener("mousemove", function (event) {
+        document.querySelectorAll(".context_menu .item").forEach(element_qsaci => element_qsaci.addEventListener("mousemove", function(event) {
             get_context_menu_element().setAttribute("data-navtype", "mouse");
 
             var temp_tab_index = parseInt(event.target.closest(".item").getAttribute("data-selectable-id"));
@@ -1467,10 +1627,10 @@
         }));
 
         //on enregistre l'event de click sur chaque items et on leur ajoute un index
-        all_item_element.forEach(function (item, index) {
+        all_item_element.forEach(function(item, index) {
             var parent_item = item.parentElement.parentElement;
 
-            parent_item.addEventListener("click", function (event) {
+            parent_item.addEventListener("click", function(event) {
                 event.preventDefault();
                 item_context_menu_clicked(event.target);
             });
@@ -1491,7 +1651,7 @@
         }
 
         function unclicked() {
-            document.querySelectorAll(".clickfocus").forEach(function (selected_items) {
+            document.querySelectorAll(".clickfocus").forEach(function(selected_items) {
                 selected_items.classList.remove("clickfocus");
             });
         }
@@ -1573,7 +1733,7 @@
 
         function unselect_all() {
             //on retire à tout les items le tag séléctionné
-            document.querySelectorAll(".selected").forEach(function (selected_items) {
+            document.querySelectorAll(".selected").forEach(function(selected_items) {
                 selected_items.classList.remove("selected");
             });
         }
@@ -1644,7 +1804,7 @@
             if (get_context_menu_element().classList.contains("shiftkeydown")) {
                 get_context_menu_element().classList.remove("shiftkeydown");
             }
-            document.querySelectorAll(".hover").forEach(function (selected_items) {
+            document.querySelectorAll(".hover").forEach(function(selected_items) {
                 selected_items.classList.remove("hover");
             });
             unclicked();
@@ -1653,7 +1813,7 @@
 
         function update_lock_state(id, lock) {
             if (id == "*") {
-                all_item_element.forEach(function (item, index) {
+                all_item_element.forEach(function(item, index) {
                     var parent_item = item.parentElement.parentElement;
                     if (lock) {
                         parent_item.classList.add("lock");
@@ -1851,7 +2011,7 @@
                         break;
                     case "ajouter_favori":
                         if (getSelectedElements().length > 1) {
-                            getSelectedElements().forEach(function (element) {
+                            getSelectedElements().forEach(function(element) {
                                 internal_ajouter_aux_favoris(element.querySelector(".star"), element.id, true);
                             });
                         } else {
@@ -1861,7 +2021,7 @@
                         break;
                     case "retirer_favori":
                         if (getSelectedElements().length > 1) {
-                            getSelectedElements().forEach(function (element) {
+                            getSelectedElements().forEach(function(element) {
                                 internal_ajouter_aux_favoris(element.querySelector(".star"), element.id, false);
                             });
                         } else {
@@ -1871,7 +2031,7 @@
 
                     case "afficher_calque":
                         if (getSelectedElements().length > 1) {
-                            getSelectedElements().forEach(function (element) {
+                            getSelectedElements().forEach(function(element) {
                                 internal_change_visibility(element.querySelector(".eye"), element.id, true);
                             });
                         } else {
@@ -1881,7 +2041,7 @@
                         break;
                     case "masquer_calque":
                         if (getSelectedElements().length > 1) {
-                            getSelectedElements().forEach(function (element) {
+                            getSelectedElements().forEach(function(element) {
                                 internal_change_visibility(element.querySelector(".eye"), element.id, false);
                             });
                         } else {
@@ -1895,7 +2055,7 @@
 
                         if (getSelectedElements().length > 1) {
                             let listOfId = "";
-                            getSelectedElements().forEach(function (element) {
+                            getSelectedElements().forEach(function(element) {
                                 listOfId += element.id + ",";
                             });
                             layer_Csharp_call_from_js.clear_cache(listOfId);
@@ -1939,10 +2099,10 @@
 
 
         layer_Csharp_call_from_js.request_search_string()
-            .then(function (initSearchValue) {
+            .then(function(initSearchValue) {
                 console.log("search " + initSearchValue);
                 if (initSearchValue != null && initSearchValue != undefined) {
-                    search(initSearchValue);
+                    searchAndUpdatePreview(initSearchValue);
                 }
             });
 

@@ -14,9 +14,9 @@ namespace MapsInMyFolder
     {
         private HitType SetHitType(Point point)
         {
-            var ActiveRectangleLocations = GetRectangleLocation(ActiveRectangle);
-            Point No_Placement = map.LocationToView(ActiveRectangleLocations.NO);
-            Point Se_Placement = map.LocationToView(ActiveRectangleLocations.SE);
+            var (NO, SE) = GetRectangleLocation(ActiveRectangle);
+            Point No_Placement = map.LocationToView(NO);
+            Point Se_Placement = map.LocationToView(SE);
 
             double tblr_GAP = Settings.selection_rectangle_resize_tblr_gap;
             double angle_GAP = Settings.selection_rectangle_resize_angle_gap;
@@ -174,10 +174,11 @@ namespace MapsInMyFolder
             None, Body, UL, UR, LR, LL, L, R, T, B, Null, NotAllowed
         };
 
-        private MapControl.Map map;
+        private readonly MapControl.Map map;
         private bool IsRightClick;
         private bool IsLeftClick;
 
+        public event EventHandler<EventArgs> RequestedPreviewUpdate;
         public event EventHandler<MapPolygon> OnLocationUpdated;
         public event EventHandler<MapPolygon> RectangleGotFocus;
         public event EventHandler<MapPolygon> RectangleLostFocus;
@@ -185,7 +186,7 @@ namespace MapsInMyFolder
 
         public bool DisposeElementsOnUnload = true;
         public bool RectangleCanBeDeleted;
-        public bool IsSnapToGrid;
+        public bool IsSnapToGrid { get; set; }
         public bool DisableRectangleMoving;
         public int MinimalNumberOfRectangles;
 
@@ -199,7 +200,7 @@ namespace MapsInMyFolder
         private Point OriginSePlacement = new Point();
         private Point SavedLeftClickPreviousActions;
 
-        private List<MapPolygon> Rectangles = new List<MapPolygon>();
+        private readonly List<MapPolygon> Rectangles = new List<MapPolygon>();
         public MapPolygon ActiveRectangle { get; set; }
 
         public MapSelectable(MapControl.Map map, Location startingNO = null, Location startingSE = null, Page page = null)
@@ -295,7 +296,7 @@ namespace MapsInMyFolder
 
         private void MapMouseWheel(object sender, MouseWheelEventArgs e)
         {
-            MainPage._instance.LayerTilePreview_RequestUpdate();
+            RequestedPreviewUpdate?.Invoke(this, null);
         }
 
         public MapPolygon AddRectangle(Location NO, Location SE)
@@ -412,10 +413,9 @@ namespace MapsInMyFolder
             {
                 return false;
             }
-            
+
             if (map.Children.Contains(rectangle))
             {
-
                 map.Children.Remove(rectangle);
             }
             if (Rectangles.Contains(rectangle))
@@ -531,7 +531,6 @@ namespace MapsInMyFolder
         {
             if (IsRightClick && Mouse.RightButton == MouseButtonState.Released)
             {
-
                 IsRightClick = false;
                 CleanRectangleLocations(ActiveRectangle);
             }
@@ -545,7 +544,7 @@ namespace MapsInMyFolder
                 CleanRectangleLocations(ActiveRectangle);
             }
 
-            MainPage._instance.LayerTilePreview_RequestUpdate();
+            RequestedPreviewUpdate?.Invoke(this, null);
         }
 
         private void MiddleClickUp(object sender, MouseButtonEventArgs e)
@@ -621,7 +620,7 @@ namespace MapsInMyFolder
             {
                 if (Math.Abs(targetLocation.Longitude) == 180)
                 {
-                    double maxLongitude = 179.99999999;
+                    const double maxLongitude = 179.99999999;
 
                     if (targetLocation.Longitude == actualLocation.Longitude)
                     {
@@ -711,7 +710,7 @@ namespace MapsInMyFolder
 
             if (IsSnapToGrid)
             {
-                var snapLocations = SnapToGrid(NO, SE, rectangle);
+                var snapLocations = SnapToGrid(NO, SE);
 
                 if (doUpdateNo)
                 {
@@ -749,9 +748,9 @@ namespace MapsInMyFolder
             return NO.Latitude == NO.Longitude || SE.Latitude == SE.Longitude || NO.Latitude == SE.Latitude || NO.Longitude == SE.Longitude;
         }
 
-        private (Location NO, Location SE) SnapToGrid(Location NO, Location SE, MapPolygon rectangle)
+        private (Location NO, Location SE) SnapToGrid(Location NO, Location SE)
         {
-            int zoomLevel = 16;
+            int zoomLevel = (int)Math.Floor(map.ZoomLevel) + 2;
             var noLocationTiles = Collectif.CoordonneesToTile(NO.Latitude, NO.Longitude, zoomLevel);
             var seLocationTiles = Collectif.CoordonneesToTile(SE.Latitude, SE.Longitude, zoomLevel);
 
@@ -869,9 +868,9 @@ namespace MapsInMyFolder
             {
                 OriginClickPlacement = e.GetPosition(map);
                 SavedLeftClickPreviousActions = e.GetPosition(map);
-                var activeRectangleLocations = GetRectangleLocation(ActiveRectangle);
-                OriginNoPlacement = map.LocationToView(activeRectangleLocations.NO);
-                OriginSePlacement = map.LocationToView(activeRectangleLocations.SE);
+                var (NO, SE) = GetRectangleLocation(ActiveRectangle);
+                OriginNoPlacement = map.LocationToView(NO);
+                OriginSePlacement = map.LocationToView(SE);
             }
         }
 
@@ -888,7 +887,7 @@ namespace MapsInMyFolder
                 IsLeftClick = false;
                 SetHandCursor();
             }
-            else if (IsRightClick == false && Mouse.RightButton == MouseButtonState.Pressed)
+            else if (!IsRightClick && Mouse.RightButton == MouseButtonState.Pressed)
             {
                 IsRightClick = true;
                 if (updateHitType)
@@ -1047,10 +1046,10 @@ namespace MapsInMyFolder
             }
 
             Point mousePositionPoint = e.GetPosition(map);
-            var rectLocation = GetRectangleLocation(ActiveRectangle);
+            var (NO, SE) = GetRectangleLocation(ActiveRectangle);
 
-            Point NOPoint = map.LocationToView(rectLocation.NO);
-            Point SEPoint = map.LocationToView(rectLocation.SE);
+            Point NOPoint = map.LocationToView(NO);
+            Point SEPoint = map.LocationToView(SE);
 
             if ((Math.Abs(NOPoint.X - SEPoint.X) < 5) || (Math.Abs(NOPoint.Y - SEPoint.Y) < 5))
             {
@@ -1107,8 +1106,8 @@ namespace MapsInMyFolder
                         }
                         savedNoPlacementPoint = map.LocationToView(savedNoPlacement);
                         savedSePlacementPoint = map.LocationToView(savedSePlacement);
-                        displacementX = mouseLocation.X - (savedNoPlacementPoint.X + (savedSePlacementPoint.X - savedNoPlacementPoint.X) * xPercentage);
-                        displacementY = mouseLocation.Y - (savedNoPlacementPoint.Y + (savedSePlacementPoint.Y - savedNoPlacementPoint.Y) * yPercentage);
+                        displacementX = mouseLocation.X - (savedNoPlacementPoint.X + ((savedSePlacementPoint.X - savedNoPlacementPoint.X) * xPercentage));
+                        displacementY = mouseLocation.Y - (savedNoPlacementPoint.Y + ((savedSePlacementPoint.Y - savedNoPlacementPoint.Y) * yPercentage));
                         if (Math.Abs(displacementX) > Math.Abs(displacementY))
                         {
                             displacementY = 0;
@@ -1124,8 +1123,8 @@ namespace MapsInMyFolder
                         savedSePlacement = rectanglePosition.SE;
                         savedNoPlacementPoint = map.LocationToView(savedNoPlacement);
                         savedSePlacementPoint = map.LocationToView(savedSePlacement);
-                        displacementX = mouseLocation.X - (savedNoPlacementPoint.X + (savedSePlacementPoint.X - savedNoPlacementPoint.X) * xPercentage);
-                        displacementY = mouseLocation.Y - (savedNoPlacementPoint.Y + (savedSePlacementPoint.Y - savedNoPlacementPoint.Y) * yPercentage);
+                        displacementX = mouseLocation.X - (savedNoPlacementPoint.X + ((savedSePlacementPoint.X - savedNoPlacementPoint.X) * xPercentage));
+                        displacementY = mouseLocation.Y - (savedNoPlacementPoint.Y + ((savedSePlacementPoint.Y - savedNoPlacementPoint.Y) * yPercentage));
                     }
                     Location targetNOloc = map.ViewToLocation(new Point(savedNoPlacementPoint.X + displacementX, savedNoPlacementPoint.Y + displacementY));
                     Location targetSEloc = map.ViewToLocation(new Point(savedSePlacementPoint.X + displacementX, savedSePlacementPoint.Y + displacementY));
@@ -1213,6 +1212,21 @@ namespace MapsInMyFolder
                     break;
             }
             UpdateVisualCursor(e);
+        }
+
+
+        public static BoundingBox GetTileBounding(Location location, int zoom)
+        {
+            var Tiles = Collectif.CoordonneesToTile(location.Latitude, location.Longitude, zoom);
+            var NO_Location = Collectif.TileToCoordonnees(Tiles.X - 1, Tiles.Y - 1, zoom);
+            var SE_Location = Collectif.TileToCoordonnees(Tiles.X + 2, Tiles.Y + 2, zoom);
+            return new BoundingBox()
+            {
+                East = NO_Location.Longitude,
+                North = NO_Location.Latitude,
+                West = SE_Location.Longitude,
+                South = SE_Location.Latitude
+            };
         }
     }
 }

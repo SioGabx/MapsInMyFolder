@@ -645,13 +645,80 @@
                     MinWidth="30"
                     MinHeight="30"
                     Background="White"
-                    MouseWheel="mapviewerappercu_MouseWheel"
+                    MouseWheel="Mapviewerappercu_MouseWheel"
                     ZoomLevel="18">
                     <map:Map.Center>
                         <map:Location Latitude="48.198846" Longitude="6.429381" />
                     </map:Map.Center>
                     <map:MapTileLayer x:Name="MapTileLayer_Transparent" />
                     <map:MapItemsControl x:Name="mapviewerRectangles" />
+                    <map:Map.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem
+                                Click="ZoomToTile_Click"
+                                Foreground="#BCBCBC"
+                                Header="{Binding Source={x:Static commun:Languages.Current}, Path=[editorMapOptionsZoomToTile]}">
+                                <MenuItem.Icon>
+                                    <ui:FontIcon Foreground="#888989" Glyph="&#xE12B;" />
+                                </MenuItem.Icon>
+                            </MenuItem>
+                            <MenuItem
+                                Click="ZoomToLocation_Click"
+                                Foreground="#BCBCBC"
+                                Header="{Binding Source={x:Static commun:Languages.Current}, Path=[editorMapOptionsZoomToLocation]}">
+                                <MenuItem.Icon>
+                                    <ui:FontIcon Foreground="#888989" Glyph="&#xE128;" />
+                                </MenuItem.Icon>
+                            </MenuItem>
+                            <Separator />
+                            <MenuItem
+                                x:Name="PrintUrl"
+                                Click="PrintUrl_Click"
+                                Foreground="#BCBCBC"
+                                Header="{Binding Source={x:Static commun:Languages.Current}, Path=[editorMapOptionsShowAndCopyTileUrl]}">
+                                <MenuItem.Icon>
+                                    <ui:FontIcon Foreground="#888989" Glyph="&#xE16F;" />
+                                </MenuItem.Icon>
+                            </MenuItem>
+                            <MenuItem
+                                x:Name="PrintPreviewUrl"
+                                Click="PrintPreviewUrl_Click"
+                                Foreground="#BCBCBC"
+                                Header="{Binding Source={x:Static commun:Languages.Current}, Path=[editorMapOptionsShowAndCopyPreviewTileUrl]}">
+                                <MenuItem.Icon>
+                                    <ui:FontIcon Foreground="#888989" Glyph="&#xE16F;" />
+                                </MenuItem.Icon>
+                            </MenuItem>
+                            <MenuItem
+                                x:Name="PrintPreviewFallbackUrl"
+                                Click="PrintPreviewFallbackUrl_Click"
+                                Foreground="#BCBCBC"
+                                Header="{Binding Source={x:Static commun:Languages.Current}, Path=[editorMapOptionsShowAndCopyFallbackTileUrl]}">
+                                <MenuItem.Icon>
+                                    <ui:FontIcon Foreground="#888989" Glyph="&#xE16F;" />
+                                </MenuItem.Icon>
+                            </MenuItem>
+                            <Separator />
+                            <MenuItem
+                                x:Name="SetPreviewUrl"
+                                Click="SetPreviewUrl_Click"
+                                Foreground="#BCBCBC"
+                                Header="{Binding Source={x:Static commun:Languages.Current}, Path=[editorMapOptionsDefinePreviewTileUrl]}">
+                                <MenuItem.Icon>
+                                    <ui:FontIcon Foreground="#888989" Glyph="&#xE15A;" />
+                                </MenuItem.Icon>
+                            </MenuItem>
+                            <MenuItem
+                                x:Name="SetPreviewFallbackUrl"
+                                Click="SetPreviewFallbackUrl_Click"
+                                Foreground="#BCBCBC"
+                                Header="{Binding Source={x:Static commun:Languages.Current}, Path=[editorMapOptionsDefineFallbackTileUrl]}">
+                                <MenuItem.Icon>
+                                    <ui:FontIcon Foreground="#888989" Glyph="&#xE15A;" />
+                                </MenuItem.Icon>
+                            </MenuItem>
+                        </ContextMenu>
+                    </map:Map.ContextMenu>
                 </map:Map>
                 <Label
                     x:Name="ZoomLevelIndicator"
@@ -734,33 +801,7 @@
                                     IsCheckable="True"
                                     IsChecked="False"
                                     Unchecked="IsInDebugModeSwitch_Toggle" />
-                                <Separator />
-                                <MenuItem
-                                    x:Name="PrintUrl"
-                                    Click="PrintUrl_Click"
-                                    Foreground="#BCBCBC"
-                                    Header="{Binding Source={x:Static commun:Languages.Current}, Path=[editorMapOptionsShowAndCopyTileUrl]}" />
-                                <MenuItem
-                                    x:Name="PrintPreviewUrl"
-                                    Click="PrintPreviewUrl_Click"
-                                    Foreground="#BCBCBC"
-                                    Header="{Binding Source={x:Static commun:Languages.Current}, Path=[editorMapOptionsShowAndCopyPreviewTileUrl]}" />
-                                <MenuItem
-                                    x:Name="PrintPreviewFallbackUrl"
-                                    Click="PrintPreviewFallbackUrl_Click"
-                                    Foreground="#BCBCBC"
-                                    Header="{Binding Source={x:Static commun:Languages.Current}, Path=[editorMapOptionsShowAndCopyFallbackTileUrl]}" />
-                                <Separator />
-                                <MenuItem
-                                    x:Name="SetPreviewUrl"
-                                    Click="SetPreviewUrl_Click"
-                                    Foreground="#BCBCBC"
-                                    Header="{Binding Source={x:Static commun:Languages.Current}, Path=[editorMapOptionsDefinePreviewTileUrl]}" />
-                                <MenuItem
-                                    x:Name="SetPreviewFallbackUrl"
-                                    Click="SetPreviewFallbackUrl_Click"
-                                    Foreground="#BCBCBC"
-                                    Header="{Binding Source={x:Static commun:Languages.Current}, Path=[editorMapOptionsDefineFallbackTileUrl]}" />
+
                             </ui:MenuFlyout>
                         </ui:DropDownButton.Flyout>
                     </ui:DropDownButton>

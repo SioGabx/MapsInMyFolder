@@ -139,7 +139,8 @@
                     MinHeight="30"
                     Margin="10,0,0,0"
                     Background="White"
-                    ZoomLevel="18">
+                    ZoomLevel="18"
+                    MouseDown="MapViewer_MouseDown">
                     <map:Map.Center>
                         <map:Location Latitude="48.198846" Longitude="6.429381" />
                     </map:Map.Center>

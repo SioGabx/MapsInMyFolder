@@ -302,3 +302,164 @@ fetchLayers(-1).catch(error => {
 Related url to improve this script :
  - https://www.arcgis.com/sharing/rest/content/items/2c9f3e737cbf4f6faf2eb956fa26cdc5/data
  - https://grand-nancy.maps.arcgis.com/sharing/rest/content/items/428a60494ab34b3f8c83b1692f79077d/data?f=json
+ 
+ 
+ 
+ ### Shom : 
+ 
+ https://data.shom.fr/donnees#001=eyJjIjpbLTQ5ODkxNi4yMjY4MjE1NTYwNSw1OTQ3NjU5LjIwMDg4NTU0M10sInoiOjcsInIiOjAsImwiOltdfQ==
+
+Manual scrapping
+```
+function getProperties() {
+    console.clear();
+    var conteneur = document.querySelector("#list-layers-on-map li");
+    let title = conteneur.querySelector(".displayed-layer-title-container").innerText;
+    console.log("----------------------------------------------------");
+    console.log(title);
+    var clickevent = document.createEvent("MouseEvents");
+    clickevent.initEvent("click", true, true);
+    var clickevent2 = document.createEvent("MouseEvents");
+    clickevent2.initEvent("click", true, true);
+    let url = "https://services.data.shom.fr/clevisu/wmts?layer=" + conteneur.id + "&style=normal&tilematrixset=3857&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix={z}&TileCol={x}&TileRow={y}";
+    console.log(url);
+    console.log(conteneur.id);
+
+    let abstract = conteneur.querySelector(".layer-abstract").innerText.replace(/\s+/g, ' ').trim().replace(/(<|&lt;)br\s*\/*(>|&gt;)/g, '\n');
+   
+
+    var legendelink = conteneur.querySelector(".legend-button");
+    if (legendelink != null) {
+        legendelink.click();
+        var listoflengend = document.querySelectorAll("#legends-root .main-legend-panel");
+        var legende = listoflengend[listoflengend.length - 1];
+        console.log(abstract + "\nLegende : " + legende.querySelector("img").src);
+        //legende.querySelector(".main-legend-panel-top-close-button i").dispatchEvent(clickevent2);
+        legende.style.display = "none";
+    }else{
+	 console.log(abstract);
+	}
+    let croix = conteneur.querySelector(".show-hide-button");
+    croix.dispatchEvent(clickevent);
+
+    document.querySelector("#list-layers-on-map").children.forEach((element) => {
+        element.style.display = "none";
+    });
+}
+ ```
+ 
+ Auto scrapping
+ ```
+ function getProperties() {
+    console.clear();
+    var conteneur = document.querySelector("#list-layers-on-map li");
+	if (conteneur == null){
+	return;
+	}
+	if (conteneur == null){
+	return;
+	}
+    let title = conteneur.querySelector(".displayed-layer-title-container").innerText;
+    console.log("----------------------------------------------------");
+    console.log(title);
+    var clickevent = document.createEvent("MouseEvents");
+    clickevent.initEvent("click", true, true);
+    let url = "https://services.data.shom.fr/clevisu/wmts?layer=" + conteneur.id + "&style=normal&tilematrixset=3857&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image%2Fpng&TileMatrix={z}&TileCol={x}&TileRow={y}";
+    console.log(url);
+    console.log(conteneur.id);
+let uniqueID = conteneur.id;
+let abstractelement = conteneur.querySelector(".layer-abstract");
+    let abstract = "";
+	if (abstractelement != null){
+	abstract = abstractelement.innerText.replace(/\s+/g, ' ').trim().replace(/(<|&lt;)br\s*\/*(>|&gt;)/g, '\n');
+   }
+var finaldescription = abstract;
+    var legendelink = conteneur.querySelector(".legend-button");
+    if (legendelink != null) {
+        legendelink.click();
+        var listoflengend = document.querySelectorAll("#legends-root .main-legend-panel");
+        var legende = listoflengend[listoflengend.length - 1];
+		var legendeimg = legende.querySelector("img");
+		if (legendeimg != null){
+        finaldescription = abstract + "\nLegende : " + legendeimg.src;
+		}
+        legende.style.display = "none";
+    }
+	 console.log(finaldescription);
+	
+    let croix = conteneur.querySelector(".show-hide-button");
+    croix.dispatchEvent(clickevent);
+	/*
+	var elements = Array.from(document.querySelector("#list-layers-on-map").children);
+
+for (var i = 0; i < elements.length - 1; i++) {
+  var element = elements[i];
+  element.querySelector(".remove-button i").click();
+}
+*/
+
+    document.querySelector("#list-layers-on-map").children.forEach((element) => {
+        element.style.display = "none"; // querySelector(".remove-button i").click()//
+    });
+
+    var sql = `
+INSERT INTO "main"."CUSTOMSLAYERS" ("NAME", "DESCRIPTION", "CATEGORY", "COUNTRY", "IDENTIFIER", "TILE_URL", "MIN_ZOOM", "MAX_ZOOM", "FORMAT", "SITE", "SITE_URL", "STYLE", "TILE_SIZE", "FAVORITE", "SCRIPT", "VISIBILITY", "SPECIALSOPTIONS", "RECTANGLES", "VERSION", "HAS_SCALE") VALUES ('` + title + `', '` + finaldescription + `', 'Cartes marines', 'France', '` + uniqueID + `', '` + url + `', '4', '17', 'png', 'Shom', 'data.shom.fr', '', '256', '0', 'function getTile(args) {
+    return args;
+}
+function getPreview(args) {
+    args.url = &quot;[internal]&quot; + args.url;
+    args.x = &quot;126&quot;;
+    args.y = &quot;89&quot;;
+    args.z = &quot;8&quot;;
+    return args;
+}', 'Visible', '{"BackgroundColor":""}', '', '1', '1');
+
+`;
+    return sql;
+}
+
+var FinalSQL = "";
+var elements = null;
+var lastelement = null;
+async function processElements() {
+  for (let i = 0; i < elements.length; i++) {
+    var element = elements[i];
+	var layerlabel = element.querySelector(".layer-title-container");
+	var title = layerlabel.innerText
+	if (i < restartAt){
+		console.log("Ignore " + title);
+		continue;
+	}else{
+    var clickevent2 = document.createEvent("MouseEvents");
+    clickevent2.initEvent("click", true, true);
+    
+	layerlabel.dispatchEvent(clickevent2);
+lastelement = layerlabel;
+    await delay(5000); // Attendre 10 seconde
+
+    FinalSQL = FinalSQL + getProperties();
+	console.log(title + " Element" + i + " / " + elements.length);
+	await delay(5000);
+  }}
+}
+
+function delay(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+
+setTimeout(function() {
+  console.log("Delayed function executed!");
+   elements = document.querySelectorAll(".catalog-layer-item");
+processElements();
+}, 3000);
+
+var restartAt = 164;
+ ```
+ 
+ 
+ 
+ 
+ 
+ 
+ 

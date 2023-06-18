@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Net.Http.Headers;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -33,6 +35,32 @@ namespace MapsInMyFolder.Commun
             return new string(theChars);
         }
 
+        public static string TrimStart(this string target, string trimString)
+        {
+            if (string.IsNullOrEmpty(trimString)) return target;
+
+            string result = target;
+            while (result.StartsWith(trimString))
+            {
+                result = result.Substring(trimString.Length);
+            }
+
+            return result;
+        }
+
+        public static string TrimEnd(this string target, string trimString)
+        {
+            if (string.IsNullOrEmpty(trimString)) return target;
+
+            string result = target;
+            while (result.EndsWith(trimString))
+            {
+                result = result.Substring(0, result.Length - trimString.Length);
+            }
+
+            return result;
+        }
+
         public static bool IsJson(this string source)
         {
             if (string.IsNullOrWhiteSpace(source))
@@ -57,9 +85,11 @@ namespace MapsInMyFolder.Commun
             return false;
         }
 
-        public static void SetText(this TextBox textbox, string text)
+        public static void SetText(this TextBox textbox, string text, TextChangedEventHandler textChangedEvent)
         {
-            textbox?.GetType().GetProperty("Text").SetValue(textbox, text, null);
+                textbox.TextChanged -= textChangedEvent;
+                textbox.Text = text;
+                textbox.TextChanged += textChangedEvent;
         }
         public static void SetSelectedIndex(this ComboBox combobox, int index)
         {
@@ -81,6 +111,10 @@ namespace MapsInMyFolder.Commun
 
         public static string RemoveNewLineChar(this string theString)
         {
+            if (string.IsNullOrWhiteSpace(theString))
+            {
+                return theString;
+            }
             var sb = new System.Text.StringBuilder(theString.Length);
             foreach (char i in theString)
             {
@@ -203,7 +237,7 @@ namespace MapsInMyFolder.Commun
             }
             return Texte;
         }
-        
+
         public static string ReplaceSingle(this string chaine, string oldValue, string newValue)
         {
             int index = chaine.IndexOf(oldValue);
@@ -231,4 +265,29 @@ namespace MapsInMyFolder.Commun
             }
         }
     }
+
+    //https://stackoverflow.com/a/26575203/9947331 and https://stackoverflow.com/a/27013997/9947331
+    //Usage : [UserFriendlyString( "I am before the enum element" ) ]
+    public class UserFriendlyStringAttribute : Attribute
+    {
+        public string UserFriendlyString;
+        public UserFriendlyStringAttribute(string value)
+        {
+            UserFriendlyString = value;
+        }
+    }
+
+    public static class EnumExtender
+    {
+        public static string GetUserFriendlyString(this Enum enumeration)
+        {
+            var memberInfo = enumeration.GetType().GetMember(enumeration.ToString());
+            if (memberInfo.Length <= 0) return enumeration.ToString();
+
+            var attributes = memberInfo[0].GetCustomAttributes(typeof(UserFriendlyStringAttribute), false);
+            return attributes.Length > 0 ? ((UserFriendlyStringAttribute)attributes[0]).UserFriendlyString : enumeration.ToString();
+        }
+    }
+
+
 }
