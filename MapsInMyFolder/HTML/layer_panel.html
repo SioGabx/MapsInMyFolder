@@ -1,0 +1,2114 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Layer Panel</title>
+    <!--<meta charset="UTF-8">-->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="author" content="SioGabx">
+    <meta charset="UTF-8">
+    <meta name="language" content="fr-FR">
+    <style>
+        li:not(.select) .layer_main_div:hover {
+            border-left: 4px solid #62626B;
+        }
+
+        .displaynone,
+        .hidden {
+            display: none !important;
+        }
+
+        .layerHiddenStateProgress {
+            transition: opacity 100ms;
+            opacity: 0;
+        }
+
+        .showHiddenLayer .layerHiddenStateProgress {
+            transition: opacity 100ms, filter 100ms;
+            opacity: 0.8;
+            filter: brightness(0.6) grayscale(0.5)
+        }
+
+        .layerHidden {
+            display: none;
+        }
+
+        .showHiddenLayer .layerHidden {
+            display: inherit;
+            opacity: 0.8;
+            filter: brightness(0.6) grayscale(0.5)
+        }
+
+        .layerFiltered {
+            display: none;
+        }
+
+        .showHiddenLayer .layerFiltered {
+            display: inherit;
+            opacity: 0.3;
+            filter: brightness(0.6) grayscale(0.8)
+        }
+
+        .select .layer_main_div {
+            border-left: 4px solid #F18712;
+        }
+
+        .inSelectionHighlight .layer_main_div {
+            border-top: 1px solid #794915;
+            border-right: 1px solid #794915;
+            border-bottom: 1px solid #794915;
+        }
+
+        .inSelectionHighlight .layer_main_div::before {
+            position: absolute;
+            content: "";
+            width: 100%;
+            height: 100%;
+            background-color: rgb(160, 100, 30);
+            mix-blend-mode: color;
+        }
+
+        .layerHidden.inSelectionHighlight .layer_main_div::before {
+            background-color: rgb(212 162 103);
+            mix-blend-mode: darken;
+        }
+
+        .layerHidden.inSelectionHighlight {
+            filter: brightness(0.8) grayscale(0.2)
+        }
+
+        .inSelectionHighlight p {
+            color: #f8c187 !important;
+            text-shadow: -1px 1px 7px black;
+        }
+
+        .layer_main_div {
+            height: 195px;
+            min-height: 80px;
+            width: 100%;
+            border-left: 4px solid #6F6F7B;
+            content: "";
+            background-repeat: no-repeat;
+            background-origin: border-box;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            /*background-color: #303031;*/
+            background-color: rgba(255, 255, 255, 0.5);
+            background-color: rgba(var(--background_layer_color_R, 255), var(--background_layer_color_G, 255), var(--background_layer_color_B, 255), var(--opacity_preview_background, 0.5));
+        }
+
+        .layer_content {
+            background: linear-gradient(0deg, rgba(50, 50, 50, 0.8) 0%, rgba(30, 30, 30, 0) 60%);
+            width: 100%;
+            height: 100%;
+            position: relative;
+            overflow-wrap: anywhere;
+        }
+
+        .layer_main_div_background_image {
+            position: absolute;
+            left: -1px;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background-repeat: no-repeat;
+            background-origin: border-box;
+            background-size: cover;
+            background-position: center;
+        }
+
+        body {
+            color: #E2E2E1;
+            padding-left: 4px;
+            padding-right: 10px;
+            margin-top: 0;
+            min-height: 99vh;
+            user-select: none;
+        }
+
+
+        :root {
+            --background-loading: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' style='margin: auto%3B background: rgb(241  242  243)%3B display: block%3Btransform: scale(0.25)%3B' width='50px' height='50px' viewBox='0 0 100 100' preserveAspectRatio='xMidYMid'%3E%3Cg transform='translate(20 50)'%3E%3Ccircle cx='0' cy='0' r='6' fill='%230a0c0c'%3E%3CanimateTransform attributeName='transform' type='scale' begin='-0.375s' calcMode='spline' keySplines='0.3 0 0.7 1%3B0.3 0 0.7 1' values='0%3B1%3B0' keyTimes='0%3B0.5%3B1' dur='1s' repeatCount='indefinite'%3E%3C/animateTransform%3E%3C/circle%3E%3C/g%3E%3Cg transform='translate(40 50)'%3E%3Ccircle cx='0' cy='0' r='6' fill='%23141617'%3E%3CanimateTransform attributeName='transform' type='scale' begin='-0.25s' calcMode='spline' keySplines='0.3 0 0.7 1%3B0.3 0 0.7 1' values='0%3B1%3B0' keyTimes='0%3B0.5%3B1' dur='1s' repeatCount='indefinite'%3E%3C/animateTransform%3E%3C/circle%3E%3C/g%3E%3Cg transform='translate(60 50)'%3E%3Ccircle cx='0' cy='0' r='6' fill='%231e1f20'%3E%3CanimateTransform attributeName='transform' type='scale' begin='-0.125s' calcMode='spline' keySplines='0.3 0 0.7 1%3B0.3 0 0.7 1' values='0%3B1%3B0' keyTimes='0%3B0.5%3B1' dur='1s' repeatCount='indefinite'%3E%3C/animateTransform%3E%3C/circle%3E%3C/g%3E%3Cg transform='translate(80 50)'%3E%3Ccircle cx='0' cy='0' r='6' fill='%23272729'%3E%3CanimateTransform attributeName='transform' type='scale' begin='0s' calcMode='spline' keySplines='0.3 0 0.7 1%3B0.3 0 0.7 1' values='0%3B1%3B0' keyTimes='0%3B0.5%3B1' dur='1s' repeatCount='indefinite'%3E%3C/animateTransform%3E%3C/circle%3E%3C/g%3E%3C/svg%3E");
+        }
+
+        ::-webkit-scrollbar {
+            width: 12px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #303031;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #6F6F7B;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #62626B;
+        }
+
+        ul,
+        li,
+        p {
+            margin: 0;
+            padding: 0;
+        }
+
+        p {
+            margin-bottom: 0;
+            margin-top: auto;
+            font-size: 16.5px;
+        }
+
+        p+p {
+            margin-top: 0px;
+            font-size: 12px;
+        }
+
+        .layer_texte {
+            color: #E2E2E1;
+            font-family: "Segoe UI";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            padding-left: 15px;
+            padding-bottom: 10px;
+            text-shadow: 0px 0px 10px rgb(40, 40, 40);
+        }
+
+        li {
+            margin-bottom: 15px;
+            user-select: none;
+            cursor: pointer;
+            opacity: 1;
+        }
+
+        ul {
+            list-style: none;
+        }
+
+        html {
+            scrollbar-gutter: stable;
+        }
+
+        .star {
+            width: 25px;
+            height: 25px;
+            position: absolute;
+            right: 0;
+        }
+
+        .star.orange {
+            opacity: 0.8;
+            background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNDEuNzMiIGhlaWdodD0iMTQxLjczIiB2aWV3Qm94PSIwIDAgMTQxLjczIDE0MS43MyI+PHRpdGxlPnBpY3RvZ3JhbW1lczwvdGl0bGU+PHBhdGggZD0iTTcwLjg3LDU5Ljk0QTEwLjkzLDEwLjkzLDAsMSwwLDgxLjc5LDcwLjg3LDEwLjk0LDEwLjk0LDAsMCwwLDcwLjg3LDU5Ljk0WiIgc3R5bGU9ImZpbGw6IzAxMDEwMSIvPjxwYXRoIGQ9Ik03MC44Nyw5LjM3bDE1LDQ3aDUwbC00MCwyOSwxNSw0Ny00MC0yOS00MCwyOSwxNS00Ny00MC0yOWg1MFoiIHN0eWxlPSJmaWxsOiNmMTg3MTM7c3Ryb2tlOiMwMDA7c3Ryb2tlLXdpZHRoOjJweCIvPjwvc3ZnPg==");
+            background-size: contain;
+        }
+
+        .star {
+            opacity: 0.6;
+            background-image: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIj8+CjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iMTUwIiBoZWlnaHQ9IjE1MCI+CjxwYXRoIGZpbGw9IiMwMDAiIHN0cm9rZT0iIzc0NzQ3NyIgc3Ryb2tlLXdpZHRoPSIyIiBkPSJtNzUsMTMKMTUsNDcgaDUwbC00MCwyOSAxNSw0Ny00MC0yOS00MCwyOSAxNS00Ny00MC0yOSBoNTB6Ii8+IAo8L3N2Zz4=");
+            background-size: contain;
+        }
+
+        .star:not(.orange):hover {
+            opacity: 0.7;
+        }
+
+        .star:hover {
+            opacity: 1;
+            filter: brightness(1.1)
+        }
+
+
+
+        .eye {
+            width: 25px;
+            height: 25px;
+            position: absolute;
+            right: 0px;
+            top: 26px;
+            opacity: 0.6;
+            transition: opacity 150ms;
+        }
+
+        .eye.orange {
+            opacity: 0;
+            /*            background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNDEuNzMiIGhlaWdodD0iMTQxLjczIiB2aWV3Qm94PSIwIDAgMTQxLjczIDE0MS43MyI+PHRpdGxlPnBpY3RvZ3JhbW1lczwvdGl0bGU+PHBhdGggZD0iTTcwLjg3LDU5Ljk0QTEwLjkzLDEwLjkzLDAsMSwwLDgxLjc5LDcwLjg3LDEwLjk0LDEwLjk0LDAsMCwwLDcwLjg3LDU5Ljk0WiIgc3R5bGU9ImZpbGw6I2YxODcxMztzdHJva2U6IzAwMDtzdHJva2Utd2lkdGg6MnB4Ii8+PHBhdGggZD0iTTEzNy42LDY3LjhhMTIxLjIsMTIxLjIsMCwwLDAtMTkuMzQtMTcuNjljLTE1Ljc3LTExLjY0LTMyLjE1LTE3LjgtNDcuMzktMTcuOHMtMzEuNjMsNi4xNi00Ny40LDE3LjhBMTIxLjc0LDEyMS43NCwwLDAsMCw0LjEzLDY3LjhhNC44MSw0LjgxLDAsMCwwLDAsNi4xM0ExMjEuMiwxMjEuMiwwLDAsMCwyMy40Nyw5MS42MmMxNS43NywxMS42NSwzMi4xNiwxNy44LDQ3LjQsMTcuOHMzMS42Mi02LjE1LDQ3LjM5LTE3LjhBMTIwLjY3LDEyMC42NywwLDAsMCwxMzcuNiw3My45Myw0LjgxLDQuODEsMCwwLDAsMTM3LjYsNjcuOFpNNzAuODcsOTUuODdhMjUsMjUsMCwxLDEsMjUtMjVBMjUsMjUsMCwwLDEsNzAuODcsOTUuODdaIiBzdHlsZT0iZmlsbDojZjE4NzEzO3N0cm9rZTojMDAwO3N0cm9rZS13aWR0aDoycHgiLz48L3N2Zz4=");  */
+            /*            background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNDEuNzMiIGhlaWdodD0iMTQxLjczIiB2aWV3Qm94PSIwIDAgMTQxLjczIDE0MS43MyI+PGRlZnM+PHN0eWxlPi5he2ZpbGw6bm9uZTtzdHJva2U6IzAxMDEwMTtzdHJva2UtbWl0ZXJsaW1pdDoxMDtzdHJva2Utd2lkdGg6NHB4O308L3N0eWxlPjwvZGVmcz48dGl0bGU+cGljdG9ncmFtbWVzPC90aXRsZT48cGF0aCBjbGFzcz0iYSIgZD0iTTcwLjg3LDU5Ljk0QTEwLjkzLDEwLjkzLDAsMSwwLDgxLjc5LDcwLjg3LDEwLjk0LDEwLjk0LDAsMCwwLDcwLjg3LDU5Ljk0WiIvPjxwYXRoIGNsYXNzPSJhIiBkPSJNMTM3LjYsNjcuOGExMjEuMiwxMjEuMiwwLDAsMC0xOS4zNC0xNy42OWMtMTUuNzctMTEuNjQtMzIuMTUtMTcuOC00Ny4zOS0xNy44cy0zMS42Myw2LjE2LTQ3LjQsMTcuOEExMjEuNzQsMTIxLjc0LDAsMCwwLDQuMTMsNjcuOGE0LjgxLDQuODEsMCwwLDAsMCw2LjEzQTEyMS4yLDEyMS4yLDAsMCwwLDIzLjQ3LDkxLjYyYzE1Ljc3LDExLjY1LDMyLjE2LDE3LjgsNDcuNCwxNy44czMxLjYyLTYuMTUsNDcuMzktMTcuOEExMjAuNjcsMTIwLjY3LDAsMCwwLDEzNy42LDczLjkzLDQuODEsNC44MSwwLDAsMCwxMzcuNiw2Ny44Wk03MC44Nyw5NS44N2EyNSwyNSwwLDEsMSwyNS0yNUEyNSwyNSwwLDAsMSw3MC44Nyw5NS44N1oiLz48cGF0aCBjbGFzcz0iYSIgZD0iTTgsMTMwLjg0LDEzMy43OCwxMC44OSIvPjwvc3ZnPg==");    */
+            background-image: url("data:image/svg+xml;base64,PHN2ZyBpZD0iQ2FscXVlXzIiIGRhdGEtbmFtZT0iQ2FscXVlIDIiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjE0MS43MyIgaGVpZ2h0PSIxNDEuNzMiIHZpZXdCb3g9IjAgMCAxNDEuNzMgMTQxLjczIj48ZGVmcz48c3R5bGU+LmNscy0xe2ZpbGw6IzAxMDEwMTtzdHJva2U6Izc1NzU3ODtzdHJva2Utd2lkdGg6MnB4O308L3N0eWxlPjwvZGVmcz48dGl0bGU+cGljdG9ncmFtbWVzPC90aXRsZT48cGF0aCBjbGFzcz0iY2xzLTEiIGQ9Ik03MC44Nyw1OS45NEExMC45MywxMC45MywwLDEsMCw4MS43OSw3MC44NywxMC45NCwxMC45NCwwLDAsMCw3MC44Nyw1OS45NFoiLz48cGF0aCBjbGFzcz0iY2xzLTEiIGQ9Ik0xMzcuNiw2Ny44YTEyMS4yLDEyMS4yLDAsMCwwLTE5LjM0LTE3LjY5Yy0xNS43Ny0xMS42NC0zMi4xNS0xNy44LTQ3LjM5LTE3LjhzLTMxLjYzLDYuMTYtNDcuNCwxNy44QTEyMS43NCwxMjEuNzQsMCwwLDAsNC4xMyw2Ny44YTQuODEsNC44MSwwLDAsMCwwLDYuMTNBMTIxLjIsMTIxLjIsMCwwLDAsMjMuNDcsOTEuNjJjMTUuNzcsMTEuNjUsMzIuMTYsMTcuOCw0Ny40LDE3LjhzMzEuNjItNi4xNSw0Ny4zOS0xNy44QTEyMC42NywxMjAuNjcsMCwwLDAsMTM3LjYsNzMuOTMsNC44MSw0LjgxLDAsMCwwLDEzNy42LDY3LjhaTTcwLjg3LDk1Ljg3YTI1LDI1LDAsMSwxLDI1LTI1QTI1LDI1LDAsMCwxLDcwLjg3LDk1Ljg3WiIvPjwvc3ZnPg==");
+            /*            background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNDEuNzMiIGhlaWdodD0iMTQxLjczIiB2aWV3Qm94PSIwIDAgMTQxLjczIDE0MS43MyI+PGRlZnM+PHN0eWxlPi5he2ZpbGw6I2YxODcxMztzdHJva2U6IzAwMDtzdHJva2Utd2lkdGg6MnB4O308L3N0eWxlPjwvZGVmcz48dGl0bGU+cGljdG9ncmFtbWVzPC90aXRsZT48cGF0aCBjbGFzcz0iYSIgZD0iTTcwLjg3LDU5Ljk0QTEwLjkzLDEwLjkzLDAsMSwwLDgxLjc5LDcwLjg3LDEwLjk0LDEwLjk0LDAsMCwwLDcwLjg3LDU5Ljk0WiIvPjxwYXRoIGNsYXNzPSJhIiBkPSJNMTM3LjYsNjcuOGExMjEuMiwxMjEuMiwwLDAsMC0xOS4zNC0xNy42OWMtMTUuNzctMTEuNjQtMzIuMTUtMTcuOC00Ny4zOS0xNy44cy0zMS42Myw2LjE2LTQ3LjQsMTcuOEExMjEuNzQsMTIxLjc0LDAsMCwwLDQuMTMsNjcuOGE0LjgxLDQuODEsMCwwLDAsMCw2LjEzQTEyMS4yLDEyMS4yLDAsMCwwLDIzLjQ3LDkxLjYyYzE1Ljc3LDExLjY1LDMyLjE2LDE3LjgsNDcuNCwxNy44czMxLjYyLTYuMTUsNDcuMzktMTcuOEExMjAuNjcsMTIwLjY3LDAsMCwwLDEzNy42LDczLjkzLDQuODEsNC44MSwwLDAsMCwxMzcuNiw2Ny44Wk03MC44Nyw5NS44N2EyNSwyNSwwLDEsMSwyNS0yNUEyNSwyNSwwLDAsMSw3MC44Nyw5NS44N1oiLz48L3N2Zz4=");*/
+            background-size: contain;
+        }
+
+        .eye {
+            background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNDEuNzMiIGhlaWdodD0iMTQxLjczIiB2aWV3Qm94PSIwIDAgMTQxLjczIDE0MS43MyI+PGRlZnM+PHN0eWxlPi5he2ZpbGw6IzAxMDEwMTt9LmJ7ZmlsbDpub25lO3N0cm9rZTojMDEwMTAxO3N0cm9rZS1taXRlcmxpbWl0OjEwO3N0cm9rZS13aWR0aDoxNnB4O308L3N0eWxlPjwvZGVmcz48dGl0bGU+cGljdG9ncmFtbWVzPC90aXRsZT48cGF0aCBjbGFzcz0iYSIgZD0iTTcwLjg3LDU5Ljk0QTEwLjkzLDEwLjkzLDAsMSwwLDgxLjc5LDcwLjg3LDEwLjk0LDEwLjk0LDAsMCwwLDcwLjg3LDU5Ljk0WiIvPjxwYXRoIGQ9Ik0xMzcuNiw2Ny44YTEyMS4yLDEyMS4yLDAsMCwwLTE5LjM0LTE3LjY5Yy0xNS43Ny0xMS42NC0zMi4xNS0xNy44LTQ3LjM5LTE3LjhzLTMxLjYzLDYuMTYtNDcuNCwxNy44QTEyMS43NCwxMjEuNzQsMCwwLDAsNC4xMyw2Ny44YTQuODEsNC44MSwwLDAsMCwwLDYuMTNBMTIxLjIsMTIxLjIsMCwwLDAsMjMuNDcsOTEuNjJjMTUuNzcsMTEuNjUsMzIuMTYsMTcuOCw0Ny40LDE3LjhzMzEuNjItNi4xNSw0Ny4zOS0xNy44QTEyMC42NywxMjAuNjcsMCwwLDAsMTM3LjYsNzMuOTMsNC44MSw0LjgxLDAsMCwwLDEzNy42LDY3LjhaTTcwLjg3LDk1Ljg3YTI1LDI1LDAsMSwxLDI1LTI1QTI1LDI1LDAsMCwxLDcwLjg3LDk1Ljg3WiIvPjxwYXRoIGNsYXNzPSJiIiBkPSJNMTYsMTIzLjE0LDEyNS43MSwxOC41OSIvPjwvc3ZnPg==");
+            background-size: contain;
+        }
+
+        li:hover .eye {
+            opacity: 0.6;
+        }
+
+        li .eye:hover {
+            opacity: 0.8;
+            filter: brightness(1.1)
+        }
+
+        .warning {
+            width: 23px;
+            height: 25px;
+            position: absolute;
+            left: 5px;
+            top: 0px;
+            opacity: 0.9;
+            transition: opacity 150ms;
+        }
+
+        .warning {
+            background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNDEuNzMiIGhlaWdodD0iMTQxLjczIiB2aWV3Qm94PSIwIDAgMTQxLjczIDE0MS43MyI+PGRlZnM+PHN0eWxlPi5he2ZpbGw6I2ZkZDQ1NTtzdHJva2U6IzFlMWUxYztzdHJva2Utd2lkdGg6NHB4O30uYSwuYntzdHJva2UtbGluZWpvaW46cm91bmQ7fS5ie2ZpbGw6I2FmYWZhZjtzdHJva2U6IzAwMDtzdHJva2Utd2lkdGg6M3B4O308L3N0eWxlPjwvZGVmcz48dGl0bGU+cGljdG9ncmFtbWVzLTIwPC90aXRsZT48cG9seWdvbiBjbGFzcz0iYSIgcG9pbnRzPSIyLjEzIDEzMy44NyAxMzkuNjEgMTMzLjg3IDcwLjg3IDUuNzcgMi4xMyAxMzMuODciLz48cmVjdCBjbGFzcz0iYiIgeD0iNjYuMjgiIHk9IjQ1LjE1IiB3aWR0aD0iOS4xOCIgaGVpZ2h0PSI1Mi43OSIvPjxyZWN0IGNsYXNzPSJiIiB4PSI2Ni4yOCIgeT0iMTA4Ljk5IiB3aWR0aD0iOS4xOCIgaGVpZ2h0PSI5LjE4Ii8+PC9zdmc+");
+            background-size: contain;
+            background-repeat: no-repeat;
+        }
+
+        li:hover .warning {
+            opacity: 1;
+        }
+
+
+        /*  ------------------ CONTEXT MENU ------------------ */
+
+
+        /*@import url('https://fonts.googleapis.com/css2?family=Roboto');*/
+
+        /*body{
+            height: 350vh;
+            width:120vw;
+        }
+        */
+
+        .context_menu svg {
+            transform: translateY(5px);
+            display: block;
+            margin: auto;
+            max-height: 100%;
+            width: 20px;
+            fill: none;
+            stroke: #e2e2e1;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            stroke-width: 0.6px;
+        }
+
+        .context_menu .icon svg {
+            transform: translateY(1px);
+            stroke-width: 9px;
+            stroke: white;
+        }
+
+        .context_menu .lock .icon svg {
+            stroke: #888989;
+        }
+
+        .context_menu {
+            transform: scale(0.8);
+            display: none;
+            bottom: 0px;
+            box-shadow: rgba(0, 0, 0, 0.14) 0px 8px 10px 1px, rgba(0, 0, 0, 0.12) 0px 3px 14px 2px, rgba(0, 0, 0, 0.2) 0px 5px 5px -3px;
+            caret-color: rgb(32, 33, 36);
+            color: #E2E2E1;
+            column-rule-color: rgb(32, 33, 36);
+            cursor: default;
+            height: min-content;
+            left: 10px;
+            letter-spacing: 0.2px;
+            position: absolute;
+            right: 10px;
+            text-decoration: none solid rgb(32, 33, 36);
+            text-emphasis-color: rgb(32, 33, 36);
+            top: 10px;
+            transform-origin: 0px 0px;
+            user-select: none;
+            width: min-content;
+            z-index: 7;
+            background: none repeat scroll 0% 0% / auto padding-box border-box;
+            border-radius: 4px 4px 4px 4px;
+            background-color: #171719;
+            --background-menu-color: #171719;
+            font: 14px;
+            font-family: "Segoe UI";
+            outline: rgb(32, 33, 36) none 0px;
+            overflow: visible;
+            padding: 6px 0px;
+            border: 1px solid hsl(240, 4%, 13%);
+            z-index: 9999;
+        }
+
+        .context_menu .context_menu {
+            transform: scale(1);
+            position: absolute;
+            left: 100%;
+            top: -6px;
+            box-shadow: rgb(0 0 0 / 8%) 5px 2px 20px 0, rgb(0 0 0 / 10%) 0px 5px 11px;
+        }
+
+        .item {
+            padding: 7px 48px;
+            padding-right: 20px;
+            position: relative;
+            transition: background-color ease 125ms;
+        }
+
+        /*  [data-navtype="keyboard"] [data-navtype="mouse"] */
+        .context_menu[data-navtype="mouse"] .item:hover,
+        .item:focus-within,
+        .context_menu[data-navtype="keyboard"] .item.selected {
+            background-color: #303031;
+            --background-menu-color: #303031;
+        }
+
+        .item .sous-menu {
+            display: none;
+            width: 100%;
+        }
+
+        .context_menu[data-navtype="mouse"] .item:hover .sous-menu,
+        .item:focus-within .sous-menu,
+        .context_menu[data-navtype="keyboard"] .item.selected .sous-menu {
+            display: block;
+        }
+
+        .item-content {
+            align-items: center;
+            caret-color: #E2E2E1;
+            color: #E2E2E1;
+            column-rule-color: #E2E2E1;
+            cursor: pointer;
+            display: flex;
+            height: 20px;
+            justify-content: space-between;
+            left: 0px;
+            letter-spacing: 0.2px;
+            position: relative;
+            right: 0px;
+            text-decoration: none solid #E2E2E1;
+            text-emphasis-color: #E2E2E1;
+            top: 0px;
+            transform-origin: 115px 10px;
+            user-select: none;
+            white-space: nowrap;
+            border: 0px none rgb(32, 33, 36);
+            font: 14px;
+            font-family: "Segoe UI";
+        }
+
+        .icon {
+            background-position: 50% 50%;
+            bottom: 0px;
+            caret-color: #E2E2E1;
+            color: #E2E2E1;
+            column-rule-color: #E2E2E1;
+            cursor: pointer;
+            height: 20px;
+            left: -32px;
+            letter-spacing: 0.2px;
+            opacity: 0.55;
+            perspective-origin: 10px 10px;
+            position: absolute;
+            right: 232px;
+            text-decoration: none solid rgb(32, 33, 36);
+            text-emphasis-color: rgb(32, 33, 36);
+            top: 0px;
+            transform-origin: 10px 10px;
+            user-select: none;
+            vertical-align: middle;
+            white-space: nowrap;
+            width: 20px;
+            background-color: rgba(0, 0, 0, 0);
+            background-repeat: no-repeat;
+            background-attachment: scroll;
+            background-size: 50% 50% / 20px;
+            background-clip: padding-box border-box;
+            font: 14px;
+            font-family: "Segoe UI";
+            list-style: outside none none;
+            margin: 0px 12px 0px 0px;
+        }
+
+        .span-more {
+            background-position: 50% 50%;
+            block-size: 20px;
+            caret-color: white;
+            color: white;
+            column-rule-color: white;
+            cursor: pointer;
+            display: block;
+            height: 20px;
+            letter-spacing: 0.2px;
+            min-height: auto;
+            min-width: auto;
+            opacity: 0.5;
+            perspective-origin: 10px 10px;
+            right: 10px;
+            text-align: right;
+            transform-origin: 10px 10px;
+            user-select: none;
+            white-space: nowrap;
+            width: 20px;
+            background: white url("https://www.gstatic.com/images/icons/material/system/1x/arrow_right_black_20dp.png") no-repeat scroll 50% 50% / 20px padding-box border-box;
+            font: 0px / 20px;
+            list-style: outside none none;
+            margin: 0px -24px 0px 0px;
+            transition: all 125ms ease 0s;
+        }
+
+        .lock .item-content {
+            caret-color: #888989;
+            color: #888989;
+            column-rule-color: #888989;
+        }
+
+        /*
+                .lock .icon {
+                    opacity: 0.15;
+                }
+        */
+
+
+        .item_hr {
+            border-top: 1px solid hsl(240, 4%, 20%);
+        }
+
+        .context_menu.isleft .context_menu {
+            left: -100%;
+        }
+
+        .context_menu a {
+            text-decoration: none;
+            color: inherit;
+            pointer-events: none;
+        }
+
+        .context_menu .lock a {
+            cursor: default;
+        }
+
+        .nolayermessage {
+            display: none;
+        }
+
+        .nolayermessage p {
+            font-size: 14px;
+            font-family: "Segoe UI";
+            color: #888989;
+        }
+
+        body:has(ul:empty) .nolayermessage {
+            display: block;
+        }
+
+        body:has(ul:empty) {
+            overflow: hidden;
+        }
+
+
+        /*  ------------------ CONTEXT MENU ------------------ */
+
+        ul.condensed .layer_main_div {
+            height: 109px;
+        }
+
+        ul.small .layer_main_div {
+            height: 60px;
+        }
+
+
+        ul.condensed .layer_content,
+        ul.small .layer_content {
+            background: linear-gradient(0deg, rgba(50, 50, 50, 0.8) 0%, rgba(30, 30, 30, 0) 120%);
+        }
+
+
+
+
+        ul.list div,
+        ul.list_alternat div {
+            background: none !important;
+            border: none !important;
+            /* list-style: auto!important; */
+            min-height: 0 !important;
+            /* height: 59px!important; */
+            height: min-content !important;
+            padding: 0px !important;
+        }
+
+        ul.list .select p,
+        ul.list_alternat .select p {
+            color: #F18712 !important;
+        }
+
+        ul.list li:has(.select),
+        ul.list_alternat li:has(.select) {
+            color: #F18712 !important;
+        }
+
+        ul.list li,
+        ul.list_alternat li {
+            list-style: disc !important;
+            margin-left: 15px;
+        }
+
+        ul.list_alternat li:nth-child(even) {
+            background-color: #313131;
+        }
+
+        ul.list .zoom,
+        ul.list_alternat .zoom {
+            display: none;
+        }
+
+        ul.list .layer_texte,
+        ul.list_alternat .layer_texte {
+            position: initial;
+        }
+
+        .menu.item.shiftkeydownrequired {
+            display: none;
+        }
+
+        .context_menu.shiftkeydown:not([data-layer_binding="0"]) .menu.item.shiftkeydownrequired {
+            display: block;
+        }
+
+    </style>
+</head>
+
+<body>
+    <div class="nolayermessage">
+        <p>%layerMessageNoData%</p><br />
+        <p>%layerMessageHowToAddLayer%</p>
+    </div>
+    <!--  ------------------ CONTENT ------------------ -->
+    <!--htmllayerplaceholder-->
+    <!--  ------------------ CONTENT ------------------ -->
+    <!--  ------------------ CONTEXT MENU ------------------ -->
+
+    <div class="context_menu" data-navtype="mouse">
+        <!--
+                <div class="menu item" id="rendre_courant">
+                    <div class="item-content">
+                        <div class="icon">
+                            <svg width="141.73" height="141.73" version="1.1" viewBox="0 0 141.73 141.73" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M11.73,25.59,71.08,81.68,130,25.59" />
+                                <path d="M11.73,67.28l59.35,56.08L130,67.28" />
+                            </svg>
+                        </div>
+                        <a href="#">Rendre le calque courant</a>
+                    </div>
+                </div>
+        -->
+        <div class="menu item" id="ajouter_favori">
+            <div class="item-content">
+                <div class="icon">
+                    <svg width="141.73" height="141.73" version="1.1" viewBox="0 0 141.73 141.73" xmlns="http://www.w3.org/2000/svg">
+
+                        <polygon points="70.87 11.26 90.23 50.5 133.54 56.8 102.2 87.34 109.6 130.47 70.87 110.11 32.13 130.47 39.53 87.34 8.19 56.8 51.5 50.5" />
+                    </svg>
+                </div>
+                <a href="#">%layerContextMenuAddFavorite%</a>
+            </div>
+        </div>
+        <div class="menu item" id="retirer_favori">
+            <div class="item-content">
+                <div class="icon">
+                    <svg width="141.73" height="141.73" version="1.1" viewBox="0 0 141.73 141.73" xmlns="http://www.w3.org/2000/svg">
+                        <polygon points="70.87 11.26 90.23 50.5 133.54 56.8 102.2 87.34 109.6 130.47 70.87 110.11 32.13 130.47 39.53 87.34 8.19 56.8 51.5 50.5" />
+                        <path d="m9.6791 133.61 125.83-119.95"></path>
+                    </svg>
+                </div>
+                <a href="#">%layerContextMenuRemoveFavorite%</a>
+            </div>
+        </div>
+
+        <div class="menu item" id="afficher_calque">
+            <div class="item-content">
+                <div class="icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="141.73" height="141.73" viewBox="0 0 141.73 141.73">
+                        <path d="M70.87,59.94A10.93,10.93,0,1,0,81.79,70.87,10.94,10.94,0,0,0,70.87,59.94Z" />
+                        <path d="M137.6,67.8a121.2,121.2,0,0,0-19.34-17.69c-15.77-11.64-32.15-17.8-47.39-17.8s-31.63,6.16-47.4,17.8A121.74,121.74,0,0,0,4.13,67.8a4.81,4.81,0,0,0,0,6.13A121.2,121.2,0,0,0,23.47,91.62c15.77,11.65,32.16,17.8,47.4,17.8s31.62-6.15,47.39-17.8A120.67,120.67,0,0,0,137.6,73.93,4.81,4.81,0,0,0,137.6,67.8ZM70.87,95.87a25,25,0,1,1,25-25A25,25,0,0,1,70.87,95.87Z" />
+                    </svg>
+                </div>
+                <a href="#">%layerContextMenuShowLayer%</a>
+            </div>
+        </div>
+        <div class="menu item" id="masquer_calque">
+            <div class="item-content">
+                <div class="icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="141.73" height="141.73" viewBox="0 0 141.73 141.73">
+                        <path d="M70.87,59.94A10.93,10.93,0,1,0,81.79,70.87,10.94,10.94,0,0,0,70.87,59.94Z" />
+                        <path d="M137.6,67.8a121.2,121.2,0,0,0-19.34-17.69c-15.77-11.64-32.15-17.8-47.39-17.8s-31.63,6.16-47.4,17.8A121.74,121.74,0,0,0,4.13,67.8a4.81,4.81,0,0,0,0,6.13A121.2,121.2,0,0,0,23.47,91.62c15.77,11.65,32.16,17.8,47.4,17.8s31.62-6.15,47.39-17.8A120.67,120.67,0,0,0,137.6,73.93,4.81,4.81,0,0,0,137.6,67.8ZM70.87,95.87a25,25,0,1,1,25-25A25,25,0,0,1,70.87,95.87Z" />
+                        <path d="M8,130.84,133.78,10.89" />
+                    </svg>
+                </div>
+                <a href="#">%layerContextMenuHideLayer%</a>
+            </div>
+        </div>
+        <div class="item_hr"></div>
+        <div class="menu item" id="modifier_calque">
+            <div class="item-content">
+                <div class="icon">
+                    <svg width="141.73" height="141.73" version="1.1" viewBox="0 0 141.73 141.73" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M5.81,135.14Q12,120.2,18.22,105.26L87.51,35l17.83,18.07L35.58,122.85Z" />
+                        <path d="m87.51 35 29.64-30.23 18.68 18.07-30.49 30.24z" />
+                        <path d="m18.22 105.26 17.36 17.59" />
+                    </svg>
+                </div>
+                <a href="#">%layerContextMenuEditLayer%</a>
+            </div>
+        </div>
+        <div class="menu item" id="supprimer_cache_calque">
+            <div class="item-content">
+                <div class="icon">
+                    <svg width="141.73" height="141.73" version="1.1" viewBox="0 0 141.73 141.73" xmlns="http://www.w3.org/2000/svg">
+                        <ellipse cx="44.6" cy="26.1" rx="41.3" ry="18.4" />
+                        <path d="M61.1,100.9c-5.1,1-10.7,1.5-16.5,1.5 c-22.8,0-41.3-8.2-41.3-18.4V26.1v28c0,10.2,18.5,18.4,41.3,18.4s41.3-8.2,41.3-18.4v24.6V26.1" />
+                        <path d="M123.4,40.6c2.4-3.1,7.3-3.5,11.1-1.2 c4.2,2.5,6.2,7.7,4.1,11.5c-8.4,12.5-16.8,25-25.2,37.5L98.2,78.1L123.4,40.6z" />
+                        <path d="M86.2,123.4 c2.3-3.5,5.3-7.8,7.6-11.3c0.1,4.5,0.5,10.9,0.6,15.4c3.7,1.5,7.5,2.9,11.2,4.4c0.1-0.7,2.4-14,3.9-17.4c0.4-0.9,8-16.9,7.7-19.6
+		c-0.4-3-2.2-5.2-3.6-6.5L98.2,78.1c-1.5-1-4.1-2.4-7.1-2.1c-2.7,0.2-16.7,11-17.6,11.6c-3,2.2-15.6,7.2-16.2,7.5
+		c2.2,3.3,4.4,6.7,6.6,10c4.4-0.9,10.7-1.8,15.2-2.7c-2.9,3-6.5,6.9-9.5,9.8L86.2,123.4z" />
+                    </svg>
+                </div>
+                <a href="#">%layerContextMenuEmptyLayerCache%</a>
+            </div>
+        </div>
+        <div class="item_hr"></div>
+        <div class="menu item" id="ajouter_calque">
+            <div class="item-content">
+                <div class="icon">
+                    <svg width="141.73" height="141.73" version="1.1" viewBox="0 0 141.73 141.73" xmlns="http://www.w3.org/2000/svg">
+                        <line x1="71" y1="134" x2="71" y2="8" />
+                        <line x1="8" y1="71" x2="134" y2="71" />
+                    </svg>
+                </div>
+                <a href="#">%layerContextMenuAddLayer%</a>
+            </div>
+        </div>
+        <div class="menu item shiftkeydownrequired" id="ajouter_calque_template">
+            <div class="item-content">
+                <div class="icon">
+                    <svg width="141.73" height="141.73" version="1.1" viewBox="0 0 141.73 141.73" xmlns="http://www.w3.org/2000/svg">
+                        <line x1="71" y1="134" x2="71" y2="8" />
+                        <line x1="8" y1="71" x2="134" y2="71" />
+                    </svg>
+                </div>
+                <a href="#">%layerContextMenuAddLayerFromTemplate%</a>
+            </div>
+        </div>
+        <!--        <div class="item_hr"></div>-->
+        <div class="menu item" id="basculer_affichage_showmasque">
+            <div class="item-content">
+                <div class="icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="141.73" height="141.73" viewBox="0 0 141.73 141.73">
+                        <path d="M70.87,59.94A10.93,10.93,0,1,0,81.79,70.87,10.94,10.94,0,0,0,70.87,59.94Z" />
+                        <path d="M137.6,67.8a121.2,121.2,0,0,0-19.34-17.69c-15.77-11.64-32.15-17.8-47.39-17.8s-31.63,6.16-47.4,17.8A121.74,121.74,0,0,0,4.13,67.8a4.81,4.81,0,0,0,0,6.13A121.2,121.2,0,0,0,23.47,91.62c15.77,11.65,32.16,17.8,47.4,17.8s31.62-6.15,47.39-17.8A120.67,120.67,0,0,0,137.6,73.93,4.81,4.81,0,0,0,137.6,67.8ZM70.87,95.87a25,25,0,1,1,25-25A25,25,0,0,1,70.87,95.87Z" />
+                        <path d="M8,130.84,133.78,10.89" />
+                    </svg>
+                </div>
+                <a href="#">%layerContextMenuShowHiddenLayer%</a>
+            </div>
+        </div>
+        <div class="menu item" id="basculer_affichage_hidemasque">
+            <div class="item-content">
+                <div class="icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="141.73" height="141.73" viewBox="0 0 141.73 141.73">
+                        <path d="M70.87,59.94A10.93,10.93,0,1,0,81.79,70.87,10.94,10.94,0,0,0,70.87,59.94Z" />
+                        <path d="M137.6,67.8a121.2,121.2,0,0,0-19.34-17.69c-15.77-11.64-32.15-17.8-47.39-17.8s-31.63,6.16-47.4,17.8A121.74,121.74,0,0,0,4.13,67.8a4.81,4.81,0,0,0,0,6.13A121.2,121.2,0,0,0,23.47,91.62c15.77,11.65,32.16,17.8,47.4,17.8s31.62-6.15,47.39-17.8A120.67,120.67,0,0,0,137.6,73.93,4.81,4.81,0,0,0,137.6,67.8ZM70.87,95.87a25,25,0,1,1,25-25A25,25,0,0,1,70.87,95.87Z" />
+                    </svg>
+                </div>
+                <a href="#">%layerContextMenuHideHiddenLayer%</a>
+            </div>
+        </div>
+        <div class="menu item" id="actualiser_panel">
+            <div class="item-content">
+                <div class="icon">
+                    <svg version="1.2" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 141.7 141.7" overflow="visible" xml:space="preserve">
+                        <g id="Calque_2">
+                            <path d="
+		M135.5,61.9c5.2,36.9-20.5,71-57.4,76.2c-0.4,0-0.7,0.1-1.1,0.1C39.9,140.5,7.9,112.2,5.7,75c-0.1-1.8-0.1-3.5-0.1-5.3
+		C6.9,33.8,35.5,5,71.3,3.4c21.2,0.6,41,10.8,53.8,27.8l2.9,4.4H95.9" />
+                        </g>
+                    </svg>
+                </div>
+                <a href="#">%layerContextMenuRefresh%</a>
+            </div>
+        </div>
+    </div>
+    <!--  ------------------ CONTEXT MENU ------------------ -->
+
+    <script>
+        //https://codepen.io/SioGabx/pen/wvxNaxg
+
+        const selectedItemClass = "inSelection";
+        const selectedHighlightItemClass = "inSelectionHighlight";
+        const referenceItemClass = "isReference";
+
+        //Add click event on all items
+        document.querySelectorAll("li").forEach((element) => {
+            element.addEventListener("click", select);
+        });
+
+
+        var lastelement;
+        //on click
+        function select(event) {
+            if (event != null) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+
+            hide_context_menu(null);
+            let eventTarget = event.target.closest("li");
+            if (eventTarget.tagName.toLowerCase() != "li") {
+                return;
+            }
+
+
+            //is selection additive or not
+            let dataSelectIsAdditiveAttribute = eventTarget.parentElement.getAttribute(
+                "data-select-isAdditive"
+            );
+            let isAdditive =
+                dataSelectIsAdditiveAttribute == "true" ||
+                dataSelectIsAdditiveAttribute == null;
+            //get all li element inside parent element
+            let ulQuerySelectorItems = eventTarget.parentElement.querySelectorAll("li");
+            //get Array from querySelector to get element with a index.
+            let NodeArray = Array.prototype.slice.call(ulQuerySelectorItems);
+            //get Index of the current target element.
+            let Index = NodeArray.indexOf(eventTarget);
+            //get LastIndexClick from html
+            let lastIndexClick = NodeArray.indexOf(
+                eventTarget.parentElement.querySelector("li." + referenceItemClass)
+            );
+            //if no element is found with reference class
+            if (lastIndexClick == undefined) {
+                lastIndexClick = -1;
+            }
+            //remove each element with class reference
+            NodeArray.forEach((element) => {
+                element.classList.remove(referenceItemClass);
+                element.classList.remove(selectedHighlightItemClass);
+            });
+            //if CTRL key is not down then we remove all selected class.
+            if (!event.ctrlKey) {
+                NodeArray.forEach((element) => {
+                    element.classList.remove(selectedItemClass);
+                });
+            }
+
+            //if shiftKey is down, then we are doing multiple selection at once.
+
+            if (!event.shiftKey && eventTarget.classList.contains(selectedItemClass)) {
+                //if element has arealdy the selected class, then that mean we want to remove it. Set for the next shift that we want to remove tag and not add
+                eventTarget.classList.remove(selectedItemClass);
+                //save to the dom :
+                NodeArray[Index].classList.add(referenceItemClass);
+                eventTarget.parentElement.setAttribute("data-select-isAdditive", false);
+            } else {
+                if (!event.shiftKey) {
+                    //this mean that the element havent the selected classList = we want to add elements
+                    isAdditive = true;
+                }
+                let from = 0;
+                let to = 0;
+
+                if (event.shiftKey) {
+                    //get the range of elements between old click and new one if shift key is down
+                    from = Math.min(lastIndexClick, Index);
+                    to = Math.max(lastIndexClick, Index);
+                } else {
+                    from = Index;
+                    to = Index;
+                    lastIndexClick = Index;
+
+                    if (!event.ctrlKey || eventTarget.parentElement.querySelectorAll("." + selectedItemClass).length == 0)
+                        //Add select class to the click if it is simple (no CTRL + no SHIFT key press)
+                        try {
+                            document.querySelectorAll('.select').forEach(function(layer) {
+                                layer.classList.remove("select");
+                                lastelement = layer;
+                            });
+                            NodeArray[Index].classList.add("select");
+                            if (lastelement != NodeArray[Index]) {
+                                //Execute c#
+                                layer_Csharp_call_from_js.layer_set_current(parseInt(eventTarget.id))
+                            }
+                        } catch (error) {
+                            console.error(error);
+                        }
+
+
+                }
+
+                //save to the dom
+                eventTarget.parentElement.setAttribute("data-select-isAdditive", isAdditive);
+                if (lastIndexClick > -1) {
+                    NodeArray[lastIndexClick].classList.add(referenceItemClass);
+                }
+
+
+                //update class from range
+                for (let i = from; i <= to; i++) {
+                    if (!isAdditive && event.shiftKey && event.ctrlKey) {
+                        ulQuerySelectorItems[i].classList.remove(selectedItemClass);
+                    } else {
+                        ulQuerySelectorItems[i].classList.add(selectedItemClass);
+                    }
+                }
+            }
+            if (eventTarget.parentElement.querySelectorAll("." + selectedItemClass).length <= 1) {
+                return;
+            } else {
+                eventTarget.parentElement.querySelectorAll("." + selectedItemClass).forEach(function(element) {
+                    element.classList.add(selectedHighlightItemClass);
+                });
+            }
+        }
+
+
+        function getSelectedElements() {
+            let listOfSelectedElements = [];
+            document.querySelectorAll('.' + selectedItemClass).forEach(function(element) {
+                if (element.clientHeight > 0) {
+                    listOfSelectedElements.push(element);
+                }
+            });
+            return listOfSelectedElements;
+        }
+
+    </script>
+
+
+    <script>
+        function change_visibility(event, eye, id) {
+            if (event != null) {
+                event.stopPropagation();
+                event.preventDefault();
+            }
+
+            let isAddingAction;
+            if (eye.classList.contains("orange")) {
+                isAddingAction = false;
+            } else {
+                isAddingAction = true;
+            }
+
+            if (getSelectedElements().length > 1 && eye.closest("li").classList.contains(selectedItemClass)) {
+                getSelectedElements().forEach(function(element) {
+                    internal_change_visibility(element.querySelector(".eye"), element.id, isAddingAction);
+                });
+            } else {
+                internal_change_visibility(eye, id, isAddingAction);
+            }
+        }
+
+        function internal_change_visibility(eye, id, isAddingAction) {
+            let liElement = document.getElementById(id);
+            if (liElement.classList.contains("layerFiltered")) {
+                return;
+            }
+
+            if (isAddingAction) {
+                //C# ajouter au favoris
+                if (!eye.classList.contains("orange")) {
+                    eye.classList.add("orange")
+                }
+                if (!liElement.classList.contains("layerVisible")) {
+                    liElement.classList.add("layerVisible");
+                    liElement.classList.remove("layerHidden");
+                    liElement.classList.remove("layerHiddenStateProgress");
+                }
+
+                layer_Csharp_call_from_js.layer_visibility(parseInt(id), true)
+                eye.title = "%layerContextMenuHideLayer%";
+            } else {
+                //C# supprimer des favoris
+                if (eye.classList.contains("orange")) {
+                    eye.classList.remove("orange")
+                }
+                if (!liElement.classList.contains("layerHidden")) {
+                    liElement.classList.add("layerHiddenStateProgress");
+                    liElement.classList.remove("layerVisible");
+                }
+                layer_Csharp_call_from_js.layer_visibility(parseInt(id), false)
+                eye.title = "%layerContextMenuShowLayer%";
+
+                if (liElement.classList.contains("layerHiddenStateProgress")) {
+                    setTimeout(function() {
+                        liElement.classList.add("layerHidden");
+                        liElement.classList.remove("layerHiddenStateProgress");
+                    }, 150);
+                }
+            }
+        }
+
+        function show_warning(event, id) {
+            if (event != null) {
+                event.stopPropagation();
+                event.preventDefault();
+            }
+            layer_Csharp_call_from_js.layer_show_warning(parseInt(id));
+        }
+
+        function ajouter_aux_favoris(event, star, id) {
+            if (event != null) {
+                event.stopPropagation();
+                event.preventDefault();
+            }
+            let isAddingAction;
+            if (star.classList.contains("orange")) {
+                isAddingAction = false;
+            } else {
+                isAddingAction = true;
+            }
+
+            if (getSelectedElements().length > 1) {
+                getSelectedElements().forEach(function(element) {
+                    internal_ajouter_aux_favoris(element.querySelector(".star"), element.id, isAddingAction);
+                });
+            } else {
+                internal_ajouter_aux_favoris(star, id, isAddingAction);
+            }
+        }
+
+        function internal_ajouter_aux_favoris(star, id, isAddingAction) {
+            if (isAddingAction) {
+                //C# ajouter au favoris
+                if (!star.classList.contains("orange")) {
+                    star.classList.add("orange")
+                }
+                layer_Csharp_call_from_js.layer_favorite(parseInt(id), true)
+                star.title = "%layerContextMenuRemoveFavorite%";
+            } else {
+                //C# supprimer des favoris
+                if (star.classList.contains("orange")) {
+                    star.classList.remove("orange")
+                }
+                layer_Csharp_call_from_js.layer_favorite(parseInt(id), false)
+                star.title = "%layerContextMenuAddFavorite%";
+            }
+        }
+
+        function selectionner_calque_by_id(id, scroll = true) {
+            console.log("selectionner_calque_by_id" + id);
+            document.querySelectorAll('.select').forEach(function(layer) {
+                layer.classList.remove("select");
+            });
+            document.querySelectorAll('.inSelection').forEach(function(layer) {
+                layer.classList.remove(selectedItemClass);
+                layer.classList.remove(referenceItemClass);
+                layer.classList.remove(selectedHighlightItemClass);
+            });
+            let element = document.getElementById(id);
+            element.classList.add("select");
+            element.classList.add(selectedItemClass);
+            element.classList.add(referenceItemClass);
+
+            if (scroll && document.body.getBoundingClientRect().y == 0) {
+                element.scrollIntoView({
+                    block: 'center',
+                    behavior: 'smooth'
+                });
+            }
+            if (lastelement != element) {
+                layer_Csharp_call_from_js.layer_set_current(parseInt(id));
+                lastelement = element;
+            }
+
+        }
+
+    </script>
+    <script>
+        function searchAndUpdatePreview(originalSearchedText) {
+            search(originalSearchedText);
+            checkVisibility();
+            UpdatePreview();
+        }
+
+        function search(originalSearchedText) {
+            let searchedText = originalSearchedText;
+            console.log("originalSearchedText : " + originalSearchedText)
+            let quotedStrings = extractQuotedStrings(searchedText);
+            quotedStrings.forEach((quotedString) => {
+                searchedText = searchedText.replace(quotedString, encodeURI(quotedString.slice(1, quotedString.length - 1)));
+            });
+
+            const searchClasses = [
+                ["%searchLayerFiltersSite%", "layer_website"],
+                ["%searchLayerFiltersCategory%", "layer_category"],
+                ["%searchLayerFiltersZoom%", "zoom"],
+                ["%searchLayerFiltersName%", "display_name"]
+            ];
+
+            //specifier search
+            let searchArguments = searchedText.split(' ');
+            let filteredLayers = searchWithSpecifier(searchClasses, searchArguments);
+
+            //delete non query terms
+            searchArguments.slice().forEach(function(argument) {
+                searchClasses.forEach(function(item) {
+                    let specifier = item[0];
+                    let SpecifierIdentifier = specifier + ":";
+                    if (argument.startsWith(SpecifierIdentifier)) {
+                        let index = searchArguments.indexOf(argument);
+                        if (index > -1) {
+                            searchArguments.splice(index, 1);
+                        }
+                    }
+                });
+            });
+
+            console.log(searchArguments);
+
+            //regular search
+            let li = document.getElementsByTagName('li');
+            Array.prototype.forEach.call(li, function(liElement) {
+                let isVisible = true;
+                if (filteredLayers.includes(liElement.id)) {
+                    paragraphe = liElement.getElementsByTagName("p");
+                    Array.prototype.forEach.call(searchArguments, function(searchArgument) {
+                        let decodedSearchArgument = decodeURI(searchArgument);
+                        let isFound = false;
+                        Array.prototype.forEach.call(paragraphe, function(pElement) {
+                            if (contains(pElement.innerText, removeStartAndEndQuotes(decodedSearchArgument))) {
+                                isFound = true;
+                            }
+                        });
+                        if (!isFound) {
+                            //delete item from filteredLayers
+                            const index = filteredLayers.indexOf(liElement.id);
+                            if (index !== -1) {
+                                filteredLayers.splice(index, 1);
+                            }
+                            return;
+                        }
+                    });
+                }
+            });
+
+            applySearch(filteredLayers);
+            return filteredLayers;
+        }
+
+        function applySearch(filteredLayers) {
+            let li = document.getElementsByTagName('li');
+            Array.prototype.forEach.call(li, function(liElement) {
+                let ID = liElement.id;
+                if (filteredLayers.includes(ID)) {
+                    showLi(liElement);
+                } else {
+                    hideLi(liElement);
+                }
+            });
+        }
+
+        function searchWithSpecifier(searchClasses, searchArguments) {
+            let filteredLi = [];
+            let li = document.getElementsByTagName('li');
+            Array.prototype.forEach.call(li, function(liElement) {
+                // code pour manipuler chaque élément li ici
+
+                let HasFoundSomething = true;
+                Array.prototype.forEach.call(searchArguments, function(searchArgument) {
+                    searchClasses.forEach(function(item) {
+                        let specifier = item[0];
+                        let classToSearch = item[1];
+
+                        // faire la recherche en utilisant le spécifieur et la classe appropriée
+                        let SpecifierIdentifier = specifier + ":";
+                        if (searchArgument.startsWith(SpecifierIdentifier)) {
+                            searchArgument = searchArgument.replace(SpecifierIdentifier, "");
+                            // Sélectionnez tous les éléments li avec la classe
+                            let specifierSelector = liElement.getElementsByClassName(classToSearch);
+
+                            // Bouclez à travers tous les éléments sélectionnés
+                            Array.prototype.forEach.call(specifierSelector, function(specifierElement) {
+                                // Faites quelque chose avec chaque élément ici
+                                let decodedSearchArgument = decodeURI(searchArgument);
+                                if (!contains(specifierElement.innerHTML, removeStartAndEndQuotes(decodedSearchArgument))) {
+                                    HasFoundSomething = false;
+                                    //} else {
+                                    //console.log('Found "' + decodedSearchArgument + '" inside ' + specifier + " in layerid=" + liElement.id);
+                                }
+                            });
+                        }
+                    });
+                });
+                if (HasFoundSomething === true) {
+                    filteredLi.push(liElement.id);
+                }
+
+            });
+            return filteredLi;
+        }
+
+        function extractQuotedStrings(texte) {
+            let start = -1;
+            let end = -1;
+            let openedQuotes = 0;
+            const matches = [];
+
+            for (let i = 0; i < texte.length; i++) {
+                const currentChar = texte[i];
+                const previousChar = i > 0 ? texte[i - 1] : null;
+                const nextChar = i < texte.length - 1 ? texte[i + 1] : null;
+
+                if (currentChar === '"' && (previousChar === ' ' || previousChar === ':' || previousChar === null)) {
+                    if (openedQuotes === 0) {
+                        start = i;
+                    }
+                    openedQuotes++;
+                } else if (currentChar === '"' && (nextChar === ' ' || nextChar === null)) {
+                    openedQuotes--;
+                    if (openedQuotes === 0) {
+                        end = i;
+                        matches.push(texte.substring(start, end + 1));
+                        start = -1;
+                        end = -1;
+                    }
+                }
+            }
+
+            console.log(matches);
+
+            return matches;
+        }
+
+        function showLi(li) {
+            if (li.classList.contains("hidden")) {
+                li.classList.add("visible");
+                li.classList.remove("hidden");
+            }
+        }
+
+        function hideLi(li) {
+            li.classList.remove("visible");
+            li.classList.add("hidden");
+        }
+
+        function contains(str, substring) {
+            return cleantxt(str).indexOf(cleantxt(substring)) !== -1;
+        }
+
+        function cleantxt(source) {
+            const replacements = {
+                "é": "e",
+                "è": "e",
+                "ê": "e",
+                "ô": "o",
+                "î": "i",
+                "à": "a",
+                "â": "a",
+                "æ": "ae",
+                "ë": "e",
+                "ï": "i",
+                "œ": "oe",
+                "ù": "u",
+                "û": "u",
+                "ü": "u",
+                "µ": "u",
+                "ç": "c",
+
+                "”": '"',
+                "“": '"',
+                "‟": '"',
+                "″": '"',
+                "〞": '"',
+                "«": '"',
+                "»": '"',
+                "❞": '"',
+                "„": '"',
+                "¨": '"',
+
+                "´": "'",
+                "`": "'",
+                "’": "'",
+                "‘": "'",
+            };
+            let source_clean = source.toLowerCase();
+            for (const [key, value] of Object.entries(replacements)) {
+                source_clean = source_clean.replaceAll(key, value);
+            }
+            return source_clean;
+        }
+
+        function StartAndEndQuotes(quotedString) {
+            return quotedString.startsWith('"') && quotedString.endsWith('"');
+        }
+
+        function removeStartAndEndQuotes(quotedString) {
+            if (StartAndEndQuotes(quotedString)) {
+                return quotedString.slice(1, quotedString.length - 1);
+            } else {
+                return quotedString;
+            }
+        }
+
+    </script>
+
+    <script>
+        function StartObserving() {
+            checkVisibility();
+            UpdatePreview();
+        }
+
+        //let isScrolling = false;
+        //let scrollTimeout;
+        //window.addEventListener("scroll", () => {
+        //    clearTimeout(scrollTimeout);
+
+        //    // Set a new scroll timeout
+        //    scrollTimeout = setTimeout(function () {
+        //        isScrolling = false;
+        //        StartObserving();
+        //    }, 200);
+
+        //});
+
+        let lastScrollTop = 0;
+        let lastTimestamp = Date.now();
+        let scrollSpeed = 0;
+        let scrollTimeout = null;
+
+        function measureScrollSpeed() {
+            const currentScrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            const currentTimestamp = Date.now();
+
+            const distance = Math.abs(currentScrollTop - lastScrollTop);
+            const timeElapsed = currentTimestamp - lastTimestamp;
+
+            scrollSpeed = distance / timeElapsed;
+            lastScrollTop = currentScrollTop;
+            lastTimestamp = currentTimestamp;
+            console.log("Vitesse de défilement :", scrollSpeed);
+
+            if (scrollSpeed < 1.8) {
+                clearTimeout(scrollTimeout);
+                StartObserving();
+            } else {
+                clearTimeout(scrollTimeout);
+                scrollTimeout = setTimeout(measureScrollSpeed, 150);
+            }
+        }
+
+        window.addEventListener("scroll", function() {
+            measureScrollSpeed();
+        });
+
+        measureScrollSpeed();
+
+        //        function InternalUpdatePreview(element_fiup) {
+        //            if (document.querySelector("ul").classList.value == "list" || document.querySelector("ul").classList.value == "list_alternat") {
+        //                return;
+        //            }
+        //            if (element_fiup !== null) {
+        //                if (element_fiup.classList.contains("hidden") || element_fiup.classList.contains("displaynone")) {
+        //                    return;
+        //                }
+        //                let mainDiv = element_fiup.querySelector(".layer_main_div");
+        //                let id = parseInt(element_fiup.id);
+        //
+        //                layer_Csharp_call_from_js.gettilepreviewurlfromid(id).then(function (urlResultString) {
+        //                    //console.log("urlResult : " + urlResultString);
+        //                    if (element_fiup.classList.contains("hidden") || element_fiup.classList.contains("displaynone")) {
+        //                        return;
+        //                    }
+        //                    let urlResult = JSON.parse(urlResultString);
+        //                    let css_opti = "url(\"" + urlResult.preview.frontImage.url + "\")";
+        //                    if ((mainDiv.style.backgroundImage != css_opti || mainDiv.querySelector(".layer_main_div_background_image").style.backgroundImage == "") && (urlResult != "") && element_fiup.classList.contains("inview")) {
+        //                        let fallbackurl = urlResult.previewFallback.frontImage.url;
+        //                        let fallbackbbackgroundurl = urlResult.previewFallback.frontImage.url;
+        //                        const img = new Image(); // width, height
+        //                        img.src = urlResult.preview.frontImage.url;
+        //                        img.addEventListener('load', function () {
+        //                            //console.log("Preview : " + id + "loaded");
+        //                            mainDiv.style.backgroundImage = "url(" + img.src + ")";
+        //                            if (element_fiup.classList.contains("inview")) {
+        //                                mainDiv.querySelector(".layer_main_div_background_image").style.backgroundImage = "url(" + urlResult.preview.backgroundImage.url + ")";
+        //                                mainDiv.style.setProperty("--opacity_preview_background", "");
+        //                            }
+        //                        });
+        //                        img.addEventListener('error', function () {
+        //                            if (fallbackurl === undefined) {
+        //                                emptyPreview();
+        //                            } else {
+        //                                const fallbackimg = new Image();
+        //                                fallbackimg.src = fallbackurl;
+        //                                fallbackimg.addEventListener('load', function () {
+        //                                    //console.log("Preview : " + id + "loaded");
+        //                                    mainDiv.style.backgroundImage = "url(" + fallbackimg.src + ")";
+        //                                    if (element_fiup.classList.contains("inview")) {
+        //                                        if (fallbackbbackgroundurl !== undefined) {
+        //                                            mainDiv.querySelector(".layer_main_div_background_image").style.backgroundImage = "url(" + fallbackbbackgroundurl + ")";
+        //                                            mainDiv.style.setProperty("--opacity_preview_background", "");
+        //                                        } else {
+        //                                            mainDiv.querySelector(".layer_main_div_background_image").style.backgroundImage = "url(" + urlResult.preview.backgroundImage.url + ")";
+        //                                            mainDiv.style.setProperty("--opacity_preview_background", "1");
+        //                                        }
+        //                                    }
+        //                                });
+        //
+        //                                fallbackimg.addEventListener('error', function () {
+        //                                    console.log("Failed to load fallback image : " + fallbackurl);
+        //                                    emptyPreview();
+        //                                });
+        //                            }
+        //
+        //                            function emptyPreview() {
+        //                                if (element_fiup.classList.contains("inview")) {
+        //                                    //console.log("Preview : " + id + "error");
+        //                                    mainDiv.style.backgroundImage = "url(data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7)"; //transparent 1pixel gif
+        //                                    mainDiv.querySelector(".layer_main_div_background_image").style.backgroundImage = "url(" + urlResult.preview.backgroundImage.url + ")";
+        //                                }
+        //                            }
+        //
+        //                        });
+        //                    }
+        //                });
+        //
+        //            } else {
+        //                console.error("null element ignore");
+        //            }
+        //        }
+
+        
+        
+                     function InternalUpdatePreview(element_fiup) {
+                    if (document.querySelector("ul").classList.value == "list" || document.querySelector("ul").classList.value == "list_alternat") {
+                        return;
+                    }
+                    if (element_fiup !== null) {
+                        if (element_fiup.classList.contains("hidden") || element_fiup.classList.contains("displaynone")) {
+                            return;
+                        }
+                        let mainDiv = element_fiup.querySelector(".layer_main_div");
+                        let id = parseInt(element_fiup.id);
+        
+                        layer_Csharp_call_from_js.gettilepreviewurlfromid(id).then(function (urlResultString) {
+                            console.log("urlResult : " + urlResultString);
+                            if (element_fiup.classList.contains("hidden") || element_fiup.classList.contains("displaynone")) {
+                                return;
+                            }
+                            let urlResult = JSON.parse(urlResultString);
+                            let css_opti = "url(\"" + urlResult.preview.frontImage.url + "\")";
+                            if ((mainDiv.style.backgroundImage != css_opti || mainDiv.querySelector(".layer_main_div_background_image").style.backgroundImage == "") && (urlResult != "") && element_fiup.classList.contains("inview")) {
+                                let fallbackurl = urlResult.previewFallback.frontImage.url;
+                                let fallbackbbackgroundurl = urlResult.previewFallback.backgroundImage.url;
+                                const img = new Image(); // width, height
+                                img.src = urlResult.preview.frontImage.url;
+                                img.addEventListener('load', function () {
+                                    //console.log("Preview : " + id + "loaded");
+                                    mainDiv.style.backgroundImage = "url(" + img.src + ")";
+                                    if (element_fiup.classList.contains("inview")) {
+                                        mainDiv.querySelector(".layer_main_div_background_image").style.backgroundImage = "url(" + urlResult.preview.backgroundImage.url + ")";
+                                        mainDiv.style.setProperty("--opacity_preview_background", "");
+                                    }
+                                });
+                                img.addEventListener('error', function () {
+                                    if (fallbackurl === undefined) {
+                                        emptyPreview();
+                                    } else {
+                                        const fallbackimg = new Image();
+                                        fallbackimg.src = fallbackurl;
+                                        fallbackimg.addEventListener('load', function () {
+                                            //console.log("Preview : " + id + "loaded");
+                                            mainDiv.style.backgroundImage = "url(" + fallbackimg.src + ")";
+                                            if (element_fiup.classList.contains("inview")) {
+                                                if (fallbackbbackgroundurl !== undefined) {
+                                                    mainDiv.querySelector(".layer_main_div_background_image").style.backgroundImage = "url(" + fallbackbbackgroundurl + ")";
+                                                    mainDiv.style.setProperty("--opacity_preview_background", "");
+                                                } else {
+                                                    mainDiv.querySelector(".layer_main_div_background_image").style.backgroundImage = "url(" + urlResult.preview.backgroundImage.url + ")";
+                                                    mainDiv.style.setProperty("--opacity_preview_background", "1");
+                                                }
+                                            }
+                                        });
+        
+                                        fallbackimg.addEventListener('error', function () {
+                                            console.log("Failed to load fallback image : " + fallbackurl);
+                                            emptyPreview();
+                                        });
+                                    }
+        
+                                    function emptyPreview() {
+                                        if (element_fiup.classList.contains("inview")) {
+                                            //console.log("Preview : " + id + "error");
+                                            mainDiv.style.backgroundImage = "url(data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7)"; //transparent 1pixel gif
+                                            mainDiv.querySelector(".layer_main_div_background_image").style.backgroundImage = "url(" + urlResult.preview.backgroundImage.url + ")";
+                                        }
+                                    }
+        
+                                });
+                            }
+                        });
+        
+                    } else {
+                        console.error("null element ignore");
+                    }
+                }
+        
+//        
+//        
+//function InternalUpdatePreview(element_fiup) {
+//    if (document.querySelector("ul").classList.value == "list" || document.querySelector("ul").classList.value == "list_alternat") {
+//        return;
+//    }
+//    if (element_fiup !== null) {
+//        if (element_fiup.classList.contains("hidden") || element_fiup.classList.contains("displaynone")) {
+//            return;
+//        }
+//        let mainDiv = element_fiup.querySelector(".layer_main_div");
+//        let id = parseInt(element_fiup.id);
+//
+//        layer_Csharp_call_from_js.gettilepreviewurlfromid(id).then(function (urlResultString) {
+//            //console.log("urlResult : " + urlResultString);
+//            if (element_fiup.classList.contains("hidden") || element_fiup.classList.contains("displaynone")) {
+//                return;
+//            }
+//            let urlResult = JSON.parse(urlResultString);
+//            let css_opti = "url(\"" + urlResult.preview.frontImage.url + "\")";
+//            if ((mainDiv.style.backgroundImage != css_opti || mainDiv.querySelector(".layer_main_div_background_image").style.backgroundImage == "") && (urlResult != "") && element_fiup.classList.contains("inview")) {
+//                let fallbackurl = urlResult.previewFallback.frontImage.url;
+//                let fallbackbbackgroundurl = urlResult.previewFallback.backgroundImage.url;
+//                const img = new Image(); // width, height
+//                if (urlResult.preview.frontImage.url.startsWith("[base64]")) {
+//                    layer_Csharp_call_from_js.convertimagetobase64(id, urlResult.preview.frontImage.url).then(function (base64Image) {
+//                        img.src = base64Image;
+//                        loadImage(element_fiup, mainDiv, img, urlResult.preview.backgroundImage.url, fallbackurl, fallbackbbackgroundurl);
+//                    });
+//                } else {
+//                    img.src = urlResult.preview.frontImage.url;
+//                    loadImage(element_fiup, mainDiv, img, urlResult.preview.backgroundImage.url, fallbackurl, fallbackbbackgroundurl);
+//                }
+//            }
+//        });
+//    } else {
+//        console.error("null element ignore");
+//    }
+//}
+//
+//function loadImage(element_fiup,mainDiv,img, backgroundUrl, fallbackUrl, fallbackBackgroundUrl) {
+//    img.addEventListener('load', function () {
+//        //console.log("Preview : " + id + "loaded");
+//        mainDiv.style.backgroundImage = "url(" + img.src + ")";
+//        if (element_fiup.classList.contains("inview")) {
+//            mainDiv.querySelector(".layer_main_div_background_image").style.backgroundImage = "url(" + backgroundUrl + ")";
+//            mainDiv.style.setProperty("--opacity_preview_background", "");
+//        }
+//    });
+//    img.addEventListener('error', function () {
+//        if (fallbackUrl === undefined) {
+//            emptyPreview();
+//        } else {
+//            const fallbackimg = new Image();
+//            fallbackimg.src = fallbackUrl;
+//            fallbackimg.addEventListener('load', function () {
+//                //console.log("Preview : " + id + "loaded");
+//                mainDiv.style.backgroundImage = "url(" + fallbackimg.src + ")";
+//                if (element_fiup.classList.contains("inview")) {
+//                    if (fallbackBackgroundUrl !== undefined) {
+//                        mainDiv.querySelector(".layer_main_div_background_image").style.backgroundImage = "url(" + fallbackBackgroundUrl + ")";
+//                        mainDiv.style.setProperty("--opacity_preview_background", "");
+//                    } else {
+//                        mainDiv.querySelector(".layer_main_div_background_image").style.backgroundImage = "url(" + backgroundUrl + ")";
+//                        mainDiv.style.setProperty("--opacity_preview_background", "1");
+//                    }
+//                }
+//            });
+//
+//            fallbackimg.addEventListener('error', function () {
+//                console.log("Failed to load fallback image : " + fallbackUrl);
+//                emptyPreview();
+//            });
+//        }
+//
+//        function emptyPreview() {
+//            if (element_fiup.classList.contains("inview")) {
+//                //console.log("Preview : " + id + "error");
+//                mainDiv.style.backgroundImage = "url(data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7)"; //transparent 1pixel gif
+//                mainDiv.querySelector(".layer_main_div_background_image").style.backgroundImage = "url(" + backgroundUrl + ")";
+//            }
+//        }
+//    });
+//}
+
+        function checkVisibility() {
+            let items = document.querySelectorAll("li");
+            items.forEach(function(item) {
+                let isVisible = isElementInViewport(item);
+                if (isVisible) {
+                    item.classList.add('inview');
+                    if (item.querySelector(".layer_main_div").style.backgroundImage.includes("R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7")) {
+                        item.querySelector(".layer_main_div").style.backgroundImage = "var(--background-loading)";
+                    }
+                } else {
+                    item.classList.remove('inview');
+                }
+            });
+        }
+
+        function isElementInViewport(element) {
+            if (element == undefined || element.classList == undefined || (element.classList.contains("hidden") || element.classList.contains("displaynone"))) {
+                return false;
+            }
+            let rect = element.getBoundingClientRect();
+            const margin = 150;
+            let windowHeight = window.innerHeight || document.documentElement.clientHeight;
+
+            return (
+                rect.top >= -margin &&
+                rect.bottom <= windowHeight + margin &&
+                rect.left >= 0 &&
+                rect.right <= (window.innerWidth || document.documentElement.clientWidth) &&
+                element.clientWidth > 0
+            );
+        }
+
+        function UpdatePreview() {
+            try {
+                console.log("UpdatePreview");
+                let inviewelements = document.querySelectorAll(".inview");
+                inviewelements.forEach(function(element_up) {
+                    InternalUpdatePreview(element_up);
+                });
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        setTimeout(StartObserving, 500);
+
+    </script>
+
+    <script>
+        // ------------------ CONTEXT MENU ------------------
+        //Ajout des évents Listener
+        window.addEventListener("click", clicked);
+        window.addEventListener("visibilitychange", hide_context_menu);
+        window.addEventListener("blur", hide_context_menu);
+        window.addEventListener("scroll", hide_context_menu);
+        window.addEventListener("keydown", keydown);
+        window.addEventListener("contextmenu", show_context_menu);
+        // init variables globales
+        var tab_index = -1;
+        var all_item_element = document.querySelectorAll(".context_menu .item .item-content:not(.have-sous-menu) a");
+        //init fonction
+        //si la souris bouge sur l'un des item du context menu, alors on passe en mode souris et on enregistre sa position
+        document.querySelectorAll(".context_menu .item").forEach(element_qsaci => element_qsaci.addEventListener("mousemove", function(event) {
+            get_context_menu_element().setAttribute("data-navtype", "mouse");
+
+            var temp_tab_index = parseInt(event.target.closest(".item").getAttribute("data-selectable-id"));
+            if (Number.isInteger(temp_tab_index) == true) {
+                tab_index = temp_tab_index;
+            } else {
+                //have-sous-menu
+                if (event.target.classList.contains("have-sous-menu")) {
+                    temp_tab_index = parseInt(event.target.parentElement.querySelector(".item[data-selectable-id]").getAttribute("data-selectable-id"));
+                    if (Number.isInteger(temp_tab_index) == true) {
+                        tab_index = temp_tab_index;
+                    }
+                }
+            }
+            unselect_all();
+            event.target.classList.add("selected");
+        }));
+
+        //on enregistre l'event de click sur chaque items et on leur ajoute un index
+        all_item_element.forEach(function(item, index) {
+            var parent_item = item.parentElement.parentElement;
+
+            parent_item.addEventListener("click", function(event) {
+                event.preventDefault();
+                item_context_menu_clicked(event.target);
+            });
+            parent_item.setAttribute("data-selectable-id", index)
+        });
+
+        function clicked(e) {
+            try {
+                hide_context_menu(e);
+                let target_li = e.target.closest("li");
+
+                if (target_li != null) {
+                    target_li.classList.add("clickfocus");
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        function unclicked() {
+            document.querySelectorAll(".clickfocus").forEach(function(selected_items) {
+                selected_items.classList.remove("clickfocus");
+            });
+        }
+
+        function get_context_menu_element() {
+            var context_menu = document.querySelector(".context_menu");
+            return context_menu;
+        }
+
+
+        function context_menu_arrow_navigation(direction) {
+            //fonction navigation au clavier
+            do {
+                if (
+                    get_context_menu_element().querySelectorAll(
+                        ".context_menu .item:not(.lock) .item-content a" //".context_menu :not(.sous-menu) .item:not(.lock) .item-content:not(.have-sous-menu) a"
+                    ).length > 0
+                ) {
+                    context_menu_arrow_navigation_main(direction);
+                } else {
+                    return;
+                }
+            } while (all_item_element[tab_index].parentElement.parentElement.classList.contains("lock"));
+
+            //main fonction
+            function context_menu_arrow_navigation_main(direction) {
+                //on defini le mode de navigation (pour gerer apres avec le CSS)
+                if (get_context_menu_element().getAttribute("data-navtype") != "keyboard") {
+                    get_context_menu_element().setAttribute("data-navtype", "keyboard");
+                    if (tab_index != -1) {
+                        let curent_item_tab_index = get_context_menu_element().querySelector('.item[data-selectable-id="' + tab_index + '"]');
+                        if (curent_item_tab_index.parentElement.classList.contains("sous-menu") == false) {
+
+                            curent_item_tab_index.classList.add("selected");
+                        }
+                    }
+                }
+
+                if (Number.isInteger(tab_index) != true) {
+                    //si tab_index n'est pas un integer, alors on le redefini à sa valeur de base
+                    tab_index = -1;
+                }
+
+                if (tab_index != -1) {
+                    //si tab index n'as pas sa valeur par défaut alors :
+                    if (direction == "down") {
+                        if (all_item_element[tab_index].closest(".item").classList.contains("selected")) {
+                            //si la direction est vers le bas alors on incrémente tab index
+                            tab_index = tab_index + 1;
+                            //si tab index depasse le nombre d'item alors on reboucle à 0
+                            if (tab_index > all_item_element.length - 1) {
+                                tab_index = 0;
+                            }
+                        }
+                    } else if (direction == "up") {
+                        if (all_item_element[tab_index].closest(".item").classList.contains("selected")) {
+                            //si la direction est vers le haut alors on décrémente tab index
+                            tab_index = tab_index - 1;
+                            //si tab index depasse 0 alors on reboucle à à la fin
+                            if (tab_index < 0) {
+                                tab_index = all_item_element.length - 1;
+                            }
+                        }
+                    }
+                } else {
+                    //on defini tab index si il n'avait pas encore de valeur
+                    tab_index = 0;
+                }
+
+                unselect_all();
+                var item_selected = all_item_element[tab_index].closest(".item");
+                item_selected.classList.add("selected");
+                if (item_selected.parentElement.classList.contains("sous-menu")) {
+                    item_selected.parentElement.parentElement.classList.add("selected");
+                }
+                all_item_element[tab_index].focus();
+            }
+        }
+
+        function unselect_all() {
+            //on retire à tout les items le tag séléctionné
+            document.querySelectorAll(".selected").forEach(function(selected_items) {
+                selected_items.classList.remove("selected");
+            });
+        }
+
+        function keydown(e) {
+            //event en cas d'appuis de touches
+            //on check si le context menu est affiché
+            if (get_context_menu_element().style.display == "block") {
+
+                //si echap alors on masque
+                if (e.type == "keydown" && e.key === "Escape") {
+                    hide_context_menu(e);
+                }
+                //si fleche vers le bas alors on change l'item selectionné
+                if (e.which === 40) {
+                    e.preventDefault();
+                    //console.log("down");
+                    context_menu_arrow_navigation("down");
+                }
+                //si fleche vers le haut alors on change l'item selectionné
+                if (e.which === 38) {
+                    e.preventDefault();
+                    //console.log("up");
+                    context_menu_arrow_navigation("up");
+                }
+                //si tabulation alors on masque le context menu
+                if (e.which === 9) { // Tabulation
+                    e.preventDefault();
+                    hide_context_menu(e);
+                }
+                //si enter, on valide la selection
+                if (e.which === 13) { //Enter
+                    if (tab_index != -1) {
+                        e.preventDefault();
+                        item_context_menu_clicked(all_item_element[tab_index]);
+                    }
+                } //si supp, on retire de la liste
+            }
+            /**/
+            if (e.which === 46) { //Supp
+                //                if (document.querySelector(".clickfocus") != null) {
+                //                    let dataState = document.querySelector(".clickfocus .download_main_div").getAttribute("data-state");
+                //                    download_Csharp_call_from_js.download_cancel_deleted_db(parseInt(document.querySelector(".clickfocus").getAttribute("id")));
+                //                    /*if (dataState == "success" || dataState == "cancel" || dataState == "error") {
+                //                        e.preventDefault();
+                //                        console.log(document.querySelector(".clickfocus"));
+                //                        download_js_delete_db(document.querySelector(".clickfocus").getAttribute("id"));
+                //                        hide_context_menu(e);
+                //                    } else {
+                //                        download_Csharp_call_from_js.download_cancel_deleted_db(parseInt(document.querySelector(".clickfocus").getAttribute("id")));
+                //                        hide_context_menu(e);
+                //                    }*/
+                //                }
+            }
+            /**/
+
+        }
+
+        function hide_context_menu(e) {
+            if (e !== null && e.type == "click") {
+                //en cas de click droit et que ce n'est pas sur le menu lui-meme alors on le masque
+                if (get_context_menu_element().contains(e.target)) {
+                    return false;
+                }
+            }
+            //toute les exceptions on été traité, si la fonction est toujours ok alors on masque
+            get_context_menu_element().style.display = "none";
+            if (get_context_menu_element().classList.contains("shiftkeydown")) {
+                get_context_menu_element().classList.remove("shiftkeydown");
+            }
+            document.querySelectorAll(".hover").forEach(function(selected_items) {
+                selected_items.classList.remove("hover");
+            });
+            unclicked();
+        }
+
+
+        function update_lock_state(id, lock) {
+            if (id == "*") {
+                all_item_element.forEach(function(item, index) {
+                    var parent_item = item.parentElement.parentElement;
+                    if (lock) {
+                        parent_item.classList.add("lock");
+                    } else {
+                        parent_item.classList.remove("lock");
+                    }
+                });
+            } else {
+                let element_uls = document.getElementById(id);
+                if (element_uls === null) {
+                    console.error("Null exeption at update_lock_state");
+                    return;
+                }
+                if (lock) {
+                    element_uls.classList.add("lock");
+                } else {
+                    element_uls.classList.remove("lock");
+                }
+            }
+        }
+
+        function show_context_menu(e) {
+            try {
+                //on signale que l'event est traité par nous
+                e.preventDefault();
+                //on masque pour terminer les events précédent
+                hide_context_menu(null)
+                if (e.type == "contextmenu") {
+                    //en cas de click droit et que ce n'est pas sur le menu lui-meme alors on le masque
+                    if (get_context_menu_element().contains(e.target)) {
+                        return false;
+                    }
+
+                    if (e.shiftKey) {
+                        get_context_menu_element().classList.add("shiftkeydown");
+                    }
+
+                    if (e.target) {
+                        element_sctm = e.target.closest("li");
+
+                        if (element_sctm != null && element_sctm !== null) {
+                            if (!element_sctm.classList.contains(selectedItemClass) && getSelectedElements().length > 1) {
+                                lastelement = null;
+                                selectionner_calque_by_id(element_sctm.getAttribute("id"), false);
+                            }
+                            get_context_menu_element().setAttribute("data-layer_binding", element_sctm.getAttribute("id"));
+
+                            element_sctm.classList.add("hover")
+                            update_lock_state("*", false);
+                            let favState = element_sctm.querySelector(".star").classList.contains("orange");
+                            //console.log(state);
+                            get_context_menu_element().querySelector("#ajouter_favori").style.display = "inherit";
+                            get_context_menu_element().querySelector("#retirer_favori").style.display = "inherit";
+                            if (favState) {
+                                get_context_menu_element().querySelector("#ajouter_favori").style.display = "none";
+                            } else {
+                                get_context_menu_element().querySelector("#retirer_favori").style.display = "none";
+                            }
+
+                            let eyeState = element_sctm.querySelector(".eye").classList.contains("orange");
+                            //console.log(state);
+                            get_context_menu_element().querySelector("#afficher_calque").style.display = "inherit";
+                            get_context_menu_element().querySelector("#masquer_calque").style.display = "inherit";
+                            if (eyeState) {
+                                get_context_menu_element().querySelector("#afficher_calque").style.display = "none";
+                            } else {
+                                get_context_menu_element().querySelector("#masquer_calque").style.display = "none";
+                            }
+                            if (element_sctm.classList.contains("layerFiltered") && getSelectedElements().length <= 1) {
+                                get_context_menu_element().querySelector("#masquer_calque").style.display = "none";
+                                get_context_menu_element().querySelector("#afficher_calque").style.display = "none";
+                            }
+
+
+                        } else {
+                            get_context_menu_element().setAttribute("data-layer_binding", "0")
+                            update_lock_state("*", true);
+                            update_lock_state("ajouter_calque", false);
+                            update_lock_state("actualiser_panel", false);
+                            update_lock_state("basculer_affichage_showmasque", false);
+                            update_lock_state("basculer_affichage_hidemasque", false);
+                        }
+
+                        //if multiple element, then change text :
+                        if (getSelectedElements().length <= 1) {
+                            document.querySelector("#supprimer_cache_calque a").innerText = "%layerContextMenuEmptyLayerCache%";
+                            document.querySelector("#afficher_calque a").innerText = "%layerContextMenuShowLayer%";
+                            document.querySelector("#masquer_calque a").innerText = "%layerContextMenuHideLayer%";
+                        } else {
+                            update_lock_state("modifier_calque", true);
+                            update_lock_state("supprimer_cache_calque", false);
+                            update_lock_state("retirer_favori", false);
+                            update_lock_state("ajouter_favori", false);
+                            update_lock_state("afficher_calque", false);
+                            update_lock_state("masquer_calque", false);
+                            document.querySelector("#supprimer_cache_calque a").innerText = "%layerContextMenuEmptyLayersCache%";
+                            document.querySelector("#afficher_calque a").innerText = "%layerContextMenuShowLayers%";
+                            document.querySelector("#masquer_calque a").innerText = "%layerContextMenuHideLayers%";
+                        }
+
+                        if (document.querySelector("ul").classList.contains("showHiddenLayer")) {
+                            get_context_menu_element().querySelector("#basculer_affichage_showmasque").style.display = "none";
+                            get_context_menu_element().querySelector("#basculer_affichage_hidemasque").style.display = "inherit";
+                        } else {
+                            get_context_menu_element().querySelector("#basculer_affichage_showmasque").style.display = "inherit";
+                            get_context_menu_element().querySelector("#basculer_affichage_hidemasque").style.display = "none";
+                        }
+
+
+                    }
+                }
+                tab_index = -1;
+                unselect_all();
+                // on affiche le menu à ce niveau la pour pouvoir calculer ses dimensions
+                var context_menu = get_context_menu_element();
+                context_menu.style.display = "block";
+
+                //recupération des éléments pour calculer la position du context menu
+                var page_left_padding = 0;
+                var page_bottom_padding = 0;
+
+                function getScrollbarWidth() {
+                    // Creating invisible container
+                    const outer = document.createElement('div');
+                    outer.style.visibility = 'hidden';
+                    outer.style.overflow = 'scroll';
+                    document.body.appendChild(outer);
+                    const inner = document.createElement('div');
+                    outer.appendChild(inner);
+                    page_left_padding = (outer.offsetWidth - inner.offsetWidth);
+                    page_bottom_padding = (outer.offsetHeight - inner.offsetHeight);
+                    outer.parentNode.removeChild(outer);
+                }
+
+
+                var page_width = (window.innerWidth + window.pageXOffset) - page_left_padding;
+                var page_height = (window.innerHeight + window.pageYOffset) - page_bottom_padding;
+                var menu_width = context_menu.getBoundingClientRect().width;
+                var menu_height = context_menu.getBoundingClientRect().height;
+                var click_position_left = e.pageX;
+                var click_position_top = e.pageY;
+                var menu_distance_right_border = page_width - (click_position_left + menu_width) - 15;
+                var menu_distance_bottom_border = page_height - (click_position_top + menu_height) - 5;
+                var final_menu_x = click_position_left;
+                var final_menu_y = click_position_top;
+
+                //si le context menu n'as pas la place de s'ouvrir, alors on décale sa position finale d'autant
+                if (menu_distance_right_border < 0) {
+                    final_menu_x = final_menu_x + menu_distance_right_border;
+                }
+                if (menu_distance_bottom_border < 0) {
+                    //final_menu_y = final_menu_y + menu_distance_bottom_border
+                    final_menu_y = final_menu_y - menu_height;
+                }
+
+                //on applique les coordonnées finales au style
+                context_menu.style.left = final_menu_x + "px";
+                context_menu.style.top = final_menu_y + "px";
+
+                //on regarde si il y a la place pour ouvrir les sous-menu également
+                var sous_menu_distance_right_border = page_width - (final_menu_x + (menu_width * 2));
+
+                if (sous_menu_distance_right_border < 0) {
+                    context_menu.classList.add("isleft");
+                    context_menu.classList.remove("isright");
+                } else {
+                    context_menu.classList.add("isright");
+                    context_menu.classList.remove("isleft");
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+
+        function item_context_menu_clicked(item) {
+            //si item lock, alors on ne le considère pas
+            if (!item.closest(".item").classList.contains("lock")) {
+                //on lance l'action
+                let id = get_context_menu_element().getAttribute("data-layer_binding");
+                let action = item.closest(".item").getAttribute("id");
+                console.log("Vous avez cliqué sur : " + item.closest(".item").querySelector("a").innerText + " element id = " + id);
+                /*
+<!--rendre_courant ajouter_favori retirer_favori modifier_calque-->
+                */
+                //                let element = document.querySelector(".star").classList.contains("orange");
+                let element_icmc = document.getElementById(id);
+                //                if (element === null) {
+                //                    console.log("Element was null, abord");
+                //                    return;
+                //                }
+                switch (action) {
+                    case "rendre_courant":
+                        selectionner_calque_by_id(id, false);
+                        break;
+                    case "ajouter_favori":
+                        if (getSelectedElements().length > 1) {
+                            getSelectedElements().forEach(function(element) {
+                                internal_ajouter_aux_favoris(element.querySelector(".star"), element.id, true);
+                            });
+                        } else {
+                            internal_ajouter_aux_favoris(element_icmc.querySelector(".star"), id, true);
+                        }
+
+                        break;
+                    case "retirer_favori":
+                        if (getSelectedElements().length > 1) {
+                            getSelectedElements().forEach(function(element) {
+                                internal_ajouter_aux_favoris(element.querySelector(".star"), element.id, false);
+                            });
+                        } else {
+                            internal_ajouter_aux_favoris(element_icmc.querySelector(".star"), id, false);
+                        }
+                        break;
+
+                    case "afficher_calque":
+                        if (getSelectedElements().length > 1) {
+                            getSelectedElements().forEach(function(element) {
+                                internal_change_visibility(element.querySelector(".eye"), element.id, true);
+                            });
+                        } else {
+                            internal_change_visibility(element_icmc.querySelector(".eye"), id, true);
+                        }
+
+                        break;
+                    case "masquer_calque":
+                        if (getSelectedElements().length > 1) {
+                            getSelectedElements().forEach(function(element) {
+                                internal_change_visibility(element.querySelector(".eye"), element.id, false);
+                            });
+                        } else {
+                            internal_change_visibility(element_icmc.querySelector(".eye"), id, false);
+                        }
+                        break;
+                    case "modifier_calque":
+                        layer_Csharp_call_from_js.layer_edit(parseInt(id));
+                        break;
+                    case "supprimer_cache_calque":
+
+                        if (getSelectedElements().length > 1) {
+                            let listOfId = "";
+                            getSelectedElements().forEach(function(element) {
+                                listOfId += element.id + ",";
+                            });
+                            layer_Csharp_call_from_js.clear_cache(listOfId);
+                        } else {
+                            layer_Csharp_call_from_js.clear_cache(id.toString());
+                        }
+                        break;
+                    case "ajouter_calque":
+                        layer_Csharp_call_from_js.layer_edit(-1);
+                        break;
+                    case "ajouter_calque_template":
+                        layer_Csharp_call_from_js.layer_edit(-1, parseInt(id));
+                        break;
+                    case "basculer_affichage_showmasque":
+                        document.querySelector("ul").classList.add("showHiddenLayer"); //showHiddenLayer
+                        break;
+                    case "basculer_affichage_hidemasque":
+                        document.querySelector("ul").classList.remove("showHiddenLayer"); //showHiddenLayer
+                        break;
+                    case "actualiser_panel":
+                        layer_Csharp_call_from_js.refresh_panel();
+                        break;
+                    default:
+                        break;
+                }
+                hide_context_menu(null);
+            }
+        }
+        // ------------------ CONTEXT MENU ------------------
+
+    </script>
+    <script>
+        CefSharp.BindObjectAsync("layer_Csharp_call_from_js");
+        for (let i = 0; i < 5; i++) {
+            let element_iup = document.querySelectorAll("li")[i];
+            if (!element_iup.classList.contains("hidden") && !element_iup.classList.contains("displaynone")) {
+                element_iup.classList.add("inview");
+                InternalUpdatePreview(element_iup);
+            }
+        }
+
+
+        layer_Csharp_call_from_js.request_search_string()
+            .then(function(initSearchValue) {
+                console.log("search " + initSearchValue);
+                if (initSearchValue != null && initSearchValue != undefined) {
+                    searchAndUpdatePreview(initSearchValue);
+                }
+            });
+
+    </script>
+
+
+</body>
+
+</html>

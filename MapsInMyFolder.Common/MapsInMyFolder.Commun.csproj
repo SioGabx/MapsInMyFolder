@@ -81,11 +81,11 @@
     <Reference Include="Esprima, Version=3.0.0.0, Culture=neutral, PublicKeyToken=2e92ba9c8d81157f, processorArchitecture=MSIL">
       <HintPath>..\packages\Esprima.3.0.0-beta-9\lib\net462\Esprima.dll</HintPath>
     </Reference>
-    <Reference Include="GeoAPI, Version=1.7.5.0, Culture=neutral, PublicKeyToken=a1a0da7def465678, processorArchitecture=MSIL">
-      <HintPath>..\packages\GeoAPI.Core.1.7.5\lib\net45\GeoAPI.dll</HintPath>
+    <Reference Include="GeoAPI, Version=2.0.0.0, Culture=neutral, PublicKeyToken=a1a0da7def465678, processorArchitecture=MSIL">
+      <HintPath>..\packages\GeoAPI.Core.2.0.0-nuget005\lib\net45\GeoAPI.dll</HintPath>
     </Reference>
-    <Reference Include="GeoAPI.CoordinateSystems, Version=1.7.5.0, Culture=neutral, PublicKeyToken=a1a0da7def465678, processorArchitecture=MSIL">
-      <HintPath>..\packages\GeoAPI.CoordinateSystems.1.7.5\lib\net45\GeoAPI.CoordinateSystems.dll</HintPath>
+    <Reference Include="GeoAPI.CoordinateSystems, Version=2.0.0.0, Culture=neutral, PublicKeyToken=a1a0da7def465678, processorArchitecture=MSIL">
+      <HintPath>..\packages\GeoAPI.CoordinateSystems.2.0.0-nuget005\lib\net45\GeoAPI.CoordinateSystems.dll</HintPath>
     </Reference>
     <Reference Include="ICSharpCode.AvalonEdit, Version=6.3.0.90, Culture=neutral, PublicKeyToken=9cc39be672370310, processorArchitecture=MSIL">
       <HintPath>..\packages\AvalonEdit.6.3.0.90\lib\net462\ICSharpCode.AvalonEdit.dll</HintPath>

@@ -78,6 +78,7 @@
     <PackageReference Include="CefSharp.Common" Version="107.1.120" />
     <PackageReference Include="CefSharp.Common.NETCore" Version="107.1.120" />
     <PackageReference Include="CefSharp.Wpf" Version="107.1.120" />
+    <PackageReference Include="CefSharp.Wpf.NETCore" Version="107.1.120" />
     <PackageReference Include="Jint" Version="3.0.0-beta-2043" />
     <PackageReference Include="ModernWpfUis" Version="1.4.0" />
     <PackageReference Include="NetVips" Version="2.3.0" />
@@ -86,7 +87,6 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="ProjNet" Version="2.0.0" />
     <PackageReference Include="System.Data.SQLite" Version="1.0.117" />
-    <PackageReference Include="System.Text.Json" Version="6.0.0" />
     <PackageReference Include="wix" Version="3.11.2" />
   </ItemGroup>
 

@@ -46,7 +46,7 @@
 
     <Feature Id="ProductFeature" Title="MapsInMyFolder" Level="1">
       <ComponentGroupRef Id="ProductComponents" />
-      <ComponentGroupRef Id="locales_files" />
+      <!--<ComponentGroupRef Id="locales_files" />-->
       <ComponentGroupRef Id="_x64_files" />
       <ComponentGroupRef Id="fr_files" />
       <ComponentRef Id="DesktopShortcut"/>
@@ -78,7 +78,7 @@
       
       <Directory Id="ProgramFilesFolder">
         <Directory Id="INSTALLFOLDER" Name="MapsInMyFolder">
-          <Directory Id="locales" Name="locales" />
+          <!--<Directory Id="locales" Name="locales" />-->
           <Directory Id="_x64" Name="x64" />
           <Directory Id="fr" Name="fr" />
         </Directory>
@@ -101,7 +101,7 @@
       </Component>-->
     </ComponentGroup>
   </Fragment>
-  <Fragment>
+  <!--<Fragment>
     <ComponentGroup Id="locales_files" Directory="locales">
       <?foreach File in $(var.MapsInMyFolderFileslocales)?>
       <Component>
@@ -109,7 +109,7 @@
       </Component>
       <?endforeach?>
     </ComponentGroup>
-  </Fragment>
+  </Fragment>-->
   <Fragment>
     <ComponentGroup Id="_x64_files" Directory="_x64">
       <?foreach File in $(var.MapsInMyFolderFilesx64)?>

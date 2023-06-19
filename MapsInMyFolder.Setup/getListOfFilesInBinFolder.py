@@ -1,7 +1,7 @@
 import os
 
 BasePath = 'C:/Users/franc/Documents/SharpDevelop Projects/MapsInMyFolder/MapsInMyFolder/bin/Publication'
-ListOfPath= ['/', '/locales/', '/fr/', '/x64/']
+ListOfPath= ['/', '/fr/', '/x64/']
 
 
 def getListOfFileInDirectory(Path):

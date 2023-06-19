@@ -1,0 +1,1383 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>This is Hello World page</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        ::-webkit-scrollbar {
+            width: 12px;
+        }
+
+        /* Track */
+        ::-webkit-scrollbar-track {
+            background: #303031;
+        }
+
+        /* Handle */
+        ::-webkit-scrollbar-thumb {
+            background: #6F6F7B;
+            border-radius: 15px;
+        }
+
+            /* Handle on hover */
+            ::-webkit-scrollbar-thumb:hover {
+                background: #62626B;
+            }
+
+        :root {
+            --background-menu-color: red;
+        }
+
+
+        ul,
+        li,
+        p {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .overflow_main {
+            margin: 0;
+            height: 100vh;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding-left: 5px;
+            padding-right: 13px;
+            margin-right: 3px;
+        }
+
+        body {
+            overflow: hidden;
+            color: #E2E2E1;
+            /*padding-left: 5px;
+                    padding-right: 5px;*/
+            margin-top: 0;
+            margin-right: 0;
+            font-family: "Segoe UI";
+        }
+
+        .download_main_div {
+            transition: height 150ms ease-in;
+            background-color: #303031;
+            /*            height: 200vh;*/
+            height: 58px;
+            width: 100%;
+            content: "";
+            /* background: linear-gradient(0deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0) 60%), attr(data-img);*/
+            background-size: cover;
+            border-radius: 1px;
+            margin-bottom: 7px;
+            position: relative;
+            user-select: none;
+            overflow: hidden;
+        }
+
+        .download_titre {
+            font-size: 102.5%;
+            padding-top: 6px;
+            margin-left: 10px;
+            white-space: nowrap;
+            overflow: hidden;
+            width: calc(100% - 15px);
+            text-overflow: ellipsis;
+        }
+
+        .progress {
+            height: 4.5px;
+            background: #575756;
+            margin: 4px 13px 0 0;
+            position: relative;
+            margin-left: 10px;
+            /*            content:'';*/
+        }
+
+        .progress_bar {
+            background: #44ac34;
+            position: absolute;
+            width: 0%;
+            height: 100%;
+            content: '';
+        }
+
+        .timeline {
+            font-size: 102.5%;
+            margin-left: 3px;
+            padding-top: 3px;
+            padding-bottom: 10px;
+        }
+
+        .infos {
+            margin-top: 1px;
+            font-size: 11.5px;
+            color: #888989;
+            margin-left: 10px;
+        }
+
+        .button_div {
+            background: linear-gradient(90deg, rgba(87, 87, 86, 0) 0%, #303031 25%);
+            height: 100%;
+            position: absolute;
+            width: 125px;
+            top: 0;
+            right: 0;
+            opacity: 0;
+            /*            opacity: 0;*/
+            /*            transition: opacity 0.04s;*/
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 5px;
+        }
+
+        .download_main_div:hover .button_div {
+            opacity: 1;
+        }
+
+
+        .download_main_div[data-state=assemblage] .button_div, .download_main_div[data-state=rognage] .button_div, .download_main_div[data-state=enregistrement] .button_div {
+            /*            state == "assemblage" || state == "rognage" || state == "enregistrement") {*/
+            opacity: 0;
+        }
+
+
+        .download_main_div {
+            border-left: 4px solid transparent;
+        }
+
+            .download_main_div:hover,
+            li.hover .download_main_div {
+                border-color: #5A5A5A;
+            }
+
+
+        .button {
+            background: transparent;
+            height: 34px;
+            width: 36px;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+            .button + .button {
+                /*            background: blue;*/
+                margin-right: 5px;
+                margin-left: 5px;
+            }
+
+
+
+            .button:hover {
+                filter: brightness(130%);
+            }
+
+
+
+        svg {
+            transform: translateY(5px);
+            display: block;
+            margin: auto;
+            max-height: 100%;
+            width: 20px;
+            fill: none;
+            stroke: #e2e2e1;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            stroke-width: 0.6px;
+        }
+
+        .icon svg {
+            transform: translateY(1px);
+            stroke-width: 9px;
+            stroke: white;
+        }
+
+        .lock .icon svg {
+            stroke: #888989;
+        }
+
+        .button.poubelle svg {
+            transform: translateY(3px);
+        }
+
+        .button.dossier svg {
+            max-height: 20px;
+            width: 100%;
+        }
+
+        .button.pause svg {
+            max-height: 20px;
+            width: 100%;
+        }
+
+
+        /*waitfordownloading, error, cancel, success*/
+
+        .download_main_div .button {
+            display: none;
+        }
+
+        /*        croix, poubelle, start, pause, restart, dossier */
+
+        .download_main_div[data-state=pause] .button.start,
+        .download_main_div[data-state=pause] .button.croix,
+        .download_main_div[data-state=noconnection] .button.croix {
+            display: block;
+        }
+
+        .download_main_div[data-state=pause] .progress_bar,
+        .download_main_div[data-state=noconnection] .progress_bar {
+            background: #ffb100;
+        }
+
+        .download_main_div[data-state=error] .progress_bar {
+            background: #ff1d00;
+        }
+
+        .download_main_div[data-state=progress] .button.pause,
+        .download_main_div[data-state=progress] .button.croix {
+            display: block;
+        }
+
+        .download_main_div[data-state=error] .button.deleteliste,
+        .download_main_div[data-state=deleted] .button.deleteliste {
+            display: block;
+        }
+
+        .download_main_div[data-state=cleanup] .button.dossier,
+        .download_main_div[data-state=cleanup] .button.poubelle,
+        .download_main_div[data-state=success] .button.dossier,
+        .download_main_div[data-state=success] .button.poubelle {
+            display: block;
+        }
+
+        .download_main_div[data-state=success] .progress,
+        .download_main_div[data-state=cancel] .progress {
+            visibility: hidden;
+        }
+
+        .download_main_div[data-state=cancel] .button.restart,
+        .download_main_div[data-state=error] .button.restart {
+            display: block;
+        }
+
+        .openfile {
+            color: #7badd4;
+            display: none
+        }
+
+        .download_main_div[data-state=success] .infostxt {
+            display: none;
+        }
+
+        .download_main_div[data-state=success] .openfile {
+            display: inline;
+        }
+
+        .download_main_div[data-state=deleted] .download_titre {
+            text-decoration: line-through;
+            opacity: 0.6;
+        }
+
+        .download_main_div[data-state=deleted] .progress {
+            visibility: hidden;
+        }
+
+        p.timeline:not(:has(+li)) {
+            display: none;
+        }
+
+        body:not(:has(li)) .nodownloadmessage {
+            display: flex;
+        }
+
+        /*  ------------------ CONTEXT MENU ------------------ */
+
+
+        /*@import url('https://fonts.googleapis.com/css2?family=Roboto');*/
+
+        /*body{
+            height: 350vh;
+            width:120vw;
+        }
+        */
+        .context_menu {
+            transform: scale(0.8);
+            display: none;
+            bottom: 0px;
+            box-shadow: rgba(0, 0, 0, 0.14) 0px 8px 10px 1px, rgba(0, 0, 0, 0.12) 0px 3px 14px 2px, rgba(0, 0, 0, 0.2) 0px 5px 5px -3px;
+            caret-color: rgb(32, 33, 36);
+            color: #E2E2E1;
+            column-rule-color: rgb(32, 33, 36);
+            cursor: default;
+            height: min-content;
+            left: 10px;
+            letter-spacing: 0.2px;
+            position: absolute;
+            right: 10px;
+            text-decoration: none solid rgb(32, 33, 36);
+            text-emphasis-color: rgb(32, 33, 36);
+            top: 10px;
+            transform-origin: 0px 0px;
+            user-select: none;
+            width: min-content;
+            z-index: 7;
+            background: none repeat scroll 0% 0% / auto padding-box border-box;
+            border-radius: 4px 4px 4px 4px;
+            background-color: #171719;
+            --background-menu-color: #171719;
+            font: 14px;
+            font-family: "Segoe UI";
+            outline: rgb(32, 33, 36) none 0px;
+            overflow: visible;
+            padding: 6px 0px;
+            border: 1px solid hsl(240, 4%, 13%);
+            z-index: 9999;
+        }
+
+            .context_menu .context_menu {
+                transform: scale(1);
+                position: absolute;
+                left: 100%;
+                top: -6px;
+                box-shadow: rgb(0 0 0 / 8%) 5px 2px 20px 0, rgb(0 0 0 / 10%) 0px 5px 11px;
+            }
+
+        .item {
+            padding: 7px 48px;
+            padding-right: 20px;
+            position: relative;
+            transition: background-color ease 125ms;
+        }
+
+            /*  [data-navtype="keyboard"] [data-navtype="mouse"] */
+            .context_menu[data-navtype="mouse"] .item:hover,
+            .item:focus-within,
+            .context_menu[data-navtype="keyboard"] .item.selected {
+                background-color: #303031;
+                --background-menu-color: #303031;
+            }
+
+            .item .sous-menu {
+                display: none;
+                width: 100%;
+            }
+
+            .context_menu[data-navtype="mouse"] .item:hover .sous-menu,
+            .item:focus-within .sous-menu,
+            .context_menu[data-navtype="keyboard"] .item.selected .sous-menu {
+                display: block;
+            }
+
+        .item-content {
+            align-items: center;
+            caret-color: #E2E2E1;
+            color: #E2E2E1;
+            column-rule-color: #E2E2E1;
+            cursor: pointer;
+            display: flex;
+            height: 20px;
+            justify-content: space-between;
+            left: 0px;
+            letter-spacing: 0.2px;
+            position: relative;
+            right: 0px;
+            text-decoration: none solid #E2E2E1;
+            text-emphasis-color: #E2E2E1;
+            top: 0px;
+            transform-origin: 115px 10px;
+            user-select: none;
+            white-space: nowrap;
+            border: 0px none rgb(32, 33, 36);
+            font: 14px;
+            font-family: "Segoe UI";
+        }
+
+        .icon {
+            background-position: 50% 50%;
+            bottom: 0px;
+            caret-color: #E2E2E1;
+            color: #E2E2E1;
+            column-rule-color: #E2E2E1;
+            cursor: pointer;
+            height: 20px;
+            left: -32px;
+            letter-spacing: 0.2px;
+            opacity: 0.55;
+            perspective-origin: 10px 10px;
+            position: absolute;
+            right: 232px;
+            text-decoration: none solid rgb(32, 33, 36);
+            text-emphasis-color: rgb(32, 33, 36);
+            top: 0px;
+            transform-origin: 10px 10px;
+            user-select: none;
+            vertical-align: middle;
+            white-space: nowrap;
+            width: 20px;
+            background-color: rgba(0, 0, 0, 0);
+            background-repeat: no-repeat;
+            background-attachment: scroll;
+            background-size: 50% 50% / 20px;
+            background-clip: padding-box border-box;
+            font: 14px;
+            font-family: "Segoe UI";
+            list-style: outside none none;
+            margin: 0px 12px 0px 0px;
+        }
+
+        .span-more {
+            background-position: 50% 50%;
+            block-size: 20px;
+            caret-color: white;
+            color: white;
+            column-rule-color: white;
+            cursor: pointer;
+            display: block;
+            height: 20px;
+            letter-spacing: 0.2px;
+            min-height: auto;
+            min-width: auto;
+            opacity: 0.5;
+            perspective-origin: 10px 10px;
+            right: 10px;
+            text-align: right;
+            transform-origin: 10px 10px;
+            user-select: none;
+            white-space: nowrap;
+            width: 20px;
+            background: white url("https://www.gstatic.com/images/icons/material/system/1x/arrow_right_black_20dp.png") no-repeat scroll 50% 50% / 20px padding-box border-box;
+            font: 0px / 20px;
+            list-style: outside none none;
+            margin: 0px -24px 0px 0px;
+            transition: all 125ms ease 0s;
+        }
+
+        .lock .item-content {
+            caret-color: #888989;
+            color: #888989;
+            column-rule-color: #888989;
+        }
+
+        /*
+                .lock .icon {
+                    opacity: 0.15;
+                }
+        */
+
+
+        .item_hr {
+            border-top: 1px solid hsl(240, 4%, 20%);
+        }
+
+        .context_menu.isleft .context_menu {
+            left: -100%;
+        }
+
+        .context_menu a {
+            text-decoration: none;
+            color: inherit;
+            pointer-events: none;
+        }
+
+        .context_menu .lock a {
+            cursor: default;
+        }
+
+
+
+
+        /*  ------------------ CONTEXT MENU ------------------ */
+
+        .nodownloadmessage {
+            height: 100vh;
+            justify-content: center;
+            align-items: center;
+            display: none;
+            user-select: none;
+        }
+
+            .nodownloadmessage p {
+                font-size: 14px;
+                font-family: "Segoe UI";
+                color: #888989;
+            }
+    </style>
+</head>
+
+<body>
+    <div class="nodownloadmessage">
+        <p>%downloadMessageNoDataToShow%</p>
+    </div>
+    <div class="overflow_main">
+        <div id="main">
+            <ul></ul>
+        </div>
+    </div>
+
+
+
+
+    <!--  ------------------ CONTEXT MENU ------------------ -->
+    <div class="context_menu" data-navtype="mouse">
+
+        <div class="menu item" id="ouvrir_le_fichier">
+            <div class="item-content">
+                <div class="icon">
+                    <svg width="141.73" height="141.73" version="1.1" viewBox="0 0 141.73 141.73" xmlns="http://www.w3.org/2000/svg">
+                        <polyline points="98.3 8.91 132.82 8.91 132.82 43.38" />
+                        <path d="M132.82,75.32v47.41a10.09,10.09,0,0,1-10.09,10.09H19A10.09,10.09,0,0,1,8.91,122.73V19A10.09,10.09,0,0,1,19,8.91H71.05" />
+                        <path d="m70.85 75.3 59.48-63.84" />
+                    </svg>
+
+                </div>
+                <a href="#">%downloadContextMenuOpenFile%</a>
+            </div>
+        </div>
+
+        <div class="menu item" id="afficher_dans_dossier">
+            <div class="item-content">
+                <div class="icon">
+                    <svg width="141.73" height="141.73" version="1.1" viewBox="0 0 141.73 141.73" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M2.24,109.46V28a12.64,12.64,0,0,1,3.38-7.16A12.14,12.14,0,0,1,13,17.25H47.53a12.26,12.26,0,0,1,9,4.27,40.26,40.26,0,0,0,4.1,4.75,16.6,16.6,0,0,0,4.42,3.29,9.34,9.34,0,0,0,4.11.73h43.28A11.72,11.72,0,0,1,120,35a10,10,0,0,1,1.69,4.27V53h6.84a13.36,13.36,0,0,1,9.09,5.55,11.53,11.53,0,0,1,1.85,5.71l-15.77,51.81a12.64,12.64,0,0,1-4.66,4.91,13.2,13.2,0,0,1-6.44,1.69H13.34a13.52,13.52,0,0,1-8-4.83A13.2,13.2,0,0,1,2.24,109.46Z" />
+                        <path d="M2.24,102.78,16.4,59.54a10.73,10.73,0,0,1,3.77-4.2,12.43,12.43,0,0,1,6.14-1.91c5-.29,43.08-.52,95.4-.44" />
+                    </svg>
+                </div>
+                <a href="#">%downloadContextMenuOpenFolder%</a>
+            </div>
+        </div>
+        <div class="menu item" id="afficher_temp_folder">
+            <div class="item-content">
+                <div class="icon">
+                    <svg width="141.73" height="141.73" version="1.1" viewBox="0 0 141.73 141.73" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <style>
+                                .path_afficher_temp_folder {
+                                    fill: var(--background-menu-color);
+                                    stroke-width: 4px;
+                                }
+                            </style>
+                        </defs>
+                        <path d="M2.24,109.46V28a12.64,12.64,0,0,1,3.38-7.16A12.14,12.14,0,0,1,13,17.25H47.53a12.26,12.26,0,0,1,9,4.27,40.26,40.26,0,0,0,4.1,4.75,16.6,16.6,0,0,0,4.42,3.29,9.34,9.34,0,0,0,4.11.73h43.28A11.72,11.72,0,0,1,120,35a10,10,0,0,1,1.69,4.27V53h6.84a13.36,13.36,0,0,1,9.09,5.55,11.53,11.53,0,0,1,1.85,5.71l-15.77,51.81a12.64,12.64,0,0,1-4.66,4.91,13.2,13.2,0,0,1-6.44,1.69H13.34a13.52,13.52,0,0,1-8-4.83A13.2,13.2,0,0,1,2.24,109.46Z" />
+                        <path d="M2.24,102.78,16.4,59.54a10.73,10.73,0,0,1,3.77-4.2,12.43,12.43,0,0,1,6.14-1.91c5-.29,43.08-.52,95.4-.44" />
+                        <circle class="path_afficher_temp_folder" cx="100.63" cy="100.24" r="34.6" />
+                        <path class="path_afficher_temp_folder" d="M100.63,67.64A32.6,32.6,0,1,1,68,100.24a32.64,32.64,0,0,1,32.59-32.6m0-4a36.6,36.6,0,1,0,36.6,36.6,36.6,36.6,0,0,0-36.6-36.6Z" />
+                        <path class="path_afficher_temp_folder" d="M100.54,100.24V72.66" />
+                        <path class="path_afficher_temp_folder" d="m100.91 100.24 13-6.13" />
+                    </svg>
+                </div>
+                <a href="#">%downloadContextMenuOpenTempFolder%</a>
+            </div>
+        </div>
+
+        <div class="item_hr"></div>
+
+        <div class="menu item" id="copier_chemin_dacces">
+            <div class="item-content">
+                <div class="icon">
+                    <svg width="141.73" height="141.73" version="1.1" viewBox="0 0 141.73 141.73" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <style>
+                                .path_copier_chemin_dacces {
+                                    fill: var(--background-menu-color);
+                                }
+                            </style>
+                        </defs>
+                        <rect class="path_copier_chemin_dacces" x="34.08" y="2.33" width="92.51" height="116.14" />
+                        <path d="M124.59,4.33V116.47H36.08V4.33h88.51m4-4H32.08V120.47h96.51V.33Z" />
+                        <rect class="path_copier_chemin_dacces" x="12.81" y="23.59" width="92.51" height="116.14" rx="3.02" />
+                        <path d="M102.31,25.59a1,1,0,0,1,1,1V136.72a1,1,0,0,1-1,1H15.83a1,1,0,0,1-1-1V26.61a1,1,0,0,1,1-1h86.48m0-4H15.83a5,5,0,0,0-5,5V136.72a5,5,0,0,0,5,5h86.48a5,5,0,0,0,5-5V26.61a5,5,0,0,0-5-5Z" />
+                    </svg>
+                </div>
+                <a href="#">%downloadContextMenuCopyFilePath%</a>
+            </div>
+        </div>
+        <div class="menu item" id="copier_coordonnees">
+            <div class="item-content">
+                <div class="icon">
+                    <svg width="141.73" height="141.73" version="1.1" viewBox="0 0 141.73 141.73" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <style>
+                                .path_copier_coordonnees {
+                                    fill: var(--background-menu-color);
+                                }
+                            </style>
+                        </defs>
+                        <rect class="path_copier_coordonnees" x="34.08" y="2.33" width="92.51" height="116.14" />
+                        <path d="M124.59,4.33V116.47H36.08V4.33h88.51m4-4H32.08V120.47h96.51V.33Z" />
+                        <rect class="path_copier_coordonnees" x="12.81" y="23.59" width="92.51" height="116.14" rx="3.02" />
+                        <path d="M102.31,25.59a1,1,0,0,1,1,1V136.72a1,1,0,0,1-1,1H15.83a1,1,0,0,1-1-1V26.61a1,1,0,0,1,1-1h86.48m0-4H15.83a5,5,0,0,0-5,5V136.72a5,5,0,0,0,5,5h86.48a5,5,0,0,0,5-5V26.61a5,5,0,0,0-5-5Z" />
+                    </svg>
+                </div>
+                <a href="#">%downloadContextMenuCopyBoundingBox%</a>
+            </div>
+        </div>
+
+        <div class="item_hr"></div>
+
+        <div class="menu item" id="reselect_area">
+            <div class="item-content">
+                <div class="icon">
+                    <svg width="141.73" height="141.73" version="1.1" viewBox="0 0 141.73 141.73" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <style>
+                                .path_reselect_area {
+                                    fill: var(--background-menu-color);
+                                }
+                            </style>
+                        </defs>
+                        <path d="M91.38,0h-20V4h20V0Zm-25,0h-20V4h20V0Zm-25,0h-20V4h20V0Zm-25,0H0V4H16.38V0ZM4,8.62H0v20H4v-20Zm0,25H0v20H4v-20Zm0,25H0v20H4v-20Zm0,25H0v20H4v-20Zm0,25H0v7.76H12.24v-4H4v-3.76Zm33.24,3.76h-20v4h20v-4Zm25,0h-20v4h20v-4Zm25,0h-20v4h20v-4Zm25,0h-20v4h20v-4Zm4.14-16.86h-4v20h4v-20Zm0-25h-4v20h4v-20Zm0-25h-4v20h4v-20Zm0-25h-4v20h4v-20Zm0-20.52h-20V4h16V15.52h4V0Z" />
+                        <path class="path_reselect_area" d="M51,50,136.5,84.61,100.8,98A3.05,3.05,0,0,0,99,99.76l-13.39,35.7Z" />
+                        <path d="M54.65,53.61l73.9,29.94,2.45,1L100.1,96.13a5,5,0,0,0-2.93,2.93l-6.24,16.62-5,13.3-.36,1L54.65,53.61M49.2,47.16a1,1,0,0,0-.92,1.38l36.48,90.05a1,1,0,0,0,1.86,0l3.07-8.17q5.61-15,11.23-29.93a1,1,0,0,1,.58-.58l38.1-14.3a1,1,0,0,0,0-1.86l-90-36.48a1.08,1.08,0,0,0-.38-.08Z" />
+                    </svg>
+                </div>
+                <a href="#">%downloadContextMenuReselectBoundingBox%</a>
+            </div>
+        </div>
+
+        <div class="menu item" id="rendre_courant">
+            <div class="item-content">
+                <div class="icon">
+                    <svg width="141.73" height="141.73" version="1.1" viewBox="0 0 141.73 141.73" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M11.73,25.59,71.08,81.68,130,25.59" />
+                        <path d="M11.73,67.28l59.35,56.08L130,67.28" />
+                    </svg>
+                </div>
+                <a href="#">%downloadContextMenuMakeLayerActive%</a>
+            </div>
+        </div>
+
+        <div class="menu item" id="retelecharger">
+            <div class="item-content">
+                <div class="icon">
+                    <svg version="1.2" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 141.7 141.7" overflow="visible" xml:space="preserve">
+                    
+                    <g>
+                    <path d="
+		M135.5,61.9c5.2,36.9-20.5,71-57.4,76.2c-0.4,0-0.7,0.1-1.1,0.1C39.9,140.5,7.9,112.2,5.7,75c-0.1-1.8-0.1-3.5-0.1-5.3
+		C6.9,33.8,35.5,5,71.3,3.4c21.2,0.6,41,10.8,53.8,27.8l2.9,4.4H95.9" />
+                        </g>
+                    </svg>
+                </div>
+                <a href="#">%downloadContextMenuReDownloadMap%</a>
+            </div>
+        </div>
+
+        <div class="item_hr"></div>
+
+        <div class="menu item" id="supprimer_fichier">
+            <div class="item-content">
+                <div class="icon">
+                    <svg width="141.73" height="141.73" version="1.1" viewBox="0 0 141.73 141.73" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <style>
+                                .path_supprimer_fichier {
+                                    stroke-miterlimit: 10;
+                                }
+                            </style>
+                        </defs>
+                        <path class="path_supprimer_fichier" d="M20.29,24.09l6.61,97.66a17.83,17.83,0,0,0,4.29,10.17A19,19,0,0,0,44.4,138.8H99.74a16,16,0,0,0,9.55-3.84,16.72,16.72,0,0,0,5.27-11.43l6.78-99.44H49.93v-13a8,8,0,0,1,2.23-5.18A9,9,0,0,1,58.5,3.11H84a8.9,8.9,0,0,1,6,2.05,9,9,0,0,1,2.68,5V24.09" />
+                        <path class="path_supprimer_fichier" d="m58.5 49.35v63.92" />
+                        <path class="path_supprimer_fichier" d="m83.41 49.35v63.92" />
+                    </svg>
+                </div>
+                <a href="#">%downloadContextMenuDeleteFile%</a>
+            </div>
+        </div>
+
+        <div class="menu item" id="supprimer_liste">
+            <div class="item-content">
+                <div class="icon">
+                    <svg width="141.73" height="141.73" version="1.1" viewBox="0 0 141.73 141.73" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <style>
+                                .path_supprimer_liste-1,
+                                .path_supprimer_liste-2 {
+                                    fill: var(--background-menu-color);
+                                }
+
+                                .path_supprimer_liste-1 {
+                                    stroke-miterlimit: 10;
+                                }
+                            </style>
+                        </defs>
+                        <path class="path_supprimer_liste-1" d="m5.83 25.48h130" />
+                        <path class="path_supprimer_liste-1" d="M7.2,86.17H71" />
+                        <path class="path_supprimer_liste-1" d="m7.2 55.82h130" />
+                        <path class="path_supprimer_liste-1" d="M7.2,116.51H71" />
+                        <path class="path_supprimer_liste-2" d="m89.91 116.51 39.16-39.16" />
+                        <path class="path_supprimer_liste-2" d="m129.07 116.51-39.16-39.16" />
+                    </svg>
+                </div>
+                <a href="#">%downloadContextMenuDeleteDownload%</a>
+            </div>
+        </div>
+    </div>
+    <!--  ------------------ CONTEXT MENU ------------------ -->
+
+
+    <script>
+        function download_js_start(el, id) {
+            el.parentElement.parentElement.querySelector(".infostxt").innerText = "%downloadStateRestarting%";
+            el.parentElement.parentElement.setAttribute("data-state", "progress");
+            download_Csharp_call_from_js.download_restart(parseInt(id));
+        }
+
+        function download_js_stop(id) {
+            download_Csharp_call_from_js.download_stop(parseInt(id));
+        }
+
+        function download_js_openfolder(id) {
+            download_Csharp_call_from_js.download_openfolder(parseInt(id));
+        }
+
+        function download_js_openfile(id) {
+            download_Csharp_call_from_js.download_openfile(parseInt(id));
+        }
+
+        function download_js_opentempfolder(id) {
+            download_Csharp_call_from_js.download_opentempfolder(parseInt(id));
+        }
+
+        function download_js_delete(id) {
+            download_Csharp_call_from_js.download_deletefile(parseInt(id));
+        }
+
+        function download_js_delete_db(id) {
+            document.getElementById(id).querySelector(".download_main_div").style.height = 0;
+            document.getElementById(id).querySelector(".download_main_div").style.opacity = 0;
+
+            setTimeout(function () {
+
+
+                document.getElementById(id).remove();
+
+                let all_alone_timeline = document.querySelectorAll(".timeline+.timeline");
+                all_alone_timeline.forEach(function (single_alone_timeline) {
+                    let timeline_to_delete = single_alone_timeline.previousElementSibling;
+                    if (timeline_to_delete.classList.contains("timeline")) {
+                        timeline_to_delete.remove();
+                    }
+                });
+
+
+            }, 200)
+
+            download_Csharp_call_from_js.download_delete_db(parseInt(id));
+
+
+
+
+
+        }
+
+        function download_js_reselect_area(id) {
+            download_Csharp_call_from_js.download_reselect_area(parseInt(id));
+        }
+
+        function download_js_copyloc(id) {
+            download_Csharp_call_from_js.download_copyloc(parseInt(id));
+        }
+
+        function download_js_copypath(id) {
+            download_Csharp_call_from_js.download_copypath(parseInt(id));
+        }
+
+        function download_js_makecourant(id) {
+            download_Csharp_call_from_js.download_makecourant(parseInt(id));
+        }
+
+        function download_js_cancel(id) {
+            download_Csharp_call_from_js.download_cancel(parseInt(id));
+            document.getElementById(id).getElementsByClassName("infostxt")[0].textContent = "%downloadStateCanceled%.";
+        }
+
+        function download_js_restart(id) {
+            download_Csharp_call_from_js.download_restart(parseInt(id));
+            document.getElementById(id).getElementsByClassName("infostxt")[0].textContent = "%downloadStateRestarting%";
+        }
+        function download_js_restart_from0(id) {
+            download_Csharp_call_from_js.download_restart_from0(parseInt(id));
+            document.getElementById(id).getElementsByClassName("infostxt")[0].textContent = "%downloadStateRestarting%";
+        }
+
+        function updateprogress(id, progress) {
+            document.getElementById(id).getElementsByClassName("progress_bar")[0].style.width = progress + "%";
+            //console.log("update progress:  " + progress);
+        }
+
+
+        function updateinfos(id, infos, force) {
+            if (document.getElementById(id).getElementsByClassName("download_main_div")[0].getAttribute("data-state") == "progress" || force == "True") {
+                document.getElementById(id).getElementsByClassName("infostxt")[0].textContent = infos;
+                //console.log("update info :  " + infos);
+                reflow(document.getElementById(id).getElementsByClassName("infostxt")[0]);
+            }
+            //x = force;
+
+        }
+
+        function updatestate(id, state) {
+            //waitfordownloading, error, cancel, success
+            document.getElementById(id).getElementsByClassName("download_main_div")[0].setAttribute("data-state", state);
+            console.log(state);
+
+        }
+
+        function updatetooltips(id, tooltips) {
+            document.getElementById(id).getElementsByClassName("infos")[0].title = tooltips;
+        }
+
+        //add_download(5,"progress","testy",5,5545,"prog","1634077140")
+
+        function add_download(id, state, titre, numberoftilesdownloaded, numberoftilestodownload, statustext, timestamp) {
+            update_timeline();
+            if (timestamp == "recent") {
+                if (document.getElementById("recent") == null) {
+                    document.getElementsByTagName("ul")[0].prepend(new DOMParser().parseFromString("<p class=\"not_parse timeline\" id=\"recent\">%downloadTimelineSubTitleRecent%</p>", 'text/html').body.children[0]);
+                }
+            } else {
+                var argument_date = update_date(date_to_string(timestamp, "000"));
+                var innerhtml = "";
+                var last_timeline = document.getElementsByTagName("ul")[0].getElementsByClassName("timeline")[0];
+
+                if (last_timeline == null) {
+                    innerhtml = "null";
+                } else {
+                    innerhtml = last_timeline.innerHTML;
+                }
+
+                if (argument_date != innerhtml) {
+                    document.getElementsByTagName("ul")[0].prepend(new DOMParser().parseFromString("<p class=\"timeline\" data-timestamp=\"" + timestamp + "\">" + argument_date + "</p>", 'text/html').body.children[0]);
+                }
+            }
+
+            var download_li = new DOMParser().parseFromString(`<li id="` + id + `">
+                                        <div class="download_main_div" data-state="` + state + `">
+                                            <p class="download_titre" title="` + titre + `">` + titre + `</p>
+                                            <div class="progress"><div class="progress_bar"></div></div>
+                                            <p class="infos"><span class="infostxt">` + statustext + `</span>
+                                                <a href="#" class="openfile" onclick="download_js_openfile(` + id + `)">%downloadItemActionOpenFile%</a>
+                                            </p>
+                                            <div class="button_div">
+                                                <div class="button dossier" onclick="download_js_openfolder(` + id + `)" title="%downloadItemActionOpenFolder%">
+                                                    <svg class="dossier" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 16">
+                                                        <path class="svg_dossier" d="M.3,11.76V1.64A1.58,1.58,0,0,1,.72.75,1.51,1.51,0,0,1,1.64.3H5.93A1.52,1.52,0,0,1,7.05.83a4.93,4.93,0,0,0,.51.59,2.06,2.06,0,0,0,.55.41,1.17,1.17,0,0,0,.51.09H14a1.46,1.46,0,0,1,.94.58,1.25,1.25,0,0,1,.21.53V4.74H16a1.66,1.66,0,0,1,1.13.69,1.44,1.44,0,0,1,.23.71L15.4,12.58a1.58,1.58,0,0,1-.58.61,1.64,1.64,0,0,1-.8.21H1.68a1.69,1.69,0,0,1-1-.6A1.64,1.64,0,0,1,.3,11.76Z" />
+                                                        <path class="svg_dossier" d="M.3,11.87l2-6.34A1.35,1.35,0,0,1,2.76,5a1.32,1.32,0,0,1,.75-.24l11.62,0" />
+                                                    </svg>
+                                                </div>
+
+                                                <div class="button poubelle" onclick="download_js_delete(` + id + `)" title="%downloadItemActionDeleteFile%">
+                                                    <svg class="poubelle" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 16">
+                                                        <path class="svg_poubelle" d="M1.78,2.65l.74,10.94A2,2,0,0,0,3,14.73a2.13,2.13,0,0,0,1.48.77h6.2a1.78,1.78,0,0,0,1.07-.43,1.87,1.87,0,0,0,.59-1.28L13.1,2.65h-8V1.19A.89.89,0,0,1,5.35.61,1,1,0,0,1,6.06.3H8.92a1,1,0,0,1,.67.23,1,1,0,0,1,.3.56V2.65" />
+                                                        <path class="svg_poubelle" d="M6.06,5.48v7.16" />
+                                                        <path class="svg_poubelle" d="M8.85,5.48v7.16" />
+                                                    </svg>
+                                                </div>
+
+                                                <div class="button start" onclick="download_js_start(this,` + id + `)" title="%downloadItemActionResume%">
+                                                    <svg class="start" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 16">
+                                                        <path class="svg_start" d="M11.69,6.44,1.2.38A.6.6,0,0,0,.3.9V13a.6.6,0,0,0,.9.52l10.49-6A.6.6,0,0,0,11.69,6.44Z" />
+                                                    </svg>
+                                                </div>
+
+                                                <div class="button pause" onclick="download_js_stop(` + id + `)" title="%downloadItemActionStop%">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 8.41 13.59">
+                                                        <path d="M10.83,13.51V.52" transform="translate(-2.72 -0.22)" />
+                                                        <path d="M3,13.51V.52" transform="translate(-2.72 -0.22)" />
+                                                    </svg>
+                                                </div>
+
+                                                <div class="button croix" onclick="download_js_cancel(` + id + `)" title="%downloadItemActionCancel%">
+                                                    <svg class="croix" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 16">
+                                                        <path class="svg_croix" d="M.3.3,6.93,6.93.3,13.56,13.56.3,6.93,6.93l6.63,6.63" />
+                                                    </svg>
+                                                </div>
+
+                                                <div class="button restart" onclick="download_js_restart(` + id + `)" title="%downloadItemActionRetry%">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12.2 12.75">
+                                                        <path class="svg_restart" d="M12.63,6.21A6,6,0,0,1,7.43,13a6,6,0,0,1-6.36-6.1A6.13,6.13,0,0,1,6.92,1a6.24,6.24,0,0,1,4.79,2.47l.26.39v0H9.11" transform="translate(-0.77 -0.52)" />
+                                                    </svg>
+                                                </div>
+
+                                                <div class="button deleteliste" onclick="download_js_delete_db(` + id + `)" title="%downloadItemActionDeleteDownload%">
+                                                    <svg version="1.2" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 12.2 12.8" overflow="visible" xml:space="preserve">
+                                                        <path d="M0.1,2.2h11.8"/>
+                                                        <path d="M0.3,7.8h5.8"/>
+                                                        <path d="M0.3,5h11.8"/>
+                                                        <path d="M0.3,10.5h5.8"/>
+                                                        <path d="M7.8,10.5L11.3,7"/>
+                                                        <path d="M11.3,10.5L7.8,7"/>
+                                                    </svg>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>`, 'text/html').body.children[0];
+
+            document.getElementsByClassName("timeline")[0].after(download_li);
+        }
+
+        function date_to_string(timestamp, ajout = "") {
+            function months_to_string(d) {
+                var months = ["%downloadTimelineMonthsJanuary%", "%downloadTimelineMonthsFebruary%", "%downloadTimelineMonthsMarch%", "%downloadTimelineMonthsApril%", "%downloadTimelineMonthsMay%", "%downloadTimelineMonthsJune%",
+                    "%downloadTimelineMonthsJuly%", "%downloadTimelineMonthsAugust%", "%downloadTimelineMonthsSeptember%", "%downloadTimelineMonthsOctober%", "%downloadTimelineMonthsNovember%", "%downloadTimelineMonthsDecember%"
+                ];
+                return months[d.getMonth()];
+            }
+
+            function days_to_string(d) {
+                var days = ["%downloadTimelineDaysSunday%", "%downloadTimelineDaysMonday%", "%downloadTimelineDaysTuesday%", "%downloadTimelineDaysWednesday%", "%downloadTimelineDaysThursday%", "%downloadTimelineDaysFriday%", "%downloadTimelineDaysSaturday%"];
+                return days[d.getDay()];
+            }
+            var date_fonc = new Date(parseInt(timestamp + ajout));
+            var date_fonc_string = days_to_string(date_fonc) + " " + date_fonc.getDate() + " " + months_to_string(date_fonc) + " " + date_fonc.getFullYear();
+            return date_fonc_string;
+        }
+
+        function update_date(datetxt) {
+            var date_today_string = date_to_string(Date.now());
+            var date_yesterday_string = date_to_string(Date.now() - 864e5);
+            var date_element = datetxt;
+            if (date_element == date_today_string) {
+                date_element = "%downloadTimelineToday% - " + date_element;
+            }
+            if (date_element == date_yesterday_string) {
+                date_element = "%downloadTimelineYesterday% - " + date_element;
+            }
+            return date_element;
+        }
+
+
+        function update_timeline() {
+            Array.from(document.getElementsByClassName("timeline")).forEach((el) => {
+                if (!el.classList.contains("not_parse")) {
+                    var date_element = date_to_string(el.getAttribute("data-timestamp"), "000");
+                    el.innerHTML = update_date(date_element);
+                }
+            });
+        }
+
+        update_timeline();
+
+
+        function reflow(element) {
+            if (element === undefined) {
+                element = document.documentElement;
+            }
+            void (element.offsetHeight);
+        }
+
+    </script>
+
+    <script>
+        // ------------------ CONTEXT MENU ------------------
+        //Ajout des évents Listener
+        window.addEventListener("click", clicked);
+        window.addEventListener("visibilitychange", hide_context_menu);
+        window.addEventListener("blur", hide_context_menu);
+        window.addEventListener("scroll", hide_context_menu);
+        window.addEventListener("keydown", keydown);
+        window.addEventListener("contextmenu", show_context_menu);
+        // init variables globales
+        var tab_index = -1;
+        var all_item_element = document.querySelectorAll(".context_menu .item .item-content:not(.have-sous-menu) a");
+        //init fonction
+        //si la souris bouge sur l'un des item du context menu, alors on passe en mode souris et on enregistre sa position
+        document.querySelectorAll(".context_menu .item").forEach(element => element.addEventListener("mousemove", function (event) {
+            get_context_menu_element().setAttribute("data-navtype", "mouse");
+
+            var temp_tab_index = parseInt(event.target.closest(".item").getAttribute("data-selectable-id"));
+            if (Number.isInteger(temp_tab_index) == true) {
+                tab_index = temp_tab_index;
+            } else {
+                //have-sous-menu
+                if (event.target.classList.contains("have-sous-menu")) {
+                    temp_tab_index = parseInt(event.target.parentElement.querySelector(".item[data-selectable-id]").getAttribute("data-selectable-id"));
+                    if (Number.isInteger(temp_tab_index) == true) {
+                        tab_index = temp_tab_index;
+                    }
+                }
+            }
+            unselect_all();
+            event.target.classList.add("selected");
+        }));
+
+        //on enregistre l'event de click sur chaque items et on leur ajoute un index
+        all_item_element.forEach(function (item, index) {
+            var parent_item = item.parentElement.parentElement;
+
+            parent_item.addEventListener("click", function (event) {
+                event.preventDefault();
+                item_context_menu_clicked(event.target);
+            });
+            parent_item.setAttribute("data-selectable-id", index)
+        });
+
+        function clicked(e) {
+            hide_context_menu(e);
+            let target_li = e.target.closest("li");
+
+            if (target_li != null) {
+                target_li.classList.add("clickfocus");
+            }
+        }
+
+        function unclicked() {
+            document.querySelectorAll(".clickfocus").forEach(function (selected_items) {
+                selected_items.classList.remove("clickfocus");
+            });
+        }
+
+        function get_context_menu_element() {
+            var context_menu = document.querySelector(".context_menu");
+            return context_menu;
+        }
+
+
+        function context_menu_arrow_navigation(direction) {
+            //fonction navigation au clavier
+            do {
+                if (
+                    get_context_menu_element().querySelectorAll(
+                        ".context_menu .item:not(.lock) .item-content a" //".context_menu :not(.sous-menu) .item:not(.lock) .item-content:not(.have-sous-menu) a"
+                    ).length > 0
+                ) {
+                    context_menu_arrow_navigation_main(direction);
+                } else {
+                    return;
+                }
+            } while (all_item_element[tab_index].parentElement.parentElement.classList.contains("lock"));
+
+            //main fonction
+            function context_menu_arrow_navigation_main(direction) {
+                //on defini le mode de navigation (pour gerer apres avec le CSS)
+                if (get_context_menu_element().getAttribute("data-navtype") != "keyboard") {
+                    get_context_menu_element().setAttribute("data-navtype", "keyboard");
+                    if (tab_index != -1) {
+                        let curent_item_tab_index = get_context_menu_element().querySelector('.item[data-selectable-id="' + tab_index + '"]');
+                        if (curent_item_tab_index.parentElement.classList.contains("sous-menu") == false) {
+
+                            curent_item_tab_index.classList.add("selected");
+                        }
+                    }
+                }
+
+                if (Number.isInteger(tab_index) != true) {
+                    //si tab_index n'est pas un integer, alors on le redefini à sa valeur de base
+                    tab_index = -1;
+                }
+
+                if (tab_index != -1) {
+                    //si tab index n'as pas sa valeur par défaut alors :
+                    if (direction == "down") {
+                        if (all_item_element[tab_index].closest(".item").classList.contains("selected")) {
+                            //si la direction est vers le bas alors on incrémente tab index
+                            tab_index = tab_index + 1;
+                            //si tab index depasse le nombre d'item alors on reboucle à 0
+                            if (tab_index > all_item_element.length - 1) {
+                                tab_index = 0;
+                            }
+                        }
+                    } else if (direction == "up") {
+                        if (all_item_element[tab_index].closest(".item").classList.contains("selected")) {
+                            //si la direction est vers le haut alors on décrémente tab index
+                            tab_index = tab_index - 1;
+                            //si tab index depasse 0 alors on reboucle à à la fin
+                            if (tab_index < 0) {
+                                tab_index = all_item_element.length - 1;
+                            }
+                        }
+                    }
+                } else {
+                    //on defini tab index si il n'avait pas encore de valeur
+                    tab_index = 0;
+                }
+
+                unselect_all();
+                var item_selected = all_item_element[tab_index].closest(".item");
+                item_selected.classList.add("selected");
+                if (item_selected.parentElement.classList.contains("sous-menu")) {
+                    item_selected.parentElement.parentElement.classList.add("selected");
+                }
+                all_item_element[tab_index].focus();
+            }
+        }
+
+        function unselect_all() {
+            //on retire à tout les items le tag séléctionné
+            document.querySelectorAll(".selected").forEach(function (selected_items) {
+                selected_items.classList.remove("selected");
+            });
+        }
+
+        function keydown(e) {
+            //event en cas d'appuis de touches
+            //on check si le context menu est affiché
+            if (get_context_menu_element().style.display == "block") {
+
+                //si echap alors on masque
+                if (e.type == "keydown" && e.key === "Escape") {
+                    hide_context_menu(e);
+                }
+                //si fleche vers le bas alors on change l'item selectionné
+                if (e.which === 40) {
+                    e.preventDefault();
+                    //console.log("down");
+                    context_menu_arrow_navigation("down");
+                }
+                //si fleche vers le haut alors on change l'item selectionné
+                if (e.which === 38) {
+                    e.preventDefault();
+                    //console.log("up");
+                    context_menu_arrow_navigation("up");
+                }
+                //si tabulation alors on masque le context menu
+                if (e.which === 9) { // Tabulation
+                    e.preventDefault();
+                    hide_context_menu(e);
+                }
+                //si enter, on valide la selection
+                if (e.which === 13) { //Enter
+                    if (tab_index != -1) {
+                        e.preventDefault();
+                        item_context_menu_clicked(all_item_element[tab_index]);
+                    }
+                } //si supp, on retire de la liste
+            }
+            /**/
+            if (e.which === 46) { //Supp
+                if (document.querySelector(".clickfocus") != null) {
+                    let dataState = document.querySelector(".clickfocus .download_main_div").getAttribute("data-state");
+                    download_Csharp_call_from_js.download_cancel_deleted_db(parseInt(document.querySelector(".clickfocus").getAttribute("id")));
+                    /*if (dataState == "success" || dataState == "cancel" || dataState == "error") {
+                        e.preventDefault();
+                        console.log(document.querySelector(".clickfocus"));
+                        download_js_delete_db(document.querySelector(".clickfocus").getAttribute("id"));
+                        hide_context_menu(e);
+                    } else {
+                        download_Csharp_call_from_js.download_cancel_deleted_db(parseInt(document.querySelector(".clickfocus").getAttribute("id")));
+                        hide_context_menu(e);
+                    }*/
+                }
+            }
+            /**/
+
+        }
+
+        function hide_context_menu(e) {
+            if (e !== null && e.type == "click") {
+                //en cas de click droit et que ce n'est pas sur le menu lui-meme alors on le masque
+                if (get_context_menu_element().contains(e.target)) {
+                    return false;
+                }
+            }
+            //toute les exceptions on été traité, si la fonction est toujours ok alors on masque
+            get_context_menu_element().style.display = "none";
+
+            document.querySelectorAll(".hover").forEach(function (selected_items) {
+                selected_items.classList.remove("hover");
+            });
+            unclicked();
+        }
+
+
+        function update_lock_state(id, lock) {
+            if (id == "*") {
+                all_item_element.forEach(function (item, index) {
+                    var parent_item = item.parentElement.parentElement;
+                    if (lock) {
+                        parent_item.classList.add("lock");
+                    } else {
+                        parent_item.classList.remove("lock");
+                    }
+                });
+
+            } else {
+                let element = document.getElementById(id);
+                if (lock) {
+                    element.classList.add("lock");
+                } else {
+                    element.classList.remove("lock");
+                }
+
+            }
+
+        }
+
+
+
+        //var x;
+
+        function show_context_menu(e) {
+            //on signale que l'event est traité par nous
+            e.preventDefault();
+            //on masque pour terminer les events précédent
+            hide_context_menu(null)
+            if (e.type == "contextmenu") {
+                //en cas de click droit et que ce n'est pas sur le menu lui-meme alors on le masque
+                if (get_context_menu_element().contains(e.target)) {
+                    return false;
+                }
+
+                if (e.target) {
+                    element = e.target.closest("li");
+                    if (element != null) {
+                        get_context_menu_element().setAttribute("data-download_binding", element.getAttribute("id"))
+                        element.classList.add("hover")
+                        update_lock_state("*", false);
+                        let state = element.querySelector(".download_main_div").getAttribute("data-state");
+                        //console.log(state);
+                        if (state != "success") {
+                            update_lock_state("ouvrir_le_fichier", true);
+                            update_lock_state("afficher_dans_dossier", true);
+                            update_lock_state("copier_chemin_dacces", true);
+                            update_lock_state("supprimer_fichier", true);
+                        }
+                        if (state == "progress" || state == "assemblage" || state == "rognage" || state == "enregistrement") {
+
+                            update_lock_state("retelecharger", true);
+                        }
+
+
+
+                    } else {
+                        get_context_menu_element().setAttribute("data-download_binding", "0")
+                        update_lock_state("*", true);
+                    }
+
+                }
+            }
+            tab_index = -1;
+            unselect_all();
+            // on affiche le menu à ce niveau la pour pouvoir calculer ses dimensions
+            var context_menu = get_context_menu_element();
+            context_menu.style.display = "block";
+
+            //recupération des éléments pour calculer la position du context menu
+            var page_left_padding = 0;
+            var page_bottom_padding = 0;
+
+            function getScrollbarWidth() {
+                // Creating invisible container
+                const outer = document.createElement('div');
+                outer.style.visibility = 'hidden';
+                outer.style.overflow = 'scroll';
+                document.body.appendChild(outer);
+                const inner = document.createElement('div');
+                outer.appendChild(inner);
+                page_left_padding = (outer.offsetWidth - inner.offsetWidth);
+                page_bottom_padding = (outer.offsetHeight - inner.offsetHeight);
+                outer.parentNode.removeChild(outer);
+            }
+
+
+            var page_width = (window.innerWidth + window.pageXOffset) - page_left_padding;
+            var page_height = (window.innerHeight + window.pageYOffset) - page_bottom_padding;
+            var menu_width = context_menu.getBoundingClientRect().width;
+            var menu_height = context_menu.getBoundingClientRect().height;
+            var click_position_left = e.pageX;
+            var click_position_top = e.pageY;
+            var menu_distance_right_border = page_width - (click_position_left + menu_width) - 5;
+            var menu_distance_bottom_border = page_height - (click_position_top + menu_height) - 5;
+            var final_menu_x = click_position_left;
+            var final_menu_y = click_position_top;
+
+            //si le context menu n'as pas la place de s'ouvrir, alors on décale sa position finale d'autant
+            if (menu_distance_right_border < 0) {
+                final_menu_x = final_menu_x + menu_distance_right_border;
+            }
+            if (menu_distance_bottom_border < 0) {
+                //final_menu_y = final_menu_y + menu_distance_bottom_border
+                final_menu_y = final_menu_y - menu_height;
+            }
+
+            //on applique les coordonnées finales au style
+            context_menu.style.left = final_menu_x + "px";
+            context_menu.style.top = final_menu_y + "px";
+
+            //on regarde si il y a la place pour ouvrir les sous-menu également
+            var sous_menu_distance_right_border = page_width - (final_menu_x + (menu_width * 2));
+
+            if (sous_menu_distance_right_border < 0) {
+                context_menu.classList.add("isleft");
+                context_menu.classList.remove("isright");
+            } else {
+                context_menu.classList.add("isright");
+                context_menu.classList.remove("isleft");
+            }
+        }
+
+
+        function item_context_menu_clicked(item) {
+            //si item lock, alors on ne le considère pas
+            if (!item.closest(".item").classList.contains("lock")) {
+                //on lance l'action
+                let id = get_context_menu_element().getAttribute("data-download_binding");
+                let action = item.closest(".item").getAttribute("id");
+                //console.log("Vous avez cliqué sur : " + item.closest(".item").querySelector("a").innerText + " element id = " + id);
+                /*
+
+                ouvrir_le_fichier
+                afficher_dans_dossier
+                copier_chemin_dacces
+                copier_coordonnees
+                reselect_area
+                rendre_courant
+                supprimer_fichier
+                supprimer_liste
+                */
+                switch (action) {
+                    case "ouvrir_le_fichier":
+                        download_js_openfile(id);
+                        break;
+                    case "afficher_dans_dossier":
+                        download_js_openfolder(id);
+                        break;
+                    case "copier_chemin_dacces":
+                        download_js_copypath(id);
+                        break;
+                    case "copier_coordonnees":
+                        download_js_copyloc(id);
+                        break;
+                    case "reselect_area":
+                        download_js_reselect_area(id);
+                        break;
+                    case "rendre_courant":
+                        download_js_makecourant(id);
+                        break;
+                    case "supprimer_fichier":
+                        download_js_delete(id);
+                        break;
+                    case "supprimer_liste":
+                        download_Csharp_call_from_js.download_cancel_deleted_db(parseInt(id));
+                        // download_js_delete_db(id);
+                        break;
+                    case "afficher_temp_folder":
+                        download_js_opentempfolder(id);
+                        break;
+                    case "retelecharger":
+                        download_js_restart_from0(id);
+                        break;
+                    default:
+
+                        break;
+                }
+
+
+
+
+                hide_context_menu(null);
+            }
+        }
+        // ------------------ CONTEXT MENU ------------------
+
+    </script>
+    <script>
+        CefSharp.BindObjectAsync("download_Csharp_call_from_js");
+    </script>
+
+</body>
+
+</html>
