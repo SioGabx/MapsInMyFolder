@@ -133,7 +133,7 @@ namespace MapsInMyFolder.Commun
             if (BingMapApiKey == "YOUR_API_KEY")
             {
 #if DEBUG
-                MessageBox.Show("Your Bing API Key is not set, please check MapsInMyFolder.Commun/ApiKey.cs. Fallback OpenStreetMapSearch is used");
+                System.Windows.MessageBox.Show("Your Bing API Key is not set, please check MapsInMyFolder.Commun/ApiKey.cs. Fallback OpenStreetMapSearch is used");
 #endif
                 return OpenStreetMapSearch(encodedSearch);
             }

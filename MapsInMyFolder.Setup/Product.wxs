@@ -6,17 +6,18 @@
 
 <!--DONT FORGET TO CHANGE THE VERSION NUMER HERE AND IN MAPSINMYFOLDER.CSPROJ-->
   <Product Id="*" Name="MapsInMyFolder" Language="1033" Version="0.5.0" Manufacturer="SioGabx" UpgradeCode="091b4d98-0e03-441f-8e40-acb9706db235">
-    <Package InstallerVersion="200" Compressed="yes"  InstallPrivileges="elevated" AdminImage="yes" Manufacturer="SioGabx" Description="This program provides the functionality to install MapsInMyFolder." Comments="This program provides the functionality to install MapsInMyFolder. See https://github.com/SioGabx/MapsInMyFolder" /><!--InstallScope="perUser"-->
+    <Package InstallerVersion="200" Compressed="yes" InstallPrivileges="elevated" AdminImage="yes" Manufacturer="SioGabx" Description="This program provides the functionality to install MapsInMyFolder." Comments="This program provides the functionality to install MapsInMyFolder. See https://github.com/SioGabx/MapsInMyFolder" /><!--InstallScope="perUser"-->
     <Media Id="1" Cabinet="MyCabFile.cab" EmbedCab="yes"/>
     
-    <MajorUpgrade AllowDowngrades="no" AllowSameVersionUpgrades="no" IgnoreRemoveFailure="no" Schedule="afterInstallInitialize" DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+    <MajorUpgrade AllowDowngrades="no" AllowSameVersionUpgrades="yes" IgnoreRemoveFailure="no" Schedule="afterInstallInitialize" DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
 
     <!-- Wix requires that shortcut icons' Id have the same extension as the target file, hence the .exe in the icon Id -->
     <Icon Id="application_icon.exe" SourceFile="$(var.MapsInMyFolder_TargetDir)MapsInMyFolder.exe"/>
 
     <!-- ARPPRODUCTICON is a special Id which sets the icon in Add/Remove Programs (see https://wixtoolset.org/documentation/manual/v3/howtos/ui_and_localization/configure_arp_appearance.html) -->
     <Property Id="ARPPRODUCTICON" Value="application_icon.exe" />
-
+    <!--<Property Id="REINSTALLMODE" Value="amus"/>-->
+    <!-- a = replace all -->
     <Property Id="VC_REDIST_X64_EXISTS" Secure="yes">
       <RegistrySearch Id="VC_REDIST_X64_REGSEARCH" Root="HKLM" Key="SOFTWARE\Microsoft\VisualStudio\14.0\VC\Runtimes\x64" Name="Version" Type="raw" />
     </Property>
