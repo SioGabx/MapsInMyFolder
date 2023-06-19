@@ -23,24 +23,12 @@ using System.Windows.Media.Imaging;
 
 namespace MapsInMyFolder.Commun
 {
-    public static class DebugMode
-    {
-        public static void WriteLine(object text)
-        {
-            if (Settings.is_in_debug_mode)
-            {
-                Debug.WriteLine(text.ToString());
-            }
-        }
-    }
-
-
     public class NameHiddenIdValue
     {
-        public int Id { get; }
-        public string Name { get; }
+        public object Id { get; }
+        public object Name { get; }
 
-        public NameHiddenIdValue(int id, string name)
+        public NameHiddenIdValue(object id, object name)
         {
             Id = id;
             Name = name;
@@ -48,7 +36,7 @@ namespace MapsInMyFolder.Commun
 
         public override string ToString()
         {
-            return Name;
+            return Name.ToString();
         }
     }
 
@@ -58,7 +46,7 @@ namespace MapsInMyFolder.Commun
         {
             public enum InvokeFunction { getTile, getPreview, getPreviewFallback }
 
-            public static (Dictionary<string, object> DefaultCallValue, Dictionary<string, string> ResultCallValue) CallFunctionAndGetResult(string urlbase, string TileComputationScript, int Tilex, int Tiley, int z, int LayerID, InvokeFunction InvokeFunction)
+            public static (Dictionary<string, object> DefaultCallValue, Dictionary<string, string> ResultCallValue) CallFunctionAndGetResult(string urlbase, string Script, int Tilex, int Tiley, int z, int LayerID, InvokeFunction InvokeFunction)
             {
                 if (LayerID == -1)
                 {
@@ -67,7 +55,7 @@ namespace MapsInMyFolder.Commun
 
                 var location_topleft = TileToCoordonnees(Tilex, Tiley, z);
                 var location_bottomright = TileToCoordonnees(Tilex + 1, Tiley + 1, z);
-                var location = GetCenterBetweenTwoPoints(location_topleft, location_bottomright);
+                var (Latitude, Longitude) = GetCenterBetweenTwoPoints(location_topleft, location_bottomright);
 
                 Dictionary<string, object> argument = new Dictionary<string, object>()
                 {
@@ -75,8 +63,8 @@ namespace MapsInMyFolder.Commun
                       { "y",  Tiley.ToString() },
                       { "z",  z.ToString() },
                       { "zoom",  z.ToString() },
-                      { "lat",  location.Latitude.ToString() },
-                      { "lng",  location.Longitude.ToString()},
+                      { "lat",  Latitude.ToString() },
+                      { "lng",  Longitude.ToString()},
 
                       { "t_lat",  location_topleft.Latitude.ToString() },
                       { "t_lng",  location_topleft.Longitude.ToString()},
@@ -87,19 +75,18 @@ namespace MapsInMyFolder.Commun
                       { "url",  urlbase },
                 };
 
-
-                if (!string.IsNullOrEmpty(TileComputationScript))
+                if (!string.IsNullOrEmpty(Script))
                 {
                     Jint.Native.JsValue JavascriptMainResult = null;
                     try
                     {
-                        JavascriptMainResult = Javascript.ExecuteScript(TileComputationScript, new Dictionary<string, object>(argument), LayerID, InvokeFunction);
+                        JavascriptMainResult = Javascript.ExecuteScript(Script, new Dictionary<string, object>(argument), LayerID, InvokeFunction);
                     }
                     catch (Exception ex)
                     {
-                        Javascript.PrintError(ex.Message);
+                        Javascript.Functions.PrintError(ex.Message);
                     }
-                    if (!(JavascriptMainResult is null) && JavascriptMainResult.IsObject())
+                    if (JavascriptMainResult is not null && JavascriptMainResult.IsObject())
                     {
                         object JavascriptMainResultObject = JavascriptMainResult.ToObject();
                         var JavascriptMainResultJson = JsonConvert.SerializeObject(JavascriptMainResultObject);
@@ -108,9 +95,7 @@ namespace MapsInMyFolder.Commun
                     }
                 }
                 return (null, null);
-
             }
-
 
             public static string FromTileXYZ(string urlbase, int Tilex, int Tiley, int z, int LayerID, InvokeFunction InvokeFunction)
             {
@@ -124,8 +109,8 @@ namespace MapsInMyFolder.Commun
                 {
                     return string.Empty;
                 }
-                string TileComputationScript = calque.class_tilecomputationscript;
-                var ValuesDictionnary = CallFunctionAndGetResult(urlbase, TileComputationScript, Tilex, Tiley, z, LayerID, InvokeFunction);
+                string Script = calque.class_script;
+                var ValuesDictionnary = CallFunctionAndGetResult(urlbase, Script, Tilex, Tiley, z, LayerID, InvokeFunction);
                 if (ValuesDictionnary.ResultCallValue is null)
                 {
                     return string.Empty;
@@ -197,7 +182,7 @@ namespace MapsInMyFolder.Commun
                 return new List<int>() { return_x, return_y };
             }
 
-            public static List<Url_class> GetListOfUrlFromLocation(Dictionary<string, double> location, int z, string urlbase, int LayerID, int downloadid = 0)
+            public static List<TilesUrl> GetListOfUrlFromLocation(Dictionary<string, double> location, int z, string urlbase, int LayerID, int downloadid = 0)
             {
                 var NO_tile = CoordonneesToTile(location["NO_Latitude"], location["NO_Longitude"], z);
                 var SE_tile = CoordonneesToTile(location["SE_Latitude"], location["SE_Longitude"], z);
@@ -206,7 +191,7 @@ namespace MapsInMyFolder.Commun
                 int SE_x = SE_tile.X;
                 int SE_y = SE_tile.Y;
 
-                List<Url_class> list_of_url_to_download = new List<Url_class>();
+                List<TilesUrl> list_of_url_to_download = new List<TilesUrl>();
                 int Download_X_tile = 0;
                 int Download_Y_tile = 0;
                 int max_x = Math.Abs(SE_x - NO_x) + 1;
@@ -218,8 +203,7 @@ namespace MapsInMyFolder.Commun
                         int tuileX = NO_x + Download_X_tile;
                         int tuileY = NO_y + Download_Y_tile;
                         string url_to_add_inside_list = FromTileXYZ(urlbase, tuileX, tuileY, z, LayerID, InvokeFunction.getTile);
-                        list_of_url_to_download.Add(new Url_class(url_to_add_inside_list, tuileX, tuileY, z, Status.waitfordownloading, downloadid));
-                        DebugMode.WriteLine("Need to download tuileX:" + tuileX + " tuileY:" + tuileY);
+                        list_of_url_to_download.Add(new TilesUrl(url_to_add_inside_list, tuileX, tuileY, z, Status.waitfordownloading, downloadid));
                         List<int> next_num_list = NextNumberFromPara(Download_X_tile, Download_Y_tile, max_x, max_y);
                         Download_X_tile = next_num_list[0];
                         Download_Y_tile = next_num_list[1];
@@ -228,7 +212,6 @@ namespace MapsInMyFolder.Commun
                 return list_of_url_to_download;
             }
         }
-
 
         public static DoubleAnimation GetOpacityAnimation(int toValue, double durationMultiplicator = 1)
         {
@@ -240,9 +223,8 @@ namespace MapsInMyFolder.Commun
 
         public static void GetAllManifestResourceNames()
         {
-            Assembly assembly = Assembly.GetEntryAssembly();
             //get assembly ManifestResourceNames
-            Debug.WriteLine("get assembly ManifestResourceNames");
+            Assembly assembly = Assembly.GetEntryAssembly();
             for (int i = 0; i < assembly.GetManifestResourceNames().Length; i++)
             {
                 string name = assembly.GetManifestResourceNames()[i];
@@ -254,6 +236,10 @@ namespace MapsInMyFolder.Commun
         {
             using (Stream stream = ReadResourceStream(pathWithSlash))
             {
+                if (stream == null)
+                {
+                    return string.Empty;
+                }
                 string return_rsx = String.Empty;
                 using (StreamReader reader = new StreamReader(stream, Encoding.UTF8, true))
                 {
@@ -288,7 +274,6 @@ namespace MapsInMyFolder.Commun
             };
 
             process.Start();
-
             Application.Current.Shutdown();
         }
 
@@ -323,7 +308,7 @@ namespace MapsInMyFolder.Commun
 
         public static SolidColorBrush RgbValueToSolidColorBrush(int R, int G, int B)
         {
-            return new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(255, (byte)R, (byte)G, (byte)B));
+            return new SolidColorBrush(Color.FromArgb(255, (byte)R, (byte)G, (byte)B));
         }
 
         public static ScrollViewer FormatDiffGetScrollViewer(string texteBase, string texteModif)
@@ -339,27 +324,29 @@ namespace MapsInMyFolder.Commun
             StackPanel ScrollViewerElementContent = new StackPanel()
             {
                 Margin = new Thickness(0, 0, 25, 0),
-                Background = Collectif.HexValueToSolidColorBrush("#303031"),
+                Background = HexValueToSolidColorBrush("#303031"),
             };
             ScrollViewerElementContent.Children.Add(FormatDiffTextblock);
             ScrollViewerElement.Content = ScrollViewerElementContent;
             return ScrollViewerElement;
         }
 
-
         public static TextBlock FormatDiff(string texteBase, string texteModif)
         {
-            DiffMatchPatch dmp = new DiffMatchPatch();
-            dmp.Diff_Timeout = 0;
+            DiffMatchPatch dmp = new DiffMatchPatch()
+            {
+                Diff_Timeout = 0
+            };
+
             TextBlock ContentTextBlock = new TextBlock()
             {
                 TextWrapping = TextWrapping.WrapWithOverflow,
-                Foreground = Collectif.HexValueToSolidColorBrush("#FFE2E2E1"),
+                Foreground = HexValueToSolidColorBrush("#FFE2E2E1"),
                 TextAlignment = TextAlignment.Justify
             };
             List<Diff> diffs = dmp.diff_main(texteBase, texteModif);
-            SolidColorBrush BackgroundGreen = Collectif.HexValueToSolidColorBrush("#6b803f");
-            SolidColorBrush BackgroundRed = Collectif.HexValueToSolidColorBrush("#582e2e");
+            SolidColorBrush BackgroundGreen = HexValueToSolidColorBrush("#6b803f");
+            SolidColorBrush BackgroundRed = HexValueToSolidColorBrush("#582e2e");
             foreach (var diff in diffs)
             {
                 SolidColorBrush curentBrush = Brushes.Transparent;
@@ -372,7 +359,7 @@ namespace MapsInMyFolder.Commun
                     curentBrush = BackgroundRed;
                 }
 
-                ContentTextBlock.Inlines.Add(new System.Windows.Documents.Run()
+                ContentTextBlock.Inlines.Add(new Run()
                 {
                     Text = diff.text,
                     Background = curentBrush,
@@ -381,24 +368,23 @@ namespace MapsInMyFolder.Commun
             return ContentTextBlock;
         }
 
-        public static void setBackgroundOnUIElement(UIElement element, string hexcolor)
+        public static void SetBackgroundOnUIElement(UIElement element, string hexcolor)
         {
             SolidColorBrush brush;
             if (string.IsNullOrEmpty(hexcolor?.Trim()))
             {
-                brush = Collectif.RgbValueToSolidColorBrush(Settings.background_layer_color_R, Settings.background_layer_color_G, Settings.background_layer_color_B); ;
+                brush = RgbValueToSolidColorBrush(Settings.background_layer_color_R, Settings.background_layer_color_G, Settings.background_layer_color_B); ;
             }
             else
             {
-                brush = Collectif.HexValueToSolidColorBrush(hexcolor);
+                brush = HexValueToSolidColorBrush(hexcolor);
             }
 
-            //element.GetType().GetProperty("Background").GetValue(element);
             element.GetType().GetProperty("Background").SetValue(element, brush);
 
         }
 
-        public static string GetSaveTempDirectory(string nom, string identifiant, int zoom = -1, string temp_folder = "")
+        public static string GetSaveTempDirectory(string nom, string identifier, int zoom = -1, string temp_folder = "")
         {
             string settings_temp_folder;
             if (string.IsNullOrEmpty(temp_folder))
@@ -409,9 +395,9 @@ namespace MapsInMyFolder.Commun
             {
                 settings_temp_folder = temp_folder;
             }
-            //Debug.WriteLine(settings_temp_folder);
+
             string nom_charclean = string.Concat(nom.Split(Path.GetInvalidFileNameChars()));
-            string chemin = Path.Combine(settings_temp_folder, "layers", nom_charclean + "_" + identifiant + "\\");
+            string chemin = Path.Combine(settings_temp_folder, "layers", nom_charclean + "_" + identifier + "\\");
             if (zoom != -1)
             {
                 chemin += zoom + "\\";
@@ -422,16 +408,16 @@ namespace MapsInMyFolder.Commun
         public static MemoryStream ByteArrayToStream(byte[] input)
         {
             if (input == null) { return null; }
-            MemoryStream ms = new MemoryStream(input);
-            return ms;
+            return new MemoryStream(input);
         }
 
         public static byte[] GetBytesFromBitmapSource(BitmapSource bmp)
         {
-            PngBitmapEncoder encoder = new PngBitmapEncoder();
             using (MemoryStream stream = new MemoryStream())
             {
-                encoder.Frames.Add(BitmapFrame.Create(bmp));
+                BitmapFrame bitmap = BitmapFrame.Create(bmp);
+                PngBitmapEncoder encoder = new PngBitmapEncoder();
+                encoder.Frames.Add(bitmap);
                 encoder.Save(stream);
                 byte[] bit = stream.ToArray();
                 stream.Close();
@@ -439,8 +425,7 @@ namespace MapsInMyFolder.Commun
             }
         }
 
-        static readonly object Locker = new object();
-        public static byte[] GetEmptyImageBufferFromText(HttpResponse httpResponse)
+        public static byte[] GetEmptyImageBufferFromText(HttpResponse httpResponse, int LayerID, string FileFormat)
         {
             string BitmapErrorsMessage;
             if (httpResponse is null || httpResponse.ResponseMessage is null)
@@ -453,38 +438,68 @@ namespace MapsInMyFolder.Commun
                 {
                     BitmapErrorsMessage = "Null response";
                 }
-
             }
             else
             {
-                BitmapErrorsMessage = (((int)httpResponse?.ResponseMessage?.StatusCode).ToString() + " - " + httpResponse?.ResponseMessage?.ReasonPhrase);
+                BitmapErrorsMessage = $"{(int)httpResponse?.ResponseMessage?.StatusCode} - {httpResponse?.ResponseMessage?.ReasonPhrase}";
             }
 
-            return GetEmptyImageBufferFromText(BitmapErrorsMessage);
+            return GetEmptyImageBufferFromText(BitmapErrorsMessage, LayerID, FileFormat);
         }
 
-        public static byte[] GetEmptyImageBufferFromText(string BitmapErrorsMessage)
+        public static byte[] GetEmptyImageBufferFromText(string BitmapErrorsMessage, int LayerID, string FileFormat)
         {
             const int tile_size = 300;
             const int border_size = 1;
             const int border_tile_size = tile_size - (border_size * 2);
-            const string format = "jpeg";
-            var color = new double[] { Settings.background_layer_color_R, Settings.background_layer_color_G, Settings.background_layer_color_B };
-            NetVips.VOption saveVOption = getSaveVOption(format, 100, tile_size);
+            if (FileFormat == "png" || LayerID == -2)
+            {
+                const string format = "png";
+                double[] color = new double[] { Settings.background_layer_color_R, Settings.background_layer_color_G, Settings.background_layer_color_B, 60 };
+                VOption saveVOption = GetSaveVOption(format, 100, tile_size);
 
-            if (string.IsNullOrEmpty(BitmapErrorsMessage))
-            {
-                return null;
-            }
-            lock (Locker)
-            {
-                using (NetVips.Image text = NetVips.Image.Text(WordWrap(BitmapErrorsMessage, 20), null, null, null, NetVips.Enums.Align.Centre, null, 100, 5, null))
+                if (string.IsNullOrEmpty(BitmapErrorsMessage))
+                {
+                    return null;
+                }
+
+                using (NetVips.Image text = NetVips.Image.Text(WordWrap(BitmapErrorsMessage, 20), null, null, null, Enums.Align.Centre, null, 100, 5, null, true))
+                using (NetVips.Image background = NetVips.Image.Black(border_tile_size, border_tile_size))
                 {
                     int offsetX = (int)Math.Floor((double)(border_tile_size - text.Width) / 2);
                     int offsetY = (int)Math.Floor((double)(border_tile_size - text.Height) / 2);
-                    using (NetVips.Image image = NetVips.Image.Black(border_tile_size, border_tile_size).Linear(color, color).Composite2(text, NetVips.Enums.BlendMode.Atop, offsetX, offsetY))
+
+                    using (NetVips.Image image = background.Linear(color, color))
+                    using (NetVips.Image SrgbImage = image.Copy(interpretation: Enums.Interpretation.Srgb))
+                    using (NetVips.Image finalImage = SrgbImage.Composite2(text, Enums.BlendMode.Xor, offsetX, offsetY))
+                    using (NetVips.Image GravityFinalImage = finalImage.Gravity(Enums.CompassDirection.Centre, tile_size, tile_size, Enums.Extend.Background, new double[] { 0, 0, 0, 255 }))
                     {
-                        return image.Gravity(Enums.CompassDirection.Centre, tile_size, tile_size, Enums.Extend.Black).WriteToBuffer("." + format, saveVOption); ;
+                        return GravityFinalImage.WriteToBuffer("." + format, saveVOption);
+                    }
+                }
+            }
+            else
+            {
+                const string format = "jpeg";
+                var color = new double[] { Settings.background_layer_color_R, Settings.background_layer_color_G, Settings.background_layer_color_B };
+                VOption saveVOption = GetSaveVOption(format, 100, tile_size);
+
+                if (string.IsNullOrEmpty(BitmapErrorsMessage))
+                {
+                    return null;
+                }
+
+                using (NetVips.Image text = NetVips.Image.Text(WordWrap(BitmapErrorsMessage, 20), null, null, null, Enums.Align.Centre, null, 100, 5, null, true))
+                using (NetVips.Image background = NetVips.Image.Black(border_tile_size, border_tile_size))
+                {
+                    int offsetX = (int)Math.Floor((double)(border_tile_size - text.Width) / 2);
+                    int offsetY = (int)Math.Floor((double)(border_tile_size - text.Height) / 2);
+
+                    using (NetVips.Image image = background.Linear(color, color))
+                    using (NetVips.Image finalImage = image.Composite2(text, Enums.BlendMode.Atop, offsetX, offsetY))
+                    using (NetVips.Image GravityFinalImage = finalImage.Gravity(Enums.CompassDirection.Centre, tile_size, tile_size, Enums.Extend.Black))
+                    {
+                        return GravityFinalImage.WriteToBuffer("." + format, saveVOption);
                     }
                 }
             }
@@ -495,6 +510,7 @@ namespace MapsInMyFolder.Commun
             DirectoryInfo di = new DirectoryInfo(folderPath);
             return di.EnumerateFiles("*.*", SearchOption.AllDirectories).Sum(fi => fi.Length);
         }
+
         public static string FormatBytes(long bytes)
         {
             string[] Suffix = { "octets", "Ko", "Mo", "Go", "To" };
@@ -505,10 +521,10 @@ namespace MapsInMyFolder.Commun
                 dblSByte = bytes / 1024.0;
             }
 
-            return String.Format("{0:0} {1}", dblSByte, Suffix[i]);
+            return string.Format("{0:0} {1}", dblSByte, Suffix[i]);
         }
 
-        public static VOption getSaveVOption(string final_saveformat, int quality, int? tile_size)
+        public static VOption GetSaveVOption(string final_saveformat, int quality, int? tile_size)
         {
             if (quality <= 0)
             {
@@ -518,38 +534,33 @@ namespace MapsInMyFolder.Commun
             VOption saving_options;
             if (final_saveformat == "png")
             {
-                saving_options = new VOption
-                    {
-                        { "Q", quality },
-                        { "compression", 100 },
-                        { "interlace", true },
-                        { "strip", true },
-                    };
+                saving_options = new VOption {
+                    { "compression", quality },
+                    { "interlace", true },
+                    { "strip", true },
+                };
             }
             else if (final_saveformat == "jpeg")
             {
-                saving_options = new VOption
-                    {
-                        { "Q", quality },
-                        { "interlace", true },
-                        { "optimize_coding", true },
-                        { "strip", true },
-
-                    };
+                saving_options = new VOption {
+                    { "Q", quality },
+                    { "interlace", true },
+                    { "optimize_coding", true },
+                    { "strip", true },
+                };
             }
             else if (final_saveformat == "tiff")
             {
-                saving_options = new VOption
-                    {
-                        { "Q", quality },
-                        { "tileWidth", tile_size },
-                        { "tileHeight", tile_size },
-                        { "compression", "jpeg" },
-                        { "interlace", true },
-                        { "tile", true },
-                        { "pyramid", true },
-                        { "bigtif", true }
-                    };
+                saving_options = new VOption {
+                    { "Q", quality },
+                    { "tileWidth", tile_size },
+                    { "tileHeight", tile_size },
+                    { "compression", "jpeg" },
+                    { "interlace", true },
+                    { "tile", true },
+                    { "pyramid", true },
+                    { "bigtif", true }
+                };
             }
             else
             {
@@ -558,108 +569,212 @@ namespace MapsInMyFolder.Commun
             return saving_options;
         }
 
-        public static async Task<Stream> StreamDownloadUri(Uri url)
+        //public static async Task<HttpResponse> ByteDownloadUri(Uri url, int LayerId, bool getRealRequestMessage = false)
+        //{
+
+        //    if (!Network.FastIsNetworkAvailable())
+        //    {
+        //        return new HttpResponse(null, new HttpResponseMessage(HttpStatusCode.ServiceUnavailable)
+        //        {
+        //            ReasonPhrase = "Aucune connexion : Vérifiez votre connexion Internet"
+        //        });
+        //    }
+
+        //    HttpResponse response = HttpResponse.HttpResponseError;
+        //    int maxRetry = Settings.max_redirection_download_tile;
+        //    int retry = 0;
+        //    bool doNeedToRetry;
+        //    Uri parsing_url = url;
+        //    do
+        //    {
+        //        doNeedToRetry = false;
+        //        retry++;
+
+        //        try
+        //        { 
+        //            using (var responseMessage = await Tiles.HttpClient.GetAsync(parsing_url, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false))
+        //            {
+        //                if (responseMessage is null)
+        //                {
+        //                    return response;
+        //                }
+
+        //                if (responseMessage.IsSuccessStatusCode)
+        //                {
+        //                    byte[] buffer = await responseMessage.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
+        //                    return new HttpResponse(buffer, responseMessage);
+        //                }
+        //                else if (!string.IsNullOrWhiteSpace(responseMessage?.Headers?.Location?.ToString()?.Trim()))
+        //                {
+        //                    // Redirect found (autodetect)  System.Net.HttpStatusCode.Found
+        //                    Uri new_location = responseMessage.Headers.Location;
+        //                    doNeedToRetry = true;
+        //                    parsing_url = new_location;
+        //                }
+        //                else
+        //                {
+        //                    if (LayerId == -2)
+        //                    {
+        //                        Javascript.Functions.PrintError($"DownloadUrl - Error {(int)responseMessage.StatusCode} : {responseMessage.ReasonPhrase}. Url : {parsing_url}");
+        //                    }
+
+        //                    if (Settings.generate_transparent_tiles_on_error)
+        //                    {
+        //                        if (getRealRequestMessage)
+        //                        {
+        //                            return new HttpResponse(null, responseMessage);
+        //                        }
+        //                        else
+        //                        {
+        //                            return new HttpResponse(null, new System.Net.Http.HttpResponseMessage(HttpStatusCode.NotFound));
+        //                        }
+        //                    }
+        //                }
+        //                if (getRealRequestMessage)
+        //                {
+        //                    response = new HttpResponse(response.Buffer, responseMessage);
+        //                }
+
+        //            }
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            if (ex.InnerException is System.Net.Sockets.SocketException socketException && socketException.SocketErrorCode == System.Net.Sockets.SocketError.HostNotFound)
+        //            {
+        //                // Check for internet connectivity when the host is unknown.
+        //                Network.IsNetworkAvailable();
+        //            }
+        //            Debug.WriteLine($"DownloadByteUrl catch: {url}: {ex}");
+
+        //            if (LayerId == -2)
+        //            {
+        //                Javascript.Functions.PrintError($"DownloadUrl - Error {ex.Message}. Url : {url}");
+        //            }
+        //            response = new HttpResponse(null, null, ex.Message);
+        //        }
+        //        finally
+        //        {
+
+        //        }
+        //    } while (doNeedToRetry && (retry < maxRetry));
+
+        //    return response;
+        //}
+        public static string AddHttpToUrl(string url)
         {
-            try
+            if (!string.IsNullOrWhiteSpace(url))
             {
-                using (var responseMessage = await TileGeneratorSettings.HttpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false))
+                if (!url.StartsWith("http://") && !url.StartsWith("https://"))
                 {
-                    if (responseMessage.IsSuccessStatusCode)
-                    {
-                        return await responseMessage.Content.ReadAsStreamAsync().ConfigureAwait(false);
-                    }
-                    else
-                    {
-                        Debug.WriteLine($"DownloadStreamUrl: {url}: {(int)responseMessage.StatusCode} {responseMessage.ReasonPhrase}");
-                    }
+                    url = "http://" + url;
                 }
             }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"DownloadStreamUrl: {url}: {ex.Message}");
-            }
-
-            return null;
+            return url;
         }
 
         public static async Task<HttpResponse> ByteDownloadUri(Uri url, int LayerId, bool getRealRequestMessage = false)
         {
+            if (!Network.FastIsNetworkAvailable())
+            {
+                return new HttpResponse(null, new HttpResponseMessage(HttpStatusCode.ServiceUnavailable)
+                {
+                    ReasonPhrase = "Aucune connexion : Vérifiez votre connexion Internet"
+                });
+            }
+
             HttpResponse response = HttpResponse.HttpResponseError;
+            string originalReferer = Layers.GetLayerById(LayerId)?.class_site_url;
 
-            int max_retry = Settings.max_redirection_download_tile;
+            int maxRetry = Settings.max_redirection_download_tile;
             int retry = 0;
-
-            bool do_need_retry;
-
+            bool doNeedToRetry;
             Uri parsing_url = url;
 
             do
             {
-                do_need_retry = false;
+                doNeedToRetry = false;
                 retry++;
 
                 try
                 {
-                    using (var responseMessage = await TileGeneratorSettings.HttpClient.GetAsync(parsing_url, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false))
+                    using var requestMessage = new HttpRequestMessage(HttpMethod.Get, parsing_url);
+                    if (!string.IsNullOrWhiteSpace(originalReferer))
                     {
-                        if (responseMessage is null)
-                        {
-                            DebugMode.WriteLine("Error null response");
-                            return response;
-                        }
+                        requestMessage.Headers.Referrer = new Uri(AddHttpToUrl(originalReferer)); // Ajoute le referer original à la requête
+                    }
 
-                        if (responseMessage.IsSuccessStatusCode)
+                    using var responseMessage = await Tiles.HttpClient.SendAsync(requestMessage, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false);
+                    if (responseMessage is null)
+                    {
+                        return response;
+                    }
+
+                    if (responseMessage.IsSuccessStatusCode)
+                    {
+                        byte[] buffer = await responseMessage.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
+                        return new HttpResponse(buffer, responseMessage);
+                    }
+                    else if (!string.IsNullOrWhiteSpace(responseMessage?.Headers?.Location?.ToString()?.Trim()))
+                    {
+                        // Redirect found (autodetect)  System.Net.HttpStatusCode.Found
+                        Uri new_location = responseMessage.Headers.Location;
+                        doNeedToRetry = true;
+                        parsing_url = new_location;
+                    }
+                    else
+                    {
+                        if (LayerId == -2)
                         {
-                            byte[] buffer = await responseMessage.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
-                            return new HttpResponse(buffer, responseMessage);
-                        }
-                        else if (!(responseMessage is null) && !(responseMessage.Headers is null) && !(responseMessage.Headers.Location is null) && !string.IsNullOrEmpty(responseMessage.Headers.Location.ToString().Trim()))
-                        {
-                            // Redirect found (autodetect)  System.Net.HttpStatusCode.Found
-                            Uri new_location = responseMessage.Headers.Location;
-                            DebugMode.WriteLine($"DownloadByteUrl Retry : {parsing_url} to {new_location}: {(int)responseMessage.StatusCode} {responseMessage.ReasonPhrase}");
-                            do_need_retry = true;
-                            parsing_url = new_location;
-                        }
-                        else
-                        {
-                            DebugMode.WriteLine($"DownloadByteUrl: {parsing_url}: {(int)responseMessage.StatusCode} {responseMessage.ReasonPhrase}");
-                            if (LayerId == -2)
+                            var ErrorPageContent = "";
+                            if (responseMessage?.Content != null)
                             {
-                                Javascript.PrintError($"DownloadUrl - Error {(int)responseMessage.StatusCode} : {responseMessage.ReasonPhrase}. Url : {parsing_url}");
-                            }
-                            if (Settings.generate_transparent_tiles_on_error)
-                            {
-                                if (getRealRequestMessage)
+                                byte[] buffer = await responseMessage.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
+                                var TempErrorPageContent = ByteArrayToString(buffer);
+                                if (!string.IsNullOrWhiteSpace(TempErrorPageContent))
                                 {
-                                    return new HttpResponse(null, responseMessage);
-                                }
-                                else
-                                {
-                                    return new HttpResponse(null, new System.Net.Http.HttpResponseMessage(HttpStatusCode.NotFound));
+                                    ErrorPageContent = "\n" + TempErrorPageContent + "\n";
                                 }
                             }
-                        }
-                        if (getRealRequestMessage)
-                        {
-                            response = new HttpResponse(response.Buffer, responseMessage);
+                            Javascript.Functions.PrintError($"DownloadUrl - Error {(int)responseMessage.StatusCode} : {responseMessage.ReasonPhrase}. Url : {parsing_url}" + ErrorPageContent);
                         }
 
+                        if (Settings.generate_transparent_tiles_on_error)
+                        {
+                            if (getRealRequestMessage)
+                            {
+                                return new HttpResponse(null, responseMessage);
+                            }
+                            else
+                            {
+                                return new HttpResponse(null, new System.Net.Http.HttpResponseMessage(HttpStatusCode.NotFound));
+                            }
+                        }
+                    }
+                    if (getRealRequestMessage)
+                    {
+                        response = new HttpResponse(response.Buffer, responseMessage);
                     }
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine($"DownloadByteUrl catch: {url}: {ex.Message}");
+                    if (ex.InnerException is System.Net.Sockets.SocketException socketException && socketException.SocketErrorCode == System.Net.Sockets.SocketError.HostNotFound)
+                    {
+                        // Check for internet connectivity when the host is unknown.
+                        Network.IsNetworkAvailable();
+                    }
+                    Debug.WriteLine($"DownloadByteUrl catch: {url}: {ex}");
+
                     if (LayerId == -2)
                     {
-                        Javascript.PrintError($"DownloadUrl - Error {ex.Message}. Url : {url}");
+                        Javascript.Functions.PrintError($"DownloadUrl - Error {ex.Message}. Url : {url}");
                     }
                     response = new HttpResponse(null, null, ex.Message);
                 }
-            } while (do_need_retry && (retry < max_retry));
+            } while (doNeedToRetry && (retry < maxRetry));
 
             return response;
         }
+
 
         public class HttpClientDownloadWithProgress
         {
@@ -678,7 +793,7 @@ namespace MapsInMyFolder.Commun
 
             public async Task StartDownload()
             {
-                using (var response = await TileGeneratorSettings.HttpClient.GetAsync(_downloadUrl, HttpCompletionOption.ResponseHeadersRead))
+                using (var response = await Tiles.HttpClient.GetAsync(_downloadUrl, HttpCompletionOption.ResponseHeadersRead))
                 {
                     await DownloadFileFromHttpResponseMessage(response);
                 }
@@ -746,35 +861,22 @@ namespace MapsInMyFolder.Commun
             }
         }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         public static string ByteArrayToString(byte[] data)
         {
             return Encoding.UTF8.GetString(data, 0, data.Length);
         }
 
-        public static Boolean CheckIfDownloadIsNeededOrCached(string save_temp_directory, string filename, int settings_max_tiles_cache_days)
+        public static bool CheckIfDownloadIsNeededOrCached(string save_temp_directory, string filename, int settings_max_tiles_cache_days)
         {
             if (!Directory.Exists(save_temp_directory))
             {
                 Directory.CreateDirectory(save_temp_directory);
                 return true;
             }
-            if (File.Exists(save_temp_directory + filename))
+
+            if (File.Exists(Path.Combine(save_temp_directory, filename)))
             {
-                FileInfo filinfo = new FileInfo(save_temp_directory + filename);
+                FileInfo filinfo = new FileInfo(Path.Combine(save_temp_directory, filename));
                 long size = filinfo.Length;
                 DateTime date_du_telechargement = DateTime.Now;
                 date_du_telechargement = date_du_telechargement.AddDays(-Math.Abs(settings_max_tiles_cache_days));
@@ -792,13 +894,6 @@ namespace MapsInMyFolder.Commun
             {
                 return true;
             }
-        }
-
-        public static void LockPreviousUndo(RichTextBox uIElement)
-        {
-            int undo_limit = uIElement.UndoLimit;
-            uIElement.UndoLimit = 0;
-            uIElement.UndoLimit = undo_limit;
         }
 
         public static void LockPreviousUndo(TextBox uIElement)
@@ -827,19 +922,16 @@ namespace MapsInMyFolder.Commun
         public static void TextEditorCursorPositionChanged(ICSharpCode.AvalonEdit.TextEditor textEditor, Grid grid, ScrollViewer scrollViewer, int MarginTop = 25)
         {
             if (Mouse.LeftButton == MouseButtonState.Pressed) { return; }
-            double Margin = 40;
-
+            const double Margin = 40;
             double TextboxLayerScriptTopPosition = textEditor.TranslatePoint(new Point(0, 0), grid).Y;
             double TextboxLayerScriptCaretTopPosition = textEditor.TextArea.Caret.CalculateCaretRectangle().Top + TextboxLayerScriptTopPosition;
             if (TextboxLayerScriptCaretTopPosition > (grid.ActualHeight - Margin))
             {
                 scrollViewer.ScrollToVerticalOffset(scrollViewer.VerticalOffset + (TextboxLayerScriptCaretTopPosition - (grid.ActualHeight - Margin)));
-                return;
             }
             else if (TextboxLayerScriptCaretTopPosition < MarginTop)
             {
                 scrollViewer.ScrollToVerticalOffset(scrollViewer.VerticalOffset - Math.Abs((MarginTop) - TextboxLayerScriptCaretTopPosition));
-                return;
             }
         }
 
@@ -894,7 +986,7 @@ namespace MapsInMyFolder.Commun
                         //Unable to cast object to type 'System.Windows.UIElement'
                         continue;
                     }
-                    if (!(objChild is null))
+                    if (objChild is not null)
                     {
                         children.Add(objChild);
                         if (BlackListNoSearchChildren?.Contains(objChild.GetType()) != true)
@@ -941,7 +1033,7 @@ namespace MapsInMyFolder.Commun
                 }
                 else if (!string.IsNullOrEmpty(childName))
                 {
-                    var frameworkElement = child as FrameworkElement;
+                    FrameworkElement frameworkElement = child as FrameworkElement;
                     // If the child's name is set for search
                     if (frameworkElement != null && frameworkElement.Name == childName)
                     {
@@ -993,7 +1085,7 @@ namespace MapsInMyFolder.Commun
 
             List<UIElement> ListOfisualChildren = FindVisualChildren(SourcePanel, TypeOfSearchElement);
 
-            string strHachCode = String.Empty;
+            string strHachCode = string.Empty;
             ListOfisualChildren.ForEach(element =>
             {
                 if (TypeOfSearchElement.Contains(element.GetType()))
@@ -1002,7 +1094,7 @@ namespace MapsInMyFolder.Commun
                     if (!string.IsNullOrEmpty(elementXName))
                     {
                         int hachCode = 0;
-                        System.Type type = element.GetType();
+                        Type type = element.GetType();
                         if (type == typeof(TextBox))
                         {
                             TextBox TextBox = (TextBox)element;
@@ -1056,7 +1148,7 @@ namespace MapsInMyFolder.Commun
                         }
                         else
                         {
-                            throw new System.NotSupportedException("The type " + type.Name + " is not supported by the function");
+                            throw new NotSupportedException("The type " + type.Name + " is not supported by the function");
                         }
                         strHachCode += hachCode.ToString();
                     }
@@ -1122,39 +1214,22 @@ namespace MapsInMyFolder.Commun
                     return_texte = return_texte.Replace(Entities.Key, Entities.Value);
                 }
             }
-            //MessageBox.Show(return_texte);
             return return_texte;
         }
 
         public static bool IsUrlValid(string url)
         {
-
             const string pattern = @"(http|https|ftp|)\:\/\/[0-9a-zA-Z]([-.\w]*[0-9a-zA-Z])*(:(0-9)*)*(\/?)([a-zA-Z0-9\-\.\?\,\'\/\\\+&%\$#_]*)?([a-zA-Z0-9\-\?\,\'\/\+&%\$#_]+)";
             Regex reg = new Regex(pattern, RegexOptions.Compiled | RegexOptions.IgnoreCase);
             return reg.IsMatch(url);
-        }
-
-        public static void SetRichTextBoxText(RichTextBox textBox, string text)
-        {
-            Stream SM = new MemoryStream(Encoding.UTF8.GetBytes(text));
-            TextRange range = new TextRange(textBox.Document.ContentStart, textBox.Document.ContentEnd);
-            range.Load(SM, DataFormats.Text);
-            SM.Close();
-        }
-
-        public static string GetRichTextBoxText(RichTextBox textBox)
-        {
-            TextRange textRange = new TextRange(textBox.Document.ContentStart, textBox.Document.ContentEnd);
-            string return_texte = textRange.Text;
-            return return_texte;
         }
 
         public static bool FilterDigitOnlyWhileWritingInTextBox(TextBox textbElement, List<char> char_supplementaire = null, bool onlyOnePoint = true, bool limitLenght = true)
         {
             string textboxtext = textbElement.Text;
             var cursor_position = textbElement.SelectionStart;
-            string filtered_string = FilterDigitOnly(textboxtext, char_supplementaire);
-            textbElement.SetText(filtered_string);
+            string filtered_string = FilterDigitOnly(textboxtext, char_supplementaire, onlyOnePoint, limitLenght);
+            textbElement.Text = filtered_string;
             if (textboxtext != filtered_string)
             {
                 if (cursor_position > 0) textbElement.SelectionStart = cursor_position - 1;
@@ -1180,7 +1255,7 @@ namespace MapsInMyFolder.Commun
                 if (MaxInt != -1 && textbElementTextValue > MaxInt)
                 {
                     string MaxIntString = MaxInt.ToString();
-                    textbElement.SetText(MaxIntString);
+                    textbElement.Text = MaxIntString;
                     textbElement.SelectionStart = MaxIntString.Length;
                 }
                 else
@@ -1193,10 +1268,9 @@ namespace MapsInMyFolder.Commun
 
         public static string FilterDigitOnly(string origin, List<char> char_supplementaire, bool onlyOnePoint = true, bool limitLenght = true)
         {
-            //string str = new string((from c in origin where char.IsDigit(c) select c).ToArray());
             if (string.IsNullOrEmpty(origin)) { return String.Empty; }
             string str = "";
-            foreach (char caractere in origin.ToCharArray())
+            foreach (char caractere in origin)
             {
                 if (str.Length > 10 && limitLenght)
                 {
@@ -1207,14 +1281,11 @@ namespace MapsInMyFolder.Commun
                 {
                     str += car.ToString();
                 }
-                if (!(char_supplementaire is null))
+                if (char_supplementaire is not null && char_supplementaire.Contains(car))
                 {
                     if (!(car == '.' && str.Contains(car) && onlyOnePoint))
                     {
-                        if (char_supplementaire.Contains(car))
-                        {
-                            str += car.ToString();
-                        }
+                        str += car.ToString();
                     }
                 }
             }
@@ -1223,45 +1294,49 @@ namespace MapsInMyFolder.Commun
 
         public static string Replacements(string tileBaseUrl, string x, string y, string z, int LayerID, Collectif.GetUrl.InvokeFunction invokeFunction)
         {
-            if (string.IsNullOrEmpty(tileBaseUrl)) { return String.Empty; }
+            if (string.IsNullOrEmpty(tileBaseUrl)) { return string.Empty; }
             return GetUrl.FromTileXYZ(tileBaseUrl, Convert.ToInt32(x), Convert.ToInt32(y), Convert.ToInt32(z), LayerID, invokeFunction).Replace(" ", "%20");
         }
 
-        public static int CheckIfDownloadSuccess(string url)
+        public static async Task<int> CheckIfDownloadSuccess(string url)
         {
-            async Task<HttpStatusCode> InternalCheckIfDownloadSuccess(string internalurl)
+            static async Task<HttpStatusCode> InternalCheckIfDownloadSuccess(string internalurl)
             {
                 try
                 {
-                    HttpResponse reponseHttpResponse = await ByteDownloadUri(new Uri(internalurl), 0, true);
-                    if (reponseHttpResponse is null || reponseHttpResponse.ResponseMessage is null)
+                    HttpResponse response = await ByteDownloadUri(new Uri(internalurl), 0, true);
+                    if (response is null || response.ResponseMessage is null)
                     {
                         return HttpStatusCode.SeeOther;
                     }
-                    HttpResponseMessage reponse = reponseHttpResponse.ResponseMessage;
-                    if (reponse.IsSuccessStatusCode)
+
+                    HttpResponseMessage httpResponse = response.ResponseMessage;
+                    Debug.WriteLine(httpResponse.StatusCode.ToString());
+                    if (httpResponse.IsSuccessStatusCode)
                     {
                         return HttpStatusCode.OK;
                     }
                     else
                     {
-                        return reponse.StatusCode;
+                        return httpResponse.StatusCode;
                     }
                 }
-                catch (Exception a)
+                catch (Exception ex)
                 {
-                    Debug.WriteLine("Exception CIDS : " + a.Message);
+                    Debug.WriteLine("Exception CIDS : " + ex.Message);
                 }
+
                 return HttpStatusCode.SeeOther;
             }
 
-            switch (InternalCheckIfDownloadSuccess(url).Result)
+            switch (await InternalCheckIfDownloadSuccess(url))
             {
                 case HttpStatusCode.NotFound:
                     return 404;
                 case HttpStatusCode.OK:
                     return 200;
-                default: return -1;
+                default:
+                    return -1;
             }
         }
 
@@ -1339,13 +1414,21 @@ namespace MapsInMyFolder.Commun
 
         public static (int X, int Y) CoordonneesToTile(double Latitude, double Longitude, int zoom)
         {
-            double ValuetoRadians(float value)
+            try
             {
-                return value * Math.PI / 180;
+                static double ValuetoRadians(float value)
+                {
+                    return value * Math.PI / 180;
+                }
+                int x = Convert.ToInt32(Math.Floor(((float)Longitude + 180) / 360 * Math.Pow(2, zoom)));
+                int y = Convert.ToInt32(Math.Floor((1 - (Math.Log(Math.Tan(ValuetoRadians((float)Latitude)) + (1 / Math.Cos(ValuetoRadians((float)Latitude)))) / Math.PI)) / 2 * Math.Pow(2, zoom)));
+                return (x, y);
             }
-            int x = Convert.ToInt32(Math.Floor(((float)Longitude + 180) / 360 * Math.Pow(2, zoom)));
-            int y = Convert.ToInt32(Math.Floor((1 - (Math.Log(Math.Tan(ValuetoRadians((float)Latitude)) + (1 / Math.Cos(ValuetoRadians((float)Latitude)))) / Math.PI)) / 2 * Math.Pow(2, zoom)));
-            return (x, y);
+            catch (Exception ex)
+            {
+                Message.NoReturnBoxAsync("Unable to convert latitude and longitude into tile coordinates.\n" + ex.Message, Languages.Current["dialogTitleOperationFailed"]);
+                return (0, 0);
+            }
         }
 
         public static (double Latitude, double Longitude) TileToCoordonnees(int TileX, int TileY, int zoom)
@@ -1357,7 +1440,7 @@ namespace MapsInMyFolder.Commun
 
         public static string WordWrap(string text, int width)
         {
-            if (string.IsNullOrEmpty(text) || 0 == width || width >= text.Length)
+            if (string.IsNullOrEmpty(text) || width == 0 || width >= text.Length)
             {
                 return text;
             }
@@ -1365,7 +1448,7 @@ namespace MapsInMyFolder.Commun
             var sr = new StringReader(text);
             string line;
             var first = true;
-            while (null != (line = sr.ReadLine()))
+            while ((line = sr.ReadLine()) != null)
             {
                 var col = 0;
                 if (!first)
@@ -1383,7 +1466,7 @@ namespace MapsInMyFolder.Commun
                 for (var i = 0; i < words.Length; i++)
                 {
                     var word = words[i];
-                    if (0 != i)
+                    if (i != 0)
                     {
                         sb.Append(" ");
                         ++col;
@@ -1399,61 +1482,41 @@ namespace MapsInMyFolder.Commun
             }
             return sb.ToString();
         }
-
     }
 
     public static class ScrollViewerHelper
     {
         //from https://stackoverflow.com/questions/8932720/listview-inside-of-scrollviewer-prevents-scrollviewer-scroll/61092700#61092700
-        // Attached property boilerplate
-        public static bool GetFixMouseWheel(ScrollViewer scrollViewer) => (bool)scrollViewer?.GetValue(FixMouseWheelProperty);
-        public static void SetFixMouseWheel(ScrollViewer scrollViewer, bool value) => scrollViewer?.SetValue(FixMouseWheelProperty, value);
-        public static readonly DependencyProperty FixMouseWheelProperty =
-            DependencyProperty.RegisterAttached("FixMouseWheel", typeof(bool), typeof(ScrollViewerHelper),
-                new PropertyMetadata(OnFixMouseWheelChanged));
-        // End attached property boilerplate
 
-        static void OnFixMouseWheelChanged(DependencyObject d,
-                                           DependencyPropertyChangedEventArgs e)
+        public static void SetScrollViewerMouseWheelFix(ScrollViewer scrollViewer)
         {
-            var scrollViewer = d as ScrollViewer;
             if (scrollViewer == null) return;
 
-            scrollViewer.PreviewMouseWheel += (s2, e2) =>
+            scrollViewer.PreviewMouseWheel += FixMouseWheel_PreviewMouseWheel;
+            scrollViewer.Unloaded += FixMouseWheel_Unloaded;
+
+            void FixMouseWheel_PreviewMouseWheel(object sender, MouseWheelEventArgs e2)
             {
-                var parent = scrollViewer.Parent as UIElement;
-                bool hitTopOrBottom = HitTopOrBottom(e2.Delta, scrollViewer);
-                if (parent is null || !hitTopOrBottom) return;
+                if (scrollViewer.Parent is not UIElement parent)
+                {
+                    return;
+                };
 
                 var argsCopy = Copy(e2);
                 parent.RaiseEvent(argsCopy);
-            };
-        }
+            }
 
-        static bool HitTopOrBottom(double delta, ScrollViewer scrollViewer)
-        {
-            return true;
-            //var contentVerticalOffset = scrollViewer.ContentVerticalOffset;
-
-            //var atTop = contentVerticalOffset == 0;
-            //var movedUp = delta > 0;
-            //var hitTop = atTop && movedUp;
-
-            //var atBottom =
-            //    contentVerticalOffset == scrollViewer.ScrollableHeight;
-            //var movedDown = delta < 0;
-            //var hitBottom = atBottom && movedDown;
-
-            //return hitTop || hitBottom;
-        }
-
-        static MouseWheelEventArgs Copy(MouseWheelEventArgs e)
-            => new MouseWheelEventArgs(e.MouseDevice, e.Timestamp, e.Delta)
+            void FixMouseWheel_Unloaded(object sender, EventArgs e2)
             {
-                RoutedEvent = UIElement.MouseWheelEvent,
-                Source = e.Source,
-            };
+                scrollViewer.PreviewMouseWheel -= FixMouseWheel_PreviewMouseWheel;
+                scrollViewer.Unloaded -= FixMouseWheel_Unloaded;
+            }
+        }
+
+        static MouseWheelEventArgs Copy(MouseWheelEventArgs e) => new MouseWheelEventArgs(e.MouseDevice, e.Timestamp, e.Delta)
+        {
+            RoutedEvent = UIElement.MouseWheelEvent,
+            Source = e.Source,
+        };
     }
-
-
 }

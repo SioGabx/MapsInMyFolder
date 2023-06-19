@@ -31,7 +31,4 @@ namespace MapsInMyFolder
             throw new NotImplementedException();
         }
     }
-
-
-
 }

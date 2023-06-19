@@ -8,20 +8,17 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Threading;
 
 namespace MapsInMyFolder.Commun
 {
-    public class Javascript
+    public partial class Javascript
     {
         public enum JavascriptAction { refreshMap }
         public static event EventHandler<JavascriptAction> JavascriptActionEvent;
 
         #region logs
         //Register logger to the CustomOrEditPage
-        public static Javascript JavascriptInstance = new Javascript();
+        public static Javascript instance = new Javascript();
         private string _logs;
         public class LogsEventArgs : EventArgs
         {
@@ -38,7 +35,7 @@ namespace MapsInMyFolder.Commun
             get { return _logs; }
             set
             {
-                if (TileGeneratorSettings.AcceptJavascriptPrint)
+                if (Tiles.AcceptJavascriptPrint)
                 {
                     _logs = value;
                     OnLogsChanged();
@@ -72,408 +69,61 @@ namespace MapsInMyFolder.Commun
             }
         }
 
+        public static long OldScriptTimestamp;
+        public static bool IsWaitingUserAction;
+        public static readonly TimeSpan ScriptTimeOut = new TimeSpan(0, 0, 4);
+
         private static Engine SetupEngine(int LayerId)
         {
             CancellationTokenSource JsCancelToken = new CancellationTokenSource();
-            if (JsListCancelTocken.ContainsKey(LayerId))
+
+            if (JsListCancelTocken.TryGetValue(LayerId, out CancellationTokenSource cancelTockenToDispose))
             {
+                cancelTockenToDispose.Dispose();
                 JsListCancelTocken.Remove(LayerId);
             }
-            try
-            {
-                JsListCancelTocken.Add(LayerId, JsCancelToken);
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine("Error JsListCancelTocken " + ex.Message);
-            }
 
+            JsListCancelTocken.Add(LayerId, JsCancelToken);
 
             Engine add = new Engine(options =>
             {
-                options.TimeoutInterval(TimeSpan.FromSeconds(10));
+                options.TimeoutInterval(new TimeSpan(0, 1, 0));
                 options.MaxStatements(5000);
                 options.CancellationToken(JsCancelToken.Token);
             });
 
-            Action<object> PrintAction = stringtext => Print(stringtext, LayerId);
-            add.SetValue("print", PrintAction);
+            return SetupFunctions(add, LayerId);
+        }
 
-            Action<object> PrintClearAction = _ => PrintClear();
-            add.SetValue("printClear", PrintClearAction);
-            add.SetValue("cls", PrintClearAction);
-
-            Action<object> helpAction = _ => Help(LayerId);
-            add.SetValue("help", helpAction);
-
-            Func<object, object, bool, object> setVarAction = (variable, value, isglobalvar) => SetVar(variable, value, isglobalvar, LayerId);
-            add.SetValue("setVar", setVarAction); //setVar("variable1","valeur1")
-
-            Func<object, object> getVarFunction = (variablename) => GetVar(variablename, LayerId);
-            add.SetValue("getVar", getVarFunction); //getVar("variable1")
-
-            Func<object, bool> clearVarFunction = (variablename) => ClearVar(LayerId, variablename);
-            add.SetValue("clearVar", clearVarFunction);
-
-            Func<object, object, object, object> getTileNumberAction = (latitude, longitude, zoom) => CoordonneesToTile(latitude, longitude, zoom);
-            add.SetValue("getTileNumber", getTileNumberAction); //setVar("variable1","valeur1")
-
-            Func<object, object, object, object> getLatLongAction = (TileX, TileY, zoom) => TileToCoordonnees(TileX, TileY, zoom);
-            add.SetValue("getLatLong", getLatLongAction); //setVar("variable1","valeur1")
-
-            Action<double, double, double, double, bool> setSelectionAction = (NO_Latitude, NO_Longitude, SE_Latitude, SE_Longitude, ZoomToNewLocation) =>
-            SetSelection(NO_Latitude, NO_Longitude, SE_Latitude, SE_Longitude, ZoomToNewLocation, LayerId);
-            add.SetValue("setSelection", setSelectionAction);
-
-            Func<object> getSelectionAction = () => GetSelection();
-            add.SetValue("getSelection", getSelectionAction);
-
-            Action<object, object> alertAction = (texte, caption) => Alert(LayerId, texte, caption);
-            add.SetValue("alert", alertAction);
-
-            Func<object, object, object> inputboxAction = (texte, caption) => InputBox(LayerId, texte, caption);
-            add.SetValue("inputbox", inputboxAction);
-
-            Func<object, object, object, object, object> SendNotificationFunction = (texte, caption, callback, notifId) => SendNotification(LayerId, texte, caption, callback, notifId);
-            add.SetValue("sendNotification", SendNotificationFunction);
-
-            Func<object> refreshMap = () =>
+        public static Engine SetupFunctions(Engine engine, int LayerId)
+        {
+            engine.SetValue("print", (Action<object>)(stringtext => Functions.Print(stringtext, LayerId)));
+            engine.SetValue("printClear", (Action<object>)(_ => Functions.PrintClear()));
+            engine.SetValue("cls", (Action<object>)(_ => Functions.PrintClear()));
+            engine.SetValue("help", (Action<object>)(_ => Functions.Help(LayerId)));
+            engine.SetValue("setVar", (Func<object, object, bool, object>)((variable, value, isglobalvar) => Functions.SetVar(variable, value, isglobalvar, LayerId)));
+            engine.SetValue("getVar", (Func<object, object>)(variablename => Functions.GetVar(variablename, LayerId)));
+            engine.SetValue("clearVar", (Func<object, bool>)(variablename => Functions.ClearVar(LayerId, variablename)));
+            engine.SetValue("getTileNumber", (Func<object, object, object, object>)((latitude, longitude, zoom) => Functions.CoordonneesToTile(latitude, longitude, zoom)));
+            engine.SetValue("getLatLong", (Func<object, object, object, object>)((TileX, TileY, zoom) => Functions.TileToCoordonnees(TileX, TileY, zoom)));
+            engine.SetValue("setSelection", (Action<double, double, double, double, bool>)((NO_Latitude, NO_Longitude, SE_Latitude, SE_Longitude, ZoomToNewLocation) =>
+                Functions.SetSelection(NO_Latitude, NO_Longitude, SE_Latitude, SE_Longitude, ZoomToNewLocation, LayerId)));
+            engine.SetValue("getSelection", (Func<object>)(() => Functions.GetSelection()));
+            engine.SetValue("alert", (Action<object, object>)((texte, caption) => Functions.Alert(LayerId, texte, caption)));
+            engine.SetValue("inputbox", (Func<object, object, object>)((texte, caption) => Functions.InputBox(LayerId, texte, caption)));
+            engine.SetValue("notification", (Func<object, object, object, object, object>)((texte, caption, callback, notifId) =>
+                Functions.SendNotification(LayerId, texte, caption, callback, notifId)));
+            engine.SetValue("refreshMap", (Func<object>)(() =>
             {
                 JavascriptActionEvent?.Invoke(LayerId, JavascriptAction.refreshMap);
                 return null;
-            };
-            add.SetValue("refreshMap", refreshMap);
-            return add;
-        }
-
-        #region StoreVariable
-        private static readonly Dictionary<int, Dictionary<string, object>> DictionnaryOfVariablesKeyLayerId = new Dictionary<int, Dictionary<string, object>>();
-        static public object SetVar(object variablename, object value, bool isglobalvar = false, int LayerId = 0)
-        {
-            string variablenameString;
-            if (variablename is null)
-            {
-                PrintError("Le nom de la variable n'est pas défini !");
-                return null;
-            }
-            else
-            {
-                variablenameString = variablename.ToString();
-            }
-
-            if (isglobalvar)
-            {
-                LayerId = 0;
-            }
-
-            if (DictionnaryOfVariablesKeyLayerId.TryGetValue(LayerId, out Dictionary<string, object> VariableKeyAndValue))
-            {
-                VariableKeyAndValue[variablenameString] = value;
-            }
-            else
-            {
-                DictionnaryOfVariablesKeyLayerId.Add(LayerId, new Dictionary<string, object>() { { variablenameString, value } });
-            }
-            return value;
-        }
-
-        static public object GetVar(object variablename, int LayerId = 0)
-        {
-            string variablenameString;
-            if (variablename is null)
-            {
-                PrintError("Le nom de la variable n'est pas défini !", LayerId);
-                return null;
-            }
-            else
-            {
-                variablenameString = variablename.ToString();
-            }
-
-            //ID 0 is global scope
-            foreach (int ID in new int[] { LayerId, 0 })
-            {
-                if (DictionnaryOfVariablesKeyLayerId.TryGetValue(ID, out Dictionary<string, object> VariableKeyAndValue))
-                {
-                    if (VariableKeyAndValue.ContainsKey(variablenameString))
-                    {
-                        return VariableKeyAndValue[variablenameString];
-                    }
-                }
-            }
-            PrintError("La variable " + variablenameString + " n'est pas défini", LayerId);
-            return null;
-        }
-
-        static public bool ClearVar(int LayerId, object variablename = null)
-        {
-            if (object.ReferenceEquals(null, variablename))
-            {
-                if (DictionnaryOfVariablesKeyLayerId.ContainsKey(LayerId))
-                {
-                    DictionnaryOfVariablesKeyLayerId.Remove(LayerId);
-                    return true;
-                }
-            }
-            else
-            {
-                if (DictionnaryOfVariablesKeyLayerId.TryGetValue(LayerId, out Dictionary<string, object> VariableKeyAndValue))
-                {
-                    if (VariableKeyAndValue.ContainsKey(variablename.ToString()))
-                    {
-                        VariableKeyAndValue.Remove(variablename.ToString());
-                        return true;
-                    }
-                }
-            }
-            return false;
-        }
-
-        public static void DisposeVariablesOfLayer(int LayerId)
-        {
-            DictionnaryOfVariablesKeyLayerId.Remove(LayerId);
-        }
-
-        public static void DisposeVariable(string variablename, int LayerId)
-        {
-            if (DictionnaryOfVariablesKeyLayerId.TryGetValue(LayerId, out Dictionary<string, object> VariableKeyAndValue))
-            {
-                VariableKeyAndValue.Remove(variablename);
-                Print("< Info : La variable à été disposée");
-            }
-            else
-            {
-                PrintError("La variable " + variablename + " n'existe pas");
-            }
-        }
-        #endregion
-
-        public static void SetSelection(double NO_Latitude, double NO_Longitude, double SE_Latitude, double SE_Longitude, bool ZoomToNewLocation, int LayerId)
-        {
-            if (Layers.Curent.class_id == LayerId)
-            {
-                JavascriptInstance.Location = new Dictionary<string, double>(){
-                    {"SE_Latitude",SE_Latitude },
-                    {"SE_Longitude",SE_Longitude },
-                    {"NO_Latitude",NO_Latitude },
-                    {"NO_Longitude",NO_Longitude }
-                };
-                JavascriptInstance.ZoomToNewLocation = ZoomToNewLocation;
-            }
-        }
-
-        public static Dictionary<string, Dictionary<string, double>> GetSelection()
-        {
-            var ReturnDic = new Dictionary<string, Dictionary<string, double>>
-            {
-                {
-                    "SE",
-                    new Dictionary<string, double>() {
-            {"lat",Map.CurentSelection.SE_Latitude },
-            {"long",Map.CurentSelection.SE_Longitude }
-            }
-                },
-
-                {
-                    "NO",
-                    new Dictionary<string, double>() {
-            {"lat",Map.CurentSelection.NO_Latitude },
-            {"long",Map.CurentSelection.NO_Longitude }
-            }
-                }
-            };
-
-            return ReturnDic;
-        }
-
-        public static Dictionary<string, int> CoordonneesToTile(object latitude, object longitude, object zoom)
-        {
-            int Intzoom = Convert.ToInt32(zoom);
-            var TilesNumber = Collectif.CoordonneesToTile((double)latitude, (double)longitude, Intzoom);
-            Dictionary<string, int> returnTileNumber = new Dictionary<string, int>()
-            {
-                { "x",  TilesNumber.X },
-                { "y",  TilesNumber.Y },
-                { "z",  Intzoom }
-            };
-            return returnTileNumber;
-            //return returnTileNumber;
-        }
-        public static Dictionary<string, double> TileToCoordonnees(object TileX, object TileY, object zoom)
-        {
-            int Intzoom = Convert.ToInt32(zoom);
-            var LocationNumber = Collectif.TileToCoordonnees(Convert.ToInt32(TileX), Convert.ToInt32(TileY), Intzoom);
-            Dictionary<string, double> returnLocationNumber = new Dictionary<string, double>()
-            {
-                { "long",  LocationNumber.Latitude },
-                { "lat",  LocationNumber.Longitude },
-                { "z",  Intzoom}
-            };
-            return returnLocationNumber;
-        }
-
-        private static string ConvertJSObjectToString(object supposedString)
-        {
-
-            string returnString = supposedString?.ToString();
-            if (returnString != null && (supposedString.GetType() == typeof(System.Object) || supposedString.GetType() == typeof(System.Object[]) || supposedString.GetType() == typeof(System.Dynamic.ExpandoObject) || supposedString.GetType() == typeof(Dictionary<string, string>) || supposedString.GetType() == typeof(Dictionary<string, object>))
-                && (supposedString.GetType().FullName != "Jint.Runtime.Interop.DelegateWrapper"))
-            {
-                Debug.WriteLine(supposedString.GetType().FullName);
-                returnString = JsonConvert.SerializeObject(supposedString);
-            }
-            return returnString;
-        }
-        public static void Print(object print, int LayerId = 0)
-        {
-            string printString = ConvertJSObjectToString(print);
-            if (!string.IsNullOrEmpty(printString))
-            {
-                if (LayerId == -2 && TileGeneratorSettings.AcceptJavascriptPrint)
-                {
-                    JavascriptInstance.Logs = String.Concat(JavascriptInstance.Logs, "\n", printString);
-                }
-            }
-        }
-
-        static public void PrintClear()
-        {
-            if (TileGeneratorSettings.AcceptJavascriptPrint)
-            {
-                JavascriptInstance.Logs = String.Empty;
-            }
-        }
-
-        static readonly object JSLocker = new object();
-        static public string InputBox(int LayerId, object texte, object caption = null)
-        {
-            lock (JSLocker)
-            {
-                //alert("pos");
-                if (string.IsNullOrEmpty(caption?.ToString()))
-                {
-                    caption = Collectif.HTMLEntities(Layers.GetLayerById(LayerId).class_name, true) + " indique :";
-                }
-                TextBox TextBox;
-                var frame = new DispatcherFrame();
-                TextBox = Application.Current.Dispatcher.Invoke(new Func<TextBox>(() =>
-                {
-                    var (textBox, dialog) = Message.SetInputBoxDialog(texte, caption);
-                    dialog.Closed += (_, __) =>
-                    {
-                        // stops the frame
-                        frame.Continue = false;
-                    };
-                    dialog.ShowAsync();
-                    return textBox;
-                }));
-                Dispatcher.PushFrame(frame);
-                return Application.Current.Dispatcher.Invoke(new Func<string>(() => TextBox.Text));
-            }
-        }
-
-        static public void Alert(int LayerId, object texte, object caption = null)
-        {
-            lock (JSLocker)
-            {
-                //alert("pos");
-                if (string.IsNullOrEmpty(caption?.ToString()))
-                {
-                    caption = Collectif.HTMLEntities(Layers.GetLayerById(LayerId).class_name, true) + " indique :";
-                }
-
-                var frame = new DispatcherFrame();
-                Application.Current.Dispatcher.Invoke(new Action(() =>
-                {
-                    var dialog = Message.SetContentDialog(texte, caption);
-                    dialog.Closed += (_, __) =>
-                    {
-                        frame.Continue = false; // stops the frame
-                    };
-                    dialog.ShowAsync();
-                }));
-                Dispatcher.PushFrame(frame);
-            }
-        }
-
-
-        static public string SendNotification(int LayerId, object texte, object caption = null, object javascriptCallback = null, object notifId = null)
-        {
-            if (LayerId == -2 || LayerId != Layers.Curent.class_id)
-            {
-                PrintError("Impossible d'envoyer une notification depuis l'editeur ou si le calque n'est pas courant");
-                return null;
-            }
-            Notification notification = null;
-
-            void SetupNotification()
-            {
-                Action callback = () => Javascript.ExecuteScript(Layers.GetLayerById(LayerId).class_tilecomputationscript, null, LayerId, javascriptCallback.ToString());
-
-                notification = new NText(texte.ToString(), caption.ToString(), "MainPage", callback);
-                if (notifId != null && !string.IsNullOrWhiteSpace(notifId.ToString()))
-                {
-                    notification.NotificationId = "LayerId_" + LayerId + "_" + notifId;
-                }
-                notification.Register();
-            }
-            if (System.Threading.Thread.CurrentThread.GetApartmentState() == ApartmentState.STA)
-            {
-                SetupNotification();
-            }
-
-            return notification?.NotificationId;
-        }
-
-        static public void Help(int LayerId)
-        {
-            Print(
-                "\n\nAIDE CALCUL TUILE" + "\n" +
-                "A chaque chargement de tuile, la function getTile est appelée avec des arguments\n" +
-                "et dois retourner un objet contenant les remplacements à effectués.\n" +
-                "Les arguments qui sont envoyé à la fonction de base sont les suivants : " + "\n" +
-                " - X : Représente en WMTS le numero de la tuile X" + "\n" +
-                " - Y : Représente en WMTS le numero de la tuile Y" + "\n" +
-                " - Z : Représente le niveau de zoom" + "\n" +
-                " - layerid : Représente l'ID du calque sélectionnée" + "\n" +
-                "Exemple pour l'url \"https://tile.openstreetmap.org/{NiveauZoom}/{TuileX}/{TuileY}.png\":" + "\n" +
-                "function getTile(args) {" + "\n" +
-                "var returnvalue = new Object;" + "\n" +
-                "returnvalue.TuileX = args.x;" + "\n" +
-                "returnvalue.TuileY = args.y;" + "\n" +
-                "returnvalue.NiveauZoom = args.z;" + "\n" +
-                "return returnvalue;" + "\n" +
-                "}" + "\n" +
-                "\n" +
-                "AIDE FUNCTIONS PERSONALISÉE" + "\n" +
-                "print(string) : Affiche un message dans la console" + "\n" +
-                "alert(string) : Affiche une boite de dialogue" + "\n" +
-                "printClear(string) : Efface la console" + "\n" +
-                "help() : Affiche cette aide" + "\n" +
-                "setVar(\"nom_variable\",\"valeur\") : Defini la valeur de la variable. Cette variable est conservé durant l'entiéreté de l'execution de l'application" + "\n" +
-                "getVar(\"nom_variable\") : Obtiens la valeur de la variable." + "\n" +
-                "getTileNumber(latitude, longitude, zoom) : Converti les coordonnées en tiles" + "\n" +
-                "getLatLong(TileX, TileY, zoom) : Converti les numero de tiles en coordonnées" + "\n" +
-                "", LayerId);
-
-        }
-
-        static public void PrintError(string print, int LayerId = -2)
-        {
-            string errorType;
-            if (print.EndsWith(" is not defined"))
-            {
-                errorType = "Uncaught ReferenceError";
-            }
-            else if (print.EndsWith("Unexpected token ILLEGAL"))
-            {
-                errorType = "Uncaught SyntaxError";
-            }
-            else
-            {
-                errorType = "Uncaught Error";
-            }
-            Print("< " + errorType + " : " + print, LayerId);
+            }));
+            engine.SetValue("getStyle", (Func<object>)(() => Tiles.Loader.GetStyle(LayerId)));
+            engine.SetValue("transformLocation", (Func<object, object, object, object, object>)((OriginWkt, TargetWkt, ProjX, ProjY) =>
+         Functions.TransformLocation(OriginWkt, TargetWkt, ProjX, ProjY)));
+            engine.SetValue("transformLocationFromWGS84", (Func<object, object, object, object>)((TargetWkt, ProjX, ProjY) =>
+         Functions.TransformLocationFromWGS84(TargetWkt, ProjX, ProjY)));
+            return engine;
         }
 
         #region engines
@@ -482,20 +132,30 @@ namespace MapsInMyFolder.Commun
 
         public static void EngineStopAll()
         {
+            SetOldScriptTimestamp();
             foreach (KeyValuePair<int, CancellationTokenSource> tockensource in JsListCancelTocken)
             {
-                tockensource.Value.Cancel();
+                CancelTokenSource(tockensource.Value);
             }
         }
+
         public static void EngineStopById(int LayerId)
         {
             if (JsListCancelTocken.TryGetValue(LayerId, out CancellationTokenSource tockensource))
+            {
+                CancelTokenSource(tockensource);
+            }
+        }
+
+        public static void CancelTokenSource(CancellationTokenSource tockensource)
+        {
+            if (!tockensource.IsCancellationRequested)
             {
                 tockensource.Cancel();
             }
         }
 
-        static readonly object locker = new object();
+        static readonly object ExecuteScriptLocker = new object();
         public static Engine EngineGetById(int LayerId, string script)
         {
             if (ListOfEngines.TryGetValue(LayerId, out Engine engine))
@@ -504,41 +164,43 @@ namespace MapsInMyFolder.Commun
             }
             else
             {
-                if (ListOfEngines.Count > 200)
-                {
-                    //todo : add setting for that
-                    EngineClearList();
-                }
                 Engine add = SetupEngine(LayerId);
                 try
                 {
                     add = add.Execute(script);
-                    if (CheckIfFunctionExist(add, Collectif.GetUrl.InvokeFunction.getTile.ToString()))
+                    if (CheckIfFunctionExist(add, nameof(Collectif.GetUrl.InvokeFunction.getTile)))
                     {
                         return add;
                     }
                     else
                     {
-                        add = add.Execute(Settings.tileloader_default_script);
-                        return add;
+                        return add.Execute(Settings.tileloader_default_script);
                     }
-
                 }
                 catch (Exception ex)
                 {
-                    EngineDeleteById(LayerId);
                     Debug.WriteLine(ex.Message);
-                    PrintError(ex.Message);
+                    Functions.PrintError(ex.Message);
                 }
-                return null;
             }
+            return null;
         }
 
         public static void EngineDeleteById(int LayerId)
         {
-            ListOfEngines.Remove(LayerId);
-            JsListCancelTocken.Remove(LayerId);
+            if (ListOfEngines.TryGetValue(LayerId, out Engine engineToDispose))
+            {
+                ListOfEngines.Remove(LayerId);
+                engineToDispose.Dispose();
+            }
+
+            if (JsListCancelTocken.TryGetValue(LayerId, out CancellationTokenSource cancelTockenToDispose))
+            {
+                JsListCancelTocken.Remove(LayerId);
+                cancelTockenToDispose.Dispose();
+            }
         }
+
         public static void EngineUpdate(Engine engine, int LayerId)
         {
             ListOfEngines[LayerId] = engine;
@@ -546,7 +208,10 @@ namespace MapsInMyFolder.Commun
 
         public static void EngineClearList()
         {
+            SetOldScriptTimestamp();
+            ListOfEngines.Values.DisposeItems();
             ListOfEngines.Clear();
+            JsListCancelTocken.Values.DisposeItems();
             JsListCancelTocken.Clear();
         }
         #endregion
@@ -589,6 +254,25 @@ namespace MapsInMyFolder.Commun
             JsValue evaluateValue = add.Evaluate("typeof " + functionName + " === 'function'");
             return evaluateValue.AsBoolean();
         }
+        private static string ConvertJSObjectToString(object supposedString)
+        {
+            string returnString = supposedString?.ToString();
+
+            if (returnString != null &&
+                (supposedString.GetType() == typeof(object) ||
+                supposedString.GetType() == typeof(object[]) ||
+                supposedString.GetType() == typeof(System.Dynamic.ExpandoObject) ||
+                supposedString.GetType() == typeof(Dictionary<string, string>) ||
+                supposedString.GetType() == typeof(Dictionary<string, int>) ||
+                supposedString.GetType() == typeof(Dictionary<string, double>) ||
+                supposedString.GetType() == typeof(Dictionary<string, object>))
+            && (supposedString.GetType().FullName != "Jint.Runtime.Interop.DelegateWrapper"))
+            {
+                returnString = JsonConvert.SerializeObject(supposedString);
+            }
+
+            return returnString;
+        }
 
         public static bool CheckIfFunctionExist(int LayerId, string functionName, string script = null)
         {
@@ -598,82 +282,114 @@ namespace MapsInMyFolder.Commun
             }
             if (string.IsNullOrEmpty(script))
             {
-                script = Layers.GetLayerById(LayerId).class_tilecomputationscript;
+                script = Layers.GetLayerById(LayerId).class_script;
             }
-            Engine add;
-            lock (locker)
-            {
-                add = EngineGetById(LayerId, script);
-            }
-            if (add is null)
+            Engine add = EngineGetById(LayerId, script);
+
+            if (add is null || string.IsNullOrEmpty(functionName))
             {
                 return false;
             }
-            JsValue evaluateValue = add.Evaluate("typeof " + functionName + " === 'function'");
-
-            return evaluateValue.AsBoolean();
-
+            try
+            {
+                JsValue evaluateValue = add?.Evaluate($"typeof {functionName} === 'function'");
+                return evaluateValue?.AsBoolean() ?? false;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+                return false;
+            }
         }
-
-        public static Jint.Native.JsValue ExecuteScript(string script, Dictionary<string, object> arguments, int LayerId, Collectif.GetUrl.InvokeFunction InvokeFunction)
+        public static JsValue ExecuteScript(string script, Dictionary<string, object> arguments, int LayerId, Collectif.GetUrl.InvokeFunction InvokeFunction)
         {
             return ExecuteScript(script, arguments, LayerId, InvokeFunction.ToString());
         }
 
-
-        public static Jint.Native.JsValue ExecuteScript(string script, Dictionary<string, object> arguments, int LayerId, string InvokeFunctionString)
+        public static JsValue ExecuteScript(string script, Dictionary<string, object> arguments, int LayerId, string InvokeFunctionString)
         {
-            Jint.Native.JsValue jsValue = null;
-            Engine add = null;
-
-            lock (locker)
+            long ScriptTimestamp = GetTimestamp();
+            try
             {
-                CancellationTokenSource cts = new CancellationTokenSource();
-                Task<Jint.Native.JsValue> task = Task.Run(() =>
+                Monitor.Enter(ExecuteScriptLocker);
+
+                if (ScriptIsOld(ScriptTimestamp))
                 {
-                    add = EngineGetById(LayerId, script);
-                    if (add is null)
-                    {
-                        return null;
-                    }
-                    try
-                    {
-                        return add.Invoke(InvokeFunctionString, arguments);
-                    }
-                    catch (Exception ex)
-                    {
-                        Debug.WriteLine(ex.Message);
-                        if (ex.Message == "Can only invoke functions")
-                        {
-                            //PrintError("No main function fund. Use \"function getT(args) {}\"");
-                            PrintError("La fontion " + InvokeFunctionString + " n'as pas été trouvé dans le script. Faite help() pour obtenir de l'aide sur cette commande.");
-                        }
-                        else
-                        {
-                            PrintError(ex.Message);
-                        }
-                        return null;
-                    }
-                    finally
-                    {
-                        EngineUpdate(add, LayerId);
-                    }
-                }, cts.Token);
-
-
-                int TimeoutInSeconds = 4;
-
-                if (task.Wait(TimeSpan.FromSeconds(TimeoutInSeconds)))
-                {
-                    jsValue = task.Result;
+                    Functions.PrintError("Execution of the function has been canceled because its start date is too old and/or has been revoked.");
+                    return null;
                 }
-                else
+                bool executedSuccessfully = false;
+
+                var task = Task.Run(async () =>
                 {
-                    PrintError($"Script execution timed out ({TimeoutInSeconds} seconds).");
-                    cts.Cancel();
+                    await Task.Delay(10000); // Délai de 10 secondes
+
+                    if (!executedSuccessfully && !IsWaitingUserAction)
+                    {
+                        Functions.PrintError("The execution of the function has been canceled as it took too long to respond.");
+                        Monitor.Exit(ExecuteScriptLocker);
+                        return;
+                    }
+                    //The task has been successfully executed!
+                });
+
+                Engine add = EngineGetById(LayerId, script);
+
+                if (add is null)
+                {
+                    return null;
+                }
+                JsValue jsValue = null;
+
+                try
+                {
+                    jsValue = add?.Invoke(InvokeFunctionString, arguments);
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine("ExecuteScript " + ex.Message);
+                    if (ex.Message == "Can only invoke functions")
+                    {
+                        Functions.PrintError(InvokeFunctionString + "=> " + ex.Message);
+                    }
+                    else
+                    {
+                        Functions.PrintError(ex.Message);
+                    }
+                    return null;
+                }
+                finally
+                {
+                    executedSuccessfully = true;
+                    EngineUpdate(add, LayerId);
+                }
+
+                return jsValue;
+            }
+            finally
+            {
+                if (Monitor.IsEntered(ExecuteScriptLocker))
+                {
+                    Monitor.Exit(ExecuteScriptLocker);
                 }
             }
-            return jsValue;
+        }
+
+
+
+        public static long GetTimestamp()
+        {
+            return DateTime.Now.Ticks;
+        }
+
+        public static void SetOldScriptTimestamp()
+        {
+            OldScriptTimestamp = GetTimestamp() + 10;
+        }
+
+        public static bool ScriptIsOld(long scriptTimestamp)
+        {
+            return (scriptTimestamp < OldScriptTimestamp) || (scriptTimestamp + ScriptTimeOut.Ticks < GetTimestamp());
         }
 
         public static void ExecuteCommand(string command, int LayerId)
@@ -681,7 +397,7 @@ namespace MapsInMyFolder.Commun
             var add = EngineGetById(LayerId, "");
             try
             {
-                Print("> " + command, LayerId);
+                Functions.Print("> " + command, LayerId);
                 string evaluateResultString = string.Empty;// add.Evaluate(command).ToString();
                 JsValue evaluateResult = add.Evaluate(command);
                 if ((evaluateResult.IsArray() || evaluateResult.IsObject()) && evaluateResult.GetType().FullName != "Jint.Runtime.Interop.DelegateWrapper")
@@ -695,17 +411,16 @@ namespace MapsInMyFolder.Commun
                     {
                         evaluateResultString = "\"" + evaluateResultString + "\"";
                     }
-
                 }
                 if (!string.IsNullOrEmpty(evaluateResultString) && evaluateResultString != "null")
                 {
-                    Print("< " + evaluateResultString, LayerId);
+                    Functions.Print("< " + evaluateResultString, LayerId);
                 }
             }
             catch (Exception ex)
             {
                 Debug.WriteLine(ex.Message);
-                PrintError(ex.Message);
+                Functions.PrintError(ex.Message);
             }
         }
     }

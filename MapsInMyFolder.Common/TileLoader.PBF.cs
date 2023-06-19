@@ -9,7 +9,7 @@ using System.Windows.Media.Imaging;
 
 namespace MapsInMyFolder.Commun
 {
-    public partial class TileGenerator
+    public partial class TileLoader
     {
         public async Task<HttpResponse> GetTilePBF(int LayerID, string urlBase, int TileX, int TileY, int TileZoom, string save_temp_directory, int render_tile_size, int TextSizeMultiplicateur, double OverflowTextCorrectingValue, bool pbfdisableadjacent = false)
         {
@@ -42,7 +42,7 @@ namespace MapsInMyFolder.Commun
                 else
                 {
                     //if PBFRenderingTask take more thant 30 seconds
-                    DebugMode.WriteLine("PBFRenderingTask have take more than 30 seconds to complete. Task abord");
+                    Debug.WriteLine("PBFRenderingTask have take more than 30 seconds to complete. Task abord");
                 }
             }
             catch (Exception ex)
@@ -57,8 +57,6 @@ namespace MapsInMyFolder.Commun
         static readonly object PBF_SetProviders_Locker = new object();
         public async Task<HttpResponse> PBFRenderingAsync(int tache, int LayerID, string urlBase, int TileX, int TileY, int zoom, string save_temp_directory, int render_tile_size, int TextSizeMultiplicateur, double OverflowTextCorrectingValue, bool pbfdisableadjacent = false)
         {
-            //System.Threading.Thread.CurrentThread.Priority = System.Threading.ThreadPriority.Highest;
-            DebugMode.WriteLine("Function PBFrender LayerId:" + LayerID + " for tache " + tache);
             int settings_max_tiles_cache_days = Settings.tiles_cache_expire_after_x_days;
             if (LayerID <= 0)
             {
@@ -85,10 +83,6 @@ namespace MapsInMyFolder.Commun
                         do_download_this_tile = Collectif.CheckIfDownloadIsNeededOrCached(save_temp_directory_rawBPF, filename, settings_max_tiles_cache_days);
                     }
                 }
-                else
-                {
-                    DebugMode.WriteLine("Save temp dir est vide, le cache est désactivé" + save_temp_directory);
-                }
 
                 Stream StreamPBFFile;
                 HttpResponse response;
@@ -97,11 +91,9 @@ namespace MapsInMyFolder.Commun
                 if (do_download_this_tile)
                 {
                     Uri uri = new Uri(Collectif.GetUrl.FromTileXYZ(urlBase, TileX, TileY, zoom, LayerID, Collectif.GetUrl.InvokeFunction.getTile));
-                    DebugMode.WriteLine("Tache n°" + tache + " : Telechargement u1");
                     response = await Collectif.ByteDownloadUri(uri, LayerID, true);
                     if (response?.Buffer is null)
                     {
-                        DebugMode.WriteLine("Tache n°" + tache + " : u1 is null");
                         return response;
                     }
 
@@ -113,7 +105,6 @@ namespace MapsInMyFolder.Commun
                         }
                         if (!File.Exists(save_filename) && cache_tile)
                         {
-                            DebugMode.WriteLine("Ecriture de  : " + save_temp_directory_rawBPF + filename);
                             lock (PBF_RenderingAsync_Locker)
                             {
                                 File.WriteAllBytes(save_filename, response.Buffer);
@@ -139,7 +130,7 @@ namespace MapsInMyFolder.Commun
                 VectorTileRenderer.Style style = PBFGetStyle(LayerID);
                 if (style is null)
                 {
-                    Javascript.PrintError("Tile style est null", LayerID);
+                    Javascript.Functions.PrintError("The layer style is not defined.", LayerID);
                     return HttpResponse.HttpResponseError;
                 }
 
@@ -173,23 +164,30 @@ namespace MapsInMyFolder.Commun
 
                 void SetProviders(int ArrayX, int ArrayY, int ComputedTileX, int ComputedTileY)
                 {
-                    VectorTileRenderer.Sources.PbfTileSource pbfTileSource = GetProviderFromXYZ(LayerID, urlBase, ComputedTileX, ComputedTileY, zoom, cache_tile, save_temp_directory_rawBPF, save_temp_directory, filename, settings_max_tiles_cache_days).Result;
-                    lock (PBF_SetProviders_Locker)
+                    try
                     {
-                        try
+                        VectorTileRenderer.Sources.PbfTileSource pbfTileSource = GetProviderFromXYZ(LayerID, urlBase, ComputedTileX, ComputedTileY, zoom, cache_tile, save_temp_directory_rawBPF, save_temp_directory, filename, settings_max_tiles_cache_days).Result;
+                        lock (PBF_SetProviders_Locker)
                         {
-                            providers[ArrayX][ArrayY] = pbfTileSource;
+                            try
+                            {
+                                providers[ArrayX][ArrayY] = pbfTileSource;
+                            }
+                            catch (Exception ex)
+                            {
+                                Debug.WriteLine("Erreur set providers :" + ex.Message);
+                            }
                         }
-                        catch (Exception ex)
-                        {
-                            Debug.WriteLine("Erreur set providers :" + ex.Message);
-                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine("Erreur set PbfTileSource :" + ex.Message);
                     }
                 }
 
                 ICanvas bitmap = new SkiaCanvas();
-                MapsInMyFolder.VectorTileRenderer.Renderer.ICanvasCollisions ReturnCanvasAndCollisions;
-                MapsInMyFolder.VectorTileRenderer.Renderer.Collisions ListOfEntitiesCollisions = new MapsInMyFolder.VectorTileRenderer.Renderer.Collisions();
+                Renderer.ICanvasCollisions ReturnCanvasAndCollisions;
+                Renderer.Collisions ListOfEntitiesCollisions = new MapsInMyFolder.VectorTileRenderer.Renderer.Collisions();
                 Renderer.ROptions Roptions = null;
                 if (!(providers[1][1] is null))
                 {
@@ -209,7 +207,7 @@ namespace MapsInMyFolder.Commun
                     Debug.WriteLine("Error : providers[1][1] was null");
                     return HttpResponse.HttpResponseError;
                 }
-                DebugMode.WriteLine("Colistion number " + ListOfEntitiesCollisions.CollisionEntity.Count);
+
                 if (!pbfdisableadjacent)
                 {
                     for (int i = 2; i > -1; i--)
@@ -217,7 +215,7 @@ namespace MapsInMyFolder.Commun
                         for (int j = 0; j < 3; j++)
                         {
                             if (i == 1 && j == 1) { continue; }
-                            DebugMode.WriteLine("Recherche de colisions");
+                            //Recherche de colisions
                             try
                             {
                                 if (!(providers[j][i] is null))
@@ -251,7 +249,7 @@ namespace MapsInMyFolder.Commun
                     StreamPBFFile.Dispose();
                 }
                 ReturnCanvasAndCollisions = null;
-                async Task<MapsInMyFolder.VectorTileRenderer.Renderer.ICanvasCollisions> CreateBitmap(ICanvas bitmapf, int PosX, int PosY, VectorTileRenderer.Sources.PbfTileSource pbfTileSource, MapsInMyFolder.VectorTileRenderer.Renderer.Collisions collisions, bool createCanvas = false, int NbrTileHeightWidth = 1)
+                async Task<Renderer.ICanvasCollisions> CreateBitmap(ICanvas bitmapf, int PosX, int PosY, VectorTileRenderer.Sources.PbfTileSource pbfTileSource, MapsInMyFolder.VectorTileRenderer.Renderer.Collisions collisions, bool createCanvas = false, int NbrTileHeightWidth = 1)
                 {
                     if (pbfTileSource != null)
                     {
@@ -268,16 +266,15 @@ namespace MapsInMyFolder.Commun
                             GenerateCanvas = createCanvas
                         };
                         style.SetSourceProvider(0, pbfTileSource);
-                        MapsInMyFolder.VectorTileRenderer.Renderer.ICanvasCollisions bitmapff = await Renderer.Render(style, bitmapf, 0, 0, zoom, 1, options: options, collisions: collisions);
-                        return bitmapff;
+                        return await Renderer.Render(style, bitmapf, 0, 0, zoom, 1, options: options, collisions: collisions);
                     }
                     else
                     {
-                        DebugMode.WriteLine("pdfTileSource not define");
+                        //pdfTileSource not define
                         return new Renderer.ICanvasCollisions(collisions, bitmapf, null);
                     }
                 }
-                DebugMode.WriteLine("Tache n°" + tache + " : FinishDraw");
+
                 SkiaCanvas skiaCanvas = new SkiaCanvas();
                 BitmapSource img = bitmap.FinishDrawing();
                 img.Freeze();
@@ -286,12 +283,7 @@ namespace MapsInMyFolder.Commun
                 {
                     Int32Rect int32Rect = new Int32Rect(render_tile_size, render_tile_size, render_tile_size, render_tile_size);
                     CroppedBitmap cb = new CroppedBitmap(img, int32Rect);
-                    //double scale_transform = (double)256 / (double)render_tile_size;
-                    //TransformedBitmap cb_r = new TransformedBitmap(cb, new ScaleTransform(scale_transform, scale_transform));
-                    //DebugMode.WriteLine("FINALLLL SIZE TILE W=" + cb_r.Width + " H=" + cb_r.Height + " SCALETRANSFORM=" + scale_transform);
                     cb.Freeze();
-                    //cb_r.Freeze();
-                    //img_cropped = cb_r;
                     img_cropped = cb;
                 }
                 else
@@ -300,107 +292,29 @@ namespace MapsInMyFolder.Commun
                 }
                 img_cropped.Freeze();
                 img = null;
-                DebugMode.WriteLine("Tache n°" + tache + " : Cropping to byte");
-
                 return new HttpResponse(Collectif.GetBytesFromBitmapSource(img_cropped), response.ResponseMessage);
             }
             catch (Exception ex)
             {
                 Debug.WriteLine("Tache n°" + tache + " : Erreur f GetProviderFromXYZ" + ex.Message + "\n" + ex.ToString());
             }
-
-            DebugMode.WriteLine("Tache n°" + tache + " : end return null");
             return HttpResponse.HttpResponseError;
         }
 
 
-        public static MapsInMyFolder.VectorTileRenderer.Style PBFGetStyle(int layerID)
+        public static VectorTileRenderer.Style PBFGetStyle(int layerID)
         {
-            string styleValueOrUrlOrPath;
-            Layers layers = Layers.GetLayerById(layerID);
             try
             {
-                styleValueOrUrlOrPath = layers?.class_specialsoptions?.PBFJsonStyle;
-            }
-            catch (Exception ex)
-            {
-                Javascript.PrintError("Tile style load Layer : " + ex.Message, layerID);
-                return null;
-            }
-            if (string.IsNullOrEmpty(styleValueOrUrlOrPath))
-            {
-                Javascript.PrintError("Tile style non défini", layerID);
-                return null;
-            }
-
-            try
-            {
-                //if this is a url, then download the style and save it
-                if (Uri.IsWellFormedUriString(styleValueOrUrlOrPath, UriKind.Absolute) && Collectif.IsUrlValid(styleValueOrUrlOrPath))
+                string styleValueOrUrlOrPath = Tiles.Loader.GetStyle(layerID);
+                if (!string.IsNullOrEmpty(styleValueOrUrlOrPath))
                 {
-                    string path = Path.Combine(Collectif.GetSaveTempDirectory(layers.class_name, layers.class_identifiant), "layerstyle", styleValueOrUrlOrPath.GetHashCode().ToString() + ".json");
-                    if (File.Exists(path))
-                    {
-                        styleValueOrUrlOrPath = path;
-                    }
-                    else
-                    {
-                        //if file not exist, then download it ONCE
-                        lock (PBF_RenderingAsync_Locker)
-                        {
-                            //maybe after the lock the file exist now
-                            if (File.Exists(path))
-                            {
-                                styleValueOrUrlOrPath = path;
-                            }
-                            else
-                            {
-                                Debug.WriteLine("Load style from url :" + path);
-                                #region downloadStyleFromUrl
-                                try
-                                {
-                                    HttpResponse httpResponse = Collectif.ByteDownloadUri(new Uri(styleValueOrUrlOrPath), layerID, true).Result;
-                                    if (httpResponse?.ResponseMessage.IsSuccessStatusCode == true)
-                                    {
-                                        if (httpResponse.Buffer != null)
-                                        {
-                                            styleValueOrUrlOrPath = Collectif.ByteArrayToString(httpResponse.Buffer);
-                                            if (!string.IsNullOrEmpty(styleValueOrUrlOrPath))
-                                            {
-                                                //save filetodisk
-                                                string path_dir = Path.GetDirectoryName(path);
-                                                if (!Directory.Exists(path_dir))
-                                                {
-                                                    Directory.CreateDirectory(path_dir);
-                                                }
-                                                File.WriteAllText(path, styleValueOrUrlOrPath);
-                                            }
-                                        }
-                                        else
-                                        {
-                                            Debug.WriteLine("VectorTileRenderer.Style buffer from url is null");
-                                        }
-                                    }
-                                    else
-                                    {
-                                        Debug.WriteLine("VectorTileRenderer.Style response from url is null");
-                                    }
-                                }
-                                catch (Exception ex)
-                                {
-                                    Debug.WriteLine(ex.Message);
-                                }
-                                #endregion
-                            }
-                        }
-                    }
+                    return new VectorTileRenderer.Style(styleValueOrUrlOrPath);
                 }
-
-                return new MapsInMyFolder.VectorTileRenderer.Style(styleValueOrUrlOrPath);
             }
             catch (Exception ex)
             {
-                Javascript.PrintError("Tile style : " + ex.Message, layerID);
+                Javascript.Functions.PrintError("An error occurred while loading the style. " + ex.Message, layerID);
             }
             return null;
         }
@@ -425,7 +339,6 @@ namespace MapsInMyFolder.Commun
                         tp_response = await Collectif.ByteDownloadUri(temp_uri, 0, true).ConfigureAwait(false);
                         if (tp_response?.Buffer is null)
                         {
-                            DebugMode.WriteLine("Erreur loading g");
                             return null;
                         }
 
@@ -462,17 +375,15 @@ namespace MapsInMyFolder.Commun
                                 bool success = false;
                                 try
                                 {
-                                    DebugMode.WriteLine("Trying to read file");
                                     StreamPBFFile = File.OpenRead(prov_save_filename);
                                     success = true;
-                                    DebugMode.WriteLine("End read file");
                                 }
                                 catch (Exception ex)
                                 {
-                                    Debug.WriteLine("TileGenerator : Failed to load " + prov_save_filename + " - " + tentatives + "/" + Settings.max_retry_download + "\n Reason : " + ex.Message);
                                     tentatives++;
                                     success = false;
                                     System.Threading.Thread.SpinWait(500);
+                                    Debug.WriteLine(ex.Message);
                                 }
                                 if (success)
                                 {

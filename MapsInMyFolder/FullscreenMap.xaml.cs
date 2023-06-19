@@ -11,7 +11,7 @@ namespace MapsInMyFolder
 {
     public class SelectionRectangle
     {
-        public MapSelectable mapSelectable;
+        public MapSelectable MapSelectable { get; set; }
         public MapPolygon Rectangle;
         public Border PropertiesDisplayElement;
         public TextBox NameTextBox;
@@ -25,36 +25,29 @@ namespace MapsInMyFolder
         public TextBox SELongitudeTextBox;
 
         public event EventHandler<RoutedEventArgs> PropertiesDisplayElementGotFocus;
-        //public event EventHandler<RoutedEventArgs> PropertiesDisplayElementLostFocus;
 
-        public static List<SelectionRectangle> Rectangles = new List<SelectionRectangle>();
+        public static List<SelectionRectangle> Rectangles { get; set; } = new List<SelectionRectangle>();
 
-        public static SelectionRectangle GetSelectionRectangleFromRectangle(MapPolygon SearchedRectangle)
+        public static SelectionRectangle GetSelectionRectangleFromRectangle(MapPolygon searchedRectangle)
         {
-            if (Rectangles.Count == 0)
-            {
-                return null;
-            }
-            return Rectangles?.Where(Rectangle => Rectangle.Rectangle == SearchedRectangle).FirstOrDefault();
+            return Rectangles?.FirstOrDefault(rectangle => rectangle.Rectangle == searchedRectangle);
         }
 
-
-        public SelectionRectangle(MapPolygon Rectangle, string Nom, string MinZoom, string MaxZoom, string Color, string StrokeThickness)
+        public SelectionRectangle(MapPolygon rectangle, string name, string minZoom, string maxZoom, string color, string strokeThickness)
         {
-            this.Rectangle = Rectangle;
-            CreateSelectionElement(Nom, MinZoom, MaxZoom, Color, StrokeThickness);
+            Rectangle = rectangle;
+            CreateSelectionElement(name, minZoom, maxZoom, color, strokeThickness);
         }
 
-        public void Focus(bool IsFocused = false)
+        public void Focus(bool isFocused = false)
         {
-            if (IsFocused && (PropertiesDisplayElement.IsFocused || PropertiesDisplayElement.IsKeyboardFocusWithin))
+            if (isFocused && (PropertiesDisplayElement.IsFocused || PropertiesDisplayElement.IsKeyboardFocusWithin))
             {
                 PropertiesDisplayElement.BorderBrush = Collectif.HexValueToSolidColorBrush("#F18712");
             }
-            else if (IsFocused)
+            else if (isFocused)
             {
                 PropertiesDisplayElement.BorderBrush = Collectif.HexValueToSolidColorBrush("#F18712");
-                //PropertiesDisplayElement.Focus();
             }
             else
             {
@@ -62,47 +55,47 @@ namespace MapsInMyFolder
             }
         }
 
-        public Border CreateSelectionElement(string Nom, string MinZoom, string MaxZoom, string Color, string StrokeThickness)
+        public Border CreateSelectionElement(string name, string minZoom, string maxZoom, string color, string strokeThickness)
         {
-            Grid getGrid(bool AddCollums = true)
+            Grid getGrid(bool addColumns = true)
             {
-                Grid ContentGrid = new Grid()
+                Grid contentGrid = new Grid()
                 {
                     Background = Collectif.HexValueToSolidColorBrush("#303031")
                 };
-                ContentGrid.RowDefinitions.Add(new RowDefinition()
+                contentGrid.RowDefinitions.Add(new RowDefinition()
                 {
                     Height = new GridLength(17)
                 });
-                ContentGrid.RowDefinitions.Add(new RowDefinition());
-                if (AddCollums)
+                contentGrid.RowDefinitions.Add(new RowDefinition());
+                if (addColumns)
                 {
-                    ContentGrid.ColumnDefinitions.Add(new ColumnDefinition());
-                    ContentGrid.ColumnDefinitions.Add(new ColumnDefinition()
+                    contentGrid.ColumnDefinitions.Add(new ColumnDefinition());
+                    contentGrid.ColumnDefinitions.Add(new ColumnDefinition()
                     {
                         Width = new GridLength(10)
                     });
-                    ContentGrid.ColumnDefinitions.Add(new ColumnDefinition());
+                    contentGrid.ColumnDefinitions.Add(new ColumnDefinition());
                 }
-                return ContentGrid;
+                return contentGrid;
             }
 
-            TextBox setSimpleColumTextBox(Grid grid, string LabelText, string TextBoxValue, string DefaultTextBoxValue)
+            TextBox setSimpleColumnTextBox(Grid grid, string labelText, string textBoxValue, string defaultTextBoxValue)
             {
                 Label label = new Label()
                 {
-                    Content = LabelText,
+                    Content = labelText,
                 };
                 Grid.SetRow(label, 0);
 
                 TextBox textbox = new TextBox();
-                if (string.IsNullOrWhiteSpace(TextBoxValue))
+                if (string.IsNullOrWhiteSpace(textBoxValue))
                 {
-                    textbox.Text = DefaultTextBoxValue;
+                    textbox.Text = defaultTextBoxValue;
                 }
                 else
                 {
-                    textbox.Text = TextBoxValue;
+                    textbox.Text = textBoxValue;
                 }
 
                 Grid.SetRow(textbox, 1);
@@ -111,32 +104,28 @@ namespace MapsInMyFolder
                 return textbox;
             }
 
-            (TextBox LeftTextBox, TextBox RightTextBox) setDoubleColumnTextBox(Grid Grid, string LeftLabelText, string RightLabelText)
+            (TextBox LeftTextBox, TextBox RightTextBox) setDoubleColumnTextBox(Grid grid, string leftLabelText, string rightLabelText)
             {
-                Grid.Margin = new Thickness(0, 20, 0, 0);
-                Label Leftlabel = new Label()
+                grid.Margin = new Thickness(0, 20, 0, 0);
+                TextBox GetTextBox(object content, int column)
                 {
-                    Content = LeftLabelText,
-                };
-                Grid.SetRow(Leftlabel, 0);
-                Grid.SetColumn(Leftlabel, 0);
-                TextBox LeftTextbox = new TextBox();
-                Grid.SetRow(LeftTextbox, 1);
-                Grid.SetColumn(LeftTextbox, 0);
-                Grid.Children.Add(Leftlabel);
-                Grid.Children.Add(LeftTextbox);
-                Label Rightlabel = new Label()
-                {
-                    Content = RightLabelText,
-                };
-                Grid.SetRow(Rightlabel, 0);
-                Grid.SetColumn(Rightlabel, 2);
-                TextBox Rightextbox = new TextBox();
-                Grid.SetRow(Rightextbox, 1);
-                Grid.SetColumn(Rightextbox, 2);
-                Grid.Children.Add(Rightlabel);
-                Grid.Children.Add(Rightextbox);
-                return (LeftTextbox, Rightextbox);
+                    Label label = new Label()
+                    {
+                        Content = content,
+                    };
+                    Grid.SetRow(label, 0);
+                    Grid.SetColumn(label, column);
+                    TextBox textbox = new TextBox();
+                    Grid.SetRow(textbox, 1);
+                    Grid.SetColumn(textbox, column);
+                    grid.Children.Add(label);
+                    grid.Children.Add(textbox);
+                    return textbox;
+                }
+
+                TextBox leftTextbox = GetTextBox(leftLabelText, 0);
+                TextBox rightTextbox = GetTextBox(rightLabelText, 2);
+                return (leftTextbox, rightTextbox);
             }
 
             PropertiesDisplayElement = new Border()
@@ -148,146 +137,192 @@ namespace MapsInMyFolder
                 Focusable = true
             };
 
-            PropertiesDisplayElement.GotFocus += (o, e) =>
-            {
-                mapSelectable?.SetRectangleAsActive(Rectangle);
-                PropertiesDisplayElementGotFocus?.Invoke(o, e);
-            };
-            PropertiesDisplayElement.IsKeyboardFocusWithinChanged += (o, e) =>
-            {
-                mapSelectable?.SetRectangleAsActive(Rectangle);
-                PropertiesDisplayElementGotFocus?.Invoke(o, null);
-            };
+            PropertiesDisplayElement.GotFocus += PropertiesDisplayElement_GotFocus;
+            PropertiesDisplayElement.IsKeyboardFocusWithinChanged += PropertiesDisplayElement_IsKeyboardFocusWithinChanged;
+            PropertiesDisplayElement.Unloaded += PropertiesDisplayElement_Unloaded;
 
             StackPanel stackPanel = new StackPanel()
             {
                 Margin = new Thickness(10, 10, 5, 20),
             };
 
-            Grid ZoneNameGrid = getGrid(false);
-            NameTextBox = setSimpleColumTextBox(ZoneNameGrid, "Nom :", Nom, "Selection sans nom");
-            stackPanel.Children.Add(ZoneNameGrid);
+            Grid zoneNameGrid = getGrid(false);
+            NameTextBox = setSimpleColumnTextBox(zoneNameGrid, Languages.Current["editorSelectionsPropertyNameName"], name, Languages.Current["editorSelectionsPropertyDefaultValueName"]);
+            stackPanel.Children.Add(zoneNameGrid);
 
-            Grid ColorGrid = getGrid(false);
-            ColorTextBox = setSimpleColumTextBox(ColorGrid, "Couleur (hex) :", Color, "#000000");
-            stackPanel.Children.Add(ColorGrid);
+            Grid colorGrid = getGrid(false);
+            ColorTextBox = setSimpleColumnTextBox(colorGrid, Languages.Current["editorSelectionsPropertyNameColor"], color, "#000000");
+            stackPanel.Children.Add(colorGrid);
 
-            Grid StrokeThicknessGrid = getGrid(false);
-            StrokeThicknessTextBox = setSimpleColumTextBox(StrokeThicknessGrid, "Epaisseur de ligne :", StrokeThickness, "1");
-            stackPanel.Children.Add(StrokeThicknessGrid);
+            Grid strokeThicknessGrid = getGrid(false);
+            StrokeThicknessTextBox = setSimpleColumnTextBox(strokeThicknessGrid, Languages.Current["editorSelectionsPropertyNameStrokeThickness"], strokeThickness, "5");
+            stackPanel.Children.Add(strokeThicknessGrid);
 
-            Grid ZoomGrid = getGrid();
-            var ZoomTextBox = setDoubleColumnTextBox(ZoomGrid, "Min Zoom :", "Max Zoom :");
-            stackPanel.Children.Add(ZoomGrid);
-            MinZoomTextBox = ZoomTextBox.LeftTextBox;
-            MaxZoomTextBox = ZoomTextBox.RightTextBox;
-            if (string.IsNullOrWhiteSpace(MinZoom))
-            {
-                MinZoomTextBox.Text = "∞";
-            }
-            else
-            {
-                MinZoomTextBox.Text = MinZoom;
-            }
+            Grid zoomGrid = getGrid();
+            var zoomTextBox = setDoubleColumnTextBox(zoomGrid, Languages.Current["editorSelectionsPropertyNameMinZoom"], Languages.Current["editorSelectionsPropertyNameMaxZoom"]);
+            stackPanel.Children.Add(zoomGrid);
+            MinZoomTextBox = zoomTextBox.LeftTextBox;
+            MaxZoomTextBox = zoomTextBox.RightTextBox;
+            MinZoomTextBox.Text = getTextIfInfinity(minZoom);
+            MaxZoomTextBox.Text = getTextIfInfinity(maxZoom);
 
-            if (string.IsNullOrWhiteSpace(MaxZoom))
-            {
-                MaxZoomTextBox.Text = "∞";
-            }
-            else
-            {
-                MaxZoomTextBox.Text = MaxZoom;
-            }
+            Grid nordOuestGrid = getGrid();
+            var nordOuestTextBox = setDoubleColumnTextBox(nordOuestGrid, Languages.Current["editorSelectionsPropertyNameNorthwestLatitude"], Languages.Current["editorSelectionsPropertyNameNorthwestLongitude"]);
+            stackPanel.Children.Add(nordOuestGrid);
+            NOLatitudeTextBox = nordOuestTextBox.LeftTextBox;
+            NOLongitudeTextBox = nordOuestTextBox.RightTextBox;
 
-            Grid NordOuestGrid = getGrid();
-            var NordOuestTextBox = setDoubleColumnTextBox(NordOuestGrid, "Nord-Ouest Latitude :", "Nord-Ouest Longitude :");
-            stackPanel.Children.Add(NordOuestGrid);
-            NOLatitudeTextBox = NordOuestTextBox.LeftTextBox;
-            NOLongitudeTextBox = NordOuestTextBox.RightTextBox;
-
-            Grid SudEstGrid = getGrid();
-            var SudEstTextBox = setDoubleColumnTextBox(SudEstGrid, "Sud-Est Latitude :", "Sud-Est Longitude :");
-            stackPanel.Children.Add(SudEstGrid);
+            Grid sudEstGrid = getGrid();
+            var sudEstTextBox = setDoubleColumnTextBox(sudEstGrid, Languages.Current["editorSelectionsPropertyNameSoutheastLatitude"], Languages.Current["editorSelectionsPropertyNameSoutheastLongitude"]);
+            stackPanel.Children.Add(sudEstGrid);
             PropertiesDisplayElement.Child = stackPanel;
-            SELatitudeTextBox = SudEstTextBox.LeftTextBox;
-            SELongitudeTextBox = SudEstTextBox.RightTextBox;
+            SELatitudeTextBox = sudEstTextBox.LeftTextBox;
+            SELongitudeTextBox = sudEstTextBox.RightTextBox;
 
-            var Locations = MapSelectable.GetRectangleLocationFromRectangle(Rectangle);
-            NOLatitudeTextBox.Text = Locations.NO.Latitude.ToString();
-            NOLongitudeTextBox.Text = Locations.NO.Longitude.ToString();
-            SELatitudeTextBox.Text = Locations.SE.Latitude.ToString();
-            SELongitudeTextBox.Text = Locations.SE.Longitude.ToString();
+            var locations = MapSelectable.GetRectangleLocationFromRectangle(Rectangle);
+            NOLatitudeTextBox.Text = locations.NO.Latitude.ToString();
+            NOLongitudeTextBox.Text = locations.NO.Longitude.ToString();
+            SELatitudeTextBox.Text = locations.SE.Latitude.ToString();
+            SELongitudeTextBox.Text = locations.SE.Longitude.ToString();
 
             NOLatitudeTextBox.TextChanged += UpdateLocation_NO;
             NOLongitudeTextBox.TextChanged += UpdateLocation_NO;
             SELatitudeTextBox.TextChanged += UpdateLocation_SE;
             SELongitudeTextBox.TextChanged += UpdateLocation_SE;
+
+            MinZoomTextBox.TextChanged += FilterZoomOnTextChanged;
+            MaxZoomTextBox.TextChanged += FilterZoomOnTextChanged;
+            StrokeThicknessTextBox.TextChanged += FilterStrokeThicknessOnTextChanged;
+
             return PropertiesDisplayElement;
+
+            string getTextIfInfinity(string texteValue)
+            {
+                if (string.IsNullOrWhiteSpace(texteValue) || texteValue == "-1" || string.Equals(texteValue, "infinity", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    return "∞";
+                }
+                else if (int.TryParse(texteValue, out int _))
+                {
+                    return texteValue;
+                }
+                else
+                {
+                    return "∞";
+                }
+            }
         }
 
-        public void UpdateLocation_NO(object o, TextChangedEventArgs e)
+        public void FilterZoomOnTextChanged(object sender, TextChangedEventArgs e)
         {
-            TextBox TextBoxSender = o as TextBox;
-            Collectif.FilterDigitOnlyWhileWritingInTextBox(TextBoxSender, new List<char>() { '.', '-' }, true, false);
+            TextBox textBoxSender = sender as TextBox;
+            Collectif.FilterDigitOnlyWhileWritingInTextBox(textBoxSender, new List<char>() { '-', '∞' }, true, false);
+            if (textBoxSender.Text.Trim() == "-1")
+            {
+                textBoxSender.Text = "∞";
+            }
+        }
+
+        public void FilterStrokeThicknessOnTextChanged(object sender, TextChangedEventArgs e)
+        {
+            TextBox textBoxSender = sender as TextBox;
+            Collectif.FilterDigitOnlyWhileWritingInTextBox(textBoxSender, new List<char>() { '.' }, true, false);
+        }
+
+        private void PropertiesDisplayElement_Unloaded(object sender, RoutedEventArgs e)
+        {
+            PropertiesDisplayElement.GotFocus -= PropertiesDisplayElement_GotFocus;
+            PropertiesDisplayElement.IsKeyboardFocusWithinChanged -= PropertiesDisplayElement_IsKeyboardFocusWithinChanged;
+            PropertiesDisplayElement.Unloaded -= PropertiesDisplayElement_Unloaded;
+            NOLatitudeTextBox.TextChanged -= UpdateLocation_NO;
+            NOLongitudeTextBox.TextChanged -= UpdateLocation_NO;
+            SELatitudeTextBox.TextChanged -= UpdateLocation_SE;
+            SELongitudeTextBox.TextChanged -= UpdateLocation_SE;
+
+            MinZoomTextBox.TextChanged -= FilterZoomOnTextChanged;
+            MaxZoomTextBox.TextChanged -= FilterZoomOnTextChanged;
+            StrokeThicknessTextBox.TextChanged -= FilterStrokeThicknessOnTextChanged;
+        }
+
+        private void PropertiesDisplayElement_GotFocus(object sender, RoutedEventArgs e)
+        {
+            MapSelectable?.SetRectangleAsActive(Rectangle);
+            PropertiesDisplayElementGotFocus?.Invoke(sender, e);
+        }
+
+        private void PropertiesDisplayElement_IsKeyboardFocusWithinChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            MapSelectable?.SetRectangleAsActive(Rectangle);
+            PropertiesDisplayElementGotFocus?.Invoke(sender, null);
+        }
+
+        public void UpdateLocation_NO(object sender, TextChangedEventArgs e)
+        {
+            TextBox textBoxSender = sender as TextBox;
+            Collectif.FilterDigitOnlyWhileWritingInTextBox(textBoxSender, new List<char>() { '.', '-' }, true, false);
             if (string.IsNullOrWhiteSpace(NOLatitudeTextBox.Text) || string.IsNullOrWhiteSpace(NOLongitudeTextBox.Text))
             {
                 return;
             }
             if (!double.TryParse(NOLatitudeTextBox.Text, out var latitude)) return;
             if (!double.TryParse(NOLongitudeTextBox.Text, out var longitude)) return;
-            int SelectStartAt = TextBoxSender.SelectionStart;
+            int selectStartAt = textBoxSender.SelectionStart;
             if (longitude == 180)
             {
                 longitude = 179.999999;
-                TextBoxSender.Text = longitude.ToString();
-                TextBoxSender.SelectionStart = SelectStartAt;
+                textBoxSender.Text = longitude.ToString();
+                textBoxSender.SelectionStart = selectStartAt;
             }
             else if (longitude == -180)
             {
                 longitude = -179.999999;
-                TextBoxSender.Text = longitude.ToString(); TextBoxSender.SelectionStart = SelectStartAt;
+                textBoxSender.Text = longitude.ToString();
+                textBoxSender.SelectionStart = selectStartAt;
             }
-            mapSelectable.SetRectangleLocation(new Location(latitude, longitude), null, Rectangle);
+            MapSelectable.SetRectangleLocation(new Location(latitude, longitude), null, Rectangle);
         }
 
-        public void UpdateLocation_SE(object o, TextChangedEventArgs e)
+        public void UpdateLocation_SE(object sender, TextChangedEventArgs e)
         {
-            TextBox TextBoxSender = o as TextBox;
-            Collectif.FilterDigitOnlyWhileWritingInTextBox(TextBoxSender, new List<char>() { '.', '-' }, true, false);
+            TextBox textBoxSender = sender as TextBox;
+            Collectif.FilterDigitOnlyWhileWritingInTextBox(textBoxSender, new List<char>() { '.', '-' }, true, false);
             if (string.IsNullOrWhiteSpace(SELatitudeTextBox.Text) || string.IsNullOrWhiteSpace(SELongitudeTextBox.Text))
             {
                 return;
             }
             if (!double.TryParse(SELatitudeTextBox.Text, out var latitude)) return;
-            if (!double.TryParse(SELongitudeTextBox.Text, out var longitude)) return; int SelectStartAt = TextBoxSender.SelectionStart;
+            if (!double.TryParse(SELongitudeTextBox.Text, out var longitude)) return;
+            int selectStartAt = textBoxSender.SelectionStart;
             if (longitude == 180)
             {
                 longitude = 179.999999;
-                TextBoxSender.Text = longitude.ToString(); TextBoxSender.SelectionStart = SelectStartAt;
+                textBoxSender.Text = longitude.ToString();
+                textBoxSender.SelectionStart = selectStartAt;
             }
             else if (longitude == -180)
             {
                 longitude = -179.999999;
-                TextBoxSender.Text = longitude.ToString(); TextBoxSender.SelectionStart = SelectStartAt;
+                textBoxSender.Text = longitude.ToString();
+                textBoxSender.SelectionStart = selectStartAt;
             }
 
-            mapSelectable.SetRectangleLocation(null, new Location(latitude, longitude), Rectangle);
-
+            MapSelectable.SetRectangleLocation(null, new Location(latitude, longitude), Rectangle);
         }
-
     }
 
-
-    public partial class FullscreenMap : Page
+    public partial class FullscreenRectanglesMap : Page
     {
-        public static MapSelectable mapSelectable;
-        public FullscreenMap()
+        public MapSelectable mapSelectable;
+
+        public FullscreenRectanglesMap()
         {
             InitializeComponent();
-            mapSelectable = new MapSelectable(MapViewer, new Location(0, 0), new Location(0, 0), null, this) { RectangleCanBeDeleted = true };
+            mapSelectable = new MapSelectable(MapViewer, new Location(0, 0), new Location(0, 0), this) { RectangleCanBeDeleted = true };
             mapSelectable.RectangleGotFocus += MapSelectable_RectangleGotFocus;
             mapSelectable.RectangleLostFocus += MapSelectable_RectangleLostFocus;
             Notification.UpdateNotification += Notification_UpdateNotification;
+            mapSelectable.OnLocationUpdated += MapSelectable_OnLocationUpdated;
+            mapSelectable.OnRectangleDeleted += MapSelectable_OnRectangleDeleted;
         }
 
         private void Notification_UpdateNotification(object sender, (string NotificationId, string Destinateur) e)
@@ -308,11 +343,7 @@ namespace MapsInMyFolder
                     FocusRectangle(rectangle.Rectangle);
                     rectangle.PropertiesDisplayElement.Focus();
                 }
-
             }
-
-            mapSelectable.OnLocationUpdated += MapSelectable_OnLocationUpdated;
-            mapSelectable.OnRectangleDeleted += MapSelectable_OnRectangleDeleted;
         }
 
         private void PageDispose()
@@ -323,7 +354,6 @@ namespace MapsInMyFolder
             mapSelectable.OnLocationUpdated -= MapSelectable_OnLocationUpdated;
             mapSelectable.OnRectangleDeleted -= MapSelectable_OnRectangleDeleted;
         }
-
 
         private void MapSelectable_OnRectangleDeleted(object sender, MapPolygon e)
         {
@@ -339,31 +369,21 @@ namespace MapsInMyFolder
 
         private void MapSelectable_OnLocationUpdated(object sender, MapPolygon e)
         {
-            void SetValue(TextBox textbElement, string value, System.Windows.Controls.TextChangedEventHandler action)
+            static void SetValue(TextBox textBoxElement, string value, System.Windows.Controls.TextChangedEventHandler action)
             {
-                if (textbElement.Text != value && !textbElement.IsKeyboardFocused)
+                if (textBoxElement.Text != value && !textBoxElement.IsKeyboardFocused)
                 {
-                    textbElement.TextChanged -= action;
-                    textbElement.Text = value;
-                    textbElement.TextChanged += action;
+                    textBoxElement.TextChanged -= action;
+                    textBoxElement.Text = value;
+                    textBoxElement.TextChanged += action;
                 }
-
             }
 
             var Locations = mapSelectable.GetRectangleLocation(e);
             SelectionRectangle selectionRectangle = SelectionRectangle.GetSelectionRectangleFromRectangle(e);
             if (selectionRectangle == null)
             {
-                if (Locations.NO.Latitude != 0 && Locations.NO.Latitude != 0 && Locations.SE.Longitude != 0 && Locations.SE.Longitude != 0)
-                {
-                    MessageBox.Show("Added");
-                    AddNewSelection(e);
-                    selectionRectangle = SelectionRectangle.GetSelectionRectangleFromRectangle(e);
-                }
-                else
-                {
-                    return;
-                }
+                return;
             }
 
             SetValue(selectionRectangle.NOLatitudeTextBox, Math.Round(Locations.NO.Latitude, 6).ToString(), selectionRectangle.UpdateLocation_NO);
@@ -393,7 +413,7 @@ namespace MapsInMyFolder
                 {
                     ContentGrid.Opacity = 0;
                     var doubleAnimation = new DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(Settings.animations_duration_millisecond));
-                    ContentGrid.BeginAnimation(UIElement.OpacityProperty, doubleAnimation);
+                    ContentGrid.BeginAnimation(OpacityProperty, doubleAnimation);
                     sender.InsertPosition = NotificationZone.Children.Add(ContentGrid);
                 }
             }
@@ -401,13 +421,15 @@ namespace MapsInMyFolder
             {
                 Grid ContentGrid = Collectif.FindChildByName<Grid>(NotificationZone, NotificationInternalArgs.NotificationId);
                 var doubleAnimation = new DoubleAnimation(ContentGrid.ActualHeight, 0, new Duration(TimeSpan.FromSeconds(0.1)));
-                doubleAnimation.Completed += (sender, e) =>
+                void DeleteAfterAnimation(object sender, EventArgs eventArgs)
                 {
                     ContentGrid?.Children?.Clear();
                     ContentGrid = null;
                     NotificationZone.Children.Remove(ContentGrid);
-                };
-                ContentGrid.BeginAnimation(Grid.MaxHeightProperty, doubleAnimation);
+                    doubleAnimation.Completed -= DeleteAfterAnimation;
+                }
+                doubleAnimation.Completed += DeleteAfterAnimation;
+                ContentGrid.BeginAnimation(MaxHeightProperty, doubleAnimation);
             }
         }
 
@@ -421,30 +443,11 @@ namespace MapsInMyFolder
             FocusRectangle(e);
         }
 
-
-        public void FocusRectangle(MapPolygon e)
+        private static void FocusRectangle(MapPolygon e)
         {
             SelectionRectangle selectionRectangle = SelectionRectangle.GetSelectionRectangleFromRectangle(e);
-            if (selectionRectangle == null)
-            {
-                return;
-            }
             selectionRectangle?.Focus(true);
             selectionRectangle?.PropertiesDisplayElement.BringIntoView();
-        }
-
-
-        public void SetLayer()
-        {
-            Layers Layer = Layers.GetLayerById(Settings.layer_startup_id);
-            MapViewer.MapLayer = new MapTileLayer
-            {
-                TileSource = new TileSource { UriFormat = "https://tile.openstreetmap.org/{z}/{x}/{y}.png", LayerID = Layer.class_id },
-                SourceName = Layer.class_identifiant,
-                MaxZoomLevel = Layer.class_max_zoom ?? 0,
-                MinZoomLevel = Layer.class_min_zoom ?? 0,
-                Description = ""
-            };
         }
 
         private void AddRectangle_Click(object sender, RoutedEventArgs e)
@@ -454,19 +457,28 @@ namespace MapsInMyFolder
 
         public void AddNewSelection(MapPolygon NewRectangle = null, string Nom = null, string MinZoom = null, string MaxZoom = null, string Color = null, string StrokeThickness = null)
         {
+            DeleteUnusedRectangles();
+            NewRectangle ??= mapSelectable.AddRectangle(new Location(0, 0), new Location(0, 0));
+            SelectionRectangle selectionRectangle = new SelectionRectangle(NewRectangle, Nom, MinZoom, MaxZoom, Color, StrokeThickness)
+            {
+                MapSelectable = mapSelectable
+            };
+
+            SelectionRectangle.Rectangles.Add(selectionRectangle);
+            selectionRectangle.Focus(true);
+            RectanglesStackPanel.Children.Add(selectionRectangle.PropertiesDisplayElement);
+
+            MapViewer.Focus();
+            SelectionScrollViewer.ScrollToEnd();
+        }
+
+        private void DeleteUnusedRectangles()
+        {
             int NumberOfElementInside = RectanglesStackPanel.Children.Count;
             int NumberOfUnusedRectangleDeleted = mapSelectable.DeleteUnusedRectangles();
             if (NumberOfUnusedRectangleDeleted > 0 && NumberOfElementInside != RectanglesStackPanel.Children.Count)
             {
-                string infoText = "";
-                if (NumberOfUnusedRectangleDeleted == 1)
-                {
-                    infoText += "Une sélection vide a été supprimée";
-                }
-                else
-                {
-                    infoText += $"{NumberOfElementInside - RectanglesStackPanel.Children.Count} sélections vides ont été supprimées";
-                }
+                string infoText = NumberOfUnusedRectangleDeleted == 1 ? Languages.Current["editorSelectionsNotificationEmptySelectionDeletedSingle"] : Languages.GetWithArguments("editorSelectionsNotificationEmptySelectionDeletedMultiples", NumberOfElementInside - RectanglesStackPanel.Children.Count);
                 Notification InfoUnusedRectangleDeleted = new NText(infoText, "MapsInMyFolder", "FullscreenMap")
                 {
                     NotificationId = "InfoUnusedRectangleDeleted",
@@ -475,28 +487,22 @@ namespace MapsInMyFolder
                 };
                 InfoUnusedRectangleDeleted.Register();
             }
-
-            if (NewRectangle == null)
-            {
-                NewRectangle = mapSelectable.AddRectangle(new Location(0, 0), new Location(0, 0));
-            }
-            SelectionRectangle selectionRectangle = new SelectionRectangle(NewRectangle, Nom, MinZoom, MaxZoom, Color, StrokeThickness)
-            {
-                mapSelectable = mapSelectable
-            };
-            SelectionRectangle.Rectangles.Add(selectionRectangle);
-            selectionRectangle.Focus(true);
-            RectanglesStackPanel.Children.Add(selectionRectangle.PropertiesDisplayElement);
-
-
-            MapViewer.Focus();
-            SelectionScrollViewer.ScrollToEnd();
         }
 
         private void ClosePage_button_Click(object sender, RoutedEventArgs e)
         {
             PageDispose();
             MainWindow._instance.FrameBack();
+        }
+
+        private void SaveButton_Click(object sender, RoutedEventArgs e)
+        {
+            PageDispose();
+        }
+
+        private void MapViewer_MouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            MapViewer.Focus();
         }
     }
 }

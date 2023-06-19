@@ -28,7 +28,7 @@ namespace MapsInMyFolder
             _instance = this;
             InitializeComponent();
             MainContentFrame.Navigate(MainPage);
-            TileGeneratorSettings.handler.ServerCertificateCustomValidationCallback += (_, _, _, _) => true;
+            Tiles.handler.ServerCertificateCustomValidationCallback += (_, _, _, _) => true;
         }
 
         public MainPage MainPage = new MainPage();
@@ -51,14 +51,16 @@ namespace MapsInMyFolder
 
         public void FrameLoad_PrepareDownload()
         {
-            if (Layers.Curent.class_tile_url is null)
+            if (Layers.Current.class_tile_url is null)
             {
                 Message.NoReturnBoxAsync("Une erreur s'est produite lors du chargement du calque.");
                 return;
             }
             Popup_opening(false);
-            PrepareDownloadPage PrepareDownloadPage = new PrepareDownloadPage();
-            PrepareDownloadPage.default_filename = Layers.Curent.class_name.Trim().Replace(" ", "_").ToLowerInvariant();
+            PrepareDownloadPage PrepareDownloadPage = new PrepareDownloadPage
+            {
+                defaultFilename = Layers.Current.class_name.Trim().Replace(" ", "_").ToLowerInvariant()
+            };
             PrepareDownloadPage.Init();
             MainContentFrame.Navigate(PrepareDownloadPage);
         }
@@ -72,21 +74,18 @@ namespace MapsInMyFolder
             CustomOrEditLayersPage.Init_CustomOrEditLayersWindow(prefilLayerId);
 
             MainContentFrame.Navigate(CustomOrEditLayersPage);
-            TileGeneratorSettings.AcceptJavascriptPrint = true;
+            Tiles.AcceptJavascriptPrint = true;
         }
 
-        //SQLiteConnection global_conn;
         public void Init()
         {
             TitleTextBox.Text = this.Title = "MapsInMyFolder";
+            LightInit();
             ThemeManager.Current.ApplicationTheme = ApplicationTheme.Dark;
-            ImageLoader.HttpClient.DefaultRequestHeaders.Add("User-Agent", Settings.user_agent);
-            TileGeneratorSettings.HttpClient.DefaultRequestHeaders.Add("User-Agent", Settings.user_agent);
-            MainPage.mapviewer.AnimationDuration = TimeSpan.FromMilliseconds(Settings.animations_duration_millisecond);
             Debug.WriteLine("Version dotnet :" + Environment.Version.ToString());
-            Javascript JavascriptLocationInstance = Javascript.JavascriptInstance;
-            JavascriptLocationInstance.LocationChanged += (o, e) => MainPage.MapViewerSetSelection(Javascript.JavascriptInstance.Location, Javascript.JavascriptInstance.ZoomToNewLocation);
-            Network.IsNetworkNowAvailable += (o, e) => CheckIfReadyToStartDownloadAfterNetworkChange();
+            Javascript JavascriptLocationInstance = Javascript.instance;
+            JavascriptLocationInstance.LocationChanged += (o, e) => MainPage.MapViewerSetSelection(Javascript.instance.Location, Javascript.instance.ZoomToNewLocation);
+            Network.IsNetworkNowAvailable += (o, e) => NetworkIsBack();
             Database.RefreshPanels += (o, e) => RefreshAllPanels();
             Javascript.JavascriptActionEvent += JavascriptActionEvent;
             Update.NewUpdateFoundEvent += (o, e) =>
@@ -100,7 +99,8 @@ namespace MapsInMyFolder
                     Debug.WriteLine(ex.ToString());
                 }
             };
-            Database.NewUpdateFoundEvent += (o, e) =>
+
+            Database.NewUpdateFoundEvent += (_, _) =>
             {
                 try
                 {
@@ -113,6 +113,12 @@ namespace MapsInMyFolder
             };
         }
 
+        public void LightInit()
+        {
+            ImageLoader.HttpClient.DefaultRequestHeaders.AddChangeIfExist("User-Agent", Settings.user_agent);
+            Tiles.HttpClient.DefaultRequestHeaders.AddChangeIfExist("User-Agent", Settings.user_agent);
+            MainPage.mapviewer.AnimationDuration = TimeSpan.FromMilliseconds(Settings.animations_duration_millisecond);
+        }
 
         public void JavascriptActionEvent(object sender, Javascript.JavascriptAction javascriptAction)
         {
@@ -127,7 +133,7 @@ namespace MapsInMyFolder
             }
         }
 
-        public void ApplicationUpdateFoundEvent()
+        public static void ApplicationUpdateFoundEvent()
         {
             Notification ApplicationUpdateNotification = new NText($"Une nouvelle version de l'application ({Update.UpdateRelease.Tag_name}) est disponible. Cliquez ici pour mettre à jour.", "MapsInMyFolder", "MainPage", Update.StartUpdating)
             {
@@ -138,7 +144,7 @@ namespace MapsInMyFolder
             ApplicationUpdateNotification.Register();
         }
 
-        public void DatabaseUpdateFoundEvent()
+        public static void DatabaseUpdateFoundEvent()
         {
             int ActualUserVersion = Database.ExecuteScalarSQLCommand("PRAGMA user_version");
             string Message;
@@ -181,11 +187,11 @@ namespace MapsInMyFolder
             }
         }
 
-        public void LoadAvalonEditThemes()
+        public static void LoadAvalonEditThemes()
         {
-            void LoadHighlighting(string Name, string FileName, string StyleExtension)
+            static void LoadHighlighting(string Name, string FileName, string StyleExtension)
             {
-                using (Stream s = Collectif.ReadResourceStream(@"editorTheme\" + FileName))
+                using (Stream s = Collectif.ReadResourceStream(@"EditorTheme\" + FileName))
                 {
                     if (s == null)
                     {
@@ -208,13 +214,13 @@ namespace MapsInMyFolder
 
         public static void RefreshAllPanels()
         {
-            _instance.Init();
+            _instance.LightInit();
             _instance.MainPage.MapLoad();
             _instance.MainPage.Init_layer_panel();
             _instance.MainPage.ReloadPage();
             _instance.MainPage.SearchLayerStart();
             _instance.MainPage.Init_download_panel();
-            _instance.MainPage.Set_current_layer(Layers.Curent.class_id);
+            _instance.MainPage.Set_current_layer(Layers.Current.class_id);
         }
 
         private void Window_ContentRendered(object sender, EventArgs e)
@@ -230,7 +236,6 @@ namespace MapsInMyFolder
             Javascript.EngineStopAll();
             Cef.Shutdown();
         }
-
 
         public void Popup_opening(bool ReduceOpacity = true)
         {

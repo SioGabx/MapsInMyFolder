@@ -121,6 +121,13 @@
         <Span begin="\\" end="." />
       </RuleSet>
     </Span>
+    <Span color="String" multiline="true">
+      <Begin>`</Begin>
+      <End>`</End>
+      <RuleSet>
+        <Span begin="\\" end="." />
+      </RuleSet>
+    </Span>
     <Span color="Character">
       <Begin>'</Begin>
       <End>'</End>

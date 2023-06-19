@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net.Http.Headers;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 
 namespace MapsInMyFolder.Commun
 {
-
     public static class Extensions
     {
-        public static bool Contains(this String str, String substring, StringComparison comp)
+        public static bool Contains(this string str, string substring, StringComparison comp)
         {
             if (substring == null)
             {
@@ -33,17 +33,86 @@ namespace MapsInMyFolder.Commun
             return new string(theChars);
         }
 
-        public static void SetText(this TextBox textbox, string text)
+        public static string TrimStart(this string target, string trimString)
         {
-            textbox.GetType().GetProperty("Text").SetValue(textbox, text, null);
+            if (string.IsNullOrEmpty(trimString)) return target;
+
+            string result = target;
+            while (result.StartsWith(trimString))
+            {
+                result = result.Substring(trimString.Length);
+            }
+
+            return result;
+        }
+
+        public static string TrimEnd(this string target, string trimString)
+        {
+            if (string.IsNullOrEmpty(trimString)) return target;
+
+            string result = target;
+            while (result.EndsWith(trimString))
+            {
+                result = result.Substring(0, result.Length - trimString.Length);
+            }
+
+            return result;
+        }
+
+        public static bool IsJson(this string source)
+        {
+            if (string.IsNullOrWhiteSpace(source))
+                return false;
+
+            source = source.Trim();
+
+            if ((source.StartsWith("{") && source.EndsWith("}")) || // Object
+                (source.StartsWith("[") && source.EndsWith("]")))   // Array
+            {
+                try
+                {
+                    Newtonsoft.Json.Linq.JToken.Parse(source);
+                    return true;
+                }
+                catch
+                {
+                    return false;
+                }
+            }
+
+            return false;
+        }
+
+        public static void SetText(this TextBox textbox, string text, TextChangedEventHandler textChangedEvent)
+        {
+            textbox.TextChanged -= textChangedEvent;
+            textbox.Text = text;
+            textbox.TextChanged += textChangedEvent;
         }
         public static void SetSelectedIndex(this ComboBox combobox, int index)
         {
             combobox.GetType().GetProperty("SelectedIndex").SetValue(combobox, index, null);
         }
 
+        public static void AddChangeIfExist(this HttpRequestHeaders requestHeaders, string name, string value)
+        {
+            if (requestHeaders == null)
+            {
+                return;
+            }
+            if (requestHeaders.Contains(name))
+            {
+                requestHeaders.Remove(name);
+            }
+            requestHeaders.Add(name, value);
+        }
+
         public static string RemoveNewLineChar(this string theString)
         {
+            if (string.IsNullOrWhiteSpace(theString))
+            {
+                return theString;
+            }
             var sb = new System.Text.StringBuilder(theString.Length);
             foreach (char i in theString)
             {
@@ -94,7 +163,6 @@ namespace MapsInMyFolder.Commun
             }
         }
 
-
         public static int IndexOf<T>(this IEnumerable<T> enumerable, T element, IEqualityComparer<T> comparer = null)
         {
             int i = 0;
@@ -109,7 +177,6 @@ namespace MapsInMyFolder.Commun
             }
             return -1;
         }
-
 
         public static IEnumerable<string> SelectedValues(this BlackPearl.Controls.CoreLibrary.MultiSelectCombobox MultiSelectCombobox, string DisplayMemberPath = null)
         {
@@ -129,7 +196,6 @@ namespace MapsInMyFolder.Commun
                     {
                         yield return ele.GetType().GetProperty(DisplayMemberPath).GetValue(ele).ToString().Trim();
                     }
-
                 }
             }
         }
@@ -149,6 +215,18 @@ namespace MapsInMyFolder.Commun
             return false;
         }
 
+        public static bool Contains(this string[] array, string value)
+        {
+            for (int i = 0; i < array.Length; i++)
+            {
+                if (array[i] == value)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         public static string Replace(this string Texte, IEnumerable<char> oldCharArray, string newString)
         {
             foreach (char SearchStr in oldCharArray)
@@ -156,6 +234,16 @@ namespace MapsInMyFolder.Commun
                 Texte = Texte.Replace(SearchStr.ToString(), newString);
             }
             return Texte;
+        }
+
+        public static string ReplaceSingle(this string chaine, string oldValue, string newValue)
+        {
+            int index = chaine.IndexOf(oldValue);
+            if (index != -1)
+            {
+                chaine = chaine.Remove(index, oldValue.Length).Insert(index, newValue);
+            }
+            return chaine;
         }
 
         public static string ReplaceLoop(this string Texte, string oldString, string newString)
@@ -167,7 +255,37 @@ namespace MapsInMyFolder.Commun
             return Texte;
         }
 
-
-
+        public static void DisposeItems<T>(this IEnumerable<T> collection) where T : IDisposable
+        {
+            foreach (T item in collection)
+            {
+                item.Dispose();
+            }
+        }
     }
+
+    //https://stackoverflow.com/a/26575203/9947331 and https://stackoverflow.com/a/27013997/9947331
+    //Usage : [UserFriendlyString( "I am before the enum element" ) ]
+    public class UserFriendlyStringAttribute : Attribute
+    {
+        public string UserFriendlyString;
+        public UserFriendlyStringAttribute(string value)
+        {
+            UserFriendlyString = value;
+        }
+    }
+
+    public static class EnumExtender
+    {
+        public static string GetUserFriendlyString(this Enum enumeration)
+        {
+            var memberInfo = enumeration.GetType().GetMember(enumeration.ToString());
+            if (memberInfo.Length <= 0) return enumeration.ToString();
+
+            var attributes = memberInfo[0].GetCustomAttributes(typeof(UserFriendlyStringAttribute), false);
+            return attributes.Length > 0 ? ((UserFriendlyStringAttribute)attributes[0]).UserFriendlyString : enumeration.ToString();
+        }
+    }
+
+
 }

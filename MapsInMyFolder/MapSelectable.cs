@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace MapsInMyFolder
@@ -13,9 +14,9 @@ namespace MapsInMyFolder
     {
         private HitType SetHitType(Point point)
         {
-            var ActiveRectangleLocations = GetRectangleLocation(ActiveRectangle);
-            Point No_Placement = map.LocationToView(ActiveRectangleLocations.NO);
-            Point Se_Placement = map.LocationToView(ActiveRectangleLocations.SE);
+            var (NO, SE) = GetRectangleLocation(ActiveRectangle);
+            Point No_Placement = map.LocationToView(NO);
+            Point Se_Placement = map.LocationToView(SE);
 
             double tblr_GAP = Settings.selection_rectangle_resize_tblr_gap;
             double angle_GAP = Settings.selection_rectangle_resize_angle_gap;
@@ -173,53 +174,40 @@ namespace MapsInMyFolder
             None, Body, UL, UR, LR, LL, L, R, T, B, Null, NotAllowed
         };
 
-        private MapControl.Map map;
+        private readonly MapControl.Map map;
+        private bool IsRightClick;
+        private bool IsLeftClick;
 
-        private bool IsRightClick = false;
-        private bool IsLeftClick = false;
-
+        public event EventHandler<EventArgs> RequestedPreviewUpdate;
         public event EventHandler<MapPolygon> OnLocationUpdated;
         public event EventHandler<MapPolygon> RectangleGotFocus;
         public event EventHandler<MapPolygon> RectangleLostFocus;
         public event EventHandler<MapPolygon> OnRectangleDeleted;
 
-        public bool RectangleCanBeDeleted = false;
-        public bool IsSnapToGrid = false;
-        public bool DisableRectangleMoving = false;
-        public int MinimalNumberOfRectangles = 0;
+        public bool DisposeElementsOnUnload = true;
+        public bool RectangleCanBeDeleted;
+        public bool IsSnapToGrid { get; set; }
+        public bool DisableRectangleMoving;
+        public int MinimalNumberOfRectangles;
 
         private HitType MouseHitType = HitType.None;
 
-        private Location SavedNo_Placement = new Location();
-        private Location SavedSe_Placement = new Location();
+        private Location savedNoPlacement = new Location();
+        private Location savedSePlacement = new Location();
 
         private Point OriginClickPlacement = new Point();
         private Point OriginNoPlacement = new Point();
         private Point OriginSePlacement = new Point();
         private Point SavedLeftClickPreviousActions;
 
-        private List<MapPolygon> Rectangles = new List<MapPolygon>();
+        private readonly List<MapPolygon> Rectangles = new List<MapPolygon>();
+        public MapPolygon ActiveRectangle { get; set; }
 
-        private MapPolygon _ActiveRectangle;
-        public MapPolygon ActiveRectangle
-        {
-            get
-            {
-                return _ActiveRectangle;
-            }
-            set
-            {
-                _ActiveRectangle = value;
-                //RectangleGotFocus?.Invoke(this, value);
-            }
-        }
-
-
-        public MapSelectable(MapControl.Map map, Location StartingNO = null, Location StartingSE = null, Window window = null, System.Windows.Controls.Page page = null)
+        public MapSelectable(MapControl.Map map, Location startingNO = null, Location startingSE = null, Page page = null)
         {
             this.map = map;
             map.Focusable = true;
-            System.Windows.Controls.UIElementCollection uIElementCollection = map.Children;
+            UIElementCollection uIElementCollection = map.Children;
             try
             {
                 foreach (UIElement element in uIElementCollection)
@@ -231,36 +219,84 @@ namespace MapsInMyFolder
                 }
             }
             catch (Exception) { }
-            SavedNo_Placement = StartingNO;
-            SavedSe_Placement = StartingSE;
-            AddRectangle(StartingNO, StartingSE);
+            savedNoPlacement = startingNO;
+            savedSePlacement = startingSE;
+            AddRectangle(startingNO, startingSE);
+            AttachAllEvents(map, page);
 
-            map.MouseDown += (o, e) => MapMouseDown(o, e);
+            OnLocationUpdated?.Invoke(this, ActiveRectangle);
+        }
+
+        public void AttachAllEvents(MapControl.Map map, Page page = null)
+        {
+            map.MouseDown += MapMouseDown;
             map.MouseMove += MapMouseMove;
-            map.MouseWheel += (o, e) => MainPage._instance.LayerTilePreview_RequestUpdate();
-            map.MouseRightButtonUp += (o, e) => RightClickUp();
-            map.MouseLeftButtonUp += (o, e) => LeftClickUp();//MouseLeftButtonUp
-            map.KeyDown += (o, e) =>
-            {
-                if (e.Key == Key.Delete)
-                {
-                    DeleteRectangle(ActiveRectangle);
-                    e.Handled = true;
-                }
-
-            };
-
-            if (window != null)
-            {
-                window.MouseUp += WindowMouseUp;
-                window.MouseMove += WindowMouseMove;
-            }
+            map.MouseWheel += MapMouseWheel;
+            map.MouseRightButtonUp += MapMouseRightButtonUp;
+            map.MouseLeftButtonUp += MapMouseLeftButtonUp;
+            map.KeyDown += MapKeyDown;
             if (page != null)
             {
                 page.MouseUp += WindowMouseUp;
                 page.MouseMove += WindowMouseMove;
+                page.Unloaded += PageUnloaded;
             }
-            OnLocationUpdated?.Invoke(this, ActiveRectangle);
+            map.Unloaded += MapUnloaded;
+        }
+
+        public void DettachAllEvents(MapControl.Map map, Page page = null)
+        {
+            MapUnloaded(map, null);
+            PageUnloaded(page, null);
+        }
+
+        private void PageUnloaded(object sender, RoutedEventArgs e)
+        {
+            Debug.WriteLine("MapSelectable : Page unloaded");
+            if (DisposeElementsOnUnload && sender is System.Windows.Controls.Page page)
+            {
+                page.MouseUp -= WindowMouseUp;
+                page.MouseMove -= WindowMouseMove;
+                page.Unloaded -= PageUnloaded;
+            }
+        }
+
+        private void MapUnloaded(object sender, RoutedEventArgs e)
+        {
+            if (DisposeElementsOnUnload)
+            {
+                map.MouseDown -= MapMouseDown;
+                map.MouseMove -= MapMouseMove;
+                map.MouseWheel -= MapMouseWheel;
+                map.MouseRightButtonUp -= MapMouseRightButtonUp;
+                map.MouseLeftButtonUp -= MapMouseLeftButtonUp;
+                map.KeyDown -= MapKeyDown;
+                map.Unloaded -= MapUnloaded;
+            }
+        }
+
+        private void MapKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Delete)
+            {
+                DeleteRectangle(ActiveRectangle);
+                e.Handled = true;
+            }
+        }
+
+        private void MapMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            LeftClickUp();
+        }
+
+        private void MapMouseRightButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            RightClickUp();
+        }
+
+        private void MapMouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            RequestedPreviewUpdate?.Invoke(this, null);
         }
 
         public MapPolygon AddRectangle(Location NO, Location SE)
@@ -271,18 +307,18 @@ namespace MapsInMyFolder
             return ActiveRectangle;
         }
 
-        public MapPolygon AddRectangle(MapPolygon Rectangle)
+        public MapPolygon AddRectangle(MapPolygon rectangle)
         {
-            AttachEventToRectangle(Rectangle);
+            AttachEventToRectangle(rectangle);
             map.Children.Add(ActiveRectangle);
-            Rectangles.Add(Rectangle);
+            Rectangles.Add(rectangle);
             ActiveRectangle.Focus();
             return ActiveRectangle;
         }
 
-        public void SetRectangleAsActive(MapPolygon Rectangle)
+        public void SetRectangleAsActive(MapPolygon rectangle)
         {
-            if (Rectangle == ActiveRectangle || Rectangle is null)
+            if (rectangle == ActiveRectangle || rectangle is null)
             {
                 return;
             }
@@ -290,63 +326,80 @@ namespace MapsInMyFolder
             {
                 ApplyRectangleInactiveColor(ActiveRectangle);
             }
-            ApplyRectangleActiveColor(Rectangle);
-            if (map.Children.Contains(Rectangle))
+            ApplyRectangleActiveColor(rectangle);
+            if (map.Children.Contains(rectangle))
             {
-                map.Children.Remove(Rectangle);
-                map.Children.Add(Rectangle);
+                map.Children.Remove(rectangle);
+                map.Children.Add(rectangle);
             }
-            ActiveRectangle = Rectangle;
+            ActiveRectangle = rectangle;
         }
 
         private MapPolygon CreateRectangle(Location NO, Location SE)
         {
             Debug.WriteLine("Create Rectangle");
-            MapPolygon Rectangle = new MapPolygon
+            MapPolygon rectangle = new MapPolygon
             {
                 StrokeDashCap = System.Windows.Media.PenLineCap.Square
             };
-            ApplyRectangleActiveColor(Rectangle);
-            SetRectangleLocation(NO, SE, Rectangle);
-            CleanRectangleLocations(Rectangle);
-            AttachEventToRectangle(Rectangle);
-            Rectangles.Add(Rectangle);
-            return Rectangle;
+            ApplyRectangleActiveColor(rectangle);
+            AttachEventToRectangle(rectangle);
+            SetRectangleLocation(NO, SE, rectangle);
+            CleanRectangleLocations(rectangle);
+            Rectangles.Add(rectangle);
+            return rectangle;
         }
 
-        public MapPolygon AttachEventToRectangle(MapPolygon Rectangle)
+        public MapPolygon AttachEventToRectangle(MapPolygon rectangle)
         {
-            Rectangle.MouseLeave += (o, e) =>
-            {
-                if (IsLeftClick || IsRightClick) { return; }
-                map.Cursor = Cursors.Arrow;
-            };
-            Rectangle.Focusable = true;
-
-            Rectangle.MouseMove += (o, e) =>
-            {
-                UpdateSelectionRectangle(o, e);
-            };
-            Rectangle.MouseDown += RectangleMouseDown;
-            Rectangle.MouseUp += RectangleMouseUp;
-            Rectangle.PreviewMouseLeftButtonUp += (o, e) =>
-            {
-                if (MouseHitType != HitType.None) { return; }
-                SetRectangleAsActive(Rectangle);
-            };
-            Rectangle.KeyDown += (o, e) =>
-            {
-                if (e.Key == Key.Delete)
-                {
-                    DeleteRectangle(ActiveRectangle);
-                    e.Handled = true;
-                }
-
-            };
-            return Rectangle;
+            rectangle.MouseLeave += RectangleMouseLeave;
+            rectangle.MouseMove += UpdateSelectionRectangle;
+            rectangle.MouseDown += RectangleMouseDown;
+            rectangle.MouseUp += RectangleMouseUp;
+            rectangle.PreviewMouseLeftButtonUp += RectanglePreviewMouseLeftButtonUp;
+            rectangle.KeyDown += RectangleKeyDown;
+            rectangle.Unloaded += DettachEventToRectangle;
+            rectangle.Focusable = true;
+            return rectangle;
         }
 
-        public bool DeleteRectangle(MapPolygon Rectangle)
+        private void RectangleKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Delete)
+            {
+                DeleteRectangle(ActiveRectangle);
+                e.Handled = true;
+            }
+        }
+
+        private void RectanglePreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            if (MouseHitType != HitType.None) { return; }
+            SetRectangleAsActive(sender as MapPolygon);
+        }
+
+        private void RectangleMouseLeave(object sender, MouseEventArgs e)
+        {
+            if (IsLeftClick || IsRightClick) { return; }
+            map.Cursor = Cursors.Arrow;
+        }
+
+        private void DettachEventToRectangle(object sender, RoutedEventArgs e)
+        {
+            if (DisposeElementsOnUnload)
+            {
+                MapPolygon rectangle = sender as MapPolygon;
+                rectangle.MouseLeave -= RectangleMouseLeave;
+                rectangle.MouseMove -= UpdateSelectionRectangle;
+                rectangle.MouseDown -= RectangleMouseDown;
+                rectangle.MouseUp -= RectangleMouseUp;
+                rectangle.PreviewMouseLeftButtonUp -= RectanglePreviewMouseLeftButtonUp;
+                rectangle.KeyDown -= RectangleKeyDown;
+                rectangle.Unloaded -= DettachEventToRectangle;
+            }
+        }
+
+        public bool DeleteRectangle(MapPolygon rectangle)
         {
             if (Rectangles.Count <= MinimalNumberOfRectangles)
             {
@@ -356,18 +409,18 @@ namespace MapsInMyFolder
             {
                 return false;
             }
-            if (Rectangle is null)
+            if (rectangle is null)
             {
                 return false;
             }
-            if (map.Children.Contains(Rectangle))
-            {
 
-                map.Children.Remove(Rectangle);
-            }
-            if (Rectangles.Contains(Rectangle))
+            if (map.Children.Contains(rectangle))
             {
-                Rectangles.Remove(Rectangle);
+                map.Children.Remove(rectangle);
+            }
+            if (Rectangles.Contains(rectangle))
+            {
+                Rectangles.Remove(rectangle);
             }
             if (Rectangles.Count > 0)
             {
@@ -382,7 +435,7 @@ namespace MapsInMyFolder
                 newPolygon.Focus();
             }
 
-            OnRectangleDeleted?.Invoke(this, Rectangle);
+            OnRectangleDeleted?.Invoke(this, rectangle);
             return true;
         }
 
@@ -478,7 +531,6 @@ namespace MapsInMyFolder
         {
             if (IsRightClick && Mouse.RightButton == MouseButtonState.Released)
             {
-
                 IsRightClick = false;
                 CleanRectangleLocations(ActiveRectangle);
             }
@@ -492,7 +544,7 @@ namespace MapsInMyFolder
                 CleanRectangleLocations(ActiveRectangle);
             }
 
-            MainPage._instance.LayerTilePreview_RequestUpdate();
+            RequestedPreviewUpdate?.Invoke(this, null);
         }
 
         private void MiddleClickUp(object sender, MouseButtonEventArgs e)
@@ -534,7 +586,7 @@ namespace MapsInMyFolder
             }
             else
             {
-                return (SavedNo_Placement, SavedSe_Placement);
+                return (savedNoPlacement, savedSePlacement);
             }
         }
 
@@ -543,208 +595,224 @@ namespace MapsInMyFolder
             SetRectangleLocation(NO, SE, ActiveRectangle);
         }
 
-        public void SetRectangleLocation(Location NO, Location SE, MapPolygon Rectangle = null)
+        public void SetRectangleLocation(Location NO, Location SE, MapPolygon rectangle = null)
         {
-            if (Rectangle == null)
-            {
-                Rectangle = ActiveRectangle;
-            }
-            bool DoUpdateNo = true;
-            bool DoUpdateSe = true;
+            rectangle ??= ActiveRectangle;
 
-            var CurentLocation = GetRectangleLocation(Rectangle);
-            if (NO == null || SE == null)
-            {
+            bool doUpdateNo = true;
+            bool doUpdateSe = true;
 
-                if (NO == null)
-                {
-                    DoUpdateNo = false;
-                    NO = CurentLocation.NO;
-                }
-                if (SE == null)
-                {
-                    DoUpdateSe = false;
-                    SE = CurentLocation.SE;
-                }
-            }
-            (bool isIllegal, Location result) IllegalLocation(Location TargetLocation, Location ActualLocation)
+            var currentLocation = GetRectangleLocation(rectangle);
+
+            if (NO == null)
             {
-                if (Math.Abs(TargetLocation.Longitude) == 180)
+                doUpdateNo = false;
+                NO = currentLocation.NO;
+            }
+
+            if (SE == null)
+            {
+                doUpdateSe = false;
+                SE = currentLocation.SE;
+            }
+
+            (bool isIllegal, Location result) IllegalLocation(Location targetLocation, Location actualLocation)
+            {
+                if (Math.Abs(targetLocation.Longitude) == 180)
                 {
-                    double MaxLongitude = 179.99999999;
-                    if (TargetLocation.Longitude == ActualLocation.Longitude)
+                    const double maxLongitude = 179.99999999;
+
+                    if (targetLocation.Longitude == actualLocation.Longitude)
                     {
-                        return (false, TargetLocation);
+                        return (false, targetLocation);
                     }
+
                     if (MouseHitType == HitType.Body || (Keyboard.Modifiers == ModifierKeys.Shift && (IsLeftClick || IsRightClick)))
                     {
-                        return (true, TargetLocation);
+                        return (true, targetLocation);
                     }
 
-                    if (Math.Abs(ActualLocation.Longitude) >= MaxLongitude)
+                    if (Math.Abs(actualLocation.Longitude) >= maxLongitude)
                     {
-                        return (true, TargetLocation);
+                        return (true, targetLocation);
                     }
 
-                    if (TargetLocation.Longitude == 180)
+                    if (targetLocation.Longitude == 180)
                     {
-                        TargetLocation = new Location(TargetLocation.Latitude, MaxLongitude);
+                        targetLocation = new Location(targetLocation.Latitude, maxLongitude);
                     }
-                    if (TargetLocation.Longitude == -180)
+
+                    if (targetLocation.Longitude == -180)
                     {
-                        TargetLocation = new Location(TargetLocation.Latitude, -MaxLongitude);
+                        targetLocation = new Location(targetLocation.Latitude, -maxLongitude);
                     }
                 }
-                return (false, TargetLocation);
+
+                return (false, targetLocation);
             }
 
             (Location NOFix, Location SEFix) FixLocation(Location NO, Location SE)
             {
                 if (Math.Abs(NO.Longitude) >= 180 || Math.Abs(SE.Longitude) >= 180)
                 {
-                    Point MAX_No_PlacementPoint = map.LocationToView(new Location(0, -180));
                     Point Target_No_PlacementPoint = map.LocationToView(NO);
                     Point Target_Se_PlacementPoint = map.LocationToView(SE);
                     Location NOFix;
                     Location SEFix;
-                    NOFix = map.ViewToLocation(new Point(map.LocationToView(CurentLocation.NO).X, Target_No_PlacementPoint.Y));
-                    SEFix = map.ViewToLocation(new Point(map.LocationToView(CurentLocation.SE).X, Target_Se_PlacementPoint.Y));
+                    NOFix = map.ViewToLocation(new Point(map.LocationToView(currentLocation.NO).X, Target_No_PlacementPoint.Y));
+                    SEFix = map.ViewToLocation(new Point(map.LocationToView(currentLocation.SE).X, Target_Se_PlacementPoint.Y));
                     return (NOFix, SEFix);
                 }
+
                 return (NO, SE);
             }
 
-            if (DoUpdateNo && DoUpdateSe && MouseHitType == HitType.Body)
+            if (doUpdateNo && doUpdateSe && MouseHitType == HitType.Body)
             {
-                var NoIsIllegal = IllegalLocation(NO, CurentLocation.NO);
-                var SeIsIllegal = IllegalLocation(SE, CurentLocation.SE);
-                if (NoIsIllegal.isIllegal || SeIsIllegal.isIllegal)
+                var noIsIllegal = IllegalLocation(NO, currentLocation.NO);
+                var seIsIllegal = IllegalLocation(SE, currentLocation.SE);
+
+                if (noIsIllegal.isIllegal || seIsIllegal.isIllegal)
                 {
-                    var FixLoc = FixLocation(NO, SE);
-                    NO = FixLoc.NOFix;
-                    SE = FixLoc.SEFix;
+                    var fixLoc = FixLocation(NO, SE);
+                    NO = fixLoc.NOFix;
+                    SE = fixLoc.SEFix;
                 }
             }
 
-            if (DoUpdateNo)
+            if (doUpdateNo)
             {
-                var NoIsIllegal = IllegalLocation(NO, CurentLocation.NO);
-                if (NoIsIllegal.isIllegal)
+                var noIsIllegal = IllegalLocation(NO, currentLocation.NO);
+
+                if (noIsIllegal.isIllegal)
                 {
                     return;
                 }
                 else
                 {
-                    NO = NoIsIllegal.result;
+                    NO = noIsIllegal.result;
                 }
             }
 
-            if (DoUpdateSe)
+            if (doUpdateSe)
             {
-                var SeIsIllegal = IllegalLocation(SE, CurentLocation.SE);
-                if (SeIsIllegal.isIllegal)
+                var seIsIllegal = IllegalLocation(SE, currentLocation.SE);
+
+                if (seIsIllegal.isIllegal)
                 {
                     return;
                 }
                 else
                 {
-                    SE = SeIsIllegal.result;
+                    SE = seIsIllegal.result;
                 }
             }
 
             if (IsSnapToGrid)
             {
-                var SnapLocations = SnapToGrid(NO, SE, Rectangle);
-                if (DoUpdateNo)
+                var snapLocations = SnapToGrid(NO, SE);
+
+                if (doUpdateNo)
                 {
-                    NO = SnapLocations.NO;
+                    NO = snapLocations.NO;
                 }
-                if (DoUpdateSe)
+
+                if (doUpdateSe)
                 {
-                    SE = SnapLocations.SE;
+                    SE = snapLocations.SE;
                 }
             }
 
-            Rectangle.Locations = new List<Location>() { NO, new Location(SE.Latitude, NO.Longitude), SE, new Location(NO.Latitude, SE.Longitude) };
-
-            if (NO.Latitude == SE.Latitude && NO.Longitude == SE.Longitude)
-            {
-                Rectangle.Visibility = Visibility.Hidden;
-            }
-            else if (Rectangle.Visibility == Visibility.Hidden)
-            {
-                Rectangle.Visibility = Visibility.Visible;
-            }
-            OnLocationUpdated?.Invoke(this, Rectangle);
+            rectangle.Locations = new List<Location>() { NO, new Location(SE.Latitude, NO.Longitude), SE, new Location(NO.Latitude, SE.Longitude) };
+            UpdateRectangleVisibility(rectangle, NO, SE);
+            OnLocationUpdated?.Invoke(this, rectangle);
         }
 
-        private (Location NO, Location SE) SnapToGrid(Location NO, Location SE, MapPolygon Rectangle)
+        void UpdateRectangleVisibility(MapPolygon rectangle, Location NO, Location SE)
         {
-            int ZoomLevel = 16;//((int)map.ZoomLevel) + 2;
-            var NoLocationTiles = Collectif.CoordonneesToTile(NO.Latitude, NO.Longitude, ZoomLevel);
-            var SeLocationTiles = Collectif.CoordonneesToTile(SE.Latitude, SE.Longitude, ZoomLevel);
-
-            var NoCornerLocation = Collectif.TileToCoordonnees(NoLocationTiles.X, NoLocationTiles.Y, ZoomLevel);
-            var NoCornerLocationPP = Collectif.TileToCoordonnees(NoLocationTiles.X + 1, NoLocationTiles.Y + 1, ZoomLevel);
-
-            if (NoCornerLocationPP.Latitude == NO.Latitude)
+            if (rectangle == null)
             {
-                NoCornerLocation.Latitude = NoCornerLocationPP.Latitude;
+                return;
+            }
+            if (NO == null || SE == null)
+            {
+                var currentRectangleLocation = GetRectangleLocation(rectangle);
+                NO = currentRectangleLocation.NO;
+                SE = currentRectangleLocation.SE;
+            }
+            rectangle.Visibility = IsZeroWidthRectangle(NO, SE) ? Visibility.Hidden : Visibility.Visible;
+        }
+
+        public static bool IsZeroWidthRectangle(Location NO, Location SE)
+        {
+            return NO.Latitude == NO.Longitude || SE.Latitude == SE.Longitude || NO.Latitude == SE.Latitude || NO.Longitude == SE.Longitude;
+        }
+
+        private (Location NO, Location SE) SnapToGrid(Location NO, Location SE)
+        {
+            int zoomLevel = (int)Math.Floor(map.ZoomLevel) + 2;
+            var noLocationTiles = Collectif.CoordonneesToTile(NO.Latitude, NO.Longitude, zoomLevel);
+            var seLocationTiles = Collectif.CoordonneesToTile(SE.Latitude, SE.Longitude, zoomLevel);
+
+            var noCornerLocation = Collectif.TileToCoordonnees(noLocationTiles.X, noLocationTiles.Y, zoomLevel);
+            var noCornerLocationPP = Collectif.TileToCoordonnees(noLocationTiles.X + 1, noLocationTiles.Y + 1, zoomLevel);
+
+            if (noCornerLocationPP.Latitude == NO.Latitude)
+            {
+                noCornerLocation.Latitude = noCornerLocationPP.Latitude;
             }
 
-            if (NoCornerLocationPP.Longitude == NO.Longitude)
+            if (noCornerLocationPP.Longitude == NO.Longitude)
             {
-                NoCornerLocation.Longitude = NoCornerLocationPP.Longitude;
+                noCornerLocation.Longitude = noCornerLocationPP.Longitude;
             }
-
 
             Point NOPoint = map.LocationToView(NO);
             Point SEPoint = map.LocationToView(SE);
-            int TileXSupplement = 0;
-            int TileYSupplement = 0;
+            int tileXSupplement = 0;
+            int tileYSupplement = 0;
 
             if ((IsLeftClick || IsRightClick) && MouseHitType != HitType.Body)
             {
                 if (NOPoint.X < SEPoint.X && NOPoint.Y < SEPoint.Y)
                 {
-                    Debug.WriteLine("a - " + MouseHitType);
                     if (MouseHitType == HitType.None || MouseHitType == HitType.R || MouseHitType == HitType.LR || MouseHitType == HitType.UR || (MouseHitType == HitType.T && IsRightClick))
                     {
-                        TileXSupplement++;
+                        tileXSupplement++;
                     }
+
                     if (MouseHitType == HitType.None || MouseHitType == HitType.B || MouseHitType == HitType.LL || MouseHitType == HitType.UL || MouseHitType == HitType.LR)
                     {
-                        TileYSupplement++;
+                        tileYSupplement++;
                     }
                 }
+
                 if (NOPoint.X > SEPoint.X && NOPoint.Y < SEPoint.Y)
                 {
-                    Debug.WriteLine("b");
-                    TileYSupplement++;
+                    tileYSupplement++;
                 }
+
                 if (NOPoint.X < SEPoint.X && NOPoint.Y > SEPoint.Y)
                 {
-                    Debug.WriteLine("c");
-                    TileXSupplement++;
+                    tileXSupplement++;
                 }
-
             }
 
-            var SeCornerLocation = Collectif.TileToCoordonnees(SeLocationTiles.X + TileXSupplement, SeLocationTiles.Y + TileYSupplement, ZoomLevel);
-            var SeCornerLocationPP = Collectif.TileToCoordonnees(SeLocationTiles.X + 1 + TileXSupplement, SeLocationTiles.Y + 1 + TileYSupplement, ZoomLevel);
-            if (SeCornerLocationPP.Latitude == SE.Latitude || NoCornerLocation.Latitude == SeCornerLocation.Latitude)
+            var seCornerLocation = Collectif.TileToCoordonnees(seLocationTiles.X + tileXSupplement, seLocationTiles.Y + tileYSupplement, zoomLevel);
+            var seCornerLocationPP = Collectif.TileToCoordonnees(seLocationTiles.X + 1 + tileXSupplement, seLocationTiles.Y + 1 + tileYSupplement, zoomLevel);
+
+            if (seCornerLocationPP.Latitude == SE.Latitude || noCornerLocation.Latitude == seCornerLocation.Latitude)
             {
-                SeCornerLocation.Latitude = SeCornerLocationPP.Latitude;
+                seCornerLocation.Latitude = seCornerLocationPP.Latitude;
             }
 
-            if (SeCornerLocationPP.Longitude == SE.Longitude || NoCornerLocation.Longitude == SeCornerLocation.Longitude)
+            if (seCornerLocationPP.Longitude == SE.Longitude || noCornerLocation.Longitude == seCornerLocation.Longitude)
             {
-                SeCornerLocation.Longitude = SeCornerLocationPP.Longitude;
+                seCornerLocation.Longitude = seCornerLocationPP.Longitude;
             }
 
-            return (new Location(NoCornerLocation.Latitude, NoCornerLocation.Longitude), new Location(SeCornerLocation.Latitude, SeCornerLocation.Longitude));
+            return (new Location(noCornerLocation.Latitude, noCornerLocation.Longitude), new Location(seCornerLocation.Latitude, seCornerLocation.Longitude));
         }
-
         public void CleanRectangleLocations()
         {
             CleanRectangleLocations(ActiveRectangle);
@@ -752,44 +820,46 @@ namespace MapsInMyFolder
 
         public int DeleteUnusedRectangles()
         {
-            MapPolygon[] TempList = Rectangles.ToArray();
-            int NumberOfUnusedRectangleDeleted = 0;
-            foreach (MapPolygon Rectangle in TempList)
+            int numberOfUnusedRectangleDeleted = 0;
+            foreach (MapPolygon rectangle in Rectangles.ToArray())
             {
-                var Locations = GetRectangleLocation(Rectangle);
-                if (Locations.NO.Latitude == 0 && Locations.NO.Longitude == 0 && Locations.SE.Latitude == 0 && Locations.SE.Longitude == 0)
+                var locations = GetRectangleLocation(rectangle);
+                if (IsZeroWidthRectangle(locations.NO, locations.SE))
                 {
-                    NumberOfUnusedRectangleDeleted++;
-                    DeleteRectangle(Rectangle);
+                    numberOfUnusedRectangleDeleted++;
+                    DeleteRectangle(rectangle);
                 }
             }
-            return NumberOfUnusedRectangleDeleted;
+
+            return numberOfUnusedRectangleDeleted;
         }
 
-        private void CleanRectangleLocations(MapPolygon Rectangle)
+        private void CleanRectangleLocations(MapPolygon rectangle)
         {
-            var ActualLocations = GetRectangleLocation(Rectangle);
-            Location NO = ActualLocations.NO;
-            Location SE = ActualLocations.SE;
+            var actualLocations = GetRectangleLocation(rectangle);
+            Location NO = actualLocations.NO;
+            Location SE = actualLocations.SE;
             Location NO_Temp = NO;
             Location SE_Temp = SE;
+
             if (NO.Latitude < SE.Latitude)
             {
                 NO = new Location(SE_Temp.Latitude, NO_Temp.Longitude);
                 SE = new Location(NO_Temp.Latitude, SE_Temp.Longitude);
             }
+
             if (NO.Longitude > SE.Longitude)
             {
                 NO = new Location(NO.Latitude, SE_Temp.Longitude);
                 SE = new Location(SE.Latitude, NO_Temp.Longitude);
             }
-            SetRectangleLocation(NO, SE, Rectangle);
-        }
 
+            SetRectangleLocation(NO, SE, rectangle);
+        }
 
         private void SetHandCursor()
         {
-            map.Cursor = new Cursor(Collectif.ReadResourceStream("cursors/closedhand.cur"));
+            map.Cursor = new Cursor(Collectif.ReadResourceStream("Cursors/closedhand.cur"));
         }
 
         private void SaveCurrentMousePosition(MouseEventArgs e)
@@ -798,14 +868,18 @@ namespace MapsInMyFolder
             {
                 OriginClickPlacement = e.GetPosition(map);
                 SavedLeftClickPreviousActions = e.GetPosition(map);
-                var ActiveRectangleLocations = GetRectangleLocation(ActiveRectangle);
-                OriginNoPlacement = map.LocationToView(ActiveRectangleLocations.NO);
-                OriginSePlacement = map.LocationToView(ActiveRectangleLocations.SE);
+                var (NO, SE) = GetRectangleLocation(ActiveRectangle);
+                OriginNoPlacement = map.LocationToView(NO);
+                OriginSePlacement = map.LocationToView(SE);
             }
         }
 
+        private void MapMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            MapMouseDown(sender, e, true);
+        }
 
-        private void MapMouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e, bool UpdateHitType = true)
+        private void MapMouseDown(object sender, MouseButtonEventArgs e, bool updateHitType)
         {
             if (Mouse.MiddleButton == MouseButtonState.Pressed)
             {
@@ -813,10 +887,10 @@ namespace MapsInMyFolder
                 IsLeftClick = false;
                 SetHandCursor();
             }
-            else if (IsRightClick == false && Mouse.RightButton == MouseButtonState.Pressed)
+            else if (!IsRightClick && Mouse.RightButton == MouseButtonState.Pressed)
             {
                 IsRightClick = true;
-                if (UpdateHitType)
+                if (updateHitType)
                 {
                     SaveCurrentMousePosition(e);
                     map.Cursor = Cursors.Cross;
@@ -825,16 +899,19 @@ namespace MapsInMyFolder
             }
             else if (Mouse.RightButton == MouseButtonState.Pressed)
             {
-                if (sender.GetType() == map.GetType())
+                if (sender is MapControl.Map)
                 {
                     e.Handled = true;
                 }
             }
-            else if (IsLeftClick == false && Mouse.LeftButton == MouseButtonState.Pressed)
+            else if (!IsLeftClick && Mouse.LeftButton == MouseButtonState.Pressed)
             {
-                if (IsRightClick) { return; }
+                if (IsRightClick)
+                {
+                    return;
+                }
                 IsLeftClick = true;
-                if (UpdateHitType)
+                if (updateHitType)
                 {
                     SaveCurrentMousePosition(e);
                     MouseHitType = SetHitType(e.GetPosition(map));
@@ -843,7 +920,7 @@ namespace MapsInMyFolder
             }
         }
 
-        private void MapMouseMove(object sender, System.Windows.Input.MouseEventArgs e)
+        private void MapMouseMove(object sender, MouseEventArgs e)
         {
             e.Handled = true;
             if (Mouse.MiddleButton == MouseButtonState.Pressed)
@@ -870,16 +947,17 @@ namespace MapsInMyFolder
             }
         }
 
-        private Point TransformSelectionIfShift(MapPolygon Rectangle, Point targetPoint, int OpositeCorner = 0, string overrideWidthValue = null)
+        private Point TransformSelectionIfShift(MapPolygon rectangle, Point targetPoint, int oppositeCorner = 0, string overrideWidthValue = null)
         {
             if ((Keyboard.Modifiers & ModifierKeys.Shift) != ModifierKeys.Shift)
             {
                 return targetPoint;
             }
 
-            Point SelectionRectanglePoint = map.LocationToView(Rectangle.Locations.ElementAt(OpositeCorner));
-            double width = Math.Abs(targetPoint.X - SelectionRectanglePoint.X);
-            double height = Math.Abs(targetPoint.Y - SelectionRectanglePoint.Y);
+            Point selectionRectanglePoint = map.LocationToView(rectangle.Locations.ElementAt(oppositeCorner));
+            double width = Math.Abs(targetPoint.X - selectionRectanglePoint.X);
+            double height = Math.Abs(targetPoint.Y - selectionRectanglePoint.Y);
+
             if (string.IsNullOrEmpty(overrideWidthValue))
             {
                 if (Math.Abs(width) < Math.Abs(height))
@@ -899,33 +977,27 @@ namespace MapsInMyFolder
             {
                 width = height;
             }
-            Point returnNewTargetPoint = new Point(SelectionRectanglePoint.X, SelectionRectanglePoint.Y);
-            bool XtargetPointIsSuperiorAsSelectionRectanglePoint = targetPoint.X > SelectionRectanglePoint.X;
-            bool YtargetPointIsSuperiorAsSelectionRectanglePoint = targetPoint.Y > SelectionRectanglePoint.Y;
-            //BAS GAUCHE
-            if (XtargetPointIsSuperiorAsSelectionRectanglePoint == false && YtargetPointIsSuperiorAsSelectionRectanglePoint == true)
+
+            Point returnNewTargetPoint = new Point(selectionRectanglePoint.X, selectionRectanglePoint.Y);
+            bool xTargetPointIsSuperiorAsSelectionRectanglePoint = targetPoint.X > selectionRectanglePoint.X;
+            bool yTargetPointIsSuperiorAsSelectionRectanglePoint = targetPoint.Y > selectionRectanglePoint.Y;
+
+            if (xTargetPointIsSuperiorAsSelectionRectanglePoint == false && yTargetPointIsSuperiorAsSelectionRectanglePoint == true)
             {
                 width *= -1;
                 height *= 1;
             }
-
-
-            //BAS DROITE
-            if (XtargetPointIsSuperiorAsSelectionRectanglePoint == true && YtargetPointIsSuperiorAsSelectionRectanglePoint == true)
+            else if (xTargetPointIsSuperiorAsSelectionRectanglePoint == true && yTargetPointIsSuperiorAsSelectionRectanglePoint == true)
             {
                 width *= 1;
                 height *= 1;
             }
-
-            //HAUT GAUCHE
-            if (XtargetPointIsSuperiorAsSelectionRectanglePoint == false && YtargetPointIsSuperiorAsSelectionRectanglePoint == false)
+            else if (xTargetPointIsSuperiorAsSelectionRectanglePoint == false && yTargetPointIsSuperiorAsSelectionRectanglePoint == false)
             {
                 width *= -1;
                 height *= -1;
             }
-
-            //HAUT DROITE
-            if (XtargetPointIsSuperiorAsSelectionRectanglePoint == true && YtargetPointIsSuperiorAsSelectionRectanglePoint == false)
+            else if (xTargetPointIsSuperiorAsSelectionRectanglePoint == true && yTargetPointIsSuperiorAsSelectionRectanglePoint == false)
             {
                 width *= 1;
                 height *= -1;
@@ -935,11 +1007,9 @@ namespace MapsInMyFolder
             returnNewTargetPoint.Y += height;
             return returnNewTargetPoint;
         }
-
-
         private void UpdateSelectionRectangle(object sender, MouseEventArgs e)
         {
-            Point mouse_location = e.GetPosition(map);
+            Point mouseLocation = e.GetPosition(map);
 
             if (Mouse.MiddleButton == MouseButtonState.Pressed)
             {
@@ -952,17 +1022,17 @@ namespace MapsInMyFolder
                 {
                     map.Cursor = Cursors.Cross;
                 }
-                SetRectangleLocation(null, map.ViewToLocation(TransformSelectionIfShift(ActiveRectangle, e.GetPosition(map))));
+                SetRectangleLocation(null, map.ViewToLocation(TransformSelectionIfShift(ActiveRectangle, mouseLocation)));
             }
             else if (IsLeftClick && MouseHitType != HitType.None && Mouse.LeftButton == MouseButtonState.Pressed)
             {
-                ResizeOrMoveSelectionRectange(sender, e);
+                ResizeOrMoveSelectionRectangle(sender, e);
             }
             else
             {
                 if (Mouse.LeftButton != MouseButtonState.Pressed && Mouse.RightButton != MouseButtonState.Pressed)
                 {
-                    MouseHitType = SetHitType(mouse_location);
+                    MouseHitType = SetHitType(mouseLocation);
                 }
                 ApplyMapCursor();
             }
@@ -970,176 +1040,193 @@ namespace MapsInMyFolder
 
         private void UpdateVisualCursor(MouseEventArgs e)
         {
-            if (MouseHitType != HitType.UR && MouseHitType != HitType.UL && MouseHitType != HitType.LR && MouseHitType != HitType.LL) { return; }
-            Point MousePositionPoint = e.GetPosition(map);
-            var rectLocation = GetRectangleLocation(ActiveRectangle);
+            if (MouseHitType != HitType.UR && MouseHitType != HitType.UL && MouseHitType != HitType.LR && MouseHitType != HitType.LL)
+            {
+                return;
+            }
 
-            Point NOPoint = map.LocationToView(rectLocation.NO);
-            Point SEPoint = map.LocationToView(rectLocation.SE);
+            Point mousePositionPoint = e.GetPosition(map);
+            var (NO, SE) = GetRectangleLocation(ActiveRectangle);
+
+            Point NOPoint = map.LocationToView(NO);
+            Point SEPoint = map.LocationToView(SE);
 
             if ((Math.Abs(NOPoint.X - SEPoint.X) < 5) || (Math.Abs(NOPoint.Y - SEPoint.Y) < 5))
             {
                 return;
             }
 
-            Point RectangleCenterPoint = new Point(Math.Floor((NOPoint.X + SEPoint.X) / 2), Math.Floor((NOPoint.Y + SEPoint.Y) / 2));
-            bool MouseIsAtRightFromTheCenter = MousePositionPoint.X >= RectangleCenterPoint.X;
-            bool MouseIsAboveCenter = MousePositionPoint.Y >= RectangleCenterPoint.Y;
+            Point rectangleCenterPoint = new Point(Math.Floor((NOPoint.X + SEPoint.X) / 2), Math.Floor((NOPoint.Y + SEPoint.Y) / 2));
+            bool mouseIsAtRightFromTheCenter = mousePositionPoint.X >= rectangleCenterPoint.X;
+            bool mouseIsAboveCenter = mousePositionPoint.Y >= rectangleCenterPoint.Y;
 
-            HitType VisualCursorHitType = HitType.None;
-            if (!MouseIsAboveCenter && MouseIsAtRightFromTheCenter)
+            HitType visualCursorHitType = HitType.None;
+            if (!mouseIsAboveCenter && mouseIsAtRightFromTheCenter)
             {
-                VisualCursorHitType = HitType.UR;
+                visualCursorHitType = HitType.UR;
             }
-            else if (!MouseIsAboveCenter && !MouseIsAtRightFromTheCenter)
+            else if (!mouseIsAboveCenter && !mouseIsAtRightFromTheCenter)
             {
-                VisualCursorHitType = HitType.UL;
+                visualCursorHitType = HitType.UL;
             }
-            else if (MouseIsAboveCenter && MouseIsAtRightFromTheCenter)
+            else if (mouseIsAboveCenter && mouseIsAtRightFromTheCenter)
             {
-                VisualCursorHitType = HitType.LR;
+                visualCursorHitType = HitType.LR;
             }
-            else if (MouseIsAboveCenter && !MouseIsAtRightFromTheCenter)
+            else if (mouseIsAboveCenter && !mouseIsAtRightFromTheCenter)
             {
-                VisualCursorHitType = HitType.LL;
+                visualCursorHitType = HitType.LL;
             }
-            ApplyMapCursor(VisualCursorHitType);
+            ApplyMapCursor(visualCursorHitType);
         }
 
-        private void ResizeOrMoveSelectionRectange(object sender, MouseEventArgs e)
+        private void ResizeOrMoveSelectionRectangle(object sender, MouseEventArgs e)
         {
-            Point mouse_location = ExtandPositionByXUnit(e.GetPosition(map), 4, MouseHitType);
-            Location PositionSouris;
-            Location PositionToMakeSquareIfShift;
+            Point mouseLocation = ExtandPositionByXUnit(e.GetPosition(map), 4, MouseHitType);
+            Location mousePosition;
+            Location positionToMakeSquareIfShift;
             var rectanglePosition = GetRectangleLocation(ActiveRectangle);
+
             switch (MouseHitType)
             {
                 case HitType.Body:
-                    double deplacement_X;
-                    double deplacement_Y;
-                    Point SavedNo_PlacementPoint;
-                    Point SavedSe_PlacementPoint;
-                    double XPourcent = (OriginClickPlacement.X - OriginNoPlacement.X) / (OriginSePlacement.X - OriginNoPlacement.X);
-                    double YPourcent = (OriginClickPlacement.Y - OriginNoPlacement.Y) / (OriginSePlacement.Y - OriginNoPlacement.Y);
+                    double displacementX;
+                    double displacementY;
+                    Point savedNoPlacementPoint;
+                    Point savedSePlacementPoint;
+                    double xPercentage = (OriginClickPlacement.X - OriginNoPlacement.X) / (OriginSePlacement.X - OriginNoPlacement.X);
+                    double yPercentage = (OriginClickPlacement.Y - OriginNoPlacement.Y) / (OriginSePlacement.Y - OriginNoPlacement.Y);
 
                     if ((Keyboard.Modifiers & ModifierKeys.Shift) == ModifierKeys.Shift)
                     {
                         if (OriginClickPlacement == SavedLeftClickPreviousActions)
                         {
-                            SavedNo_Placement = rectanglePosition.NO;
-                            SavedSe_Placement = rectanglePosition.SE;
+                            savedNoPlacement = rectanglePosition.NO;
+                            savedSePlacement = rectanglePosition.SE;
                         }
-                        SavedNo_PlacementPoint = map.LocationToView(SavedNo_Placement);
-                        SavedSe_PlacementPoint = map.LocationToView(SavedSe_Placement);
-                        deplacement_X = mouse_location.X - (SavedNo_PlacementPoint.X + (SavedSe_PlacementPoint.X - SavedNo_PlacementPoint.X) * XPourcent);
-                        deplacement_Y = mouse_location.Y - (SavedNo_PlacementPoint.Y + (SavedSe_PlacementPoint.Y - SavedNo_PlacementPoint.Y) * YPourcent);
-                        if (Math.Abs(deplacement_X) > Math.Abs(deplacement_Y))
+                        savedNoPlacementPoint = map.LocationToView(savedNoPlacement);
+                        savedSePlacementPoint = map.LocationToView(savedSePlacement);
+                        displacementX = mouseLocation.X - (savedNoPlacementPoint.X + ((savedSePlacementPoint.X - savedNoPlacementPoint.X) * xPercentage));
+                        displacementY = mouseLocation.Y - (savedNoPlacementPoint.Y + ((savedSePlacementPoint.Y - savedNoPlacementPoint.Y) * yPercentage));
+                        if (Math.Abs(displacementX) > Math.Abs(displacementY))
                         {
-                            deplacement_Y = 0;
+                            displacementY = 0;
                         }
                         else
                         {
-                            deplacement_X = 0;
+                            displacementX = 0;
                         }
                     }
                     else
                     {
-                        SavedNo_Placement = rectanglePosition.NO;
-                        SavedSe_Placement = rectanglePosition.SE;
-                        SavedNo_PlacementPoint = map.LocationToView(SavedNo_Placement);
-                        SavedSe_PlacementPoint = map.LocationToView(SavedSe_Placement);
-                        deplacement_X = mouse_location.X - (SavedNo_PlacementPoint.X + (SavedSe_PlacementPoint.X - SavedNo_PlacementPoint.X) * XPourcent);
-                        deplacement_Y = mouse_location.Y - (SavedNo_PlacementPoint.Y + (SavedSe_PlacementPoint.Y - SavedNo_PlacementPoint.Y) * YPourcent);
+                        savedNoPlacement = rectanglePosition.NO;
+                        savedSePlacement = rectanglePosition.SE;
+                        savedNoPlacementPoint = map.LocationToView(savedNoPlacement);
+                        savedSePlacementPoint = map.LocationToView(savedSePlacement);
+                        displacementX = mouseLocation.X - (savedNoPlacementPoint.X + ((savedSePlacementPoint.X - savedNoPlacementPoint.X) * xPercentage));
+                        displacementY = mouseLocation.Y - (savedNoPlacementPoint.Y + ((savedSePlacementPoint.Y - savedNoPlacementPoint.Y) * yPercentage));
                     }
-                    Location TargetNOloc = map.ViewToLocation(new Point(SavedNo_PlacementPoint.X + deplacement_X, SavedNo_PlacementPoint.Y + deplacement_Y));
-                    Location TargetSEloc = map.ViewToLocation(new Point(SavedSe_PlacementPoint.X + deplacement_X, SavedSe_PlacementPoint.Y + deplacement_Y));
+                    Location targetNOloc = map.ViewToLocation(new Point(savedNoPlacementPoint.X + displacementX, savedNoPlacementPoint.Y + displacementY));
+                    Location targetSEloc = map.ViewToLocation(new Point(savedSePlacementPoint.X + displacementX, savedSePlacementPoint.Y + displacementY));
 
-                    SetRectangleLocation(TargetNOloc, TargetSEloc);
+                    SetRectangleLocation(targetNOloc, targetSEloc);
                     SavedLeftClickPreviousActions = e.GetPosition(map);
                     break;
                 case HitType.UL:
                     //top left
-                    PositionToMakeSquareIfShift = map.ViewToLocation(TransformSelectionIfShift(ActiveRectangle, mouse_location, 2));
-                    SetRectangleLocation(PositionToMakeSquareIfShift, null);
+                    positionToMakeSquareIfShift = map.ViewToLocation(TransformSelectionIfShift(ActiveRectangle, mouseLocation, 2));
+                    SetRectangleLocation(positionToMakeSquareIfShift, null);
                     break;
                 case HitType.UR:
                     //top right
-                    PositionToMakeSquareIfShift = map.ViewToLocation(TransformSelectionIfShift(ActiveRectangle, mouse_location, 1));
+                    positionToMakeSquareIfShift = map.ViewToLocation(TransformSelectionIfShift(ActiveRectangle, mouseLocation, 1));
                     SetRectangleLocation(
-                        new Location(PositionToMakeSquareIfShift.Latitude, rectanglePosition.NO.Longitude),
-                        new Location(rectanglePosition.SE.Latitude, PositionToMakeSquareIfShift.Longitude)
-                        );
+                        new Location(positionToMakeSquareIfShift.Latitude, rectanglePosition.NO.Longitude),
+                        new Location(rectanglePosition.SE.Latitude, positionToMakeSquareIfShift.Longitude)
+                    );
                     break;
                 case HitType.LR:
                     //Bottom right
-                    PositionToMakeSquareIfShift = map.ViewToLocation(TransformSelectionIfShift(ActiveRectangle, mouse_location, 0));
-                    SetRectangleLocation(null, PositionToMakeSquareIfShift);
+                    positionToMakeSquareIfShift = map.ViewToLocation(TransformSelectionIfShift(ActiveRectangle, mouseLocation, 0));
+                    SetRectangleLocation(null, positionToMakeSquareIfShift);
                     break;
                 case HitType.LL:
                     //Bottom left
-                    PositionToMakeSquareIfShift = map.ViewToLocation(TransformSelectionIfShift(ActiveRectangle, mouse_location, 3));
+                    positionToMakeSquareIfShift = map.ViewToLocation(TransformSelectionIfShift(ActiveRectangle, mouseLocation, 3));
                     SetRectangleLocation(
-                       new Location(rectanglePosition.NO.Latitude, PositionToMakeSquareIfShift.Longitude),
-                       new Location(PositionToMakeSquareIfShift.Latitude, rectanglePosition.SE.Longitude)
-                       );
+                        new Location(rectanglePosition.NO.Latitude, positionToMakeSquareIfShift.Longitude),
+                        new Location(positionToMakeSquareIfShift.Latitude, rectanglePosition.SE.Longitude)
+                    );
                     break;
                 case HitType.L:
                     //left
-                    PositionToMakeSquareIfShift = map.ViewToLocation(TransformSelectionIfShift(ActiveRectangle, mouse_location, 2, "width"));
+                    positionToMakeSquareIfShift = map.ViewToLocation(TransformSelectionIfShift(ActiveRectangle, mouseLocation, 2, "width"));
                     if ((Keyboard.Modifiers & ModifierKeys.Shift) == ModifierKeys.Shift)
                     {
-                        PositionSouris = new Location(PositionToMakeSquareIfShift.Latitude, PositionToMakeSquareIfShift.Longitude);
+                        mousePosition = new Location(positionToMakeSquareIfShift.Latitude, positionToMakeSquareIfShift.Longitude);
                     }
                     else
                     {
-                        PositionSouris = new Location(rectanglePosition.NO.Latitude, PositionToMakeSquareIfShift.Longitude);
+                        mousePosition = new Location(rectanglePosition.NO.Latitude, positionToMakeSquareIfShift.Longitude);
                     }
-                    SetRectangleLocation(PositionSouris, null);
+                    SetRectangleLocation(mousePosition, null);
                     break;
                 case HitType.R:
                     //right
-                    PositionToMakeSquareIfShift = map.ViewToLocation(TransformSelectionIfShift(ActiveRectangle, mouse_location, 0, "width"));
+                    positionToMakeSquareIfShift = map.ViewToLocation(TransformSelectionIfShift(ActiveRectangle, mouseLocation, 0, "width"));
                     if ((Keyboard.Modifiers & ModifierKeys.Shift) == ModifierKeys.Shift)
                     {
-                        PositionSouris = new Location(PositionToMakeSquareIfShift.Latitude, PositionToMakeSquareIfShift.Longitude);
+                        mousePosition = new Location(positionToMakeSquareIfShift.Latitude, positionToMakeSquareIfShift.Longitude);
                     }
                     else
                     {
-                        PositionSouris = new Location(rectanglePosition.SE.Latitude, PositionToMakeSquareIfShift.Longitude);
+                        mousePosition = new Location(rectanglePosition.SE.Latitude, positionToMakeSquareIfShift.Longitude);
                     }
-                    SetRectangleLocation(null, PositionSouris);
+                    SetRectangleLocation(null, mousePosition);
                     break;
                 case HitType.B:
                     //bottom
-                    PositionToMakeSquareIfShift = map.ViewToLocation(TransformSelectionIfShift(ActiveRectangle, mouse_location, 0, "height"));
+                    positionToMakeSquareIfShift = map.ViewToLocation(TransformSelectionIfShift(ActiveRectangle, mouseLocation, 0, "height"));
                     if ((Keyboard.Modifiers & ModifierKeys.Shift) == ModifierKeys.Shift)
                     {
-                        PositionSouris = new Location(PositionToMakeSquareIfShift.Latitude, PositionToMakeSquareIfShift.Longitude);
+                        mousePosition = new Location(positionToMakeSquareIfShift.Latitude, positionToMakeSquareIfShift.Longitude);
                     }
                     else
                     {
-                        PositionSouris = new Location(PositionToMakeSquareIfShift.Latitude, rectanglePosition.SE.Longitude);
+                        mousePosition = new Location(positionToMakeSquareIfShift.Latitude, rectanglePosition.SE.Longitude);
                     }
-                    SetRectangleLocation(null, PositionSouris);
+                    SetRectangleLocation(null, mousePosition);
                     break;
                 case HitType.T:
                     //top
-                    PositionToMakeSquareIfShift = map.ViewToLocation(TransformSelectionIfShift(ActiveRectangle, mouse_location, 2, "height"));
+                    positionToMakeSquareIfShift = map.ViewToLocation(TransformSelectionIfShift(ActiveRectangle, mouseLocation, 2, "height"));
                     if ((Keyboard.Modifiers & ModifierKeys.Shift) == ModifierKeys.Shift)
                     {
-                        PositionSouris = new Location(PositionToMakeSquareIfShift.Latitude, PositionToMakeSquareIfShift.Longitude);
+                        mousePosition = new Location(positionToMakeSquareIfShift.Latitude, positionToMakeSquareIfShift.Longitude);
                     }
                     else
                     {
-                        PositionSouris = new Location(PositionToMakeSquareIfShift.Latitude, rectanglePosition.NO.Longitude);
+                        mousePosition = new Location(positionToMakeSquareIfShift.Latitude, rectanglePosition.NO.Longitude);
                     }
-                    SetRectangleLocation(PositionSouris, null);
+                    SetRectangleLocation(mousePosition, null);
                     break;
             }
             UpdateVisualCursor(e);
         }
 
+
+        public static BoundingBox GetTileBounding(Location location, int zoom)
+        {
+            var Tiles = Collectif.CoordonneesToTile(location.Latitude, location.Longitude, zoom);
+            var NO_Location = Collectif.TileToCoordonnees(Tiles.X - 1, Tiles.Y - 1, zoom);
+            var SE_Location = Collectif.TileToCoordonnees(Tiles.X + 2, Tiles.Y + 2, zoom);
+            return new BoundingBox()
+            {
+                East = NO_Location.Longitude,
+                North = NO_Location.Latitude,
+                West = SE_Location.Longitude,
+                South = SE_Location.Latitude
+            };
+        }
     }
-
-
 }

@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace MapsInMyFolder.Commun
 {
-    public partial class TileGenerator
+    public partial class TileLoader
     {
         public async Task<HttpResponse> GetTile(int layerID, string urlBase, int TileX, int TileY, int zoom)
         {
@@ -15,14 +15,14 @@ namespace MapsInMyFolder.Commun
                 return HttpResponse.HttpResponseError;
             }
 
-            if (!TileGeneratorSettings.SupportedFileType.Contains(Layer.class_format.ToLower()))
-            {
-                Debug.WriteLine("Le format peut ne pas être supporté actuellement : " + Layer.class_format);
-            }
-
             try
             {
-                Uri uri = new Uri(Collectif.GetUrl.FromTileXYZ(urlBase, TileX, TileY, zoom, layerID, Collectif.GetUrl.InvokeFunction.getTile));
+                string url = Collectif.GetUrl.FromTileXYZ(urlBase, TileX, TileY, zoom, layerID, Collectif.GetUrl.InvokeFunction.getTile);
+                if (string.IsNullOrWhiteSpace(url))
+                {
+                    return HttpResponse.HttpResponseError;
+                }
+                Uri uri = new Uri(url);
                 return await Collectif.ByteDownloadUri(uri, layerID, true);
             }
             catch (Exception ex)

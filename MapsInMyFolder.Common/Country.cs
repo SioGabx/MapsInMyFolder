@@ -10,8 +10,6 @@ namespace MapsInMyFolder.Commun
     {
         public string DisplayName { get; set; }
         public string EnglishName { get; set; }
-
-
         public static IEnumerable<Country> getList()
         {
             List<Country> CountryList = new List<Country>();
@@ -19,6 +17,7 @@ namespace MapsInMyFolder.Commun
             {
                 string CurentCultureCountry = getCountryFromCultureName(ci.DisplayName);
                 string EnglishCultureCountry = getCountryFromCultureName(ci.EnglishName);
+                //Debug.WriteLine(CurentCultureCountry + " / " + EnglishCultureCountry + " / " + ci.Name);
                 if (!string.IsNullOrWhiteSpace(CurentCultureCountry) && !string.IsNullOrWhiteSpace(EnglishCultureCountry))
                 {
                     CountryList.Add(new Country() { EnglishName = EnglishCultureCountry, DisplayName = CurentCultureCountry });
@@ -49,7 +48,6 @@ namespace MapsInMyFolder.Commun
         {
             return getListFromEnglishName(new string[] { EnglishName });
         }
-
 
         private static string getCountryFromCultureName(string Name)
         {
@@ -88,6 +86,4 @@ namespace MapsInMyFolder.Commun
             return false;
         }
     }
-
-
 }

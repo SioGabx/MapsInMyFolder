@@ -1,18 +1,23 @@
-﻿<Page x:Class="MapsInMyFolder.PrepareDownloadPage"
-      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-      xmlns:local="clr-namespace:MapsInMyFolder" xmlns:ui="http://schemas.modernwpf.com/2019"
-      mc:Ignorable="d" 
-      d:DesignHeight="450" d:DesignWidth="800"
-      Title="PrepareDownloadPage" Loaded="Page_Loaded" KeyDown="Page_KeyDown">
+﻿<Page
+    x:Class="MapsInMyFolder.PrepareDownloadPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:commun="clr-namespace:MapsInMyFolder.Commun;assembly=MapsInMyFolder.Commun"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:MapsInMyFolder"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ui="http://schemas.modernwpf.com/2019"
+    Title="PrepareDownloadPage"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    KeyDown="Page_KeyDown"
+    Loaded="Page_Loaded"
+    mc:Ignorable="d">
     <Page.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="RessourcesDictionnary.xaml"/>
+                <ResourceDictionary Source="RessourcesDictionnary.xaml" />
             </ResourceDictionary.MergedDictionaries>
-
         </ResourceDictionary>
     </Page.Resources>
 
@@ -20,93 +25,350 @@
 
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
 
         <Grid Grid.Column="0" Background="#FF171719">
             <Grid.RowDefinitions>
-                <RowDefinition Height="65"/>
-                <RowDefinition/>
+                <RowDefinition Height="65" />
+                <RowDefinition />
             </Grid.RowDefinitions>
 
-            <Label Grid.Row="0" Content="Téléchargement" HorizontalAlignment="Left" Margin="28,10,0,0" VerticalAlignment="Top" Width="Auto" Height="50" FontSize="30" FontFamily="Segoe UI Light" Foreground="#FFE2E2E1" MouseUp="Label_MouseUp"/>
-            <ScrollViewer  Padding="0,0,0,5"  VerticalScrollBarVisibility="Auto" Grid.Row="1" Grid.Column="0">
+            <Label
+                Grid.Row="0"
+                Width="Auto"
+                Height="50"
+                Margin="28,10,0,0"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"
+                Content="{Binding Source={x:Static commun:Languages.Current}, Path=[prepareTitleDownload]}"
+                FontFamily="Segoe UI Light"
+                FontSize="30"
+                Foreground="#FFE2E2E1"/>
+            <ScrollViewer
+                Grid.Row="1"
+                Grid.Column="0"
+                Padding="0,0,0,5"
+                VerticalScrollBarVisibility="Auto">
 
                 <Grid Grid.Row="1" Margin="15,10,5,30">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" x:Name="LeftWidth"/>
+                        <ColumnDefinition x:Name="LeftWidth" Width="*" />
                         <ColumnDefinition Width="10" />
                         <ColumnDefinition Width="5" />
                     </Grid.ColumnDefinitions>
 
                     <StackPanel Grid.Column="0" Background="Transparent">
-                        <Label Content="Résolution : " HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" Width="Auto" Height="25" FontSize="19" FontFamily="Segoe UI Light" Foreground="#FFE2E2E1"/>
+                        <Label
+                            Width="Auto"
+                            Height="25"
+                            Margin="0,0,0,0"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Top"
+                            Content="{Binding Source={x:Static commun:Languages.Current}, Path=[prepareSubTitleResolution]}"
+                            FontFamily="Segoe UI Light"
+                            FontSize="19"
+                            Foreground="#FFE2E2E1" />
 
 
-                        <Slider x:Name="ZoomSlider" TickPlacement="TopLeft" Foreground="#F18712" AutomationProperties.Name="Zoom" SmallChange="1" Maximum="21" Minimum="0" Value="18" 
-                          Margin="0,20,0,0" Panel.ZIndex="999" HorizontalAlignment="Stretch" VerticalAlignment="Top" FontSize="14" AutoToolTipPlacement="TopLeft" IsSnapToTickEnabled="True" ValueChanged="ZoomSlider_ValueChanged"/>
+                        <Slider
+                            x:Name="ZoomSlider"
+                            Margin="0,20,0,0"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Top"
+                            Panel.ZIndex="999"
+                            AutoToolTipPlacement="TopLeft"
+                            AutomationProperties.Name="Zoom"
+                            FontSize="14"
+                            Foreground="#F18712"
+                            IsSnapToTickEnabled="True"
+                            Maximum="21"
+                            Minimum="0"
+                            SmallChange="1"
+                            TickPlacement="TopLeft"
+                            ValueChanged="ZoomSlider_ValueChanged"
+                            Value="18" />
 
-                        <Grid  Background="Transparent">
+                        <Grid Background="Transparent">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="195" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="5" />
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
                             <Grid.RowDefinitions>
-                                <RowDefinition Height="19"/>
-                                <RowDefinition Height="19"/>
-                                <RowDefinition Height="19"/>
-                                <RowDefinition Height="19"/>
+                                <RowDefinition Height="19" />
+                                <RowDefinition Height="19" />
+                                <RowDefinition Height="19" />
+                                <RowDefinition Height="19" />
                             </Grid.RowDefinitions>
-                            <Label x:Name="Label_SliderMinMax" Grid.Row="0" Grid.Column="0" Content="Niveau de zoom (min=5, max=19)" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" Width="Auto" Height="50" FontSize="11.8" FontFamily="Segoe UI" Foreground="#888989" Padding="0"/>
-                            <Label Grid.Row="0" Grid.Column="1" Content="{Binding ElementName=ZoomSlider, Path=Value}" ContentStringFormat=": {0}" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" Width="Auto" Height="50" FontSize="11.8" FontFamily="Segoe UI" Foreground="#888989" Padding="0"/>
+                            <Label
+                                x:Name="Label_SliderMinMax"
+                                Grid.Row="0"
+                                Grid.Column="0"
+                                Width="Auto"
+                                Height="50"
+                                Margin="0,0,0,0"
+                                Padding="0"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Top"
+                                Content="{Binding Source={x:Static commun:Languages.Current}, Path=[preparePropertyZoomLevelMinMax]}"
+                                FontFamily="Segoe UI"
+                                FontSize="11.8"
+                                Foreground="#888989" />
+                            <Label
+                                Grid.Row="0"
+                                Grid.Column="2"
+                                Width="Auto"
+                                Height="50"
+                                Margin="0,0,0,0"
+                                Padding="0"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Top"
+                                Content="{Binding ElementName=ZoomSlider, Path=Value}"
+                                FontFamily="Segoe UI"
+                                FontSize="11.8"
+                                Foreground="#888989" />
 
-                            <Label Grid.Row="1" Grid.Column="0" Content="Nombre de tuiles à télécharger (lxh)" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" Width="Auto" Height="50" FontSize="11.8" FontFamily="Segoe UI" Foreground="#888989" Padding="0"/>
-                            <Label x:Name="Label_NbrTiles" Grid.Row="1" Grid.Column="1" Content="0 x 0 = 0" ContentStringFormat=": {0}" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" Width="Auto" Height="50" FontSize="11.8" FontFamily="Segoe UI" Foreground="#888989" Padding="0"/>
+                            <Label
+                                Grid.Row="1"
+                                Grid.Column="0"
+                                Width="Auto"
+                                Height="50"
+                                Margin="0,0,0,0"
+                                Padding="0"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Top"
+                                Content="{Binding Source={x:Static commun:Languages.Current}, Path=[preparePropertyNumberOfTiles]}"
+                                FontFamily="Segoe UI"
+                                FontSize="11.8"
+                                Foreground="#888989" />
+                            <Label
+                                x:Name="Label_NbrTiles"
+                                Grid.Row="1"
+                                Grid.Column="2"
+                                Width="Auto"
+                                Height="50"
+                                Margin="0,0,0,0"
+                                Padding="0"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Top"
+                                Content="0 x 0 = 0"
+                                FontFamily="Segoe UI"
+                                FontSize="11.8"
+                                Foreground="#888989" />
 
-                            <Label Grid.Row="2" Grid.Column="0" Content="Taille de l'image (lxh)" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" Width="Auto" Height="50" FontSize="11.8" FontFamily="Segoe UI" Foreground="#888989" Padding="0"/>
-                            <Label x:Name="Label_ImgSize" Grid.Row="2" Grid.Column="1" Content="0 x 0 pixels" ContentStringFormat=": {0}" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" Width="Auto" Height="50" FontSize="11.8" FontFamily="Segoe UI" Foreground="#888989" Padding="0"/>
+                            <Label
+                                Grid.Row="2"
+                                Grid.Column="0"
+                                Width="Auto"
+                                Height="50"
+                                Margin="0,0,0,0"
+                                Padding="0"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Top"
+                                Content="{Binding Source={x:Static commun:Languages.Current}, Path=[preparePropertyImageSize]}"
+                                FontFamily="Segoe UI"
+                                FontSize="11.8"
+                                Foreground="#888989" />
+                            <Label
+                                x:Name="Label_ImgSize"
+                                Grid.Row="2"
+                                Grid.Column="2"
+                                Width="Auto"
+                                Height="50"
+                                Margin="0,0,0,0"
+                                Padding="0"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Top"
+                                Content="0 x 0"
+                                FontFamily="Segoe UI"
+                                FontSize="11.8"
+                                Foreground="#888989">
+                                <Label.ContentStringFormat>
+                                    <MultiBinding StringFormat="{}{0} {1}">
+                                        <Binding ElementName="Label_ImgSize" Path="Content" />
+                                        <Binding Path="[preparePropertyUnitsPixels]" Source="{x:Static commun:Languages.Current}" />
+                                    </MultiBinding>
+                                </Label.ContentStringFormat>
+                            </Label>
 
-                            <Label Grid.Row="3" Grid.Column="0" Content="Taille d'image maximale" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" Width="Auto" Height="50" FontSize="11.8" FontFamily="Segoe UI" Foreground="#888989" Padding="0"/>
-                            <Label x:Name="Label_ImgSizeMax" Grid.Row="3" Grid.Column="1" Content="65000 x 65000 pixels" ContentStringFormat=": {0}" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" Width="Auto" Height="50" FontSize="11.8" FontFamily="Segoe UI" Foreground="#888989" Padding="0"/>
+                            <Label
+                                Grid.Row="3"
+                                Grid.Column="0"
+                                Width="Auto"
+                                Height="50"
+                                Margin="0,0,0,0"
+                                Padding="0"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Top"
+                                Content="{Binding Source={x:Static commun:Languages.Current}, Path=[preparePropertyImageSizeMax]}"
+                                FontFamily="Segoe UI"
+                                FontSize="11.8"
+                                Foreground="#888989" />
+                            <Label
+                                x:Name="Label_ImgSizeMax"
+                                Grid.Row="3"
+                                Grid.Column="2"
+                                Width="Auto"
+                                Height="50"
+                                Margin="0,0,0,0"
+                                Padding="0"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Top"
+                                Content="{Binding Source={x:Static commun:Languages.Current}, Path=[preparePropertyUnitsPixels]}"
+                                ContentStringFormat="65000 x 65000 {0}"
+                                FontFamily="Segoe UI"
+                                FontSize="11.8"
+                                Foreground="#888989" />
                         </Grid>
-
-
-
-                        <Label Content="Echelle  : " HorizontalAlignment="Left" Margin="0,30,0,0" VerticalAlignment="Top" Width="Auto" Height="25" FontSize="19" FontFamily="Segoe UI Light" Foreground="#FFE2E2E1"/>
+                        <Label
+                            Width="Auto"
+                            Height="25"
+                            Margin="0,30,0,0"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Top"
+                            Content="{Binding Source={x:Static commun:Languages.Current}, Path=[prepareSubTitleScale]}"
+                            FontFamily="Segoe UI Light"
+                            FontSize="19"
+                            Foreground="#FFE2E2E1" />
                         <StackPanel x:Name="WrapPanel_Echelle" Margin="0,10,0,0">
-                            <Grid  HorizontalAlignment="Stretch" VerticalAlignment="Center"  Background="Transparent" >
+                            <Grid
+                                HorizontalAlignment="Stretch"
+                                VerticalAlignment="Center"
+                                Background="Transparent">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="140" />
                                     <ColumnDefinition Width="10" />
                                     <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
-                                <Label x:Name="Label_Scale" Grid.Column="0" Content="Echelle :" HorizontalAlignment="Left" Margin="0,0,0,5" VerticalAlignment="Top" Width="Auto" FontSize="11.8" FontFamily="Segoe UI" Foreground="#888989" Padding="0"/>
-                                
-                                <TextBox x:Name="TextBox_Scale" Text="0" Grid.Column="2"  Height="22" HorizontalAlignment="Stretch"  Style="{DynamicResource TextBoxCleanStyle_13}" FontSize="11.8" FontFamily="Segoe UI" Padding="15.5,0,0,0" TextChanged="TextBox_Scale_TextChanged" LostFocus="TextBox_Scale_LostFocus" Tag="automatic" Cursor="IBeam"></TextBox>
-                                <TextBox x:Name="TextBox_NoScale" Grid.Column="2"  Height="22" HorizontalAlignment="Stretch"  Style="{DynamicResource TextBoxCleanStyle_13}" FontSize="11.8" FontFamily="Segoe UI" Padding="15.5,0,0,0" IsEnabled="False" Cursor="IBeam"></TextBox>
-                                <Label x:Name="Label_ScalePrefix" Grid.Column="2" Content="1/" HorizontalAlignment="Left" Margin="5,0,0,0" VerticalAlignment="Bottom" Width="Auto" Height="20" FontSize="11.8" FontFamily="Segoe UI" Foreground="#BCBCBC" Padding="0"/>
-                                
+                                <Label
+                                    x:Name="Label_Scale"
+                                    Grid.Column="0"
+                                    Width="Auto"
+                                    Margin="0,0,0,5"
+                                    Padding="0"
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Top"
+                                    Content="{Binding Source={x:Static commun:Languages.Current}, Path=[preparePropertyNameScale]}"
+                                    FontFamily="Segoe UI"
+                                    FontSize="11.8"
+                                    Foreground="#888989" />
+
+                                <TextBox
+                                    x:Name="TextBox_Scale"
+                                    Grid.Column="2"
+                                    Height="22"
+                                    Padding="15.5,0,0,0"
+                                    HorizontalAlignment="Stretch"
+                                    Cursor="IBeam"
+                                    FontFamily="Segoe UI"
+                                    FontSize="11.8"
+                                    LostFocus="TextBox_Scale_LostFocus"
+                                    Style="{DynamicResource TextBoxCleanStyle_13}"
+                                    Tag="automatic"
+                                    Text="0"
+                                    TextChanged="TextBox_Scale_TextChanged" />
+                                <TextBox
+                                    x:Name="TextBox_NoScale"
+                                    Grid.Column="2"
+                                    Height="22"
+                                    Padding="15.5,0,0,0"
+                                    HorizontalAlignment="Stretch"
+                                    Cursor="IBeam"
+                                    FontFamily="Segoe UI"
+                                    FontSize="11.8"
+                                    IsEnabled="False"
+                                    Style="{DynamicResource TextBoxCleanStyle_13}" />
+                                <Label
+                                    x:Name="Label_ScalePrefix"
+                                    Grid.Column="2"
+                                    Width="Auto"
+                                    Height="20"
+                                    Margin="5,0,0,0"
+                                    Padding="0"
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Bottom"
+                                    Content="1/"
+                                    FontFamily="Segoe UI"
+                                    FontSize="11.8"
+                                    Foreground="#BCBCBC" />
+
                             </Grid>
-                            <CheckBox x:Name="CheckBoxAddScaleToImage" Foreground="#888989" Margin="0,5,0,0">Ajouter une echelle graphique à l'image</CheckBox>
+                            <CheckBox
+                                x:Name="CheckBoxAddScaleToImage"
+                                Margin="0,5,0,0"
+                                Content="{Binding Source={x:Static commun:Languages.Current}, Path=[preparePropertyNameAddScaleBar]}"
+                                Foreground="#888989" />
                         </StackPanel>
-
-
-                        <Label Content="Redimensionnement  : " HorizontalAlignment="Left" Margin="0,30,0,0" VerticalAlignment="Top" Width="Auto" Height="25" FontSize="19" FontFamily="Segoe UI Light" Foreground="#FFE2E2E1"/>
+                        <Label
+                            Width="Auto"
+                            Height="25"
+                            Margin="0,30,0,0"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Top"
+                            Content="{Binding Source={x:Static commun:Languages.Current}, Path=[prepareSubTitleResize]}"
+                            FontFamily="Segoe UI Light"
+                            FontSize="19"
+                            Foreground="#FFE2E2E1" />
                         <Grid Margin="0,5,0,0" Background="Transparent">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="230" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="5" />
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
                             <Grid.RowDefinitions>
-                                <RowDefinition Height="19"/>
+                                <RowDefinition Height="19" />
                             </Grid.RowDefinitions>
-                            <Label Grid.Row="3" Grid.Column="0" Content="Taille de l'image après redimensionnement " HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" Width="Auto" Height="50" FontSize="11.8" FontFamily="Segoe UI" Foreground="#888989" Padding="0"/>
-                            <Label x:Name="Label_ImgSizeF" Grid.Row="3" Grid.Column="1" Content="0 x 0 pixels" ContentStringFormat=": {0}" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" Width="Auto" Height="50" FontSize="11.8" FontFamily="Segoe UI" Foreground="#888989" Padding="0"/>
+                            <Label
+                                Grid.Row="3"
+                                Grid.Column="0"
+                                Width="Auto"
+                                Height="50"
+                                Margin="0,0,0,0"
+                                Padding="0"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Top"
+                                Content="{Binding Source={x:Static commun:Languages.Current}, Path=[preparePropertyResizedImageSize]}"
+                                FontFamily="Segoe UI"
+                                FontSize="11.8"
+                                Foreground="#888989" />
+                            <Label
+                                x:Name="Label_ImgSizeF"
+                                Grid.Row="3"
+                                Grid.Column="2"
+                                Width="Auto"
+                                Height="50"
+                                Margin="0,0,0,0"
+                                Padding="0"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Top"
+                                FontFamily="Segoe UI"
+                                FontSize="11.8"
+                                Foreground="#888989" />
                         </Grid>
-                        <WrapPanel Margin="0,5,0,0" HorizontalAlignment="Stretch" VerticalAlignment="Center" x:Name="WrapPanel_Largeur"  Background="Transparent">
-                            <Label Content="Largeur :" HorizontalAlignment="Left" Margin="0,0,0,5" VerticalAlignment="Top" Width="150" FontSize="11.8" FontFamily="Segoe UI" Foreground="#888989" Padding="0"/>
-                            <StackPanel MinWidth="330" Margin="0,0,0,0" HorizontalAlignment="Left"  Width="{Binding ElementName=WrapPanel_Largeur, Path=ActualWidth, Converter={StaticResource MathConverter}}" Background="Transparent">
+                        <WrapPanel
+                            x:Name="WrapPanel_Largeur"
+                            Margin="0,5,0,0"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Center"
+                            Background="Transparent">
+                            <Label
+                                Width="150"
+                                Margin="0,0,0,5"
+                                Padding="0"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Top"
+                                Content="{Binding Source={x:Static commun:Languages.Current}, Path=[prepareSubTitleResizeWidth]}"
+                                FontFamily="Segoe UI"
+                                FontSize="11.8"
+                                Foreground="#888989" />
+                            <StackPanel
+                                Width="{Binding ElementName=WrapPanel_Largeur, Path=ActualWidth, Converter={StaticResource MathConverter}}"
+                                MinWidth="330"
+                                Margin="0,0,0,0"
+                                HorizontalAlignment="Left"
+                                Background="Transparent">
                                 <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*" />
@@ -114,18 +376,59 @@
                                         <ColumnDefinition Width="*" />
                                     </Grid.ColumnDefinitions>
 
-                                    <TextBox x:Name="TextBox_Redim_Width" Text="0" Grid.Column="0"  Height="22" HorizontalAlignment="Stretch"  Style="{DynamicResource TextBoxCleanStyle_13}" IsEnabled="True" FontSize="11.8" FontFamily="Segoe UI" TextChanged="TextBox_Redim_Width_TextChanged" LostFocus="TextBox_Redim_Width_LostFocus"></TextBox>
-                                    <ComboBox Opacity="1" x:Name="TextBox_Redim_WUnit"  Grid.Column="2" HorizontalAlignment="Stretch" Height="21" SelectedIndex="0" Cursor="Arrow" IsEnabled="True" FontSize="11.8" FontFamily="Segoe UI" SelectionChanged="TextBox_Redim_WUnit_SelectionChanged" >
-                                        <ComboBoxItem >pixels</ComboBoxItem>
-                                        <ComboBoxItem >pourcentages</ComboBoxItem>
+                                    <TextBox
+                                        x:Name="TextBox_Redim_Width"
+                                        Grid.Column="0"
+                                        Height="22"
+                                        HorizontalAlignment="Stretch"
+                                        FontFamily="Segoe UI"
+                                        FontSize="11.8"
+                                        IsEnabled="True"
+                                        LostFocus="TextBox_Redim_Width_LostFocus"
+                                        Style="{DynamicResource TextBoxCleanStyle_13}"
+                                        Text="0"
+                                        TextChanged="TextBox_Redim_Width_TextChanged" />
+                                    <ComboBox
+                                        x:Name="TextBox_Redim_WUnit"
+                                        Grid.Column="2"
+                                        Height="21"
+                                        HorizontalAlignment="Stretch"
+                                        Cursor="Arrow"
+                                        FontFamily="Segoe UI"
+                                        FontSize="11.8"
+                                        IsEnabled="True"
+                                        Opacity="1"
+                                        SelectedIndex="0"
+                                        SelectionChanged="TextBox_Redim_WUnit_SelectionChanged">
+                                        <ComboBoxItem Content="{Binding Source={x:Static commun:Languages.Current}, Path=[preparePropertyUnitsPixels]}" />
+                                        <ComboBoxItem Content="{Binding Source={x:Static commun:Languages.Current}, Path=[preparePropertyUnitsPourcents]}" />
                                     </ComboBox>
                                 </Grid>
                             </StackPanel>
                         </WrapPanel>
 
-                        <WrapPanel Margin="0,10,0,0" HorizontalAlignment="Stretch" VerticalAlignment="Center" x:Name="WrapPanel_Hauteur"  Background="Transparent">
-                            <Label Content="Hauteur :" HorizontalAlignment="Left" Margin="0,0,0,5" VerticalAlignment="Top" Width="150" FontSize="11.8" FontFamily="Segoe UI" Foreground="#888989" Padding="0"/>
-                            <StackPanel MinWidth="330" Margin="0,0,0,0" HorizontalAlignment="Left"  Width="{Binding ElementName=WrapPanel_Hauteur, Path=ActualWidth, Converter={StaticResource MathConverter}}" Background="Transparent">
+                        <WrapPanel
+                            x:Name="WrapPanel_Hauteur"
+                            Margin="0,10,0,0"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Center"
+                            Background="Transparent">
+                            <Label
+                                Width="150"
+                                Margin="0,0,0,5"
+                                Padding="0"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Top"
+                                Content="{Binding Source={x:Static commun:Languages.Current}, Path=[prepareSubTitleResizeHeight]}"
+                                FontFamily="Segoe UI"
+                                FontSize="11.8"
+                                Foreground="#888989" />
+                            <StackPanel
+                                Width="{Binding ElementName=WrapPanel_Hauteur, Path=ActualWidth, Converter={StaticResource MathConverter}}"
+                                MinWidth="330"
+                                Margin="0,0,0,0"
+                                HorizontalAlignment="Left"
+                                Background="Transparent">
                                 <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*" />
@@ -133,10 +436,32 @@
                                         <ColumnDefinition Width="*" />
                                     </Grid.ColumnDefinitions>
 
-                                    <TextBox x:Name="TextBox_Redim_Height" Text="0" Grid.Column="0"  Height="22" HorizontalAlignment="Stretch"  Style="{DynamicResource TextBoxCleanStyle_13}" IsEnabled="True" FontSize="11.8" FontFamily="Segoe UI" TextChanged="TextBox_Redim_Height_TextChanged" LostFocus="TextBox_Redim_Height_LostFocus"></TextBox>
-                                    <ComboBox Opacity="1" x:Name="TextBox_Redim_HUnit"  Grid.Column="2" HorizontalAlignment="Stretch" Height="21" SelectedIndex="0" Cursor="Arrow" IsEnabled="True" FontSize="11.8" FontFamily="Segoe UI" SelectionChanged="TextBox_Redim_HUnit_SelectionChanged" >
-                                        <ComboBoxItem >pixels</ComboBoxItem>
-                                        <ComboBoxItem >pourcentages</ComboBoxItem>
+                                    <TextBox
+                                        x:Name="TextBox_Redim_Height"
+                                        Grid.Column="0"
+                                        Height="22"
+                                        HorizontalAlignment="Stretch"
+                                        FontFamily="Segoe UI"
+                                        FontSize="11.8"
+                                        IsEnabled="True"
+                                        LostFocus="TextBox_Redim_Height_LostFocus"
+                                        Style="{DynamicResource TextBoxCleanStyle_13}"
+                                        Text="0"
+                                        TextChanged="TextBox_Redim_Height_TextChanged" />
+                                    <ComboBox
+                                        x:Name="TextBox_Redim_HUnit"
+                                        Grid.Column="2"
+                                        Height="21"
+                                        HorizontalAlignment="Stretch"
+                                        Cursor="Arrow"
+                                        FontFamily="Segoe UI"
+                                        FontSize="11.8"
+                                        IsEnabled="True"
+                                        Opacity="1"
+                                        SelectedIndex="0"
+                                        SelectionChanged="TextBox_Redim_HUnit_SelectionChanged">
+                                        <ComboBoxItem Content="{Binding Source={x:Static commun:Languages.Current}, Path=[preparePropertyUnitsPixels]}" />
+                                        <ComboBoxItem Content="{Binding Source={x:Static commun:Languages.Current}, Path=[preparePropertyUnitsPourcents]}" />
                                     </ComboBox>
                                 </Grid>
                             </StackPanel>
@@ -144,11 +469,49 @@
 
 
 
-                        <Label Content="Qualité  : " HorizontalAlignment="Left" Margin="0,30,0,0" VerticalAlignment="Top" Width="Auto" Height="25" FontSize="19" FontFamily="Segoe UI Light" Foreground="#FFE2E2E1"/>
-                        <Label Content="NB : Ce parametre ne s&#39;applique seulement sur les images exportée en format JPG" HorizontalAlignment="Left" Margin="0,10,0,0" VerticalAlignment="Top" Width="Auto" Height="15" FontSize="11.8" FontFamily="Segoe UI" Foreground="#888989" Padding="0"/>
-                        <WrapPanel Margin="0,10,0,0" HorizontalAlignment="Stretch" VerticalAlignment="Center" x:Name="WrapPanel_Qualite"  Background="Transparent">
-                            <Label Content="Qualité :" HorizontalAlignment="Left" Margin="0,0,0,5" VerticalAlignment="Top" Width="150" FontSize="11.8" FontFamily="Segoe UI" Foreground="#888989" Padding="0"/>
-                            <StackPanel MinWidth="330" Margin="0,0,0,0" HorizontalAlignment="Left"  Width="{Binding ElementName=WrapPanel_Hauteur, Path=ActualWidth, Converter={StaticResource MathConverter}}" Background="Transparent">
+                        <Label
+                            Width="Auto"
+                            Height="25"
+                            Margin="0,30,0,0"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Top"
+                            Content="{Binding Source={x:Static commun:Languages.Current}, Path=[prepareSubTitleQuality]}"
+                            FontFamily="Segoe UI Light"
+                            FontSize="19"
+                            Foreground="#FFE2E2E1" />
+                        <Label
+                            Width="Auto"
+                            Height="15"
+                            Margin="0,10,0,0"
+                            Padding="0"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Top"
+                            Content="{Binding Source={x:Static commun:Languages.Current}, Path=[prepareSubTitleQualityDisclaimer]}"
+                            FontFamily="Segoe UI"
+                            FontSize="11.8"
+                            Foreground="#888989" />
+                        <WrapPanel
+                            x:Name="WrapPanel_Qualite"
+                            Margin="0,10,0,0"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Center"
+                            Background="Transparent">
+                            <Label
+                                Width="150"
+                                Margin="0,0,0,5"
+                                Padding="0"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Top"
+                                Content="{Binding Source={x:Static commun:Languages.Current}, Path=[preparePropertyNameQuality]}"
+                                FontFamily="Segoe UI"
+                                FontSize="11.8"
+                                Foreground="#888989" />
+                            <StackPanel
+                                Width="{Binding ElementName=WrapPanel_Hauteur, Path=ActualWidth, Converter={StaticResource MathConverter}}"
+                                MinWidth="330"
+                                Margin="0,0,0,0"
+                                HorizontalAlignment="Left"
+                                Background="Transparent">
                                 <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*" />
@@ -156,33 +519,91 @@
                                         <ColumnDefinition Width="*" />
                                     </Grid.ColumnDefinitions>
 
-                                    <TextBox x:Name="TextBox_quality_number" Grid.Column="0"  Height="22" HorizontalAlignment="Stretch"  Style="{DynamicResource TextBoxCleanStyle_13}" IsEnabled="True" FontSize="11.8" FontFamily="Segoe UI" TextChanged="TextBox_quality_number_TextChanged" Cursor="IBeam" Foreground="#BCBCBC"></TextBox>
-                                    <ComboBox Opacity="1" x:Name="TextBox_quality_name"  Grid.Column="2" HorizontalAlignment="Stretch" Height="21" SelectedIndex="0" Cursor="Arrow" IsEnabled="True" FontSize="11.8" FontFamily="Segoe UI" SelectionChanged="TextBox_quality_name_SelectionChanged" >
-                                        <ComboBoxItem >Faible</ComboBoxItem>
-                                        <ComboBoxItem >Moyenne</ComboBoxItem>
-                                        <ComboBoxItem >Elevée</ComboBoxItem>
-                                        <ComboBoxItem >Supérieur</ComboBoxItem>
-                                        <ComboBoxItem >Maximum</ComboBoxItem>
+                                    <TextBox
+                                        x:Name="TextBox_quality_number"
+                                        Grid.Column="0"
+                                        Height="22"
+                                        HorizontalAlignment="Stretch"
+                                        Cursor="IBeam"
+                                        FontFamily="Segoe UI"
+                                        FontSize="11.8"
+                                        Foreground="#BCBCBC"
+                                        IsEnabled="True"
+                                        Style="{DynamicResource TextBoxCleanStyle_13}"
+                                        TextChanged="TextBox_quality_number_TextChanged" />
+                                    <ComboBox
+                                        x:Name="TextBox_quality_name"
+                                        Grid.Column="2"
+                                        Height="21"
+                                        HorizontalAlignment="Stretch"
+                                        Cursor="Arrow"
+                                        FontFamily="Segoe UI"
+                                        FontSize="11.8"
+                                        IsEnabled="True"
+                                        Opacity="1"
+                                        SelectedIndex="0"
+                                        SelectionChanged="TextBox_quality_name_SelectionChanged">
+                                        <ComboBoxItem Content="{Binding Source={x:Static commun:Languages.Current}, Path=[preparePropertyValuesQualityLow]}" />
+                                        <ComboBoxItem Content="{Binding Source={x:Static commun:Languages.Current}, Path=[preparePropertyValuesQualityMedium]}" />
+                                        <ComboBoxItem Content="{Binding Source={x:Static commun:Languages.Current}, Path=[preparePropertyValuesQualityHigh]}" />
+                                        <ComboBoxItem Content="{Binding Source={x:Static commun:Languages.Current}, Path=[preparePropertyValuesQualitySuperior]}" />
+                                        <ComboBoxItem Content="{Binding Source={x:Static commun:Languages.Current}, Path=[preparePropertyValuesQualityMaximum]}" />
                                     </ComboBox>
                                 </Grid>
                             </StackPanel>
                         </WrapPanel>
 
-                        <Label Content="Couleurs  : " HorizontalAlignment="Left" Margin="0,30,0,0" VerticalAlignment="Top" Width="Auto" Height="25" FontSize="19" FontFamily="Segoe UI Light" Foreground="#FFE2E2E1"/>
-                        <Grid Margin="0,10,0,0" HorizontalAlignment="Stretch" VerticalAlignment="Center" x:Name="WrapPanel_Couleur"  Background="Transparent" >
+                        <Label
+                            Width="Auto"
+                            Height="25"
+                            Margin="0,30,0,0"
+                            HorizontalAlignment="Left"
+                            VerticalAlignment="Top"
+                            Content="{Binding Source={x:Static commun:Languages.Current}, Path=[prepareSubTitleColors]}"
+                            FontFamily="Segoe UI Light"
+                            FontSize="19"
+                            Foreground="#FFE2E2E1" />
+                        <Grid
+                            x:Name="WrapPanel_Couleur"
+                            Margin="0,10,0,0"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Center"
+                            Background="Transparent">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="200" />
+                                <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition Width="10" />
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
 
-                            <Label Grid.Column="0" Content="Convertir les couleurs de l&#39;image vers :" HorizontalAlignment="Left" Margin="0,0,0,5" VerticalAlignment="Top" Width="Auto" FontSize="11.8" FontFamily="Segoe UI" Foreground="#888989" Padding="0"/>
+                            <Label
+                                Grid.Column="0"
+                                Width="Auto"
+                                Margin="0,0,0,5"
+                                Padding="0"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Top"
+                                Content="{Binding Source={x:Static commun:Languages.Current}, Path=[preparePropertyNameColors]}"
+                                FontFamily="Segoe UI"
+                                FontSize="11.8"
+                                Foreground="#888989" />
 
-                            <ComboBox Grid.Column="2" Opacity="1" x:Name="Combobox_color_conversion" Width="Auto" HorizontalAlignment="Stretch" Height="21" SelectedIndex="0" Cursor="Arrow" IsEnabled="True" FontSize="11.8" FontFamily="Segoe UI" SelectionChanged="Combobox_color_conversion_SelectionChanged" >
-                                <ComboBoxItem Tag="Srgb">Original</ComboBoxItem>
+                            <ComboBox
+                                x:Name="Combobox_color_conversion"
+                                Grid.Column="2"
+                                Width="Auto"
+                                Height="21"
+                                HorizontalAlignment="Stretch"
+                                Cursor="Arrow"
+                                FontFamily="Segoe UI"
+                                FontSize="11.8"
+                                IsEnabled="True"
+                                Opacity="1"
+                                SelectedIndex="0"
+                                SelectionChanged="Combobox_color_conversion_SelectionChanged">
+                                <ComboBoxItem Content="{Binding Source={x:Static commun:Languages.Current}, Path=[preparePropertyValuesColorsOriginal]}" Tag="Srgb" />
                                 <!--<ComboBoxItem Tag="Rgb">RGB</ComboBoxItem>-->
                                 <!--<ComboBoxItem Tag="Rgb">RGB 16 bit</ComboBoxItem>-->
-                                <ComboBoxItem Tag="Bw">Noir &amp; Blanc</ComboBoxItem>
+                                <ComboBoxItem Content="{Binding Source={x:Static commun:Languages.Current}, Path=[preparePropertyValuesColorsBlackAndWhite]}" Tag="Bw" />
                                 <!--<ComboBoxItem Tag="Grey16">Noir &amp; Blanc (16bit)</ComboBoxItem>-->
                             </ComboBox>
                         </Grid>
@@ -191,115 +612,322 @@
                 </Grid>
             </ScrollViewer>
         </Grid>
-        <Grid Grid.Column="1" Grid.Row="1">
+        <Grid Grid.Row="1" Grid.Column="1">
 
             <Grid.RowDefinitions>
-                <RowDefinition Height="57"/>
-                <RowDefinition/>
-                <RowDefinition Height="25"/>
-                <RowDefinition Height="60"/>
-                <RowDefinition Height="15"/>
+                <RowDefinition Height="57" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="0" />
+                <RowDefinition Height="60" />
+                <RowDefinition Height="15" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="265" />
+                <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="15" />
             </Grid.ColumnDefinitions>
 
-            <Label Grid.Row="0"  Grid.Column="0" Grid.ColumnSpan="3" Content="Aperçu" HorizontalAlignment="Left" Margin="28,10,0,0" VerticalAlignment="Top" Width="192" Height="50" FontSize="30" FontFamily="Segoe UI Light" Foreground="#FFE2E2E1"/>
+            <Label
+                Grid.Row="0"
+                Grid.Column="0"
+                Grid.ColumnSpan="3"
+                Width="Auto"
+                Height="50"
+                Margin="28,10,0,0"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"
+                Content="{Binding Source={x:Static commun:Languages.Current}, Path=[prepareTitlePreview]}"
+                FontFamily="Segoe UI Light"
+                FontSize="30"
+                Foreground="#FFE2E2E1" />
 
-            <Button Grid.Row="0" Grid.Column="1" x:Name="ClosePage_button" Style="{DynamicResource IconButton}" Margin="0,15,0,0" VerticalAlignment="Top" HorizontalAlignment="Right" Click="ClosePage_button_Click" Height="30" Width="30" Foreground="#FFE2E2E1" Cursor="Hand" ToolTip="Fermer cette fenêtre">
-                <Path Panel.ZIndex="999" Fill="Transparent" StrokeStartLineCap="round" StrokeEndLineCap="round" StrokeLineJoin="round" StrokeThickness="0.8" Data="{StaticResource CloseButton}" Stroke="{Binding Foreground, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Button}}" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center" RenderTransformOrigin="0,0" Height="20" Width="20"/>
+            <Button
+                x:Name="ClosePage_button"
+                Grid.Row="0"
+                Grid.Column="1"
+                Width="30"
+                Height="30"
+                Margin="0,15,0,0"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Top"
+                Click="ClosePage_button_Click"
+                Cursor="Hand"
+                Foreground="#FFE2E2E1"
+                Style="{DynamicResource IconButton}"
+                ToolTip="{Binding Source={x:Static commun:Languages.Current}, Path=[tooltipsCloseWindow]}">
+                <Path
+                    Width="20"
+                    Height="20"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Panel.ZIndex="999"
+                    Data="{StaticResource CloseButton}"
+                    Fill="Transparent"
+                    RenderTransformOrigin="0,0"
+                    Stretch="Uniform"
+                    Stroke="{Binding Foreground, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Button}}"
+                    StrokeEndLineCap="round"
+                    StrokeLineJoin="round"
+                    StrokeStartLineCap="round"
+                    StrokeThickness="0.8" />
             </Button>
 
-
-            <ScrollViewer  x:Name="GridImagePreviewInfoScrollViewer" VerticalScrollBarVisibility="Auto" Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="1" Grid.RowSpan="4" Margin="0,0,00,0" SizeChanged="GridImagePreviewInfoScrollViewer_SizeChanged" Padding="10,60,15,0">
-
-
-                <Grid x:Name="GridImagePreviewInfo" Grid.Row="1" Grid.Column="0" Background="Transparent" Margin="0,0,0,0">
-
+            <ScrollViewer
+                x:Name="GridImagePreviewInfoScrollViewer"
+                Grid.Row="1"
+                Grid.RowSpan="4"
+                Grid.Column="0"
+                Grid.ColumnSpan="3"
+                Margin="0,0,00,0"
+                Padding="10,60,15,0"
+                SizeChanged="GridImagePreviewInfoScrollViewer_SizeChanged"
+                VerticalScrollBarVisibility="Auto">
+                <Grid
+                    x:Name="GridImagePreviewInfo"
+                    Grid.Row="1"
+                    Grid.Column="0"
+                    Margin="0,0,0,0"
+                    Background="Transparent">
                     <Grid.RowDefinitions>
-                        <RowDefinition/>
-                        <RowDefinition/>
+                        <RowDefinition />
+                        <RowDefinition />
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition></ColumnDefinition>
-                        <ColumnDefinition></ColumnDefinition>
-                        <ColumnDefinition></ColumnDefinition>
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                        <ColumnDefinition />
                     </Grid.ColumnDefinitions>
 
-                    <StackPanel x:Name="StackPanel_ImageTilePreview_0" Background="#171719" Grid.Row="0" Grid.Column="0">
-                        <Image x:Name="ImageTilePreview_0_0" HorizontalAlignment="Stretch" VerticalAlignment="Top" Stretch="Fill" Height="{Binding ElementName=ImageTilePreview_0_0, Path=ActualWidth}" Opacity="0"/>
-                        <Image x:Name="ImageTilePreview_1_0" HorizontalAlignment="Stretch" VerticalAlignment="Top" Stretch="Fill" Height="{Binding ElementName=ImageTilePreview_1_0, Path=ActualWidth}" Opacity="0"/>
+                    <StackPanel
+                        x:Name="StackPanel_ImageTilePreview_0"
+                        Grid.Row="0"
+                        Grid.Column="0"
+                        Background="#171719">
+                        <Image
+                            x:Name="ImageTilePreview_0_0"
+                            Height="{Binding ElementName=ImageTilePreview_0_0, Path=ActualWidth}"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Top"
+                            Opacity="0"
+                            Stretch="Fill" />
+                        <Image
+                            x:Name="ImageTilePreview_1_0"
+                            Height="{Binding ElementName=ImageTilePreview_1_0, Path=ActualWidth}"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Top"
+                            Opacity="0"
+                            Stretch="Fill" />
                     </StackPanel>
 
-                    <StackPanel x:Name="StackPanel_ImageTilePreview_1" Background="#171719" Grid.Row="0" Grid.Column="1">
-                        <Image x:Name="ImageTilePreview_0_1" HorizontalAlignment="Stretch" VerticalAlignment="Top" Stretch="Fill" Height="{Binding ElementName=ImageTilePreview_0_1, Path=ActualWidth}" Opacity="0"/>
-                        <Image x:Name="ImageTilePreview_1_1" HorizontalAlignment="Stretch" VerticalAlignment="Top" Stretch="Fill" Height="{Binding ElementName=ImageTilePreview_1_1, Path=ActualWidth}" Opacity="0"/>
+                    <StackPanel
+                        x:Name="StackPanel_ImageTilePreview_1"
+                        Grid.Row="0"
+                        Grid.Column="1"
+                        Background="#171719">
+                        <Image
+                            x:Name="ImageTilePreview_0_1"
+                            Height="{Binding ElementName=ImageTilePreview_0_1, Path=ActualWidth}"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Top"
+                            Opacity="0"
+                            Stretch="Fill" />
+                        <Image
+                            x:Name="ImageTilePreview_1_1"
+                            Height="{Binding ElementName=ImageTilePreview_1_1, Path=ActualWidth}"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Top"
+                            Opacity="0"
+                            Stretch="Fill" />
                     </StackPanel>
 
-                    <StackPanel x:Name="StackPanel_ImageTilePreview_2" Background="#171719" Grid.Row="0" Grid.Column="2">
-                        <Image x:Name="ImageTilePreview_0_2" HorizontalAlignment="Stretch" VerticalAlignment="Top" Stretch="Fill" Height="{Binding ElementName=ImageTilePreview_0_2, Path=ActualWidth}" Opacity="0"/>
-                        <Image x:Name="ImageTilePreview_1_2" HorizontalAlignment="Stretch" VerticalAlignment="Top" Stretch="Fill" Height="{Binding ElementName=ImageTilePreview_1_2, Path=ActualWidth}" Opacity="0"/>
+                    <StackPanel
+                        x:Name="StackPanel_ImageTilePreview_2"
+                        Grid.Row="0"
+                        Grid.Column="2"
+                        Background="#171719">
+                        <Image
+                            x:Name="ImageTilePreview_0_2"
+                            Height="{Binding ElementName=ImageTilePreview_0_2, Path=ActualWidth}"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Top"
+                            Opacity="0"
+                            Stretch="Fill" />
+                        <Image
+                            x:Name="ImageTilePreview_1_2"
+                            Height="{Binding ElementName=ImageTilePreview_1_2, Path=ActualWidth}"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Top"
+                            Opacity="0"
+                            Stretch="Fill" />
                     </StackPanel>
 
-                    <Label  x:Name="ImageIsLoading" Grid.Row="0" Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="5" Visibility="Visible" FontFamily="Segoe UI" Foreground="#888989" Background="#99000000" Padding="5,2,5,2">Chargement...</Label>
-                    <StackPanel Grid.ColumnSpan="2"  Grid.Row="1" HorizontalAlignment="Stretch" Background="Transparent" Margin="0,10,0,0">
-                        <Grid  Background="Transparent">
+                    <Label
+                        x:Name="ImageIsLoading"
+                        Grid.Row="0"
+                        Grid.Column="2"
+                        Margin="5"
+                        Padding="5,2,5,2"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Bottom"
+                        Background="#99000000"
+                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[preparePreviewLoadingIndicator]}"
+                        FontFamily="Segoe UI"
+                        Foreground="#888989"
+                        Visibility="Visible" />
+                    <StackPanel
+                        Grid.Row="1"
+                        Grid.ColumnSpan="2"
+                        Margin="0,10,0,0"
+                        HorizontalAlignment="Stretch"
+                        Background="Transparent">
+                        <Grid Background="Transparent">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="95" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="5" />
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
                             <Grid.RowDefinitions>
-                                <RowDefinition Height="19"/>
-                                <RowDefinition Height="19"/>
-                                <RowDefinition Height="19"/>
-                                <RowDefinition Height="19"/>
+                                <RowDefinition Height="19" />
+                                <RowDefinition Height="19" />
+                                <RowDefinition Height="19" />
+                                <RowDefinition Height="19" />
                             </Grid.RowDefinitions>
-                            <Label Grid.Row="0" Grid.Column="0" Content="Largeur des tuiles" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" Width="Auto" Height="50" FontSize="11.8" FontFamily="Segoe UI" Foreground="#888989" Padding="0"/>
-                            <Label x:Name="Label_LargeurTuile" Grid.Row="0" Grid.Column="1" Content="256" ContentStringFormat=" : {0} pixels" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" Width="Auto" Height="50" FontSize="11.8" FontFamily="Segoe UI" Foreground="#888989" Padding="0"/>
+                            <Label
+                                Grid.Row="0"
+                                Grid.Column="0"
+                                Width="Auto"
+                                Height="50"
+                                Margin="0,0,0,0"
+                                Padding="0"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Top"
+                                Content="{Binding Source={x:Static commun:Languages.Current}, Path=[preparePropertyNameLayerTileSize]}"
+                                FontFamily="Segoe UI"
+                                FontSize="11.8"
+                                Foreground="#888989" />
+                            <Label
+                                x:Name="Label_LargeurTuile"
+                                Grid.Row="0"
+                                Grid.Column="2"
+                                Width="Auto"
+                                Height="50"
+                                Margin="0,0,0,0"
+                                Padding="0"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Top"
+                                FontFamily="Segoe UI"
+                                FontSize="11.8"
+                                Foreground="#888989">
+                                <Label.ContentStringFormat>
+                                    <MultiBinding StringFormat="{}{0} {1}">
+                                        <Binding ElementName="Label_LargeurTuile" Path="Content" />
+                                        <Binding Path="[preparePropertyUnitsPixels]" Source="{x:Static commun:Languages.Current}" />
+                                    </MultiBinding>
+                                </Label.ContentStringFormat>
+                            </Label>
 
-                            <Label Grid.Row="1" Grid.Column="0" Content="Nom du calque" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" Width="Auto" Height="50" FontSize="11.8" FontFamily="Segoe UI" Foreground="#888989" Padding="0"/>
-                            <Label x:Name="Label_NomCalque" Grid.Row="1" Grid.Column="1" Content="Plan IGN" ContentStringFormat=" : {0}" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" Width="Auto" Height="50" FontSize="11.8" FontFamily="Segoe UI" Foreground="#888989" Padding="0"/>
+                            <Label
+                                Grid.Row="1"
+                                Grid.Column="0"
+                                Width="Auto"
+                                Height="50"
+                                Margin="0,0,0,0"
+                                Padding="0"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Top"
+                                Content="{Binding Source={x:Static commun:Languages.Current}, Path=[preparePropertyNameLayerName]}"
+                                FontFamily="Segoe UI"
+                                FontSize="11.8"
+                                Foreground="#888989" />
+                            <Label
+                                x:Name="Label_NomCalque"
+                                Grid.Row="1"
+                                Grid.Column="2"
+                                Width="Auto"
+                                Height="50"
+                                Margin="0,0,0,0"
+                                Padding="0"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Top"
+                                FontFamily="Segoe UI"
+                                FontSize="11.8"
+                                Foreground="#888989" />
 
-                            <Label Grid.Row="2" Grid.Column="0" Content="Source" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" Width="Auto" Height="50" FontSize="11.8" FontFamily="Segoe UI" Foreground="#888989" Padding="0"/>
-                            <Label x:Name="Label_Source" Grid.Row="2" Grid.Column="1" Content="geoportail" ContentStringFormat=" : {0}" HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" Width="Auto" Height="50" FontSize="11.8" FontFamily="Segoe UI" Foreground="#888989" Padding="0"/>
-
+                            <Label
+                                Grid.Row="2"
+                                Grid.Column="0"
+                                Width="Auto"
+                                Height="50"
+                                Margin="0,0,0,0"
+                                Padding="0"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Top"
+                                Content="{Binding Source={x:Static commun:Languages.Current}, Path=[preparePropertyNameLayerSource]}"
+                                FontFamily="Segoe UI"
+                                FontSize="11.8"
+                                Foreground="#888989" />
+                            <Label
+                                x:Name="Label_Source"
+                                Grid.Row="2"
+                                Grid.Column="2"
+                                Width="Auto"
+                                Height="50"
+                                Margin="0,0,0,0"
+                                Padding="0"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Top"
+                                FontFamily="Segoe UI"
+                                FontSize="11.8"
+                                Foreground="#888989" />
                         </Grid>
-
                     </StackPanel>
-
-
                 </Grid>
-
-
-
-
-
-
-
             </ScrollViewer>
-            <Rectangle  Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Grid.RowSpan="3" HorizontalAlignment="Stretch" Height="Auto"  VerticalAlignment="Stretch" Width="Auto" IsHitTestVisible="False" ScrollViewer.CanContentScroll="True" IsEnabled="False">
+
+            <Rectangle
+                Grid.Row="2"
+                Grid.RowSpan="3"
+                Grid.Column="0"
+                Grid.ColumnSpan="2"
+                Width="Auto"
+                Height="Auto"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch"
+                IsEnabled="False"
+                IsHitTestVisible="False"
+                ScrollViewer.CanContentScroll="True">
                 <Rectangle.Fill>
-                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0" SpreadMethod="Pad">
+                    <LinearGradientBrush SpreadMethod="Pad" StartPoint="0.5,0" EndPoint="0.5,1">
                         <LinearGradientBrush.RelativeTransform>
                             <TransformGroup>
-                                <ScaleTransform CenterY="0.5" CenterX="0.5"/>
-                                <SkewTransform CenterY="0.5" CenterX="0.5"/>
-                                <RotateTransform Angle="0" CenterY="0.5" CenterX="0.5"/>
-                                <TranslateTransform/>
+                                <ScaleTransform CenterX="0.5" CenterY="0.5" />
+                                <SkewTransform CenterX="0.5" CenterY="0.5" />
+                                <RotateTransform Angle="0" CenterX="0.5" CenterY="0.5" />
+                                <TranslateTransform />
                             </TransformGroup>
                         </LinearGradientBrush.RelativeTransform>
-                        <GradientStop Color="Black" Offset="1"/>
-                        <GradientStop Color="#99000000" Offset="0.6"/>
-                        <GradientStop Color="#4C000000" Offset="0.3"/>
-                        <GradientStop Color="#00000000" Offset="0"/>
-
+                        <GradientStop Offset="1" Color="Black" />
+                        <GradientStop Offset="0.6" Color="#99000000" />
+                        <GradientStop Offset="0.3" Color="#4C000000" />
+                        <GradientStop Offset="0" Color="#00000000" />
                     </LinearGradientBrush>
                 </Rectangle.Fill>
             </Rectangle>
 
-            <Button x:Name="StartDownloadButton" Grid.Row="3" Grid.Column="1" Style="{DynamicResource RoundedButton}" Content="Télécharger le calque" Height="45" Margin="0,0,15,15" VerticalAlignment="Top" Foreground="#fff" FontSize="18" IsHitTestVisible="True" Click="StartDownloadButton_Click"/>
+            <Button
+                x:Name="StartDownloadButton"
+                Grid.Row="3"
+                Grid.Column="1"
+                Height="45"
+                MinWidth="230"
+                Margin="0,0,15,15"
+                VerticalAlignment="Top"
+                Click="StartDownloadButton_Click"
+                Content="{Binding Source={x:Static commun:Languages.Current}, Path=[downloadButtonStart]}"
+                FontSize="18"
+                Foreground="#fff"
+                IsHitTestVisible="True"
+                Style="{DynamicResource RoundedButton}" />
 
         </Grid>
     </Grid>

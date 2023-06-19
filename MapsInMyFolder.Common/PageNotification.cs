@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -9,7 +10,6 @@ using System.Windows.Shapes;
 
 namespace MapsInMyFolder.Commun
 {
-
     public abstract partial class Notification
     {
         public int InsertPosition = 0;
@@ -76,6 +76,11 @@ namespace MapsInMyFolder.Commun
             });
         }
 
+        public static Notification GetById(string NotificationId)
+        {
+            return ListOfNotificationsOnShow.FirstOrDefault(notif => notif.NotificationId == NotificationId);
+        }
+
         public static int Count()
         {
             return ListOfNotificationsOnShow.Count;
@@ -90,8 +95,6 @@ namespace MapsInMyFolder.Commun
             ContentGrid.Children.Add(Elements.CloseButton(Remove));
             return ContentGrid;
         }
-
-
     }
 
     public abstract partial class Notification
@@ -112,11 +115,15 @@ namespace MapsInMyFolder.Commun
 
                 if (OnClickCallback != null)
                 {
-                    ContentGrid.MouseLeftButtonUp += (_, __) =>
+                    ContentGrid.MouseLeftButtonUp += ContentGrid_MouseLeftButtonUp;
+
+                    void ContentGrid_MouseLeftButtonUp(object sender, MouseButtonEventArgs o)
                     {
+                        o.Handled = true;
                         CloseCallback();
                         OnClickCallback();
-                    };
+                        ContentGrid.MouseLeftButtonUp -= ContentGrid_MouseLeftButtonUp;
+                    }
                 }
 
                 System.Windows.Shapes.Rectangle BorderBottom = new System.Windows.Shapes.Rectangle()
@@ -135,7 +142,7 @@ namespace MapsInMyFolder.Commun
                 Border ContentBorder = new Border()
                 {
                     BorderThickness = new Thickness(3),
-                    BorderBrush = System.Windows.Media.Brushes.Transparent,
+                    BorderBrush = Brushes.Transparent,
                     Margin = new Thickness(5, 2, 20, 5),
                 };
                 ContentBorder.SetValue(Grid.RowProperty, 0);
@@ -191,18 +198,23 @@ namespace MapsInMyFolder.Commun
                     Width = 25,
                     Foreground = Collectif.HexValueToSolidColorBrush("#FFE2E2E1"),
                     Cursor = Cursors.Hand,
-                    ToolTip = "Fermer cette notification",
+                    ToolTip = Languages.Current["tooltipsCloseNotification"],
                     Margin = new Thickness(0, 0, 0, 0),
                     VerticalAlignment = VerticalAlignment.Top,
                     HorizontalAlignment = HorizontalAlignment.Right
                 };
 
                 CloseButton.Content = CloseButtonPath();
-                CloseButton.Click += (_, e) =>
+                CloseButton.Click += CloseButton_Click;
+
+
+                void CloseButton_Click(object sender, EventArgs o)
                 {
                     CloseCallback();
                     CloseButton.IsEnabled = false;
-                };
+                    CloseButton.Click -= CloseButton_Click;
+                }
+
                 return CloseButton;
             }
 
@@ -211,13 +223,13 @@ namespace MapsInMyFolder.Commun
                 return new Path()
                 {
                     Margin = new Thickness(0, 4, 0, 0),
-                    StrokeStartLineCap = System.Windows.Media.PenLineCap.Round,
-                    StrokeEndLineCap = System.Windows.Media.PenLineCap.Round,
-                    StrokeLineJoin = System.Windows.Media.PenLineJoin.Round,
+                    StrokeStartLineCap = PenLineCap.Round,
+                    StrokeEndLineCap = PenLineCap.Round,
+                    StrokeLineJoin = PenLineJoin.Round,
                     StrokeThickness = 0.8,
-                    Data = (System.Windows.Media.Geometry)Application.Current.Resources["CloseButton"],
+                    Data = (Geometry)Application.Current.Resources["CloseButton"],
                     Stroke = Collectif.HexValueToSolidColorBrush("#FFE2E2E1"),
-                    Stretch = System.Windows.Media.Stretch.Uniform,
+                    Stretch = Stretch.Uniform,
                     Height = 10,
                     Width = 10
                 };
@@ -299,7 +311,5 @@ namespace MapsInMyFolder.Commun
                 SendUpdate();
             }
         }
-
     }
-
 }

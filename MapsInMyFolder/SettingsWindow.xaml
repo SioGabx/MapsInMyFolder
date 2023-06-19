@@ -1,40 +1,51 @@
-﻿<Window x:Class="MapsInMyFolder.SettingsWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:ui="http://schemas.modernwpf.com/2019"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:MapsInMyFolder"
-        xmlns:avalonEdit="clr-namespace:ICSharpCode.AvalonEdit;assembly=ICSharpCode.AvalonEdit" 
-        xmlns:editing="clr-namespace:ICSharpCode.AvalonEdit.Editing;assembly=ICSharpCode.AvalonEdit"
-        xmlns:sc="clr-namespace:MapsInMyFolder;assembly=MapsInMyFolder" xmlns:cbcontrols="clr-namespace:BlackPearl.Controls.CoreLibrary;assembly=BlackPearl.Controls.CoreLibrary"
-        xmlns:sys="clr-namespace:System;assembly=mscorlib"
-        mc:Ignorable="d"
-        ui:WindowHelper.UseModernWindowStyle="True" ResizeMode="CanMinimize" Title="Paramêtres" Height="450" Width="800"
-            Background="#FF0A0C0C"
+﻿<Window
+    x:Class="MapsInMyFolder.SettingsWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:avalonEdit="clr-namespace:ICSharpCode.AvalonEdit;assembly=ICSharpCode.AvalonEdit"
+    xmlns:cbcontrols="clr-namespace:BlackPearl.Controls.CoreLibrary;assembly=BlackPearl.Controls.CoreLibrary"
+    xmlns:commun="clr-namespace:MapsInMyFolder.Commun;assembly=MapsInMyFolder.Commun"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:editing="clr-namespace:ICSharpCode.AvalonEdit.Editing;assembly=ICSharpCode.AvalonEdit"
+    xmlns:local="clr-namespace:MapsInMyFolder"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:sc="clr-namespace:MapsInMyFolder;assembly=MapsInMyFolder"
+    xmlns:sys="clr-namespace:System;assembly=mscorlib"
+    xmlns:ui="http://schemas.modernwpf.com/2019"
+    Title="Paramêtres"
+    Width="800"
+    Height="450"
+    ui:ThemeManager.RequestedTheme="Dark"
+    ui:TitleBar.ButtonStyle="{DynamicResource AppTitleBarButtonStyle}"
     ui:TitleBar.ExtendViewIntoTitleBar="True"
     ui:TitleBar.IsBackButtonVisible="False"
     ui:TitleBar.Style="{DynamicResource AppTitleBarStyle}"
-    ui:TitleBar.ButtonStyle="{DynamicResource AppTitleBarButtonStyle}"
-    ui:ThemeManager.RequestedTheme="Dark" Initialized="Window_Initialized" Loaded="Window_Loaded" Closing="Window_Closing" KeyDown="Window_KeyDown">
+    ui:WindowHelper.UseModernWindowStyle="True"
+    Background="#FF0A0C0C"
+    Closing="Window_Closing"
+    KeyDown="Window_KeyDown"
+    Loaded="Window_Loaded"
+    ResizeMode="CanMinimize"
+    mc:Ignorable="d">
 
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="RessourcesDictionnary.xaml"/>
-
-
+                <ResourceDictionary Source="RessourcesDictionnary.xaml" />
                 <ResourceDictionary>
                     <Style x:Key="GridSelectNormalStyle" TargetType="{x:Type Grid}">
                         <Style.Triggers>
                             <Trigger Property="IsMouseOver" Value="true">
-                                <Setter Property="Background" Value="#444444"/>
+                                <Setter Property="Background" Value="#444444" />
                             </Trigger>
                         </Style.Triggers>
                     </Style>
 
-                    <Style x:Key="GridInViewNormalStyle" TargetType="{x:Type Grid}" BasedOn="{StaticResource GridSelectNormalStyle}">
-                        <Setter Property="Background" Value="#303031"/>
+                    <Style
+                        x:Key="GridInViewNormalStyle"
+                        BasedOn="{StaticResource GridSelectNormalStyle}"
+                        TargetType="{x:Type Grid}">
+                        <Setter Property="Background" Value="#303031" />
                     </Style>
                 </ResourceDictionary>
 
@@ -42,16 +53,16 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Window.Resources>
-    <Grid Background="#FF0A0C0C"  x:Name="SettingsGrid">
+    <Grid x:Name="SettingsGrid" Background="#FF0A0C0C">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition />
         </Grid.RowDefinitions>
         <Grid
-            Grid.Row="0"
             x:Name="AppTitleBar"
-            Background="Black"
-            ui:ThemeManager.RequestedTheme="Dark">
+            Grid.Row="0"
+            ui:ThemeManager.RequestedTheme="Dark"
+            Background="Black">
             <Grid.Style>
                 <Style TargetType="{x:Type Grid}">
                     <Setter Property="TextElement.Foreground" Value="WhiteSmoke" />
@@ -60,21 +71,22 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="10" />
                 <ColumnDefinition />
-                <ColumnDefinition/>
+                <ColumnDefinition />
                 <ColumnDefinition Width="140" />
             </Grid.ColumnDefinitions>
             <TextBlock
-                Grid.Column="1"
                 x:Name="TitleTextBox"
-                FontFamily="Segoe UI Light"
-                FontSize="13"
-                 Padding="0,7"
+                Grid.Column="1"
+                Padding="0,7"
                 HorizontalAlignment="Left"
                 VerticalAlignment="Center"
+                FontFamily="Segoe UI Light"
+                FontSize="13"
                 Text="{Binding Title, ElementName=Window}" />
             <StackPanel
                 Grid.Column="2"
-                Orientation="Horizontal" HorizontalAlignment="Right"/>
+                HorizontalAlignment="Right"
+                Orientation="Horizontal" />
         </Grid>
 
 
@@ -82,39 +94,130 @@
         <Grid Grid.Row="1" Visibility="Visible">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="250" />
-                <ColumnDefinition/>
+                <ColumnDefinition />
             </Grid.ColumnDefinitions>
 
             <Grid Grid.Column="0" Background="#FF171719">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="65"/>
-                    <RowDefinition/>
+                    <RowDefinition Height="65" />
+                    <RowDefinition />
                 </Grid.RowDefinitions>
-
-                <Label Grid.Row="0" Content="Catégories" HorizontalAlignment="Left" Margin="28,10,0,0" VerticalAlignment="Top" Width="192" Height="50" FontSize="30" FontFamily="Segoe UI Light" Foreground="#FFE2E2E1"/>
-
-                <StackPanel  Grid.Row="1" Margin="10,-5,5,0" VerticalAlignment="Stretch" Height="Auto">
-
-                    <Grid x:Name="MenuItem_Calque"  Height="35" Style="{StaticResource GridSelectNormalStyle}" Margin="0,5,0,0"  MouseUp="ScrollMenuItem_Calque" >
-                        <TextBlock Margin="10,0,0,0" Grid.Column="1" VerticalAlignment="Center" FontSize="15"><Run Text="Calques"/></TextBlock>
+                <Label
+                    Grid.Row="0"
+                    Width="192"
+                    Height="50"
+                    Margin="28,10,0,0"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Top"
+                    Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsTitleCategory]}"
+                    FontFamily="Segoe UI Light"
+                    FontSize="30"
+                    Foreground="#FFE2E2E1" />
+                <StackPanel
+                    Grid.Row="1"
+                    Height="Auto"
+                    Margin="10,-5,5,0"
+                    VerticalAlignment="Stretch">
+                    <Grid
+                        x:Name="MenuItem_LanguagesSettings"
+                        Height="35"
+                        Margin="0,5,0,0"
+                        MouseUp="ScrollMenuItem_Languages"
+                        Style="{StaticResource GridSelectNormalStyle}">
+                        <TextBlock
+                            Grid.Column="1"
+                            Margin="10,0,0,0"
+                            VerticalAlignment="Center"
+                            FontSize="15">
+                            <Run Text="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsSubTitleLanguages]}" />
+                        </TextBlock>
+                    </Grid>  
+                    <Grid
+                        x:Name="MenuItem_Calque"
+                        Height="35"
+                        Margin="0,5,0,0"
+                        MouseUp="ScrollMenuItem_Calque"
+                        Style="{StaticResource GridSelectNormalStyle}">
+                        <TextBlock
+                            Grid.Column="1"
+                            Margin="10,0,0,0"
+                            VerticalAlignment="Center"
+                            FontSize="15">
+                            <Run Text="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsSubTitleLayers]}" />
+                        </TextBlock>
                     </Grid>
-                    <Grid x:Name="MenuItem_Telechargement" Height="35" Style="{StaticResource GridSelectNormalStyle}" Margin="0,5,0,0" MouseUp="ScrollMenuItem_Telechargement" >
-                        <TextBlock Margin="10,0,0,0" Grid.Column="1" VerticalAlignment="Center" FontSize="15"><Run Text="Téléchargement"/></TextBlock>
+                    <Grid
+                        x:Name="MenuItem_Telechargement"
+                        Height="35"
+                        Margin="0,5,0,0"
+                        MouseUp="ScrollMenuItem_Telechargement"
+                        Style="{StaticResource GridSelectNormalStyle}">
+                        <TextBlock
+                            Grid.Column="1"
+                            Margin="10,0,0,0"
+                            VerticalAlignment="Center"
+                            FontSize="15">
+                            <Run Text="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsSubTitleDownloads]}" />
+                        </TextBlock>
                     </Grid>
 
-                    <Grid x:Name="MenuItem_Carte"  Height="35" Style="{StaticResource GridSelectNormalStyle}" Margin="0,5,0,0" MouseUp="ScrollMenuItem_Carte" >
-                        <TextBlock Margin="10,0,0,0" Grid.Column="1" VerticalAlignment="Center" FontSize="15"><Run Text="Carte"/></TextBlock>
+                    <Grid
+                        x:Name="MenuItem_Carte"
+                        Height="35"
+                        Margin="0,5,0,0"
+                        MouseUp="ScrollMenuItem_Carte"
+                        Style="{StaticResource GridSelectNormalStyle}">
+                        <TextBlock
+                            Grid.Column="1"
+                            Margin="10,0,0,0"
+                            VerticalAlignment="Center"
+                            FontSize="15">
+                            <Run Text="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsSubTitleMaps]}" />
+                        </TextBlock>
                     </Grid>
-                    <Grid x:Name="MenuItem_Avance" Height="35" Style="{StaticResource GridSelectNormalStyle}" Margin="0,5,0,0" MouseUp="ScrollMenuItem_Avance" >
-                        <TextBlock Margin="10,0,0,0" Grid.Column="1" VerticalAlignment="Center" FontSize="15"><Run Text="Option avancée"/></TextBlock>
+                    <Grid
+                        x:Name="MenuItem_Avance"
+                        Height="35"
+                        Margin="0,5,0,0"
+                        MouseUp="ScrollMenuItem_Avance"
+                        Style="{StaticResource GridSelectNormalStyle}">
+                        <TextBlock
+                            Grid.Column="1"
+                            Margin="10,0,0,0"
+                            VerticalAlignment="Center"
+                            FontSize="15">
+                            <Run Text="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsSubTitleAdvancedOptions]}" />
+                        </TextBlock>
                     </Grid>
 
-                    <Grid x:Name="MenuItem_Update"  Height="35" Style="{StaticResource GridSelectNormalStyle}" Margin="0,5,0,0" MouseUp="ScrollMenuItem_Update" >
-                        <TextBlock Margin="10,0,0,0" Grid.Column="1" VerticalAlignment="Center" FontSize="15"><Run Text="Mises à jour"/></TextBlock>
+                    <Grid
+                        x:Name="MenuItem_Update"
+                        Height="35"
+                        Margin="0,5,0,0"
+                        MouseUp="ScrollMenuItem_Update"
+                        Style="{StaticResource GridSelectNormalStyle}">
+                        <TextBlock
+                            Grid.Column="1"
+                            Margin="10,0,0,0"
+                            VerticalAlignment="Center"
+                            FontSize="15">
+                            <Run Text="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsSubTitleUpdates]}" />
+                        </TextBlock>
                     </Grid>
 
-                    <Grid x:Name="MenuItem_APropos"  Height="35" Style="{StaticResource GridSelectNormalStyle}" Margin="0,5,0,0" MouseUp="ScrollMenuItem_APropos"  >
-                        <TextBlock Margin="10,0,0,0" Grid.Column="1" VerticalAlignment="Center" FontSize="15"><Run Text="A propos"/></TextBlock>
+                    <Grid
+                        x:Name="MenuItem_APropos"
+                        Height="35"
+                        Margin="0,5,0,0"
+                        MouseUp="ScrollMenuItem_APropos"
+                        Style="{StaticResource GridSelectNormalStyle}">
+                        <TextBlock
+                            Grid.Column="1"
+                            Margin="10,0,0,0"
+                            VerticalAlignment="Center"
+                            FontSize="15">
+                            <Run Text="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsSubTitleAbout]}" />
+                        </TextBlock>
                     </Grid>
                 </StackPanel>
             </Grid>
@@ -122,119 +225,218 @@
             <Grid Grid.Column="1">
 
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="65"/>
-                    <RowDefinition/>
+                    <RowDefinition Height="65" />
+                    <RowDefinition />
                 </Grid.RowDefinitions>
 
-                <Label Grid.Row="0" Content="Paramètres" HorizontalAlignment="Left" Margin="28,10,0,0" VerticalAlignment="Top" Width="192" Height="50" FontSize="30" FontFamily="Segoe UI Light" Foreground="#FFE2E2E1"/>
+                <Label
+                    Grid.Row="0"
+                    Width="192"
+                    Height="50"
+                    Margin="28,10,0,0"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Top"
+                    Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsTitle]}"
+                    FontFamily="Segoe UI Light"
+                    FontSize="30"
+                    Foreground="#FFE2E2E1" />
                 <Grid Grid.Row="1" Margin="0,0,0,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="18" />
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="0" />
                     </Grid.ColumnDefinitions>
-                    <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.Row="1" Grid.Column="1" Padding="0,0,32,10" x:Name="SettingsScrollViewer" VirtualizingPanel.ScrollUnit="Pixel" ScrollChanged="SettingsScrollViewer_ScrollChanged">
+                    <ScrollViewer
+                        x:Name="SettingsScrollViewer"
+                        Grid.Row="1"
+                        Grid.Column="1"
+                        Padding="0,0,32,10"
+                        ScrollChanged="SettingsScrollViewer_ScrollChanged"
+                        VerticalScrollBarVisibility="Auto"
+                        VirtualizingPanel.ScrollUnit="Pixel">
                         <StackPanel>
-                            <StackPanel x:Name="CalqueSettings">
-                                <!--
-                                layer_startup_id
-                                layerpanel_website_IsVisible
-                                layerpanel_put_non_letter_layername_at_the_end
-                                tileloader_default_script
-                                layers_Sort
-                                Layers_Order
-                                -->
-                                <Label x:Name="CalqueSettingsLabel"  Content="Calques : " HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" Width="Auto" Height="25" FontSize="16.5" FontFamily="Segoe UI Semilight" Foreground="#FFE2E2E1"/>
-                                <!--<Grid Margin="0,10,0,0">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="20"/>
-                                    <RowDefinition Height="*" />
-                                </Grid.RowDefinitions>
-                                <Label Content="Nom :" Foreground="#888989" Grid.Row="0"></Label>
-                                <TextBox x:Name="TextboxLayerName" HorizontalAlignment="Stretch" Grid.Row="1" Style="{DynamicResource TextBoxCleanStyle_13}" Cursor="IBeam"></TextBox>
-                            </Grid>-->
-
+                            
+                            <StackPanel x:Name="LanguagesSettings">
+                                <Label
+                                    x:Name="LanguagesSettingsLabel"
+                                    Width="Auto"
+                                    Height="25"
+                                    Margin="0,0,0,0"
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Top"
+                                    Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsSubTitleLanguages]}"
+                                    ContentStringFormat="{}{0} :"
+                                    FontFamily="Segoe UI Semilight"
+                                    FontSize="16.5"
+                                    Foreground="#FFE2E2E1" />
                                 <Grid Margin="0,10,0,0">
                                     <Grid.RowDefinitions>
-                                        <RowDefinition Height="20"/>
+                                        <RowDefinition Height="20" />
                                         <RowDefinition Height="*" />
                                     </Grid.RowDefinitions>
-                                    <Label Content="Calque de démarage (seul les calques au format JPEG sont accepté) :" Foreground="#888989" Grid.Row="0"/>
-                                    <ComboBox x:Name="layer_startup_id" Grid.Row="1" Width="Auto" HorizontalAlignment="Stretch" VerticalContentAlignment="Stretch" Height="21" SelectedIndex="4" Cursor="Arrow" Padding="5,0,0,1" Foreground="#BCBCBC" >
+                                    <Label
+                                        Grid.Row="0"
+                                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameLanguage]}"
+                                        Foreground="#888989" />
+                                    <ComboBox
+                                        x:Name="ApplicationLanguage"
+                                        Grid.Row="1"
+                                        Width="Auto"
+                                        Height="21"
+                                        Padding="5,0,0,1"
+                                        HorizontalAlignment="Stretch"
+                                        VerticalContentAlignment="Stretch"
+                                        Cursor="Arrow"
+                                        Foreground="#BCBCBC"
+                                        SelectedIndex="0">
                                         <ComboBox.Resources>
-                                            <Style TargetType="{x:Type ScrollBar}" BasedOn="{StaticResource {x:Type ScrollBar}}">
-                                                <Setter Property="Margin" Value="0,0,-5,0"/>
+                                            <Style BasedOn="{StaticResource {x:Type ScrollBar}}" TargetType="{x:Type ScrollBar}">
+                                                <Setter Property="Margin" Value="0,0,-5,0" />
                                             </Style>
                                         </ComboBox.Resources>
                                     </ComboBox>
                                 </Grid>
 
+                            </StackPanel>
+
+                            <StackPanel x:Name="CalqueSettings">
+                                <Label
+                                    x:Name="CalqueSettingsLabel"
+                                    Width="Auto"
+                                    Height="25"
+                                    Margin="0,20,0,0"
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Top"
+                                    Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsSubTitleLayers]}"
+                                    ContentStringFormat="{}{0} :"
+                                    FontFamily="Segoe UI Semilight"
+                                    FontSize="16.5"
+                                    Foreground="#FFE2E2E1" />
+                                <Grid Margin="0,10,0,0">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="20" />
+                                        <RowDefinition Height="*" />
+                                    </Grid.RowDefinitions>
+                                    <Label
+                                        Grid.Row="0"
+                                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameStartupLayer]}"
+                                        Foreground="#888989" />
+                                    <ComboBox
+                                        x:Name="layer_startup_id"
+                                        Grid.Row="1"
+                                        Width="Auto"
+                                        Height="21"
+                                        Padding="5,0,0,1"
+                                        HorizontalAlignment="Stretch"
+                                        VerticalContentAlignment="Stretch"
+                                        Cursor="Arrow"
+                                        Foreground="#BCBCBC"
+                                        SelectedIndex="4">
+                                        <ComboBox.Resources>
+                                            <Style BasedOn="{StaticResource {x:Type ScrollBar}}" TargetType="{x:Type ScrollBar}">
+                                                <Setter Property="Margin" Value="0,0,-5,0" />
+                                            </Style>
+                                        </ComboBox.Resources>
+                                    </ComboBox>
+                                </Grid>
 
                                 <Grid Margin="0,10,0,0">
                                     <Grid.RowDefinitions>
-                                        <RowDefinition Height="20"/>
+                                        <RowDefinition Height="20" />
                                         <RowDefinition Height="*" />
                                     </Grid.RowDefinitions>
                                     <Grid.Resources>
-                                        <!--/Don't forget to add « xmlns:sys="clr-namespace:System;assembly=mscorlib" » /-->
-                                        <x:Array Type="sys:Char" x:Key="AdditionalCharArray">
+                                        <!--  /Don't forget to add « xmlns:sys="clr-namespace:System;assembly=mscorlib" » /  -->
+                                        <x:Array x:Key="AdditionalCharArray" Type="sys:Char">
                                             <sys:Char>,</sys:Char>
                                             <sys:Char>/</sys:Char>
                                             <sys:Char>-</sys:Char>
                                         </x:Array>
                                     </Grid.Resources>
-                                    <Label Content="Critère de trie des calques :" Foreground="#888989" Grid.Row="0"/>
-                                    <cbcontrols:MultiSelectCombobox x:Name="layersSort" ItemSeparator="," AdditionalItemSeparators="{StaticResource ResourceKey=AdditionalCharArray}" Grid.Row="1" HorizontalAlignment="Stretch" MinHeight="16" Height="Auto" RequestBringIntoView="DisableRequestBringIntoView"/>
-
-
-                                </Grid>
-
-                                <!--<Grid Margin="0,10,0,0">
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="20"/>
-                                        <RowDefinition Height="*" />
-                                    </Grid.RowDefinitions>
-                                    <CheckBox x:Name="LayersOrder" Foreground="#888989" Grid.Row="0">Trie des calques croissant</CheckBox>
-                                </Grid>-->
-
-                                <Grid Margin="0,10,0,0">
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="20"/>
-                                        <RowDefinition Height="*" />
-                                    </Grid.RowDefinitions>
-                                    <CheckBox x:Name="layerpanel_put_non_letter_layername_at_the_end" Foreground="#888989" Grid.Row="0" Content="Afficher les calques commençant par des caractères spéciaux à la fin (ex : %, -, #)"/>
+                                    <Label
+                                        Grid.Row="0"
+                                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameLayerSort]}"
+                                        Foreground="#888989" />
+                                    <cbcontrols:MultiSelectCombobox
+                                        x:Name="layersSort"
+                                        Grid.Row="1"
+                                        Height="Auto"
+                                        MinHeight="16"
+                                        HorizontalAlignment="Stretch"
+                                        AdditionalItemSeparators="{StaticResource ResourceKey=AdditionalCharArray}"
+                                        ItemSeparator=","
+                                        RequestBringIntoView="DisableRequestBringIntoView" />
                                 </Grid>
 
                                 <Grid Margin="0,10,0,0">
                                     <Grid.RowDefinitions>
-                                        <RowDefinition Height="20"/>
+                                        <RowDefinition Height="20" />
                                         <RowDefinition Height="*" />
                                     </Grid.RowDefinitions>
-                                    <CheckBox x:Name="layerpanel_favorite_at_top" Foreground="#888989" Grid.Row="0" Content="Afficher les calques favoris en haut"/>
-                                </Grid>
-
-
-                                <Grid Margin="0,10,0,0">
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="20"/>
-                                        <RowDefinition Height="*" />
-                                        <RowDefinition/>
-                                    </Grid.RowDefinitions>
-                                    <Label Content="Masquer les calques qui ne correspondent pas au pays suivants :" Foreground="#888989" Grid.Row="0"/>
-
-                                    <cbcontrols:MultiSelectCombobox x:Name="PaysComboBox" DisplayMemberPath="DisplayName" ItemSeparator=";" Grid.Row="1" HorizontalAlignment="Stretch" MinHeight="16" Height="Auto" RequestBringIntoView="DisableRequestBringIntoView"/>
+                                    <CheckBox
+                                        x:Name="layerpanel_put_non_letter_layername_at_the_end"
+                                        Grid.Row="0"
+                                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameLayersStartingWithSpecialCharactersToEnd]}"
+                                        Foreground="#888989" />
                                 </Grid>
 
                                 <Grid Margin="0,10,0,0">
                                     <Grid.RowDefinitions>
-                                        <RowDefinition Height="20"/>
+                                        <RowDefinition Height="20" />
                                         <RowDefinition Height="*" />
                                     </Grid.RowDefinitions>
-                                    <Label Content="Type d'affichage des calques :" Foreground="#888989" Grid.Row="0"/>
-                                    <ComboBox x:Name="layerpanel_displaystyle" Grid.Row="1" Width="Auto" HorizontalAlignment="Stretch" VerticalContentAlignment="Stretch" Height="21" SelectedIndex="4" Cursor="Arrow" Padding="5,0,0,1" Foreground="#BCBCBC" >
+                                    <CheckBox
+                                        x:Name="layerpanel_favorite_at_top"
+                                        Grid.Row="0"
+                                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameFavoriteLayersAtTop]}"
+                                        Foreground="#888989" />
+                                </Grid>
+
+                                <Grid Margin="0,10,0,0">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="20" />
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition />
+                                    </Grid.RowDefinitions>
+                                    <Label
+                                        Grid.Row="0"
+                                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameCountryFilter]}"
+                                        Foreground="#888989" />
+
+                                    <cbcontrols:MultiSelectCombobox
+                                        x:Name="CountryComboBox"
+                                        Grid.Row="1"
+                                        Height="Auto"
+                                        MinHeight="16"
+                                        HorizontalAlignment="Stretch"
+                                        DisplayMemberPath="DisplayName"
+                                        ItemSeparator=";"
+                                        RequestBringIntoView="DisableRequestBringIntoView" />
+                                </Grid>
+
+                                <Grid Margin="0,10,0,0">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="20" />
+                                        <RowDefinition Height="*" />
+                                    </Grid.RowDefinitions>
+                                    <Label
+                                        Grid.Row="0"
+                                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameLayerDisplayType]}"
+                                        Foreground="#888989" />
+                                    <ComboBox
+                                        x:Name="layerpanel_displaystyle"
+                                        Grid.Row="1"
+                                        Width="Auto"
+                                        Height="21"
+                                        Padding="5,0,0,1"
+                                        HorizontalAlignment="Stretch"
+                                        VerticalContentAlignment="Stretch"
+                                        Cursor="Arrow"
+                                        Foreground="#BCBCBC"
+                                        SelectedIndex="4">
                                         <ComboBox.Resources>
-                                            <Style TargetType="{x:Type ScrollBar}" BasedOn="{StaticResource {x:Type ScrollBar}}">
-                                                <Setter Property="Margin" Value="0,0,-5,0"/>
+                                            <Style BasedOn="{StaticResource {x:Type ScrollBar}}" TargetType="{x:Type ScrollBar}">
+                                                <Setter Property="Margin" Value="0,0,-5,0" />
                                             </Style>
                                         </ComboBox.Resources>
                                     </ComboBox>
@@ -242,14 +444,26 @@
 
                                 <Grid Margin="0,10,0,0">
                                     <Grid.RowDefinitions>
-                                        <RowDefinition Height="20"/>
+                                        <RowDefinition Height="20" />
                                         <RowDefinition Height="*" />
                                     </Grid.RowDefinitions>
-                                    <Label Content="Script par défault pour le calcul des tuiles :" Foreground="#888989" Grid.Row="0"/>
-                                    <!--<TextBox x:Name="tileloader_default_script" Height="Auto"  HorizontalAlignment="Stretch" TextWrapping="NoWrap" Grid.Row="1" Style="{DynamicResource TextBoxCleanStyle_13}" Cursor="IBeam" AcceptsReturn="True" AcceptsTab="True" AutoWordSelection="False" HorizontalScrollBarVisibility="Auto" MinHeight="80" SpellCheck.IsEnabled="False"  VerticalContentAlignment="Top"></TextBox>-->
-                                    <avalonEdit:TextEditor x:Name="tileloader_default_script" Grid.Row="1" RequestBringIntoView="DisableRequestBringIntoView" HorizontalAlignment="Stretch" SyntaxHighlighting="MIMF_JavaScript" MinHeight="80" ShowLineNumbers="True" Height="Auto" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+                                    <Label
+                                        Grid.Row="0"
+                                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameDefaultScript]}"
+                                        Foreground="#888989" />
+                                    <avalonEdit:TextEditor
+                                        x:Name="tileloader_default_script"
+                                        Grid.Row="1"
+                                        Height="Auto"
+                                        MinHeight="80"
+                                        HorizontalAlignment="Stretch"
+                                        HorizontalScrollBarVisibility="Auto"
+                                        RequestBringIntoView="DisableRequestBringIntoView"
+                                        ShowLineNumbers="True"
+                                        SyntaxHighlighting="MIMF_JavaScript"
+                                        VerticalScrollBarVisibility="Auto">
                                         <avalonEdit:TextEditor.ContextMenu>
-                                            <ContextMenu Foreground="#E2E2E1" Background="#171719" >
+                                            <ContextMenu Background="#171719" Foreground="#E2E2E1">
                                                 <StaticResource ResourceKey="ContextMenu_Copier" />
                                                 <StaticResource ResourceKey="ContextMenu_Couper" />
                                                 <StaticResource ResourceKey="ContextMenu_Coller" />
@@ -262,14 +476,26 @@
 
                                 <Grid Margin="0,10,0,0">
                                     <Grid.RowDefinitions>
-                                        <RowDefinition Height="20"/>
+                                        <RowDefinition Height="20" />
                                         <RowDefinition Height="*" />
                                     </Grid.RowDefinitions>
-                                    <Label Content="Script template pour le calcul des tuiles (clic droit lors de l'edition du script) :" Foreground="#888989" Grid.Row="0"/>
-                                    <!--<TextBox x:Name="tileloader_template_script" Height="Auto"  HorizontalAlignment="Stretch" TextWrapping="NoWrap" Grid.Row="1" Style="{DynamicResource TextBoxCleanStyle_13}" Cursor="IBeam" AcceptsReturn="True" AcceptsTab="True" AutoWordSelection="False" HorizontalScrollBarVisibility="Auto" MinHeight="80" SpellCheck.IsEnabled="False"  VerticalContentAlignment="Top"></TextBox>-->
-                                    <avalonEdit:TextEditor x:Name="tileloader_template_script" Grid.Row="1" RequestBringIntoView="DisableRequestBringIntoView" HorizontalAlignment="Stretch" SyntaxHighlighting="MIMF_JavaScript" MinHeight="80" ShowLineNumbers="True" Height="Auto" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+                                    <Label
+                                        Grid.Row="0"
+                                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameScriptTemplate]}"
+                                        Foreground="#888989" />
+                                    <avalonEdit:TextEditor
+                                        x:Name="tileloader_template_script"
+                                        Grid.Row="1"
+                                        Height="Auto"
+                                        MinHeight="80"
+                                        HorizontalAlignment="Stretch"
+                                        HorizontalScrollBarVisibility="Auto"
+                                        RequestBringIntoView="DisableRequestBringIntoView"
+                                        ShowLineNumbers="True"
+                                        SyntaxHighlighting="MIMF_JavaScript"
+                                        VerticalScrollBarVisibility="Auto">
                                         <avalonEdit:TextEditor.ContextMenu>
-                                            <ContextMenu Foreground="#E2E2E1" Background="#171719" >
+                                            <ContextMenu Background="#171719" Foreground="#E2E2E1">
                                                 <StaticResource ResourceKey="ContextMenu_Copier" />
                                                 <StaticResource ResourceKey="ContextMenu_Couper" />
                                                 <StaticResource ResourceKey="ContextMenu_Coller" />
@@ -277,412 +503,752 @@
                                         </avalonEdit:TextEditor.ContextMenu>
                                     </avalonEdit:TextEditor>
                                 </Grid>
-
-                                <Button x:Name="openAvancedEditor" Content="Ouvrir l'éditeur de base de donnée avancée (beta)" Margin="0,10,0,0" Foreground="#BCBCBC" Click="openAvancedEditor_Click"/>
                             </StackPanel>
 
                             <StackPanel x:Name="TelechargementSettings">
-                                <!--
-                                working_folder
-                                temp_folder
-                                max_retry_download
-                                max_redirection_download_tile
-                                tiles_cache_expire_after_x_days
-                                max_download_project_in_parralele
-                                max_download_tiles_in_parralele
-                                waiting_before_start_another_tile_download
-                                generate_transparent_tiles_on_404
-                                generate_transparent_tiles_on_error
-                                user_agent
-                                -->
-                                <Label x:Name="TelechargementSettingsLabel" Content="Téléchargements : " HorizontalAlignment="Left" Margin="0,20,0,0" VerticalAlignment="Top" Width="Auto" Height="25" FontSize="16.5" FontFamily="Segoe UI Semilight" Foreground="#FFE2E2E1"/>
+                                <Label
+                                    x:Name="TelechargementSettingsLabel"
+                                    Width="Auto"
+                                    Height="25"
+                                    Margin="0,20,0,0"
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Top"
+                                    Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsSubTitleDownloads]}"
+                                    ContentStringFormat="{}{0} :"
+                                    FontFamily="Segoe UI Semilight"
+                                    FontSize="16.5"
+                                    Foreground="#FFE2E2E1" />
                                 <Grid Margin="0,10,0,0">
                                     <Grid.RowDefinitions>
-                                        <RowDefinition Height="20"/>
+                                        <RowDefinition Height="20" />
                                         <RowDefinition Height="*" />
-                                        <RowDefinition/>
+                                        <RowDefinition />
                                     </Grid.RowDefinitions>
-                                    <Label Content="Chemin de travail" Foreground="#888989" Grid.Row="0"/>
-                                    <TextBox x:Name="working_folder" HorizontalAlignment="Stretch" Grid.Row="1" Style="{DynamicResource TextBoxCleanStyle_13}" Cursor="IBeam" Height="21"/>
+                                    <Label
+                                        Grid.Row="0"
+                                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameWorkPath]}"
+                                        Foreground="#888989" />
+                                    <TextBox
+                                        x:Name="working_folder"
+                                        Grid.Row="1"
+                                        Height="21"
+                                        HorizontalAlignment="Stretch"
+                                        Cursor="IBeam"
+                                        Style="{DynamicResource TextBoxCleanStyle_13}" />
                                 </Grid>
 
                                 <Grid Margin="0,10,0,0">
                                     <Grid.RowDefinitions>
-                                        <RowDefinition Height="20"/>
+                                        <RowDefinition Height="20" />
                                         <RowDefinition Height="*" />
-                                        <RowDefinition/>
+                                        <RowDefinition />
                                     </Grid.RowDefinitions>
-                                    <Label Content="Chemin temporaire" Foreground="#888989" Grid.Row="0"/>
-                                    <TextBox x:Name="temp_folder" HorizontalAlignment="Stretch" Grid.Row="1" Style="{DynamicResource TextBoxCleanStyle_13}" Cursor="IBeam" Height="21"/>
+                                    <Label
+                                        Grid.Row="0"
+                                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameTempPath]}"
+                                        Foreground="#888989" />
+                                    <TextBox
+                                        x:Name="temp_folder"
+                                        Grid.Row="1"
+                                        Height="21"
+                                        HorizontalAlignment="Stretch"
+                                        Cursor="IBeam"
+                                        Style="{DynamicResource TextBoxCleanStyle_13}" />
                                 </Grid>
 
                                 <Grid Margin="0,10,0,0">
                                     <Grid.RowDefinitions>
-                                        <RowDefinition Height="20"/>
+                                        <RowDefinition Height="20" />
                                         <RowDefinition Height="*" />
-                                        <RowDefinition/>
+                                        <RowDefinition />
                                     </Grid.RowDefinitions>
-                                    <Label Content="Nombre de réessai maximum après échec" Foreground="#888989" Grid.Row="0"/>
-                                    <TextBox x:Name="max_retry_download" TextChanged="FilterDigitTextBox_TextChanged" HorizontalAlignment="Stretch" Grid.Row="1" Style="{DynamicResource TextBoxCleanStyle_13}" Cursor="IBeam" Height="21"/>
+                                    <Label
+                                        Grid.Row="0"
+                                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameMaxDownloadRetry]}"
+                                        Foreground="#888989" />
+                                    <TextBox
+                                        x:Name="max_retry_download"
+                                        Grid.Row="1"
+                                        Height="21"
+                                        HorizontalAlignment="Stretch"
+                                        Cursor="IBeam"
+                                        Style="{DynamicResource TextBoxCleanStyle_13}"
+                                        TextChanged="FilterDigitTextBox_TextChanged" />
                                 </Grid>
 
                                 <Grid Margin="0,10,0,0">
                                     <Grid.RowDefinitions>
-                                        <RowDefinition Height="20"/>
+                                        <RowDefinition Height="20" />
                                         <RowDefinition Height="*" />
-                                        <RowDefinition/>
+                                        <RowDefinition />
                                     </Grid.RowDefinitions>
-                                    <Label Content="Nombre maximum de redirection" Foreground="#888989" Grid.Row="0"/>
-                                    <TextBox x:Name="max_redirection_download_tile" TextChanged="FilterDigitTextBox_TextChanged" HorizontalAlignment="Stretch" Grid.Row="1" Style="{DynamicResource TextBoxCleanStyle_13}" Cursor="IBeam" Height="21"/>
+                                    <Label
+                                        Grid.Row="0"
+                                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameMaxNumberRedirects]}"
+                                        Foreground="#888989" />
+                                    <TextBox
+                                        x:Name="max_redirection_download_tile"
+                                        Grid.Row="1"
+                                        Height="21"
+                                        HorizontalAlignment="Stretch"
+                                        Cursor="IBeam"
+                                        Style="{DynamicResource TextBoxCleanStyle_13}"
+                                        TextChanged="FilterDigitTextBox_TextChanged" />
                                 </Grid>
 
                                 <Grid Margin="0,10,0,0">
                                     <Grid.RowDefinitions>
-                                        <RowDefinition Height="20"/>
+                                        <RowDefinition Height="20" />
                                         <RowDefinition Height="*" />
-                                        <RowDefinition/>
+                                        <RowDefinition />
                                     </Grid.RowDefinitions>
-                                    <Label Content="Secondes d'attente jusqu'à l'expiration des demandes (timeout) - Redémarrage requis" Foreground="#888989" Grid.Row="0"/>
-                                    <TextBox x:Name="http_client_timeout_in_seconds" TextChanged="FilterDigitTextBox_TextChanged" HorizontalAlignment="Stretch" Grid.Row="1" Style="{DynamicResource TextBoxCleanStyle_13}" Cursor="IBeam" Height="21"/>
+                                    <Label
+                                        Grid.Row="0"
+                                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameRequestTimeOut]}"
+                                        Foreground="#888989" />
+                                    <TextBox
+                                        x:Name="http_client_timeout_in_seconds"
+                                        Grid.Row="1"
+                                        Height="21"
+                                        HorizontalAlignment="Stretch"
+                                        Cursor="IBeam"
+                                        Style="{DynamicResource TextBoxCleanStyle_13}"
+                                        TextChanged="FilterDigitTextBox_TextChanged" />
                                 </Grid>
 
                                 <Grid Margin="0,10,0,0">
                                     <Grid.RowDefinitions>
-                                        <RowDefinition Height="20"/>
+                                        <RowDefinition Height="20" />
                                         <RowDefinition Height="*" />
-                                        <RowDefinition/>
+                                        <RowDefinition />
                                     </Grid.RowDefinitions>
-                                    <Label Content="Durée du cache (en jours)" Foreground="#888989" Grid.Row="0"/>
-                                    <TextBox x:Name="tiles_cache_expire_after_x_days" TextChanged="FilterDigitTextBox_TextChanged" HorizontalAlignment="Stretch" Grid.Row="1" Style="{DynamicResource TextBoxCleanStyle_13}" Cursor="IBeam" Height="21"/>
+                                    <Label
+                                        Grid.Row="0"
+                                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameCacheExpirationTimeInDays]}"
+                                        Foreground="#888989" />
+                                    <TextBox
+                                        x:Name="tiles_cache_expire_after_x_days"
+                                        Grid.Row="1"
+                                        Height="21"
+                                        HorizontalAlignment="Stretch"
+                                        Cursor="IBeam"
+                                        Style="{DynamicResource TextBoxCleanStyle_13}"
+                                        TextChanged="FilterDigitTextBox_TextChanged" />
                                 </Grid>
 
                                 <Grid Margin="0,10,0,0">
                                     <Grid.RowDefinitions>
-                                        <RowDefinition Height="20"/>
+                                        <RowDefinition Height="20" />
                                         <RowDefinition Height="*" />
-                                        <RowDefinition/>
+                                        <RowDefinition />
                                     </Grid.RowDefinitions>
-                                    <Label Content="Nombre maximum de téléchargelent en paralele" Foreground="#888989" Grid.Row="0"/>
-                                    <TextBox x:Name="max_download_project_in_parralele" TextChanged="FilterDigitTextBox_TextChanged" HorizontalAlignment="Stretch" Grid.Row="1" Style="{DynamicResource TextBoxCleanStyle_13}" Cursor="IBeam" Height="21"/>
+                                    <Label
+                                        Grid.Row="0"
+                                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameMaxNumberSimultaneousDownloads]}"
+                                        Foreground="#888989" />
+                                    <TextBox
+                                        x:Name="max_download_project_in_parralele"
+                                        Grid.Row="1"
+                                        Height="21"
+                                        HorizontalAlignment="Stretch"
+                                        Cursor="IBeam"
+                                        Style="{DynamicResource TextBoxCleanStyle_13}"
+                                        TextChanged="FilterDigitTextBox_TextChanged" />
                                 </Grid>
 
                                 <Grid Margin="0,10,0,0">
                                     <Grid.RowDefinitions>
-                                        <RowDefinition Height="20"/>
+                                        <RowDefinition Height="20" />
                                         <RowDefinition Height="*" />
-                                        <RowDefinition/>
+                                        <RowDefinition />
                                     </Grid.RowDefinitions>
-                                    <Label Content="Nombre maximum en paralele de requêtes (par téléchargement)" Foreground="#888989" Grid.Row="0"/>
-                                    <TextBox x:Name="max_download_tiles_in_parralele" TextChanged="FilterDigitTextBox_TextChanged" HorizontalAlignment="Stretch" Grid.Row="1" Style="{DynamicResource TextBoxCleanStyle_13}" Cursor="IBeam" Height="21"/>
+                                    <Label
+                                        Grid.Row="0"
+                                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameMaxNumberRequestsProcessedSimultaneouslyPerDownload]}"
+                                        Foreground="#888989" />
+                                    <TextBox
+                                        x:Name="max_download_tiles_in_parralele"
+                                        Grid.Row="1"
+                                        Height="21"
+                                        HorizontalAlignment="Stretch"
+                                        Cursor="IBeam"
+                                        Style="{DynamicResource TextBoxCleanStyle_13}"
+                                        TextChanged="FilterDigitTextBox_TextChanged" />
                                 </Grid>
 
                                 <Grid Margin="0,10,0,0">
                                     <Grid.RowDefinitions>
-                                        <RowDefinition Height="20"/>
+                                        <RowDefinition Height="20" />
                                         <RowDefinition Height="*" />
-                                        <RowDefinition/>
+                                        <RowDefinition />
                                     </Grid.RowDefinitions>
-                                    <Label Content="Temps d'attente entre chaque nouvelle requête (en milisecondes)" Foreground="#888989" Grid.Row="0"/>
-                                    <TextBox x:Name="waiting_before_start_another_tile_download" TextChanged="FilterDigitTextBox_TextChanged" HorizontalAlignment="Stretch" Grid.Row="1" Style="{DynamicResource TextBoxCleanStyle_13}" Cursor="IBeam" Height="21"/>
+                                    <Label
+                                        Grid.Row="0"
+                                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameDelayBetweenTwoConsecutiveRequestsInMilliseconds]}"
+                                        Foreground="#888989" />
+                                    <TextBox
+                                        x:Name="waiting_before_start_another_tile_download"
+                                        Grid.Row="1"
+                                        Height="21"
+                                        HorizontalAlignment="Stretch"
+                                        Cursor="IBeam"
+                                        Style="{DynamicResource TextBoxCleanStyle_13}"
+                                        TextChanged="FilterDigitTextBox_TextChanged" />
                                 </Grid>
 
                                 <Grid Margin="0,10,0,0">
                                     <Grid.RowDefinitions>
-                                        <RowDefinition Height="20"/>
+                                        <RowDefinition Height="20" />
                                         <RowDefinition Height="*" />
-                                        <RowDefinition/>
+                                        <RowDefinition />
                                     </Grid.RowDefinitions>
-                                    <Label Content="User-Agent" Foreground="#888989" Grid.Row="0"/>
-                                    <TextBox x:Name="user_agent" HorizontalAlignment="Stretch" Grid.Row="1" Style="{DynamicResource TextBoxCleanStyle_13}" Cursor="IBeam" Height="21"/>
+                                    <Label
+                                        Grid.Row="0"
+                                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameUserAgent]}"
+                                        Foreground="#888989" />
+                                    <TextBox
+                                        x:Name="user_agent"
+                                        Grid.Row="1"
+                                        Height="21"
+                                        HorizontalAlignment="Stretch"
+                                        Cursor="IBeam"
+                                        Style="{DynamicResource TextBoxCleanStyle_13}" />
                                 </Grid>
 
                                 <Grid Margin="0,15,0,0">
                                     <Grid.RowDefinitions>
-                                        <RowDefinition Height="20"/>
+                                        <RowDefinition Height="20" />
                                         <RowDefinition Height="*" />
-                                        <RowDefinition/>
+                                        <RowDefinition />
                                     </Grid.RowDefinitions>
-                                    <Label Content="Générer des tuiles transparentes en cas d'erreurs" Foreground="#888989" Grid.Row="0"/>
-                                    <ui:RadioButtons Grid.Row="1" x:Name="Options" Width="Auto">
-                                        <RadioButton x:Name="generate_transparent_tiles_on_error" Content="Toutes les erreurs (400, 403, 404, 429, ...)" />
-                                        <RadioButton x:Name="generate_transparent_tiles_on_404" Content="En cas d'erreur 404 (recommandée)"/>
-                                        <RadioButton x:Name="generate_transparent_tiles_never" Content="Jamais (causera l'echec du téléchargement)" />
+                                    <Label
+                                        Grid.Row="0"
+                                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameGenerateTransparentTilesInCaseOfErrors]}"
+                                        Foreground="#888989" />
+                                    <ui:RadioButtons
+                                        x:Name="Options"
+                                        Grid.Row="1"
+                                        Width="Auto">
+                                        <RadioButton x:Name="generate_transparent_tiles_on_error" Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyValuesGenerateTransparentTilesInCaseOfErrorsAll]}" />
+                                        <RadioButton x:Name="generate_transparent_tiles_on_404" Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyValuesGenerateTransparentTilesInCaseOfErrorsNotFound]}" />
+                                        <RadioButton x:Name="generate_transparent_tiles_never" Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyValuesGenerateTransparentTilesInCaseOfErrorsNever]}" />
                                     </ui:RadioButtons>
                                 </Grid>
                             </StackPanel>
+
                             <StackPanel x:Name="CarteSettings">
-                                <!--
-                                background_layer_opacity
-                                background_layer_color_R
-                                background_layer_color_G  -> From hex value
-                                background_layer_color_B
-                                NO_PIN_starting_location_latitude
-                                NO_PIN_starting_location_longitude
-                                SE_PIN_starting_location_latitude
-                                SE_PIN_starting_location_longitude
-                                map_defaut_zoom_level
-                                zoom_limite_taille_carte
-                                visibility_pins
-                                map_show_tile_border
-                                -->
-                                <Label x:Name="CarteSettingsLabel"  Content="Carte : " HorizontalAlignment="Left" Margin="0,20,0,0" VerticalAlignment="Top" Width="Auto" Height="25" FontSize="16.5" FontFamily="Segoe UI Semilight" Foreground="#FFE2E2E1"/>
+                                <Label
+                                    x:Name="CarteSettingsLabel"
+                                    Width="Auto"
+                                    Height="25"
+                                    Margin="0,20,0,0"
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Top"
+                                    Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsSubTitleMaps]}"
+                                    ContentStringFormat="{}{0} :"
+                                    FontFamily="Segoe UI Semilight"
+                                    FontSize="16.5"
+                                    Foreground="#FFE2E2E1" />
 
                                 <Grid Margin="0,10,0,0">
                                     <Grid.RowDefinitions>
-                                        <RowDefinition Height="20"/>
+                                        <RowDefinition Height="20" />
                                         <RowDefinition Height="*" />
-                                        <RowDefinition/>
                                     </Grid.RowDefinitions>
-                                    <Label Content="Couleur d'arrière plan (valeur HEX)" Foreground="#888989" Grid.Row="0"/>
-                                    <TextBox x:Name="background_layer_color" HorizontalAlignment="Stretch" Grid.Row="1" Style="{DynamicResource TextBoxCleanStyle_13}" Cursor="IBeam" Height="21"/>
+                                    <Label
+                                        Grid.Row="0"
+                                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameSearchEngine]}"
+                                        Foreground="#888989" />
+                                    <ComboBox
+                                        x:Name="search_engine"
+                                        Grid.Row="1"
+                                        Width="Auto"
+                                        Height="21"
+                                        Padding="5,0,0,1"
+                                        HorizontalAlignment="Stretch"
+                                        VerticalContentAlignment="Stretch"
+                                        Cursor="Arrow"
+                                        Foreground="#BCBCBC"
+                                        SelectedIndex="4">
+                                        <ComboBox.Resources>
+                                            <Style BasedOn="{StaticResource {x:Type ScrollBar}}" TargetType="{x:Type ScrollBar}">
+                                                <Setter Property="Margin" Value="0,0,-5,0" />
+                                            </Style>
+                                        </ComboBox.Resources>
+                                    </ComboBox>
                                 </Grid>
 
                                 <Grid Margin="0,10,0,0">
                                     <Grid.RowDefinitions>
-                                        <RowDefinition Height="20"/>
+                                        <RowDefinition Height="20" />
                                         <RowDefinition Height="*" />
-                                        <RowDefinition/>
+                                        <RowDefinition />
                                     </Grid.RowDefinitions>
-                                    <Label Content="Opacitée du calque d'arrière plan (en pourcentage)" Foreground="#888989" Grid.Row="0"/>
-                                    <TextBox x:Name="background_layer_opacity" HorizontalAlignment="Stretch" Grid.Row="1" Style="{DynamicResource TextBoxCleanStyle_13}" Cursor="IBeam" Height="21"/>
+                                    <Label
+                                        Grid.Row="0"
+                                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameBackgroundColorHexValue]}"
+                                        Foreground="#888989" />
+                                    <TextBox
+                                        x:Name="background_layer_color"
+                                        Grid.Row="1"
+                                        Height="21"
+                                        HorizontalAlignment="Stretch"
+                                        Cursor="IBeam"
+                                        Style="{DynamicResource TextBoxCleanStyle_13}" />
                                 </Grid>
 
                                 <Grid Margin="0,10,0,0">
                                     <Grid.RowDefinitions>
-                                        <RowDefinition Height="20"/>
+                                        <RowDefinition Height="20" />
                                         <RowDefinition Height="*" />
-                                        <RowDefinition/>
+                                        <RowDefinition />
+                                    </Grid.RowDefinitions>
+                                    <Label
+                                        Grid.Row="0"
+                                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameBackgroundLayerOpacityInPercentage]}"
+                                        Foreground="#888989" />
+                                    <TextBox
+                                        x:Name="background_layer_opacity"
+                                        Grid.Row="1"
+                                        Height="21"
+                                        HorizontalAlignment="Stretch"
+                                        Cursor="IBeam"
+                                        Style="{DynamicResource TextBoxCleanStyle_13}" />
+                                </Grid>
+
+                                <Grid Margin="0,10,0,0">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="20" />
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition />
                                     </Grid.RowDefinitions>
                                     <Grid.ColumnDefinitions>
-                                        <ColumnDefinition/>
-                                        <ColumnDefinition Width="10"/>
-                                        <ColumnDefinition/>
+                                        <ColumnDefinition />
+                                        <ColumnDefinition Width="10" />
+                                        <ColumnDefinition />
                                     </Grid.ColumnDefinitions>
-                                    <Label Content="Coordonnées Nord-Ouest du cadre de séléction au démarage (latitude / longitude)" Foreground="#888989" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3"/>
-                                    <TextBox x:Name="NO_PIN_starting_location_latitude" HorizontalAlignment="Stretch" Grid.Row="1" Grid.Column="0" Style="{DynamicResource TextBoxCleanStyle_13}" Cursor="IBeam" Height="21"/>
-                                    <TextBox x:Name="NO_PIN_starting_location_longitude" HorizontalAlignment="Stretch" Grid.Row="1" Grid.Column="2" Style="{DynamicResource TextBoxCleanStyle_13}" Cursor="IBeam" Height="21"/>
+                                    <Label
+                                        Grid.Row="0"
+                                        Grid.Column="0"
+                                        Grid.ColumnSpan="3"
+                                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameSelectionNorthwestCoordinatesAtStartup]}"
+                                        Foreground="#888989" />
+                                    <TextBox
+                                        x:Name="NO_PIN_starting_location_latitude"
+                                        Grid.Row="1"
+                                        Grid.Column="0"
+                                        Height="21"
+                                        HorizontalAlignment="Stretch"
+                                        Cursor="IBeam"
+                                        Style="{DynamicResource TextBoxCleanStyle_13}" />
+                                    <TextBox
+                                        x:Name="NO_PIN_starting_location_longitude"
+                                        Grid.Row="1"
+                                        Grid.Column="2"
+                                        Height="21"
+                                        HorizontalAlignment="Stretch"
+                                        Cursor="IBeam"
+                                        Style="{DynamicResource TextBoxCleanStyle_13}" />
                                 </Grid>
 
                                 <Grid Margin="0,10,0,0">
                                     <Grid.RowDefinitions>
-                                        <RowDefinition Height="20"/>
+                                        <RowDefinition Height="20" />
                                         <RowDefinition Height="*" />
-                                        <RowDefinition/>
+                                        <RowDefinition />
                                     </Grid.RowDefinitions>
                                     <Grid.ColumnDefinitions>
-                                        <ColumnDefinition/>
-                                        <ColumnDefinition Width="10"/>
-                                        <ColumnDefinition/>
+                                        <ColumnDefinition />
+                                        <ColumnDefinition Width="10" />
+                                        <ColumnDefinition />
                                     </Grid.ColumnDefinitions>
-                                    <Label Content="Coordonnées Sud-Est du cadre de séléction au démarage (latitude / longitude)" Foreground="#888989" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3"/>
-                                    <TextBox x:Name="SE_PIN_starting_location_latitude" HorizontalAlignment="Stretch" Grid.Row="1" Grid.Column="0" Style="{DynamicResource TextBoxCleanStyle_13}" Cursor="IBeam" Height="21"/>
-                                    <TextBox x:Name="SE_PIN_starting_location_longitude" HorizontalAlignment="Stretch" Grid.Row="1" Grid.Column="2" Style="{DynamicResource TextBoxCleanStyle_13}" Cursor="IBeam" Height="21"/>
+                                    <Label
+                                        Grid.Row="0"
+                                        Grid.Column="0"
+                                        Grid.ColumnSpan="3"
+                                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameSelectionSoutheastCoordinatesAtStartup]}"
+                                        Foreground="#888989" />
+                                    <TextBox
+                                        x:Name="SE_PIN_starting_location_latitude"
+                                        Grid.Row="1"
+                                        Grid.Column="0"
+                                        Height="21"
+                                        HorizontalAlignment="Stretch"
+                                        Cursor="IBeam"
+                                        Style="{DynamicResource TextBoxCleanStyle_13}" />
+                                    <TextBox
+                                        x:Name="SE_PIN_starting_location_longitude"
+                                        Grid.Row="1"
+                                        Grid.Column="2"
+                                        Height="21"
+                                        HorizontalAlignment="Stretch"
+                                        Cursor="IBeam"
+                                        Style="{DynamicResource TextBoxCleanStyle_13}" />
                                 </Grid>
 
                                 <Grid Margin="0,15,0,0">
                                     <Grid.RowDefinitions>
-                                        <RowDefinition Height="20"/>
+                                        <RowDefinition Height="20" />
                                         <RowDefinition Height="*" />
                                     </Grid.RowDefinitions>
-                                    <CheckBox x:Name="visibility_pins" Foreground="#888989" Grid.Row="0" Content="Afficher les coordonnées des coins du cadre de séléction"/>
+                                    <CheckBox
+                                        x:Name="visibility_pins"
+                                        Grid.Row="0"
+                                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameDisplayCornerSelectionCoordinates]}"
+                                        Foreground="#888989" />
                                 </Grid>
 
                                 <Grid Margin="0,10,0,0">
                                     <Grid.RowDefinitions>
-                                        <RowDefinition Height="20"/>
+                                        <RowDefinition Height="20" />
                                         <RowDefinition Height="*" />
-                                        <RowDefinition/>
+                                        <RowDefinition />
                                     </Grid.RowDefinitions>
-                                    <Label Content="Zoom par défaut au démarage" Foreground="#888989" Grid.Row="0"/>
-                                    <TextBox x:Name="map_defaut_zoom_level" TextChanged="FilterDigitTextBox_TextChanged" HorizontalAlignment="Stretch" Grid.Row="1" Style="{DynamicResource TextBoxCleanStyle_13}" Cursor="IBeam" Height="21"/>
+                                    <Label
+                                        Grid.Row="0"
+                                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameDefaultZoomAtStartup]}"
+                                        Foreground="#888989" />
+                                    <TextBox
+                                        x:Name="map_defaut_zoom_level"
+                                        Grid.Row="1"
+                                        Height="21"
+                                        HorizontalAlignment="Stretch"
+                                        Cursor="IBeam"
+                                        Style="{DynamicResource TextBoxCleanStyle_13}"
+                                        TextChanged="FilterDigitTextBox_TextChanged" />
                                 </Grid>
 
                                 <Grid Margin="0,15,0,0">
                                     <Grid.RowDefinitions>
-                                        <RowDefinition Height="20"/>
+                                        <RowDefinition Height="20" />
                                         <RowDefinition Height="*" />
                                     </Grid.RowDefinitions>
-                                    <CheckBox x:Name="zoom_limite_taille_carte" Foreground="#888989" Grid.Row="0" Content="Limiter le zoom de la carte au zoom minimum du calque"/>
+                                    <CheckBox
+                                        x:Name="zoom_limite_taille_carte"
+                                        Grid.Row="0"
+                                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameLimitMapZoomToMinimumLayerZoom]}"
+                                        Foreground="#888989" />
                                 </Grid>
 
                                 <Grid Margin="0,10,0,0">
                                     <Grid.RowDefinitions>
-                                        <RowDefinition Height="20"/>
+                                        <RowDefinition Height="20" />
                                         <RowDefinition Height="*" />
                                     </Grid.RowDefinitions>
-                                    <CheckBox x:Name="map_show_tile_border" Foreground="#888989" Grid.Row="0" Content="Afficher les bordures de tuiles"/>
+                                    <CheckBox
+                                        x:Name="map_show_tile_border"
+                                        Grid.Row="0"
+                                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameDisplayTileBorders]}"
+                                        Foreground="#888989" />
                                 </Grid>
-
                             </StackPanel>
                             <StackPanel x:Name="AvanceSettings">
-                                <!--
-                                is_in_debug_mode
-                                show_layer_devtool
-                                show_download_devtool
-                                database_default_path_url
-                                default_database_pathname
-                                -->
-                                <Label x:Name="AvanceSettingsLabel"  Content="Options avancée : " HorizontalAlignment="Left" Margin="0,20,0,0" VerticalAlignment="Top" Width="Auto" Height="25" FontSize="16.5" FontFamily="Segoe UI Semilight" Foreground="#FFE2E2E1"/>
+                                <Label
+                                    x:Name="AvanceSettingsLabel"
+                                    Width="Auto"
+                                    Height="25"
+                                    Margin="0,20,0,0"
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Top"
+                                    Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsSubTitleAdvancedOptions]}"
+                                    ContentStringFormat="{}{0} :"
+                                    FontFamily="Segoe UI Semilight"
+                                    FontSize="16.5"
+                                    Foreground="#FFE2E2E1" />
 
                                 <Grid Margin="0,10,0,0">
                                     <Grid.RowDefinitions>
-                                        <RowDefinition Height="20"/>
+                                        <RowDefinition Height="20" />
                                         <RowDefinition Height="*" />
-                                        <RowDefinition/>
+                                        <RowDefinition />
                                     </Grid.RowDefinitions>
-                                    <Label Content="Nom du fichier de base de donnée" Foreground="#888989" Grid.Row="0"/>
-                                    <TextBox x:Name="database_pathname" HorizontalAlignment="Stretch" Grid.Row="1" Style="{DynamicResource TextBoxCleanStyle_13}" Cursor="IBeam" Height="21"/>
+                                    <Label
+                                        Grid.Row="0"
+                                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameDatabaseFileName]}"
+                                        Foreground="#888989" />
+                                    <TextBox
+                                        x:Name="database_pathname"
+                                        Grid.Row="1"
+                                        Height="21"
+                                        HorizontalAlignment="Stretch"
+                                        Cursor="IBeam"
+                                        Style="{DynamicResource TextBoxCleanStyle_13}" />
                                 </Grid>
                                 <Grid Margin="0,10,0,0">
                                     <Grid.RowDefinitions>
-                                        <RowDefinition Height="20"/>
+                                        <RowDefinition Height="20" />
                                         <RowDefinition Height="*" />
-                                        <RowDefinition/>
+                                        <RowDefinition />
                                     </Grid.RowDefinitions>
-                                    <Label Content="selection_rectangle_resize_tblr_gap" Foreground="#888989" Grid.Row="0"/>
-                                    <TextBox x:Name="selection_rectangle_resize_tblr_gap" TextChanged="FilterDigitTextBox_TextChanged" HorizontalAlignment="Stretch" Grid.Row="1" Style="{DynamicResource TextBoxCleanStyle_13}" Cursor="IBeam" Height="21"/>
-                                </Grid>
-
-                                <Grid Margin="0,10,0,0">
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="20"/>
-                                        <RowDefinition Height="*" />
-                                        <RowDefinition/>
-                                    </Grid.RowDefinitions>
-                                    <Label Content="selection_rectangle_resize_angle_gap" Foreground="#888989" Grid.Row="0"/>
-                                    <TextBox x:Name="selection_rectangle_resize_angle_gap" TextChanged="FilterDigitTextBox_TextChanged" HorizontalAlignment="Stretch" Grid.Row="1" Style="{DynamicResource TextBoxCleanStyle_13}" Cursor="IBeam" Height="21"/>
-                                </Grid>
-
-                                <Grid Margin="0,10,0,0">
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="20"/>
-                                        <RowDefinition Height="*" />
-                                    </Grid.RowDefinitions>
-                                    <CheckBox x:Name="is_in_debug_mode" Foreground="#888989" Grid.Row="0" Content="Activer le débuggage"/>
-                                </Grid>
-
-                                <Grid Margin="0,10,0,0">
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="20"/>
-                                        <RowDefinition Height="*" />
-                                    </Grid.RowDefinitions>
-                                    <CheckBox x:Name="show_layer_devtool" Foreground="#888989" Grid.Row="0" Content="Afficher les devtool pour le panneau &quot;Calques&quot;"/>
+                                    <Label
+                                        Grid.Row="0"
+                                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameSelectionRectangleResizeMargin]}"
+                                        Foreground="#888989" />
+                                    <TextBox
+                                        x:Name="selection_rectangle_resize_tblr_gap"
+                                        Grid.Row="1"
+                                        Height="21"
+                                        HorizontalAlignment="Stretch"
+                                        Cursor="IBeam"
+                                        Style="{DynamicResource TextBoxCleanStyle_13}"
+                                        TextChanged="FilterDigitTextBox_TextChanged" />
                                 </Grid>
 
                                 <Grid Margin="0,10,0,0">
                                     <Grid.RowDefinitions>
-                                        <RowDefinition Height="20"/>
+                                        <RowDefinition Height="20" />
                                         <RowDefinition Height="*" />
+                                        <RowDefinition />
                                     </Grid.RowDefinitions>
-                                    <CheckBox x:Name="show_download_devtool" Foreground="#888989" Grid.Row="0" Content="Afficher les devtool pour le panneau &quot;Téléchargements&quot;"/>
+                                    <Label
+                                        Grid.Row="0"
+                                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameSelectionRectangleAngularResizeMargin]}"
+                                        Foreground="#888989" />
+                                    <TextBox
+                                        x:Name="selection_rectangle_resize_angle_gap"
+                                        Grid.Row="1"
+                                        Height="21"
+                                        HorizontalAlignment="Stretch"
+                                        Cursor="IBeam"
+                                        Style="{DynamicResource TextBoxCleanStyle_13}"
+                                        TextChanged="FilterDigitTextBox_TextChanged" />
                                 </Grid>
-
 
                                 <Grid Margin="0,10,0,0">
                                     <Grid.RowDefinitions>
-                                        <RowDefinition Height="20"/>
+                                        <RowDefinition Height="20" />
                                         <RowDefinition Height="*" />
                                     </Grid.RowDefinitions>
-                                    <CheckBox x:Name="nettoyer_cache_browser_au_demarrage" Foreground="#888989" Grid.Row="0" Content="Supprimer le cache des panneaux au démarrage"/>
+                                    <CheckBox
+                                        x:Name="is_in_debug_mode"
+                                        Grid.Row="0"
+                                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameEnableDebugging]}"
+                                        Foreground="#888989" />
                                 </Grid>
 
                                 <Grid Margin="0,10,0,0">
                                     <Grid.RowDefinitions>
-                                        <RowDefinition Height="20"/>
+                                        <RowDefinition Height="20" />
                                         <RowDefinition Height="*" />
                                     </Grid.RowDefinitions>
-                                    <CheckBox x:Name="nettoyer_cache_layers_au_demarrage" Foreground="#888989" Grid.Row="0" Content="Supprimer le cache des tuiles au démarrage"/>
+                                    <CheckBox
+                                        x:Name="show_layer_devtool"
+                                        Grid.Row="0"
+                                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameDisplayDevToolsForLayersPanel]}"
+                                        Foreground="#888989" />
                                 </Grid>
-                                <Button x:Name="resetSettings" Content="Restaurer les paramètres par défaut" Margin="0,10,0,0" Foreground="#BCBCBC" Click="ResetSettings_Click"/>
+
+                                <Grid Margin="0,10,0,0">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="20" />
+                                        <RowDefinition Height="*" />
+                                    </Grid.RowDefinitions>
+                                    <CheckBox
+                                        x:Name="show_download_devtool"
+                                        Grid.Row="0"
+                                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameDisplayDevToolsForDownloadsPanel]}"
+                                        Foreground="#888989" />
+                                </Grid>
+
+                                <Grid Margin="0,10,0,0">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="20" />
+                                        <RowDefinition Height="*" />
+                                    </Grid.RowDefinitions>
+                                    <CheckBox
+                                        x:Name="nettoyer_cache_browser_au_demarrage"
+                                        Grid.Row="0"
+                                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameClearPanelsCacheAtStartup]}"
+                                        Foreground="#888989" />
+                                </Grid>
+
+                                <Grid Margin="0,10,0,0">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="20" />
+                                        <RowDefinition Height="*" />
+                                    </Grid.RowDefinitions>
+                                    <CheckBox
+                                        x:Name="nettoyer_cache_layers_au_demarrage"
+                                        Grid.Row="0"
+                                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameClearTilesCacheAtStartup]}"
+                                        Foreground="#888989" />
+                                </Grid>
+                                <Button
+                                    x:Name="resetSettings"
+                                    Margin="0,10,0,0"
+                                    Click="ResetSettings_Click"
+                                    Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameResetToDefaultSettings]}"
+                                    Foreground="#BCBCBC" />
                             </StackPanel>
 
                             <StackPanel x:Name="UpdateSettings">
-                                <Label x:Name="UpdateSettingsLabel" Content="Mises à jour : " HorizontalAlignment="Left" Margin="0,20,0,0" VerticalAlignment="Top" Width="Auto" Height="25" FontSize="16.5" FontFamily="Segoe UI Semilight" Foreground="#FFE2E2E1"/>
+                                <Label
+                                    x:Name="UpdateSettingsLabel"
+                                    Width="Auto"
+                                    Height="25"
+                                    Margin="0,20,0,0"
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Top"
+                                    Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsSubTitleUpdates]}"
+                                    ContentStringFormat="{}{0} :"
+                                    FontFamily="Segoe UI Semilight"
+                                    FontSize="16.5"
+                                    Foreground="#FFE2E2E1" />
 
 
                                 <Grid Margin="0,10,0,0">
                                     <Grid.RowDefinitions>
-                                        <RowDefinition Height="20"/>
+                                        <RowDefinition Height="20" />
                                         <RowDefinition Height="*" />
-                                        <RowDefinition/>
+                                        <RowDefinition />
                                     </Grid.RowDefinitions>
-                                    <Label Content="Github repository URL" Foreground="#888989" Grid.Row="0"/>
-                                    <TextBox x:Name="github_repository_url" HorizontalAlignment="Stretch" Grid.Row="1" Style="{DynamicResource TextBoxCleanStyle_13}" Cursor="IBeam" Height="21"/>
+                                    <Label
+                                        Grid.Row="0"
+                                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameGitHubRepositoryURL]}"
+                                        Foreground="#888989" />
+                                    <TextBox
+                                        x:Name="github_repository_url"
+                                        Grid.Row="1"
+                                        Height="21"
+                                        HorizontalAlignment="Stretch"
+                                        Cursor="IBeam"
+                                        Style="{DynamicResource TextBoxCleanStyle_13}" />
                                 </Grid>
                                 <Grid Margin="0,10,0,0">
                                     <Grid.RowDefinitions>
-                                        <RowDefinition Height="20"/>
+                                        <RowDefinition Height="20" />
                                         <RowDefinition Height="*" />
-                                        <RowDefinition/>
+                                        <RowDefinition />
                                     </Grid.RowDefinitions>
-                                    <Label Content="Nom du fichier database sur github" Foreground="#888989" Grid.Row="0"/>
-                                    <TextBox x:Name="github_database_name" HorizontalAlignment="Stretch" Grid.Row="1" Style="{DynamicResource TextBoxCleanStyle_13}" Cursor="IBeam" Height="21"/>
+                                    <Label
+                                        Grid.Row="0"
+                                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameDatabaseFileNameInGitHubRepository]}"
+                                        Foreground="#888989" />
+                                    <TextBox
+                                        x:Name="github_database_name"
+                                        Grid.Row="1"
+                                        Height="21"
+                                        HorizontalAlignment="Stretch"
+                                        Cursor="IBeam"
+                                        Style="{DynamicResource TextBoxCleanStyle_13}" />
                                 </Grid>
 
                                 <Grid Margin="0,10,0,0">
                                     <Grid.RowDefinitions>
-                                        <RowDefinition Height="20"/>
+                                        <RowDefinition Height="20" />
                                         <RowDefinition Height="*" />
                                     </Grid.RowDefinitions>
-                                    <CheckBox x:Name="search_application_update_on_startup" Foreground="#888989" Grid.Row="0" Content="Rechercher les mises à jour de l'application au démarage du logiciel"/>
+                                    <CheckBox
+                                        x:Name="search_application_update_on_startup"
+                                        Grid.Row="0"
+                                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameCheckForApplicationUpdatesOnSoftwareLaunch]}"
+                                        Foreground="#888989" />
                                 </Grid>
                                 <Grid Margin="0,10,0,0">
                                     <Grid.RowDefinitions>
-                                        <RowDefinition Height="20"/>
+                                        <RowDefinition Height="20" />
                                         <RowDefinition Height="*" />
                                     </Grid.RowDefinitions>
-                                    <CheckBox x:Name="search_database_update_on_startup" Foreground="#888989" Grid.Row="0" Content="Rechercher les mises à jour de la base de donnée au démarage du logiciel"/>
+                                    <CheckBox
+                                        x:Name="search_database_update_on_startup"
+                                        Grid.Row="0"
+                                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameCheckDatabaseUpdatesOnSoftwareLaunch]}"
+                                        Foreground="#888989" />
                                 </Grid>
 
-                                <Button x:Name="databaseExport" Content="Exporter la base de donnée" Margin="0,10,0,0" Foreground="#BCBCBC" Click="databaseExport_Click"/>
-                                
-                                <Button x:Name="searchForUpdates" Content="Rechercher des mises à jours" Margin="0,10,0,0" Foreground="#BCBCBC" Click="searchForUpdates_Click"/>
-                                <Label x:Name="searchForUpdatesLastUpdateCheck" ContentStringFormat="Dernière verification : {0}" Content="01/01/1970" Foreground="#888989"/>
+                                <Button
+                                    x:Name="databaseExport"
+                                    Margin="0,10,0,0"
+                                    Click="DatabaseExport_Click"
+                                    Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameExportDatabase]}"
+                                    Foreground="#BCBCBC" />
+                                <Button
+                                    x:Name="searchForUpdates"
+                                    Margin="0,10,0,0"
+                                    Click="SearchForUpdates_Click"
+                                    Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameCheckApplicationUpdates]}"
+                                    Foreground="#BCBCBC" />
+                                <Label
+                                    x:Name="searchForUpdatesLastUpdateCheck"
+                                    Content="Unknown"
+                                    Foreground="#888989">
+                                    <Label.ContentStringFormat>
+                                        <MultiBinding StringFormat="{}{0} {1}">
+                                            <Binding Path="[settingsPropertyNameLastApplicationUpdatesCheck]" Source="{x:Static commun:Languages.Current}" />
+                                            <Binding ElementName="searchForUpdatesLastUpdateCheck" Path="Content" />
+                                        </MultiBinding>
+                                    </Label.ContentStringFormat>
+                                </Label>
                             </StackPanel>
 
                             <StackPanel x:Name="AProposSettings">
-                                <Label x:Name="AProposSettingsLabel"  Content="A propos : " HorizontalAlignment="Left" Margin="0,20,0,0" VerticalAlignment="Top" Width="Auto" Height="25" FontSize="16.5" FontFamily="Segoe UI Semilight" Foreground="#FFE2E2E1"/>
-                                <Label Content="MapsInMyFolder" Foreground="#888989"/>
-                                <Label x:Name="SettingsVersionInformation" Content="/" ContentStringFormat="Version : {0}" Foreground="#888989"/>
+                                <Label
+                                    x:Name="AProposSettingsLabel"
+                                    Width="Auto"
+                                    Height="25"
+                                    Margin="0,20,0,0"
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Top"
+                                    Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsSubTitleAbout]}"
+                                    ContentStringFormat="{}{0} :"
+                                    FontFamily="Segoe UI Semilight"
+                                    FontSize="16.5"
+                                    Foreground="#FFE2E2E1" />
+                                <Label Content="MapsInMyFolder" Foreground="#888989" />
+                                <Label
+                                    x:Name="SettingsVersionInformation"
+                                    Content="/"
+                                    ContentStringFormat="Version : {0}"
+                                    Foreground="#888989" />
                                 <WrapPanel VerticalAlignment="Center">
-                                    <Label Content="Github : " Foreground="#888989"/>
-                                    <ui:HyperlinkButton Content="https://github.com/SioGabx/MapsInMyFolder" NavigateUri="https://github.com/SioGabx/MapsInMyFolder"/>
+                                    <Label Content="Github : " Foreground="#888989" />
+                                    <ui:HyperlinkButton Content="https://github.com/SioGabx/MapsInMyFolder" NavigateUri="https://github.com/SioGabx/MapsInMyFolder" />
                                 </WrapPanel>
-                                <Label Content="Copyright © SioGabx - François HOFFMANN" Foreground="#888989"/>
-                                <ui:HyperlinkButton Content="https://siogabx.fr/" NavigateUri="https://siogabx.fr/"/>
+                                <Label Content="Copyright © SioGabx - François HOFFMANN" Foreground="#888989" />
+                                <ui:HyperlinkButton Content="https://siogabx.fr/" NavigateUri="https://siogabx.fr/" />
                                 <StackPanel Margin="0,10,0,0">
                                     <WrapPanel>
-                                        <Label Content="Credits (merci à eux " Foreground="#888989"/>
-                                        <Label Content="♥" Foreground="#F18712"/>
-                                        <Label Content="):" Foreground="#888989"/>
+                                        <Label Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameCredits]}" Foreground="#888989" />
+                                        <Label Content=" (merci à eux pour leurs librairies " Foreground="#888989" />
+                                        <Label Content="♥" Foreground="#F18712" />
+                                        <Label Content="):" Foreground="#888989" />
                                     </WrapPanel>
                                     <StackPanel Margin="10,0,0,0">
                                         <WrapPanel VerticalAlignment="Center">
-                                            <Label Content="- Kinnara : " Foreground="#888989"/>
-                                            <ui:HyperlinkButton Content="ModernWpf" NavigateUri="https://github.com/Kinnara/ModernWpf"/>
+                                            <Label Content="- Kinnara : " Foreground="#888989" />
+                                            <ui:HyperlinkButton Content="ModernWpf" NavigateUri="https://github.com/Kinnara/ModernWpf" />
                                         </WrapPanel>
                                         <WrapPanel VerticalAlignment="Center">
-                                            <Label Content="- Clemens Fischer : " Foreground="#888989"/>
-                                            <ui:HyperlinkButton Content="XAML-Map-Control" NavigateUri="https://github.com/ClemensFischer/XAML-Map-Control"/>
+                                            <Label Content="- Clemens Fischer : " Foreground="#888989" />
+                                            <ui:HyperlinkButton Content="XAML-Map-Control" NavigateUri="https://github.com/ClemensFischer/XAML-Map-Control" />
                                         </WrapPanel>
                                         <WrapPanel VerticalAlignment="Center">
-                                            <Label Content="- AliFlux : " Foreground="#888989"/>
-                                            <ui:HyperlinkButton Content="VectorTileRenderer" NavigateUri="https://github.com/AliFlux/VectorTileRenderer"/>
-                                        </WrapPanel>
-                                        <WrapPanel VerticalAlignment="Center">
-                                            <Label Content="- CefSharp community : " Foreground="#888989"/>
-                                            <ui:HyperlinkButton Content="CefSharp" NavigateUri="https://github.com/cefsharp/CefSharp"/>
-                                        </WrapPanel>
-                                        <WrapPanel VerticalAlignment="Center">
-                                            <Label Content="- Libvips community &amp; kleisauke : " Foreground="#888989"/>
-                                            <ui:HyperlinkButton Content="libvips" NavigateUri="https://github.com/libvips/libvips"/>
-                                            <Label Foreground="#888989" Content=" / "/>
-                                            <ui:HyperlinkButton Content="net-vips" NavigateUri="https://github.com/kleisauke/net-vips"/>
+                                            <Label Content="- AliFlux : " Foreground="#888989" />
+                                            <ui:HyperlinkButton Content="VectorTileRenderer" NavigateUri="https://github.com/AliFlux/VectorTileRenderer" />
                                         </WrapPanel>
 
-
-                                        <StackPanel Height="125"/>
-
+                                        <WrapPanel VerticalAlignment="Center">
+                                            <Label Content="- SQLite Development Team : " Foreground="#888989" />
+                                            <ui:HyperlinkButton
+                                                Content="SQLite Database"
+                                                Cursor="Hand"
+                                                NavigateUri="https://system.data.sqlite.org/" />
+                                        </WrapPanel>
+                                        <WrapPanel VerticalAlignment="Center">
+                                            <Label Content="- Libvips community &amp; kleisauke : " Foreground="#888989" />
+                                            <ui:HyperlinkButton Content="libvips" NavigateUri="https://github.com/libvips/libvips" />
+                                            <Label Content=" / " Foreground="#888989" />
+                                            <ui:HyperlinkButton Content="net-vips" NavigateUri="https://github.com/kleisauke/net-vips" />
+                                        </WrapPanel>
+                                        <WrapPanel VerticalAlignment="Center">
+                                            <Label Content="- CefSharp community : " Foreground="#888989" />
+                                            <ui:HyperlinkButton Content="CefSharp" NavigateUri="https://github.com/cefsharp/CefSharp" />
+                                        </WrapPanel>
+                                        <WrapPanel VerticalAlignment="Center">
+                                            <Label Content="- AvalonEdit Contributors : " Foreground="#888989" />
+                                            <ui:HyperlinkButton Content="AvalonEdit" NavigateUri="http://avalonedit.net/" />
+                                        </WrapPanel>
+                                        <StackPanel Height="125" />
                                     </StackPanel>
                                 </StackPanel>
                             </StackPanel>
@@ -690,17 +1256,6 @@
                     </ScrollViewer>
                 </Grid>
             </Grid>
-
         </Grid>
-
-
-        <!--<ui:ContentDialog x:Name="Dialogue"
-    Title="title"
-    PrimaryButtonText="primary button"
-    SecondaryButtonText="secondary button"
-    CloseButtonText="Cancel"
-    DefaultButton="Primary" d:IsHidden="True" Background="#171719">
-        </ui:ContentDialog>-->
-
     </Grid>
 </Window>

@@ -6,6 +6,12 @@ using System.Windows;
 namespace MapsInMyFolder.Commun
 {
     public enum ListDisplayType { BIG, CONDENSED, SMALL, LIST, LIST_ALTERNAT }
+    public enum SearchEngines
+    {
+        OpenStreetMap,
+        BingMaps,
+        ArcGIS
+    }
 
     public static class Settings
     {
@@ -46,7 +52,7 @@ namespace MapsInMyFolder.Commun
         public static string tileloader_default_script = "//default script\nfunction getTile(args) {\n   return args;\n}";
         public static string tileloader_template_script = "function getTile(args) {\n   return args;\n}\n\nfunction getPreview(args){\n   return getTile(args);\n}\n\nfunction getPreviewFallback(args){\n   return getTile(args);\n}";
         public static string user_agent = "Mozilla/4.0 (Compatible; Windows NT 5.1; MSIE 6.0) (compatible; MSIE 6.0; Windows NT 5.1; .NET CLR 1.1.4322; .NET CLR 2.0.50727)";
-        public static string layers_Sort = "ID ASC";
+        public static string layers_Sort = "SITE ASC,NAME ASC";
         public static string database_pathname = "MapsInMyFolder_Database.db";
         public static Visibility visibility_pins = Visibility.Hidden;
         public static double selection_rectangle_resize_tblr_gap = 15;
@@ -60,8 +66,8 @@ namespace MapsInMyFolder.Commun
         public static bool search_application_update_on_startup = true;
         public static bool search_database_update_on_startup = true;
 
-
-
+        public static SearchEngines search_engine = SearchEngines.OpenStreetMap;
+        public static Languages.Language application_languages = Languages.Language.English;
 
         public static bool editor_autoupdatelayer = true;
 
@@ -116,7 +122,7 @@ namespace MapsInMyFolder.Commun
                 string value = XMLParser.Settings.Read(fieldName);
                 bool IsErrorOnConvert = false;
 
-                if (!(value is null))
+                if (value is not null)
                 {
                     object ConvertedValue;
                     Type value_type = fieldValue.GetType();
@@ -143,7 +149,7 @@ namespace MapsInMyFolder.Commun
                     {
                         ConvertedValue = Convert.ChangeType(fieldValue, value_type);
                         IsErrorOnConvert = true;
-                        Message.NoReturnBoxAsync("Une mauvaise valeur à été détécté dans les paramètres ! La valeur par défault à été réappliqué \n    - Nom : " + fieldName + "\n    - Valeur : " + value + "\n    - Valeur par defaut : " + fieldValue, "Erreur");
+                        Message.NoReturnBoxAsync(Languages.GetWithArguments("settingsMessageErrorWrongValueOnLoad", fieldName, value, fieldValue), Languages.Current["dialogTitleOperationFailed"]);
                     }
                     finally
                     {
@@ -155,7 +161,6 @@ namespace MapsInMyFolder.Commun
                     type.GetField(fieldName).SetValue(null, ConvertedValue);
                 }
             }
-
         }
 
         public static void SaveSettings()

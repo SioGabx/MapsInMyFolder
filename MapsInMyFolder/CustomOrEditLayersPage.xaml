@@ -1,19 +1,24 @@
-﻿<Page x:Class="MapsInMyFolder.CustomOrEditLayersPage"
-      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-      xmlns:cbcontrols="clr-namespace:BlackPearl.Controls.CoreLibrary;assembly=BlackPearl.Controls.CoreLibrary"
-      xmlns:avalonEdit="clr-namespace:ICSharpCode.AvalonEdit;assembly=ICSharpCode.AvalonEdit"
-      xmlns:editing="clr-namespace:ICSharpCode.AvalonEdit.Editing;assembly=ICSharpCode.AvalonEdit"
-      xmlns:local="clr-namespace:MapsInMyFolder" xmlns:ui="http://schemas.modernwpf.com/2019" xmlns:map="clr-namespace:MapsInMyFolder.MapControl;assembly=MapsInMyFolder.MapControl" xmlns:sys="clr-namespace:System;assembly=netstandard"
-      mc:Ignorable="d" 
-      d:DesignHeight="450" d:DesignWidth="800"
-      Title="CustomOrEditLayersPage" KeyDown="Page_KeyDown">
+﻿<Page
+    x:Class="MapsInMyFolder.CustomOrEditLayersPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:avalonEdit="clr-namespace:ICSharpCode.AvalonEdit;assembly=ICSharpCode.AvalonEdit"
+    xmlns:cbcontrols="clr-namespace:BlackPearl.Controls.CoreLibrary;assembly=BlackPearl.Controls.CoreLibrary"
+    xmlns:commun="clr-namespace:MapsInMyFolder.Commun;assembly=MapsInMyFolder.Commun"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:map="clr-namespace:MapsInMyFolder.MapControl;assembly=MapsInMyFolder.MapControl"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ui="http://schemas.modernwpf.com/2019"
+    x:Name="CustomOrEditLayers"
+    Title="CustomOrEditLayersPage"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    KeyDown="Page_KeyDown"
+    mc:Ignorable="d">
     <Page.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="RessourcesDictionnary.xaml"/>
+                <ResourceDictionary Source="RessourcesDictionnary.xaml" />
                 <ResourceDictionary>
                     <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="#454546" />
                     <SolidColorBrush x:Key="ButtonBackgroundPressed" Color="#454546" />
@@ -25,74 +30,147 @@
     </Page.Resources>
     <Grid x:Name="EditeurGrid">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition  MinWidth="400" Width="*"/>
-            <ColumnDefinition MinWidth="300" MaxWidth="800" Width="*" />
+            <ColumnDefinition Width="*" MinWidth="400" />
+            <ColumnDefinition
+                Width="*"
+                MinWidth="300"
+                MaxWidth="800" />
         </Grid.ColumnDefinitions>
 
         <Grid Grid.Column="0" Background="#FF171719">
             <Grid.RowDefinitions>
-                <RowDefinition Height="60"/>
-                <RowDefinition Height="*" x:Name="MainContentScrollRow" MinHeight="350"/>
+                <RowDefinition Height="60" />
+                <RowDefinition
+                    x:Name="MainContentScrollRow"
+                    Height="*"
+                    MinHeight="350" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" x:Name="MainContentScrollColumn"/>
-                <ColumnDefinition Width="0"/>
+                <ColumnDefinition x:Name="MainContentScrollColumn" Width="*" />
+                <ColumnDefinition Width="0" />
             </Grid.ColumnDefinitions>
-            <Label Grid.Row="0" x:Name="CalqueType" Content="Nouveau calque" HorizontalAlignment="Left" Margin="28,10,0,0" VerticalAlignment="Top" Width="Auto" Height="50" FontSize="30" FontFamily="Segoe UI Light" Foreground="#FFE2E2E1"/>
-            <Rectangle Grid.Row="0" Width="80" HorizontalAlignment="Right">
+            <Label
+                x:Name="CalqueType"
+                Grid.Row="0"
+                Width="Auto"
+                Height="50"
+                Margin="28,10,0,0"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"
+                Content="{Binding Source={x:Static commun:Languages.Current}, Path=[editorTitleNewLayer]}"
+                FontFamily="Segoe UI Light"
+                FontSize="30"
+                Foreground="#FFE2E2E1" />
+            <Rectangle
+                Grid.Row="0"
+                Width="80"
+                HorizontalAlignment="Right">
                 <Rectangle.Fill>
-                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0" SpreadMethod="Pad">
+                    <LinearGradientBrush SpreadMethod="Pad" StartPoint="0.5,0" EndPoint="0.5,1">
                         <LinearGradientBrush.RelativeTransform>
                             <TransformGroup>
-                                <ScaleTransform CenterY="0.5" CenterX="0.5"/>
-                                <SkewTransform CenterY="0.5" CenterX="0.5"/>
-                                <RotateTransform Angle="-90" CenterY="0.5" CenterX="0.5"/>
-                                <TranslateTransform/>
+                                <ScaleTransform CenterX="0.5" CenterY="0.5" />
+                                <SkewTransform CenterX="0.5" CenterY="0.5" />
+                                <RotateTransform Angle="-90" CenterX="0.5" CenterY="0.5" />
+                                <TranslateTransform />
                             </TransformGroup>
                         </LinearGradientBrush.RelativeTransform>
-                        <GradientStop Color="#FF171719" Offset="1"/>
-                        <GradientStop Color="#FF171719" Offset="0.8"/>
-                        <GradientStop Color="#00171719" Offset="0"/>
+                        <GradientStop Offset="1" Color="#FF171719" />
+                        <GradientStop Offset="0.8" Color="#FF171719" />
+                        <GradientStop Offset="0" Color="#00171719" />
                     </LinearGradientBrush>
                 </Rectangle.Fill>
             </Rectangle>
-            <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.Row="1" Grid.Column="0" x:Name="EditeurScrollBar" CanContentScroll="False">
-                <StackPanel Margin="17,0,32,0" x:Name="EditeurStackPanel">
-                    <Label x:Name="EditeurType" Content="Editeur : " HorizontalAlignment="Left" Margin="0,0,0,0" VerticalAlignment="Top" Width="Auto" Height="25" FontSize="16.5" FontFamily="Segoe UI Semilight" Foreground="#FFE2E2E1"/>
+            <ScrollViewer
+                x:Name="EditeurScrollBar"
+                Grid.Row="1"
+                Grid.Column="0"
+                CanContentScroll="False"
+                VerticalScrollBarVisibility="Auto">
+                <StackPanel x:Name="EditeurStackPanel" Margin="17,0,32,0">
+                    <Label
+                        x:Name="EditeurType"
+                        Width="Auto"
+                        Height="25"
+                        Margin="0,0,0,0"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Top"
+                        Content="{Binding Source={x:Static commun:Languages.Current}, Path=[editorSubTitleEditor]}"
+                        FontFamily="Segoe UI Semilight"
+                        FontSize="16.5"
+                        Foreground="#FFE2E2E1" />
 
                     <Grid Margin="0,10,0,0">
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="20"/>
+                            <RowDefinition Height="20" />
                             <RowDefinition Height="*" />
-                            <RowDefinition/>
+                            <RowDefinition />
                         </Grid.RowDefinitions>
-                        <Label Content="Nom :" Foreground="#888989" Grid.Row="0"></Label>
-                        <TextBox x:Name="TextboxLayerName" HorizontalAlignment="Stretch" Grid.Row="1" Style="{DynamicResource TextBoxCleanStyle_13}" Cursor="IBeam" LostFocus="TextboxLayerName_LostFocus"></TextBox>
+                        <Label
+                            Grid.Row="0"
+                            Content="{Binding Source={x:Static commun:Languages.Current}, Path=[editorPropertyNameName]}"
+                            Foreground="#888989" />
+                        <TextBox
+                            x:Name="TextboxLayerName"
+                            Grid.Row="1"
+                            HorizontalAlignment="Stretch"
+                            Cursor="IBeam"
+                            LostFocus="TextboxLayerName_LostFocus"
+                            Style="{DynamicResource TextBoxCleanStyle_13}" />
                     </Grid>
 
                     <Grid Margin="0,10,0,0">
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="20"/>
+                            <RowDefinition Height="20" />
                             <RowDefinition Height="*" />
-                            <RowDefinition/>
+                            <RowDefinition />
                         </Grid.RowDefinitions>
-                        <Label Content="Descriptif :" Foreground="#888989" Grid.Row="0"></Label>
-                        <TextBox x:Name="TextboxLayerDescriptif" Height="Auto"  HorizontalAlignment="Stretch" TextWrapping="Wrap" Grid.Row="1" Style="{DynamicResource TextBoxCleanStyle_13}" Cursor="IBeam" AcceptsReturn="True" AcceptsTab="True" AutoWordSelection="False" MinHeight="80" VerticalContentAlignment="Top" RequestBringIntoView="DisableTextBoxRequestBringIntoView" ></TextBox>
+                        <Label
+                            Grid.Row="0"
+                            Content="{Binding Source={x:Static commun:Languages.Current}, Path=[editorPropertyNameDescription]}"
+                            Foreground="#888989" />
+                        <TextBox
+                            x:Name="TextboxLayerDescription"
+                            Grid.Row="1"
+                            Height="Auto"
+                            MinHeight="80"
+                            HorizontalAlignment="Stretch"
+                            VerticalContentAlignment="Top"
+                            AcceptsReturn="True"
+                            AcceptsTab="True"
+                            AutoWordSelection="False"
+                            Cursor="IBeam"
+                            RequestBringIntoView="DisableTextBoxRequestBringIntoView"
+                            Style="{DynamicResource TextBoxCleanStyle_13}"
+                            TextWrapping="Wrap" />
 
                     </Grid>
 
                     <Grid Margin="0,10,0,0">
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="20"/>
+                            <RowDefinition Height="20" />
                             <RowDefinition Height="*" />
-                            <RowDefinition/>
+                            <RowDefinition />
                         </Grid.RowDefinitions>
-                        <Label Content="Catégorie :" Foreground="#888989" Grid.Row="0"></Label>
-                        <ComboBox x:Name="TextboxLayerCategories" Grid.Row="1" Width="Auto" HorizontalAlignment="Stretch" VerticalContentAlignment="Stretch" Height="21" SelectedIndex="4" Cursor="Arrow" Padding="5,0,0,1" Foreground="#BCBCBC" >
+                        <Label
+                            Grid.Row="0"
+                            Content="{Binding Source={x:Static commun:Languages.Current}, Path=[editorPropertyNameCategory]}"
+                            Foreground="#888989" />
+                        <ComboBox
+                            x:Name="TextboxLayerCategory"
+                            Grid.Row="1"
+                            Width="Auto"
+                            Height="21"
+                            Padding="5,0,0,1"
+                            HorizontalAlignment="Stretch"
+                            VerticalContentAlignment="Stretch"
+                            Cursor="Arrow"
+                            Foreground="#BCBCBC"
+                            SelectedIndex="4">
 
                             <ComboBox.Resources>
-                                <Style TargetType="ScrollBar" BasedOn="{StaticResource {x:Type ScrollBar}}">
-                                    <Setter Property="Margin" Value="0,0,-5,0"></Setter>
+                                <Style BasedOn="{StaticResource {x:Type ScrollBar}}" TargetType="ScrollBar">
+                                    <Setter Property="Margin" Value="0,0,-5,0" />
                                 </Style>
                             </ComboBox.Resources>
                         </ComboBox>
@@ -101,45 +179,90 @@
 
                     <Grid Margin="0,10,0,0">
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="20"/>
+                            <RowDefinition Height="20" />
                             <RowDefinition Height="*" />
-                            <RowDefinition/>
+                            <RowDefinition />
                         </Grid.RowDefinitions>
-                        <Label Content="Pays :" Foreground="#888989" Grid.Row="0"></Label>
+                        <Label
+                            Grid.Row="0"
+                            Content="{Binding Source={x:Static commun:Languages.Current}, Path=[editorPropertyNameCountry]}"
+                            Foreground="#888989" />
 
-                        <cbcontrols:MultiSelectCombobox x:Name="PaysComboBox" DisplayMemberPath="DisplayName" ItemSeparator=";" Grid.Row="1" HorizontalAlignment="Stretch" MinHeight="16" Height="Auto" RequestBringIntoView="DisableAllRequestBringIntoView"/>
+                        <cbcontrols:MultiSelectCombobox
+                            x:Name="CountryComboBox"
+                            Grid.Row="1"
+                            Height="Auto"
+                            MinHeight="16"
+                            HorizontalAlignment="Stretch"
+                            DisplayMemberPath="DisplayName"
+                            ItemSeparator=";"
+                            RequestBringIntoView="DisableAllRequestBringIntoView" />
                     </Grid>
 
                     <Grid Margin="0,10,0,0">
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="20"/>
+                            <RowDefinition Height="20" />
                             <RowDefinition Height="*" />
-                            <RowDefinition/>
+                            <RowDefinition />
                         </Grid.RowDefinitions>
-                        <Label Content="Identifiant :" Foreground="#888989" Grid.Row="0"></Label>
-                        <TextBox x:Name="TextboxLayerIdentifiant" HorizontalAlignment="Stretch" Grid.Row="1" Style="{DynamicResource TextBoxCleanStyle_13}"  SpellCheck.IsEnabled="False"></TextBox>
+                        <Label
+                            Grid.Row="0"
+                            Content="{Binding Source={x:Static commun:Languages.Current}, Path=[editorPropertyNameIdentifier]}"
+                            Foreground="#888989" />
+                        <TextBox
+                            x:Name="TextboxLayerIdentifier"
+                            Grid.Row="1"
+                            HorizontalAlignment="Stretch"
+                            SpellCheck.IsEnabled="False"
+                            Style="{DynamicResource TextBoxCleanStyle_13}" />
                     </Grid>
 
                     <Grid Margin="0,10,0,0">
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="20"/>
+                            <RowDefinition Height="20" />
                             <RowDefinition Height="*" />
-                            <RowDefinition/>
+                            <RowDefinition />
                         </Grid.RowDefinitions>
-                        <Label Content="URL (Col={x}, Row={y}, Zoom={z}) :" Foreground="#888989" Grid.Row="0"></Label>
-                        <TextBox x:Name="TextboxLayerTileUrl" Height="Auto"  HorizontalAlignment="Stretch" TextWrapping="Wrap" Grid.Row="1" Style="{DynamicResource TextBoxCleanStyle_13}" TextChanged="TextboxLayerTileUrl_TextChanged" Cursor="IBeam" SpellCheck.IsEnabled="False"></TextBox>
+                        <Label
+                            Grid.Row="0"
+                            Content="{Binding Source={x:Static commun:Languages.Current}, Path=[editorPropertyNameURL]}"
+                            Foreground="#888989" />
+                        <TextBox
+                            x:Name="TextboxLayerTileUrl"
+                            Grid.Row="1"
+                            Height="Auto"
+                            HorizontalAlignment="Stretch"
+                            Cursor="IBeam"
+                            SpellCheck.IsEnabled="False"
+                            Style="{DynamicResource TextBoxCleanStyle_13}"
+                            TextChanged="TextboxLayerTileUrl_TextChanged"
+                            TextWrapping="Wrap" />
                     </Grid>
 
                     <Grid Margin="0,10,0,0">
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="20"/>
+                            <RowDefinition Height="20" />
                             <RowDefinition Height="*" />
-                            <RowDefinition/>
+                            <RowDefinition />
                         </Grid.RowDefinitions>
-                        <Label Content="Scripts :" Foreground="#888989" Grid.Row="0"></Label>
-                        <avalonEdit:TextEditor x:Name="TextboxLayerScript" Grid.Row="1" KeyUp="TextboxLayerScript_KeyUp" HorizontalAlignment="Stretch" SyntaxHighlighting="MIMF_JavaScript" MinHeight="80" ShowLineNumbers="True" Height="Auto" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" RequestBringIntoView="DisableAllRequestBringIntoView" >
+                        <Label
+                            Grid.Row="0"
+                            Content="{Binding Source={x:Static commun:Languages.Current}, Path=[editorPropertyNameScript]}"
+                            Foreground="#888989" />
+                        <avalonEdit:TextEditor
+                            x:Name="TextboxLayerScript"
+                            Grid.Row="1"
+                            Height="Auto"
+                            MinHeight="80"
+                            HorizontalAlignment="Stretch"
+                            HorizontalScrollBarVisibility="Auto"
+                            KeyUp="TextboxLayerScript_KeyUp"
+                            RequestBringIntoView="DisableAllRequestBringIntoView"
+                            ShowLineNumbers="True"
+                            SyntaxHighlighting="MIMF_JavaScript"
+                            VerticalScrollBarVisibility="Auto">
                             <avalonEdit:TextEditor.ContextMenu>
-                                <ContextMenu Foreground="#E2E2E1" Background="#171719" >
+                                <ContextMenu Background="#171719" Foreground="#E2E2E1">
                                     <StaticResourceExtension ResourceKey="ContextMenu_Copier" />
                                     <StaticResourceExtension ResourceKey="ContextMenu_Couper" />
                                     <StaticResourceExtension ResourceKey="ContextMenu_Coller" />
@@ -150,53 +273,132 @@
 
                     <Grid Margin="0,10,0,0">
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="20"/>
+                            <RowDefinition Height="20" />
                             <RowDefinition Height="*" />
-                            <RowDefinition/>
+                            <RowDefinition />
                         </Grid.RowDefinitions>
-                        <Label Content="Aire (rectangles qui seront affichés si définis sur la map) :" Foreground="#888989" Grid.Row="0"></Label>
-                        <avalonEdit:TextEditor x:Name="TextboxRectangles" Grid.Row="1" HorizontalAlignment="Stretch" SyntaxHighlighting="MIMF_Json" MinHeight="20" ShowLineNumbers="False" Height="Auto" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" RequestBringIntoView="DisableAllRequestBringIntoView" ContextMenu="{StaticResource CopyPasteContextMenu}" KeyUp="TextboxRectangles_KeyUp" TextChanged="TextboxRectangles_TextChanged"/>
-                        <Label x:Name="LabelOpenVisualRectanglesEditor" IsTabStop="True" VerticalAlignment="Center" Content="Cliquez ici pour ouvrir l'éditeur visuel" Foreground="#888989" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" MouseEnter="ClickableLabel_MouseEnter" MouseLeave="ClickableLabel_MouseLeave" MouseUp="LabelOpenVisualRectanglesEditor_MouseUp"></Label>
+                        <Label
+                            Grid.Row="0"
+                            Content="{Binding Source={x:Static commun:Languages.Current}, Path=[editorPropertyNameArea]}"
+                            Foreground="#888989" />
+                        <avalonEdit:TextEditor
+                            x:Name="TextboxRectangles"
+                            Grid.Row="1"
+                            Height="Auto"
+                            MinHeight="20"
+                            HorizontalAlignment="Stretch"
+                            ContextMenu="{StaticResource CopyPasteContextMenu}"
+                            HorizontalScrollBarVisibility="Auto"
+                            KeyUp="TextboxRectangles_KeyUp"
+                            RequestBringIntoView="DisableAllRequestBringIntoView"
+                            ShowLineNumbers="False"
+                            SyntaxHighlighting="MIMF_Json"
+                            TextChanged="TextboxRectangles_TextChanged"
+                            VerticalScrollBarVisibility="Auto" />
+                        <Label
+                            x:Name="LabelOpenVisualRectanglesEditor"
+                            Grid.Row="2"
+                            Grid.Column="0"
+                            Grid.ColumnSpan="3"
+                            VerticalAlignment="Center"
+                            Content="{Binding Source={x:Static commun:Languages.Current}, Path=[editorOpenAreaEditor]}"
+                            Foreground="#888989"
+                            IsTabStop="True"
+                            MouseEnter="ClickableLabel_MouseEnter"
+                            MouseLeave="ClickableLabel_MouseLeave"
+                            MouseUp="LabelOpenVisualRectanglesEditor_MouseUp" />
                     </Grid>
 
                     <Grid Margin="0,10,0,0">
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="20"/>
+                            <RowDefinition Height="20" />
                             <RowDefinition Height="*" />
-                            <RowDefinition Height="25"/>
-                            <RowDefinition/>
+                            <RowDefinition Height="25" />
+                            <RowDefinition />
                         </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"></ColumnDefinition>
-                            <ColumnDefinition Width="20"></ColumnDefinition>
-                            <ColumnDefinition Width="*"></ColumnDefinition>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="20" />
+                            <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
-                        <Label Content="Min-Zoom :" Foreground="#888989" Grid.Row="0" Grid.Column="0"></Label>
-                        <TextBox x:Name="TextBoxLayerMinZoom" HorizontalAlignment="Stretch" Grid.Row="1" Grid.Column="0" Style="{DynamicResource TextBoxCleanStyle_13}" TextChanged="TextBoxLayerMinZoom_TextChanged" LostFocus="TextBoxLayerMinZoom_LostFocus"/>
-                        <Label Content="Max-Zoom :" Foreground="#888989" Grid.Row="0" Grid.Column="2"></Label>
-                        <TextBox x:Name="TextBoxLayerMaxZoom" HorizontalAlignment="Stretch" Grid.Row="1" Grid.Column="2" Style="{DynamicResource TextBoxCleanStyle_13}" TextChanged="TextBoxLayerMaxZoom_TextChanged" LostFocus="TextBoxLayerMaxZoom_LostFocus"></TextBox>
-                        <Label x:Name="LabelAutoDetectZoom" IsTabStop="True" VerticalAlignment="Center" Content="Cliquez ici pour detecter automatiquement l'interval de zooms" Foreground="#888989" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" MouseEnter="ClickableLabel_MouseEnter" MouseLeave="ClickableLabel_MouseLeave" MouseUp="LabelAutoDetectZoom_MouseUp"></Label>
+                        <Label
+                            Grid.Row="0"
+                            Grid.Column="0"
+                            Content="{Binding Source={x:Static commun:Languages.Current}, Path=[editorPropertyNameMinZoom]}"
+                            Foreground="#888989" />
+                        <TextBox
+                            x:Name="TextBoxLayerMinZoom"
+                            Grid.Row="1"
+                            Grid.Column="0"
+                            HorizontalAlignment="Stretch"
+                            LostFocus="TextBoxLayerMinZoom_LostFocus"
+                            Style="{DynamicResource TextBoxCleanStyle_13}"
+                            TextChanged="TextBoxLayerMinZoom_TextChanged" />
+                        <Label
+                            Grid.Row="0"
+                            Grid.Column="2"
+                            Content="{Binding Source={x:Static commun:Languages.Current}, Path=[editorPropertyNameMaxZoom]}"
+                            Foreground="#888989" />
+                        <TextBox
+                            x:Name="TextBoxLayerMaxZoom"
+                            Grid.Row="1"
+                            Grid.Column="2"
+                            HorizontalAlignment="Stretch"
+                            LostFocus="TextBoxLayerMaxZoom_LostFocus"
+                            Style="{DynamicResource TextBoxCleanStyle_13}"
+                            TextChanged="TextBoxLayerMaxZoom_TextChanged" />
+                        <Label
+                            x:Name="LabelAutoDetectZoom"
+                            Grid.Row="2"
+                            Grid.Column="0"
+                            Grid.ColumnSpan="3"
+                            VerticalAlignment="Center"
+                            Content="{Binding Source={x:Static commun:Languages.Current}, Path=[editorAutoDetectZoom]}"
+                            Foreground="#888989"
+                            IsTabStop="True"
+                            MouseEnter="ClickableLabel_MouseEnter"
+                            MouseLeave="ClickableLabel_MouseLeave"
+                            MouseUp="LabelAutoDetectZoom_MouseUp" />
                     </Grid>
 
                     <Grid Margin="0,10,0,0">
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="20"/>
+                            <RowDefinition Height="20" />
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
-                        <CheckBox x:Name="has_scale" Foreground="#888989" Grid.Row="0" IsChecked="True">Les tuiles du calques sont à l'echelle</CheckBox>
+                        <CheckBox
+                            x:Name="has_scale"
+                            Grid.Row="0"
+                            Content="{Binding Source={x:Static commun:Languages.Current}, Path=[editorPropertyNameHasScale]}"
+                            Foreground="#888989"
+                            IsChecked="True" />
                     </Grid>
 
                     <Grid Margin="0,10,0,0">
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="20"/>
+                            <RowDefinition Height="20" />
                             <RowDefinition Height="*" />
-                            <RowDefinition/>
+                            <RowDefinition />
                         </Grid.RowDefinitions>
-                        <Label Content="Format :" Foreground="#888989" Grid.Row="0"></Label>
-                        <ComboBox x:Name="TextboxLayerFormat" Grid.Row="1" Width="Auto" HorizontalAlignment="Stretch" VerticalContentAlignment="Stretch" Height="21" Cursor="Arrow" IsEditable="False"  Padding="5,0,0,1" SelectedIndex="0" SelectionChanged="TextboxLayerFormat_SelectionChanged" >
+                        <Label
+                            Grid.Row="0"
+                            Content="{Binding Source={x:Static commun:Languages.Current}, Path=[editorPropertyNameFormat]}"
+                            Foreground="#888989" />
+                        <ComboBox
+                            x:Name="TextboxLayerFormat"
+                            Grid.Row="1"
+                            Width="Auto"
+                            Height="21"
+                            Padding="5,0,0,1"
+                            HorizontalAlignment="Stretch"
+                            VerticalContentAlignment="Stretch"
+                            Cursor="Arrow"
+                            IsEditable="False"
+                            SelectedIndex="0"
+                            SelectionChanged="TextboxLayerFormat_SelectionChanged">
                             <ComboBox.Resources>
-                                <Style TargetType="ScrollBar" BasedOn="{StaticResource {x:Type ScrollBar}}">
-                                    <Setter Property="Margin" Value="0,0,-5,0"></Setter>
+                                <Style BasedOn="{StaticResource {x:Type ScrollBar}}" TargetType="ScrollBar">
+                                    <Setter Property="Margin" Value="0,0,-5,0" />
                                 </Style>
                             </ComboBox.Resources>
                             <ComboBoxItem>JPEG</ComboBoxItem>
@@ -207,15 +409,28 @@
 
                     <Grid Margin="0,10,0,0">
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="20"/>
+                            <RowDefinition Height="20" />
                             <RowDefinition Height="*" />
-                            <RowDefinition/>
+                            <RowDefinition />
                         </Grid.RowDefinitions>
-                        <Label Content="Nom du fournisseur :" Foreground="#888989" Grid.Row="0"></Label>
-                        <ComboBox x:Name="TextboxLayerSite"  Grid.Row="1" Width="Auto" HorizontalAlignment="Stretch" VerticalContentAlignment="Stretch" Height="21" SelectedIndex="4" Cursor="Arrow" IsEditable="False" Padding="5,0,0,1" >
+                        <Label
+                            Grid.Row="0"
+                            Content="{Binding Source={x:Static commun:Languages.Current}, Path=[editorPropertyNameProviderName]}"
+                            Foreground="#888989" />
+                        <ComboBox
+                            x:Name="TextboxLayerSite"
+                            Grid.Row="1"
+                            Width="Auto"
+                            Height="21"
+                            Padding="5,0,0,1"
+                            HorizontalAlignment="Stretch"
+                            VerticalContentAlignment="Stretch"
+                            Cursor="Arrow"
+                            IsEditable="False"
+                            SelectedIndex="4">
                             <ComboBox.Resources>
-                                <Style TargetType="ScrollBar" BasedOn="{StaticResource {x:Type ScrollBar}}">
-                                    <Setter Property="Margin" Value="0,0,-5,0"></Setter>
+                                <Style BasedOn="{StaticResource {x:Type ScrollBar}}" TargetType="ScrollBar">
+                                    <Setter Property="Margin" Value="0,0,-5,0" />
                                 </Style>
                             </ComboBox.Resources>
                         </ComboBox>
@@ -223,15 +438,28 @@
 
                     <Grid Margin="0,10,0,0">
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="20"/>
+                            <RowDefinition Height="20" />
                             <RowDefinition Height="*" />
-                            <RowDefinition/>
+                            <RowDefinition />
                         </Grid.RowDefinitions>
-                        <Label Content="Site :" Foreground="#888989" Grid.Row="0"></Label>
-                        <ComboBox x:Name="TextboxLayerSiteUrl" Grid.Row="1" Width="Auto" HorizontalAlignment="Stretch" VerticalContentAlignment="Stretch" Height="21" SelectedIndex="4" Cursor="Arrow" IsEditable="False" Padding="5,0,0,1" >
+                        <Label
+                            Grid.Row="0"
+                            Content="{Binding Source={x:Static commun:Languages.Current}, Path=[editorPropertyNameProviderSite]}"
+                            Foreground="#888989" />
+                        <ComboBox
+                            x:Name="TextboxLayerSiteUrl"
+                            Grid.Row="1"
+                            Width="Auto"
+                            Height="21"
+                            Padding="5,0,0,1"
+                            HorizontalAlignment="Stretch"
+                            VerticalContentAlignment="Stretch"
+                            Cursor="Arrow"
+                            IsEditable="False"
+                            SelectedIndex="4">
                             <ComboBox.Resources>
-                                <Style TargetType="ScrollBar" BasedOn="{StaticResource {x:Type ScrollBar}}">
-                                    <Setter Property="Margin" Value="0,0,-5,0"></Setter>
+                                <Style BasedOn="{StaticResource {x:Type ScrollBar}}" TargetType="ScrollBar">
+                                    <Setter Property="Margin" Value="0,0,-5,0" />
                                 </Style>
                             </ComboBox.Resources>
                         </ComboBox>
@@ -239,142 +467,419 @@
 
                     <Grid Margin="0,10,0,0">
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="20"/>
+                            <RowDefinition Height="20" />
                             <RowDefinition Height="*" />
-                            <RowDefinition/>
+                            <RowDefinition />
                         </Grid.RowDefinitions>
-                        <Label Content="Taille des tuiles :" Foreground="#888989" Grid.Row="0"></Label>
-                        <TextBox x:Name="TextboxLayerTileWidth" HorizontalAlignment="Stretch" Grid.Row="1" Style="{DynamicResource TextBoxCleanStyle_13}" IsEnabled="True" Cursor="IBeam" TextChanged="TextboxLayerTileWidth_TextChanged"></TextBox>
+                        <Label
+                            Grid.Row="0"
+                            Content="{Binding Source={x:Static commun:Languages.Current}, Path=[editorPropertyNameTileSize]}"
+                            Foreground="#888989" />
+                        <TextBox
+                            x:Name="TextboxLayerTileWidth"
+                            Grid.Row="1"
+                            HorizontalAlignment="Stretch"
+                            Cursor="IBeam"
+                            IsEnabled="True"
+                            Style="{DynamicResource TextBoxCleanStyle_13}"
+                            TextChanged="TextboxLayerTileWidth_TextChanged" />
                     </Grid>
 
                     <Grid Margin="0,10,0,0">
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="20"/>
+                            <RowDefinition Height="20" />
                             <RowDefinition Height="*" />
-                            <RowDefinition/>
+                            <RowDefinition />
                         </Grid.RowDefinitions>
-                        <Label Content="Couleur d'arrière plan :" Foreground="#888989" Grid.Row="0"></Label>
-                        <TextBox x:Name="TextboxSpecialOptionBackgroundColor" HorizontalAlignment="Stretch" Grid.Row="1" Style="{DynamicResource TextBoxCleanStyle_13}" IsEnabled="True" Cursor="IBeam" KeyUp="TextboxSpecialOptionBackgroundColor_KeyUp" TextChanged="TextboxSpecialOptionBackgroundColor_TextChanged" MaxLength="7" MaxLines="1"></TextBox>
+                        <Label
+                            Grid.Row="0"
+                            Content="{Binding Source={x:Static commun:Languages.Current}, Path=[editorPropertyNameBackgroundColor]}"
+                            Foreground="#888989" />
+                        <TextBox
+                            x:Name="TextboxSpecialOptionBackgroundColor"
+                            Grid.Row="1"
+                            HorizontalAlignment="Stretch"
+                            Cursor="IBeam"
+                            IsEnabled="True"
+                            KeyUp="TextboxSpecialOptionBackgroundColor_KeyUp"
+                            MaxLength="7"
+                            MaxLines="1"
+                            Style="{DynamicResource TextBoxCleanStyle_13}"
+                            TextChanged="TextboxSpecialOptionBackgroundColor_TextChanged" />
                     </Grid>
 
 
-                    <Grid Margin="0,10,0,0" x:Name="SpecialOptionPBFJsonStyle">
+                    <Grid Margin="0,10,0,0">
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="20"/>
+                            <RowDefinition Height="20" />
                             <RowDefinition Height="*" />
-                            <RowDefinition/>
+                            <RowDefinition />
                         </Grid.RowDefinitions>
-                        <Label Content="PBF Tiles style (json ou chemin d'accès) :" Foreground="#888989" Grid.Row="0"></Label>
-                        <TextBox x:Name="TextboxSpecialOptionPBFJsonStyle" Height="Auto"  HorizontalAlignment="Stretch" TextWrapping="NoWrap" Grid.Row="1" 
-                                 Style="{DynamicResource TextBoxCleanStyle_13}" Padding="5,5,13,15" Cursor="IBeam" AcceptsReturn="True" AcceptsTab="True" 
-                                 AutoWordSelection="False" HorizontalScrollBarVisibility="Auto" MinHeight="80" MaxHeight="500" SpellCheck.IsEnabled="False"  
-                                 VerticalContentAlignment="Top" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True" KeyUp="TextboxSpecialOptionPBFJsonStyle_KeyUp" >
+                        <Label
+                            Grid.Row="0"
+                            Content="{Binding Source={x:Static commun:Languages.Current}, Path=[editorPropertyNameStyle]}"
+                            Foreground="#888989" />
+                        <TextBox
+                            x:Name="TextboxLayerStyle"
+                            Grid.Row="1"
+                            Height="Auto"
+                            MinHeight="0"
+                            MaxHeight="500"
+                            Padding="5,5,13,15"
+                            HorizontalAlignment="Stretch"
+                            VerticalContentAlignment="Top"
+                            AcceptsReturn="True"
+                            AcceptsTab="True"
+                            AutoWordSelection="False"
+                            Cursor="IBeam"
+                            HorizontalScrollBarVisibility="Auto"
+                            KeyUp="TextboxSpecialOptionPBFJsonStyle_KeyUp"
+                            ScrollViewer.CanContentScroll="True"
+                            ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                            ScrollViewer.VerticalScrollBarVisibility="Auto"
+                            SpellCheck.IsEnabled="False"
+                            Style="{DynamicResource TextBoxCleanStyle_13}"
+                            TextWrapping="NoWrap">
                             <TextBox.Resources>
-                                <Style TargetType="{x:Type ScrollBar}" BasedOn="{StaticResource ScrollBarDefaultNoPadding}"></Style>
+                                <Style BasedOn="{StaticResource ScrollBarDefaultNoPadding}" TargetType="{x:Type ScrollBar}" />
                             </TextBox.Resources>
                         </TextBox>
                     </Grid>
 
                     <Grid Margin="0,30,0,0">
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="20"/>
                             <RowDefinition Height="20" />
-                            <RowDefinition/>
+                            <RowDefinition Height="20" />
+                            <RowDefinition />
                         </Grid.RowDefinitions>
-                        <Label x:Name="ResetInfoLayerClikableLabel" Content="→ Rétablir les information de calque par default" Foreground="#888989" Grid.Row="0" MouseEnter="ClickableLabel_MouseEnter" MouseLeave="ClickableLabel_MouseLeave" MouseUp="ResetInfoLayerClikableLabel_MouseUp"></Label>
-                        <Label x:Name="DeleteLayerClikableLabel" Content="→ Supprimer ce calque" Foreground="#888989" Grid.Row="1" MouseEnter="ClickableLabel_MouseEnter" MouseLeave="ClickableLabel_MouseLeave" MouseUp="DeleteLayerClikableLabel_MouseUp"></Label>
+                        <Label
+                            x:Name="ResetInfoLayerClikableLabel"
+                            Grid.Row="0"
+                            Content="{Binding Source={x:Static commun:Languages.Current}, Path=[editorResetLayerProperty]}"
+                            Foreground="#888989"
+                            MouseEnter="ClickableLabel_MouseEnter"
+                            MouseLeave="ClickableLabel_MouseLeave"
+                            MouseUp="ResetInfoLayerClikableLabel_MouseUp" />
+                        <Label
+                            x:Name="DeleteLayerClikableLabel"
+                            Grid.Row="1"
+                            Content="{Binding Source={x:Static commun:Languages.Current}, Path=[editorDeleteLayer]}"
+                            Foreground="#888989"
+                            MouseEnter="ClickableLabel_MouseEnter"
+                            MouseLeave="ClickableLabel_MouseLeave"
+                            MouseUp="DeleteLayerClikableLabel_MouseUp" />
                     </Grid>
-                    <Rectangle Height="20" Width="1"></Rectangle>
+                    <Rectangle Width="1" Height="20" />
                 </StackPanel>
             </ScrollViewer>
         </Grid>
 
-        <Grid Grid.Column="1" Background="Transparent" Margin="0,0,15,0">
+        <Grid
+            Grid.Column="1"
+            Margin="0,0,15,0"
+            Background="Transparent">
             <Grid.RowDefinitions>
-                <RowDefinition Height="65"/>
+                <RowDefinition Height="65" />
                 <RowDefinition Height="*" />
                 <RowDefinition Height="10" />
                 <RowDefinition Height="30" />
                 <RowDefinition Height="15" />
             </Grid.RowDefinitions>
-            <Button Grid.Row="0" Grid.Column="1" x:Name="ClosePage_button" Style="{DynamicResource IconButton}" Margin="0,15,0,0" VerticalAlignment="Top" HorizontalAlignment="Right" Click="ClosePage_button_Click" Height="30" Width="30" Foreground="#FFE2E2E1" Cursor="Hand" ToolTip="Fermer cette fenêtre">
-                <Path Panel.ZIndex="999" StrokeStartLineCap="round" StrokeEndLineCap="round" StrokeLineJoin="round" StrokeThickness="0.8" Data="{StaticResource CloseButton}" Stroke="{Binding Foreground, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Button}}" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center" RenderTransformOrigin="0,0" Height="20" Width="20"/>
+            <Button
+                x:Name="ClosePage_button"
+                Grid.Row="0"
+                Grid.Column="1"
+                Width="30"
+                Height="30"
+                Margin="0,15,0,0"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Top"
+                Click="ClosePage_button_Click"
+                Cursor="Hand"
+                Foreground="#FFE2E2E1"
+                Style="{DynamicResource IconButton}"
+                ToolTip="{Binding Source={x:Static commun:Languages.Current}, Path=[tooltipsCloseWindow]}">
+                <Path
+                    Width="20"
+                    Height="20"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Panel.ZIndex="999"
+                    Data="{StaticResource CloseButton}"
+                    RenderTransformOrigin="0,0"
+                    Stretch="Uniform"
+                    Stroke="{Binding Foreground, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Button}}"
+                    StrokeEndLineCap="round"
+                    StrokeLineJoin="round"
+                    StrokeStartLineCap="round"
+                    StrokeThickness="0.8" />
             </Button>
 
-            <Grid Margin="10,0,0,0" Grid.Row="1" Grid.Column="0">
+            <Grid
+                Grid.Row="1"
+                Grid.Column="0"
+                Margin="10,0,0,0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="35" />
-                    <RowDefinition Height="3*"/>
-                    <RowDefinition Height="45"/>
+                    <RowDefinition Height="3*" />
+                    <RowDefinition Height="45" />
                     <RowDefinition Height="2*" />
                     <RowDefinition Height="40" />
                     <RowDefinition Height="5" />
                 </Grid.RowDefinitions>
-                <Label Grid.Row="0" Grid.Column="0" Content="Apperçu : " HorizontalAlignment="Left" Margin="0,-4,0,0" VerticalAlignment="Top" Width="Auto" FontSize="16.5" FontFamily="Segoe UI Semilight" Foreground="#FFE2E2E1"/>
-                <map:Map Grid.Row="1" Grid.Column="0" x:Name="mapviewerappercu" ZoomLevel="18" MinHeight="30" MinWidth="30" Background="White" MouseWheel="mapviewerappercu_MouseWheel">
+                <Label
+                    Grid.Row="0"
+                    Grid.Column="0"
+                    Width="Auto"
+                    Margin="0,-4,0,0"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Top"
+                    Content="{Binding Source={x:Static commun:Languages.Current}, Path=[editorSubTitlePreview]}"
+                    FontFamily="Segoe UI Semilight"
+                    FontSize="16.5"
+                    Foreground="#FFE2E2E1" />
+                <map:Map
+                    x:Name="mapviewerappercu"
+                    Grid.Row="1"
+                    Grid.Column="0"
+                    MinWidth="30"
+                    MinHeight="30"
+                    Background="White"
+                    MouseWheel="Mapviewerappercu_MouseWheel"
+                    ZoomLevel="18">
                     <map:Map.Center>
-                        <map:Location Longitude="6.429381" Latitude="48.198846"/>
+                        <map:Location Latitude="48.198846" Longitude="6.429381" />
                     </map:Map.Center>
-                    <map:MapTileLayer x:Name="MapTileLayer_Transparent"/>
-                    <map:MapItemsControl x:Name="mapviewerRectangles"></map:MapItemsControl>
+                    <map:MapTileLayer x:Name="MapTileLayer_Transparent" />
+                    <map:MapItemsControl x:Name="mapviewerRectangles" />
+                    <map:Map.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem
+                                Click="ZoomToTile_Click"
+                                Foreground="#BCBCBC"
+                                Header="{Binding Source={x:Static commun:Languages.Current}, Path=[editorMapOptionsZoomToTile]}">
+                                <MenuItem.Icon>
+                                    <ui:FontIcon Foreground="#888989" Glyph="&#xE12B;" />
+                                </MenuItem.Icon>
+                            </MenuItem>
+                            <MenuItem
+                                Click="ZoomToLocation_Click"
+                                Foreground="#BCBCBC"
+                                Header="{Binding Source={x:Static commun:Languages.Current}, Path=[editorMapOptionsZoomToLocation]}">
+                                <MenuItem.Icon>
+                                    <ui:FontIcon Foreground="#888989" Glyph="&#xE128;" />
+                                </MenuItem.Icon>
+                            </MenuItem>
+                            <Separator />
+                            <MenuItem
+                                x:Name="PrintUrl"
+                                Click="PrintUrl_Click"
+                                Foreground="#BCBCBC"
+                                Header="{Binding Source={x:Static commun:Languages.Current}, Path=[editorMapOptionsShowAndCopyTileUrl]}">
+                                <MenuItem.Icon>
+                                    <ui:FontIcon Foreground="#888989" Glyph="&#xE16F;" />
+                                </MenuItem.Icon>
+                            </MenuItem>
+                            <MenuItem
+                                x:Name="PrintPreviewUrl"
+                                Click="PrintPreviewUrl_Click"
+                                Foreground="#BCBCBC"
+                                Header="{Binding Source={x:Static commun:Languages.Current}, Path=[editorMapOptionsShowAndCopyPreviewTileUrl]}">
+                                <MenuItem.Icon>
+                                    <ui:FontIcon Foreground="#888989" Glyph="&#xE16F;" />
+                                </MenuItem.Icon>
+                            </MenuItem>
+                            <MenuItem
+                                x:Name="PrintPreviewFallbackUrl"
+                                Click="PrintPreviewFallbackUrl_Click"
+                                Foreground="#BCBCBC"
+                                Header="{Binding Source={x:Static commun:Languages.Current}, Path=[editorMapOptionsShowAndCopyFallbackTileUrl]}">
+                                <MenuItem.Icon>
+                                    <ui:FontIcon Foreground="#888989" Glyph="&#xE16F;" />
+                                </MenuItem.Icon>
+                            </MenuItem>
+                            <Separator />
+                            <MenuItem
+                                x:Name="SetPreviewUrl"
+                                Click="SetPreviewUrl_Click"
+                                Foreground="#BCBCBC"
+                                Header="{Binding Source={x:Static commun:Languages.Current}, Path=[editorMapOptionsDefinePreviewTileUrl]}">
+                                <MenuItem.Icon>
+                                    <ui:FontIcon Foreground="#888989" Glyph="&#xE15A;" />
+                                </MenuItem.Icon>
+                            </MenuItem>
+                            <MenuItem
+                                x:Name="SetPreviewFallbackUrl"
+                                Click="SetPreviewFallbackUrl_Click"
+                                Foreground="#BCBCBC"
+                                Header="{Binding Source={x:Static commun:Languages.Current}, Path=[editorMapOptionsDefineFallbackTileUrl]}">
+                                <MenuItem.Icon>
+                                    <ui:FontIcon Foreground="#888989" Glyph="&#xE15A;" />
+                                </MenuItem.Icon>
+                            </MenuItem>
+                        </ContextMenu>
+                    </map:Map.ContextMenu>
                 </map:Map>
-                <Label x:Name="ZoomLevelIndicator" Grid.Row="1" Grid.Column="0" Margin="0,0,0,0" Padding="1,1,3,1" VerticalContentAlignment="Center" HorizontalContentAlignment="Left" Background="#6F000000" VerticalAlignment="Bottom"  ContentStringFormat="Niveau de zoom : {0:0.#}" Content="{Binding ElementName=mapviewerappercu, Path=ZoomLevel}" Foreground="#e2e2e1" HorizontalAlignment="Left"></Label>
-                <StackPanel Grid.Row="1" Grid.Column="0"  HorizontalAlignment="Right" VerticalAlignment="Top" Orientation="Horizontal">
-                    <Button Background="#303031" Foreground="#888989" Click="Button_Click" ToolTip="Recharger la map avec les nouveaux paramêtres">
-                        <ui:FontIcon Glyph="&#xE149;" RenderTransformOrigin="0.5,0.5"  >
+                <Label
+                    x:Name="ZoomLevelIndicator"
+                    Grid.Row="1"
+                    Grid.Column="0"
+                    Margin="0,0,0,0"
+                    Padding="1,1,3,1"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Bottom"
+                    HorizontalContentAlignment="Left"
+                    VerticalContentAlignment="Center"
+                    Background="#6F000000"
+                    Foreground="#e2e2e1">
+                    <Label.Content>
+                        <TextBlock>
+                            <TextBlock.Text>
+                                <MultiBinding StringFormat="{}{0}: {1:0.#}">
+                                    <Binding Path="[mapZoomLevelIndicator]" Source="{x:Static commun:Languages.Current}" />
+                                    <Binding ElementName="mapviewerappercu" Path="ZoomLevel" />
+                                </MultiBinding>
+                            </TextBlock.Text>
+                        </TextBlock>
+                    </Label.Content>
+                </Label>
+                <StackPanel
+                    Grid.Row="1"
+                    Grid.Column="0"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Top"
+                    Orientation="Horizontal">
+                    <Button
+                        Background="#303031"
+                        Click="Button_Click"
+                        Foreground="#888989"
+                        ToolTip="{Binding Source={x:Static commun:Languages.Current}, Path=[editorMapOptionsRefresh]}">
+                        <ui:FontIcon Glyph="&#xE149;" RenderTransformOrigin="0.5,0.5">
                             <ui:FontIcon.RenderTransform>
                                 <TransformGroup>
-                                    <ScaleTransform ScaleX="0.8" ScaleY="0.8"/>
-                                    <SkewTransform/>
-                                    <RotateTransform/>
-                                    <TranslateTransform/>
+                                    <ScaleTransform ScaleX="0.8" ScaleY="0.8" />
+                                    <SkewTransform />
+                                    <RotateTransform />
+                                    <TranslateTransform />
                                 </TransformGroup>
                             </ui:FontIcon.RenderTransform>
                         </ui:FontIcon>
                     </Button>
 
-                    <ui:DropDownButton AutomationProperties.Name="MapSettings" Background="#303031" Foreground="#888989" Margin="5" ToolTip="Options">
+                    <ui:DropDownButton
+                        Margin="5"
+                        AutomationProperties.Name="MapSettings"
+                        Background="#303031"
+                        Foreground="#888989"
+                        ToolTip="Options">
                         <ui:DropDownButton.Content>
                             <ui:FontIcon Glyph="&#xE10C;" />
                         </ui:DropDownButton.Content>
-                        <ui:DropDownButton.Flyout >
-                            <ui:MenuFlyout Placement="BottomEdgeAlignedRight" >
-                                <MenuItem x:Name="AutoUpdateLayer" Foreground="#BCBCBC" Header="Mettre à jour la carte automatiquement" IsCheckable="True" IsChecked="False" Checked="AutoUpdateLayer_Checked" Unchecked="AutoUpdateLayer_Unchecked"></MenuItem>
-                                <MenuItem x:Name="BackgroundSwitch" Foreground="#BCBCBC" Header="Afficher le calque de fond" IsCheckable="True" IsChecked="True" Unchecked="BackgroundSwitch_Toggle" Checked="BackgroundSwitch_Toggle"></MenuItem>
-                                <MenuItem x:Name="IsInDebugModeSwitch" Foreground="#BCBCBC" Header="Afficher les numéros de tuiles" IsCheckable="True" IsChecked="False" Unchecked="IsInDebugModeSwitch_Toggle" Checked="IsInDebugModeSwitch_Toggle"></MenuItem>
-                                <Separator />
-                                <MenuItem x:Name="PrintUrl" Foreground="#BCBCBC" Header="Afficher et copier l'url de l'image" Click="PrintUrl_Click"></MenuItem>
-                                <MenuItem x:Name="PrintPreviewUrl" Foreground="#BCBCBC" Header="Afficher et copier l'url de l'image d'apperçu" Click="PrintPreviewUrl_Click"></MenuItem>
-                                <MenuItem x:Name="PrintPreviewFallbackUrl" Foreground="#BCBCBC" Header="Afficher et copier l'url de l'image d'erreur d'apperçu" Click="PrintPreviewFallbackUrl_Click"></MenuItem>
-                                <Separator />
-                                <MenuItem x:Name="SetPreviewUrl" Foreground="#BCBCBC" Header="Definir l'image d'apperçu" Click="SetPreviewUrl_Click"></MenuItem>
-                                <MenuItem x:Name="SetPreviewFallbackUrl" Foreground="#BCBCBC" Header="Definir l'image d'erreur d'apperçu" Click="SetPreviewFallbackUrl_Click"></MenuItem>
+                        <ui:DropDownButton.Flyout>
+                            <ui:MenuFlyout Placement="BottomEdgeAlignedRight">
+                                <MenuItem
+                                    x:Name="AutoUpdateLayer"
+                                    Checked="AutoUpdateLayer_Checked"
+                                    Foreground="#BCBCBC"
+                                    Header="{Binding Source={x:Static commun:Languages.Current}, Path=[editorMapOptionsAutoRefresh]}"
+                                    IsCheckable="True"
+                                    IsChecked="False"
+                                    Unchecked="AutoUpdateLayer_Unchecked" />
+                                <MenuItem
+                                    x:Name="BackgroundSwitch"
+                                    Checked="BackgroundSwitch_Toggle"
+                                    Foreground="#BCBCBC"
+                                    Header="{Binding Source={x:Static commun:Languages.Current}, Path=[editorMapOptionsShowBackgroundLayer]}"
+                                    IsCheckable="True"
+                                    IsChecked="True"
+                                    Unchecked="BackgroundSwitch_Toggle" />
+                                <MenuItem
+                                    x:Name="IsInDebugModeSwitch"
+                                    Checked="IsInDebugModeSwitch_Toggle"
+                                    Foreground="#BCBCBC"
+                                    Header="{Binding Source={x:Static commun:Languages.Current}, Path=[editorMapOptionsShowTilesNumber]}"
+                                    IsCheckable="True"
+                                    IsChecked="False"
+                                    Unchecked="IsInDebugModeSwitch_Toggle" />
+
                             </ui:MenuFlyout>
                         </ui:DropDownButton.Flyout>
                     </ui:DropDownButton>
 
                 </StackPanel>
-                <Label Grid.Row="2" Grid.Column="0" Content="Console : " HorizontalAlignment="Left" Margin="0,10,0,0" VerticalAlignment="Top" Width="Auto" FontSize="16.5" FontFamily="Segoe UI Semilight" Foreground="#FFE2E2E1"/>
-                <TextBox x:Name="TextboxLayerScriptConsole" IsReadOnly="True"  VerticalAlignment="Stretch" Height="Auto" HorizontalAlignment="Stretch" Grid.Row="3" Style="{DynamicResource TextBoxCleanStyleNoBorder}" Padding="0,5,13,15"
-                         ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" Cursor="IBeam" MinHeight="20" ScrollViewer.CanContentScroll="True" SpellCheck.IsEnabled="False" TextWrapping="NoWrap" VerticalContentAlignment="Bottom">
+                <Label
+                    Grid.Row="2"
+                    Grid.Column="0"
+                    Width="Auto"
+                    Margin="0,10,0,0"
+                    HorizontalAlignment="Left"
+                    VerticalAlignment="Top"
+                    Content="{Binding Source={x:Static commun:Languages.Current}, Path=[editorSubTitleConsole]}"
+                    FontFamily="Segoe UI Semilight"
+                    FontSize="16.5"
+                    Foreground="#FFE2E2E1" />
+                <TextBox
+                    x:Name="TextboxLayerScriptConsole"
+                    Grid.Row="3"
+                    Height="Auto"
+                    MinHeight="20"
+                    Padding="0,5,13,15"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Stretch"
+                    VerticalContentAlignment="Bottom"
+                    Cursor="IBeam"
+                    IsReadOnly="True"
+                    ScrollViewer.CanContentScroll="True"
+                    ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                    ScrollViewer.VerticalScrollBarVisibility="Auto"
+                    SpellCheck.IsEnabled="False"
+                    Style="{DynamicResource TextBoxCleanStyleNoBorder}"
+                    TextWrapping="NoWrap">
                     <TextBox.Resources>
-                        <Style TargetType="{x:Type ScrollBar}" BasedOn="{StaticResource ScrollBarDefaultNoPadding}"></Style>
+                        <Style BasedOn="{StaticResource ScrollBarDefaultNoPadding}" TargetType="{x:Type ScrollBar}" />
                     </TextBox.Resources>
                     <TextBox.ContextMenu>
-                        <ContextMenu Foreground="#E2E2E1" Background="#171719" >
+                        <ContextMenu Background="#171719" Foreground="#E2E2E1">
                             <StaticResourceExtension ResourceKey="ContextMenu_Copier" />
                             <StaticResourceExtension ResourceKey="ContextMenu_Couper" />
                             <StaticResourceExtension ResourceKey="ContextMenu_Coller" />
                         </ContextMenu>
                     </TextBox.ContextMenu>
                 </TextBox>
-                <TextBox x:Name="TextboxLayerScriptConsoleSender" Height="Auto" HorizontalAlignment="Stretch" Grid.Row="4" Style="{DynamicResource TextBoxCleanStyle_13}" SpellCheck.IsEnabled="False" AcceptsReturn="True" Cursor="IBeam" ScrollViewer.CanContentScroll="True" TextWrapping="NoWrap" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" Padding="0,0,20,5">
+                <TextBox
+                    x:Name="TextboxLayerScriptConsoleSender"
+                    Grid.Row="4"
+                    Height="Auto"
+                    Padding="0,0,20,5"
+                    HorizontalAlignment="Stretch"
+                    AcceptsReturn="True"
+                    Cursor="IBeam"
+                    ScrollViewer.CanContentScroll="True"
+                    ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                    ScrollViewer.VerticalScrollBarVisibility="Auto"
+                    SpellCheck.IsEnabled="False"
+                    Style="{DynamicResource TextBoxCleanStyle_13}"
+                    TextWrapping="NoWrap">
                     <TextBox.Resources>
-                        <Style TargetType="{x:Type ScrollBar}" BasedOn="{StaticResource ScrollBarDefaultNoPadding}"></Style>
+                        <Style BasedOn="{StaticResource ScrollBarDefaultNoPadding}" TargetType="{x:Type ScrollBar}" />
                     </TextBox.Resources>
                 </TextBox>
             </Grid>
-            <Button x:Name="SaveEditButton" Grid.Row="2" Grid.RowSpan="3" Grid.Column="1" Style="{DynamicResource RoundedButton}" Content="Enregistrer" Height="40" Width="180" Margin="0,0,0,10" VerticalAlignment="Center" HorizontalAlignment="Right" Foreground="#fff" FontSize="18" Click="SaveEditButton_Click"/>
+            <Button
+                x:Name="SaveEditButton"
+                Grid.Row="2"
+                Grid.RowSpan="3"
+                Grid.Column="1"
+                Height="40"
+                MinWidth="230"
+                Margin="0,0,0,10"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Center"
+                Click="SaveEditButton_Click"
+                Content="{Binding Source={x:Static commun:Languages.Current}, Path=[editorButtonSave]}"
+                FontSize="18"
+                Foreground="#fff"
+                Style="{DynamicResource RoundedButton}" />
         </Grid>
     </Grid>
 </Page>

@@ -1,7 +1,6 @@
 ﻿using ModernWpf.Controls;
 using System;
 using System.Diagnostics;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -10,73 +9,42 @@ namespace MapsInMyFolder.Commun
 
     public static class Message
     {
-        public static async Task<ContentDialogResult> ShowContentDialogAsync(ContentDialog dialog)
-        {
-            try
-            {
-                return await dialog.ShowAsync().ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine("Erreur affichage ContentDialog : " + ex.ToString());
-                return ContentDialogResult.None;
-            }
-        }
-
-        //public static string InputBoxDialog(object text, object caption = null, MessageDialogButton messageBoxButton = MessageDialogButton.OK, DispatcherFrame frame = null)
-        //{
-        //    ContentDialog dialog = SetContentDialog(text, caption, messageBoxButton);
-        //    //alert("Veuillez indiquer l'adresse URL du panorama à télécharger :","Google Maps")
-        //    StackPanel stackPanel = new StackPanel();
-        //    TextBlock textBlock = new TextBlock();
-        //    if (!string.IsNullOrEmpty(text?.ToString()))
-        //    {
-        //        textBlock.Text = text.ToString();
-        //        textBlock.TextWrapping = TextWrapping.Wrap;
-        //    }
-        //    TextBox textBox = new TextBox() { };
-        //    textBox.Style = (Style)Application.Current.Resources["TextBoxCleanStyle_13"];
-        //    textBox.HorizontalAlignment = HorizontalAlignment.Stretch;
-        //    textBox.Margin = new Thickness(0, 10, 0, 0);
-        //    stackPanel.Children.Add(textBlock);
-        //    stackPanel.Children.Add(textBox);
-        //    dialog.Content = stackPanel;
-
-        //    if (frame != null)
-        //    {
-        //        dialog.Closed += (_, __) =>
-        //        {
-        //            frame.Continue = false; // stops the frame
-        //        };
-        //    }
-
-        //    dialog.ShowAsync();
-        //    return textBox.Text;
-        //}
-
         public static (TextBox textBox, ContentDialog dialog) SetInputBoxDialog(object text, object caption = null, MessageDialogButton messageBoxButton = MessageDialogButton.OK)
         {
-            ContentDialog dialog = SetContentDialog(text, caption, messageBoxButton);
-            StackPanel stackPanel = new StackPanel();
-            TextBlock textBlock = new TextBlock();
-            if (!string.IsNullOrEmpty(text?.ToString()))
+
+            if (string.IsNullOrEmpty(text?.ToString()))
             {
-                textBlock.Text = text.ToString();
-                textBlock.TextWrapping = TextWrapping.Wrap;
+                text = "";
             }
+
+            if (string.IsNullOrEmpty(caption?.ToString()))
+            {
+                caption = "MapsInMyFolder";
+            }
+
+            TextBlock textBlock = new TextBlock
+            {
+                Text = text.ToString(),
+                TextWrapping = TextWrapping.Wrap
+            };
+
             TextBox textBox = new TextBox
             {
-                Style = (Style)Application.Current.Resources["TextBoxCleanStyle_13"],
+                Style = (Style)Application.Current.Resources["TextBoxCleanStyleDefault"],
                 HorizontalAlignment = HorizontalAlignment.Stretch,
-                Margin = new Thickness(0, 10, 0, 0)
+                Margin = new Thickness(0, 10, 0, 0),
+                Height = 25,
             };
+            MessageContentDialogHelpers.FocusSenderOnLoad(textBox);
+            StackPanel stackPanel = new StackPanel();
             stackPanel.Children.Add(textBlock);
             stackPanel.Children.Add(textBox);
-            dialog.Content = stackPanel;
+
+            ContentDialog dialog = SetContentDialog(stackPanel, caption, messageBoxButton);
             return (textBox, dialog);
         }
 
-        public static ContentDialog SetContentDialog(object text, object caption = null, MessageDialogButton messageBoxButton = MessageDialogButton.OK, bool showTextbox = false)
+        public static ContentDialog SetContentDialog(object text, object caption = null, MessageDialogButton messageBoxButton = MessageDialogButton.OK)
         {
             return Application.Current.Dispatcher.Invoke(delegate
              {
@@ -93,64 +61,46 @@ namespace MapsInMyFolder.Commun
                      Background = Collectif.HexValueToSolidColorBrush("#171719")
                  };
 
-                 if (showTextbox)
-                 {
-                     //alert("Veuillez indiquer l'adresse URL du panorama à télécharger :","Google Maps")
-                     StackPanel stackPanel = new StackPanel();
-                     TextBlock textBlock = new TextBlock();
-                     if (!string.IsNullOrEmpty(text?.ToString()))
-                     {
-                         textBlock.Text = text.ToString();
-                         textBlock.TextWrapping = TextWrapping.Wrap;
-                     }
-                     TextBox textBox = new TextBox
-                     {
-                         Style = (Style)Application.Current.Resources["TextBoxCleanStyle_13"],
-                         HorizontalAlignment = HorizontalAlignment.Stretch,
-                         Margin = new Thickness(0, 10, 0, 0)
-                     };
-                     stackPanel.Children.Add(textBlock);
-                     stackPanel.Children.Add(textBox);
-                     dialog.Content = stackPanel;
-                 }
-
-
-                 Debug.WriteLine("DialogMsg" + text);
+                 string dialogButtonOK = Languages.Current["dialogButtonOK"];
+                 string dialogButtonCancel = Languages.Current["dialogButtonCancel"];
+                 string dialogButtonYes = Languages.Current["dialogButtonYes"];
+                 string dialogButtonNo = Languages.Current["dialogButtonNo"];
+                 string dialogButtonRetry = Languages.Current["dialogButtonRetry"];
 
                  switch (messageBoxButton)
                  {
                      case MessageDialogButton.OK:
-                         ShowButtonPrimary("Ok");
+                         ShowButtonPrimary(dialogButtonOK);
                          break;
                      case MessageDialogButton.OKCancel:
-                         ShowButtonPrimary("Oui");
-                         ShowButtonCancel("Annuler");
+                         ShowButtonPrimary(dialogButtonOK);
+                         ShowButtonCancel(dialogButtonCancel);
                          break;
                      case MessageDialogButton.YesNo:
-                         ShowButtonPrimary("Oui");
-                         ShowButtonSecondary("Non");
+                         ShowButtonPrimary(dialogButtonYes);
+                         ShowButtonSecondary(dialogButtonNo);
                          break;
                      case MessageDialogButton.YesNoCancel:
-                         ShowButtonPrimary("Oui");
-                         ShowButtonSecondary("Non");
-                         ShowButtonCancel("Annuler");
+                         ShowButtonPrimary(dialogButtonYes);
+                         ShowButtonSecondary(dialogButtonNo);
+                         ShowButtonCancel(dialogButtonCancel);
                          break;
                      case MessageDialogButton.YesNoRetry:
-                         ShowButtonPrimary("Oui");
-                         ShowButtonSecondary("Non");
-                         ShowButtonCancel("Réessayer");
+                         ShowButtonPrimary(dialogButtonYes);
+                         ShowButtonSecondary(dialogButtonNo);
+                         ShowButtonCancel(dialogButtonRetry);
                          break;
                      case MessageDialogButton.YesCancel:
-                         ShowButtonPrimary("Oui");
-                         ShowButtonCancel("Annuler");
+                         ShowButtonPrimary(dialogButtonYes);
+                         ShowButtonCancel(dialogButtonCancel);
                          break;
                      case MessageDialogButton.YesRetry:
-                         ShowButtonPrimary("Oui");
-                         ShowButtonCancel("Réessayer");
+                         ShowButtonPrimary(dialogButtonYes);
+                         ShowButtonCancel(dialogButtonRetry);
                          break;
                      case MessageDialogButton.RetryCancel:
-                         ShowButtonCancel("Annuler");
-                         ShowButtonPrimary("Réessayer");
+                         ShowButtonCancel(dialogButtonCancel);
+                         ShowButtonPrimary(dialogButtonRetry);
                          break;
                  }
 

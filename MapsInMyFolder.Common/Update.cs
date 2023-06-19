@@ -16,7 +16,7 @@ namespace MapsInMyFolder.Commun
         public static event EventHandler NewUpdateFoundEvent = delegate { };
         public static string GetActualVersionFormatedString()
         {
-            Version version = Update.AssemblyVersion;
+            Version version = AssemblyVersion;
             return String.Format("{0}.{1}.{2}", version.Major, version.Minor, version.Build);
         }
 
@@ -97,7 +97,7 @@ namespace MapsInMyFolder.Commun
 
         public static async void StartUpdating()
         {
-            var dialog = Message.SetContentDialog($"Une nouvelle version de l'application est disponible {UpdateRelease.Tag_name}. Voullez-vous télécharger et installer cette mise à jour ?\n\nNotes de publication :\n{UpdateRelease.Body}", "Confirmer", MessageDialogButton.YesNo);
+            var dialog = Message.SetContentDialog(Languages.GetWithArguments("updateMessageNewVersionAvailable", UpdateRelease.Tag_name, UpdateRelease.Body), "Confirmer", MessageDialogButton.YesNo);
             ContentDialogResult result2 = ContentDialogResult.None;
             try
             {
@@ -113,12 +113,10 @@ namespace MapsInMyFolder.Commun
                 return;
             }
 
-            Debug.WriteLine("La nouvelle version " + UpdateRelease.Tag_name + " va être installée");
-
             var downloadFileUrl = new Uri(UpdateFileAsset.Browser_download_url);
             string UpdateFilePath = System.IO.Path.Combine(Settings.temp_folder, UpdateFileAsset.Id + UpdateFileAsset.Name);
 
-            string NotificationMsg = $"Téléchargement en cours de '{UpdateFileAsset.Name}' depuis {downloadFileUrl.Host}...";
+            string NotificationMsg = Languages.GetWithArguments("updateNotificationStartDownloading", UpdateFileAsset.Name, downloadFileUrl.Host);
             NProgress UpdateNotification = new NProgress(NotificationMsg, "MapsInMyFolder", "MainPage", null, 0, false) { };
             UpdateNotification.Register();
 
@@ -133,7 +131,7 @@ namespace MapsInMyFolder.Commun
             };
             await client.StartDownload();
 
-            UpdateNotification.Text("Installation...");
+            UpdateNotification.Text(Languages.Current["updateNotificationStartInstalling"]);
             UpdateNotification.SendUpdate();
             Application.Current.Shutdown();
             Process.Start(new ProcessStartInfo(UpdateFilePath) { UseShellExecute = true });

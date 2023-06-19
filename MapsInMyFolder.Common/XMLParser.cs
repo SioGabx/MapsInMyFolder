@@ -30,7 +30,7 @@ namespace MapsInMyFolder.Commun
 
         public virtual string GetPathAndCreateIfNotExist()
         {
-            string FilePath = System.IO.Path.Combine(Settings.working_folder, Type + ".xml");
+            string FilePath = Path.Combine(Settings.working_folder, Type + ".xml");
             if (!File.Exists(FilePath))
             {
                 CreateFile(FilePath);

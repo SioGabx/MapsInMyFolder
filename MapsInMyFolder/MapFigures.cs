@@ -4,44 +4,58 @@ using System.Collections.Generic;
 
 namespace MapsInMyFolder
 {
-
     public class MapFigures
     {
         private List<Figure> mapPolygons = new List<Figure>();
 
         public class Figure
         {
-            public MapPolygon polygon;
-            public int MinZoom;
-            public int MaxZoom;
-            public double StrokeThickness;
-            public Location NO;
-            public Location SE;
-            public string Name;
-            public string Color;
-            public Figure(MapPolygon polygon, string Name, Location NO, Location SE, int MinZoom, int MaxZoom, double StrokeThickness, string Color)
+            public MapPolygon Polygon { get; set; }
+            public int MinZoom { get; set; }
+            public int MaxZoom { get; set; }
+            public double StrokeThickness { get; set; }
+            public Location NO { get; set; }
+            public Location SE { get; set; }
+            public string Name { get; set; }
+            public string Color { get; set; }
+
+            public Figure(MapPolygon polygon, string name, Location NO, Location SE, int minZoom, int maxZoom, double strokeThickness, string color)
             {
-                this.polygon = polygon;
-                this.MinZoom = MinZoom;
-                this.MaxZoom = MaxZoom;
+                Polygon = polygon;
+                MinZoom = minZoom;
+                MaxZoom = maxZoom;
+                StrokeThickness = strokeThickness;
                 this.NO = NO;
                 this.SE = SE;
-                this.Name = Name;
-                this.StrokeThickness = StrokeThickness;
-                this.Color = Color;
+                Name = name;
+                Color = color;
+            }
+
+
+            public bool Contains(Location OtherNO, Location OtherSE)
+            {
+                if (OtherNO.Latitude >= NO.Latitude &&
+                    OtherNO.Longitude >= NO.Longitude &&
+                    OtherSE.Latitude <= SE.Latitude &&
+                    OtherSE.Longitude <= SE.Longitude)
+                {
+                    return true;
+                }
+
+                return false;
             }
         }
 
         public void DrawFigure(MapItemsControl map, Figure figure)
         {
             mapPolygons.Add(figure);
-            map.Items.Add(figure.polygon);
+            map.Items.Add(figure.Polygon);
         }
 
         public void RemoveFigure(MapItemsControl map, Figure figure)
         {
             mapPolygons.Remove(figure);
-            map.Items.Remove(figure.polygon);
+            map.Items.Remove(figure.Polygon);
         }
 
         public void ClearFigures(MapItemsControl map)
@@ -50,45 +64,66 @@ namespace MapsInMyFolder
             mapPolygons.Clear();
             foreach (Figure figure in mapPolygonsCopy)
             {
-                map.Items.Remove(figure.polygon);
+                map.Items.Remove(figure.Polygon);
             }
         }
 
-        public void UpdateFiguresFromZoomLevel(double ZoomLevel)
+        public void UpdateFiguresFromZoomLevel(double zoomLevel)
         {
             foreach (Figure figure in mapPolygons)
             {
-                if (figure.MinZoom != -1 && figure.MinZoom > ZoomLevel)
+                if (figure.MinZoom != -1 && figure.MinZoom > zoomLevel)
                 {
-                    figure.polygon.Visibility = System.Windows.Visibility.Collapsed;
+                    figure.Polygon.Visibility = System.Windows.Visibility.Collapsed;
                     continue;
                 }
 
-                if (figure.MaxZoom != -1 && figure.MaxZoom < ZoomLevel)
+                if (figure.MaxZoom != -1 && figure.MaxZoom < zoomLevel)
                 {
-                    figure.polygon.Visibility = System.Windows.Visibility.Collapsed;
+                    figure.Polygon.Visibility = System.Windows.Visibility.Collapsed;
                     continue;
                 }
-                figure.polygon.Visibility = System.Windows.Visibility.Visible;
+                figure.Polygon.Visibility = System.Windows.Visibility.Visible;
             }
         }
 
         public static IEnumerable<Figure> GetFiguresFromJsonString(string json)
         {
-            foreach (Dictionary<string, string> ElementsForRectangleSelection in Newtonsoft.Json.JsonConvert.DeserializeObject<List<Dictionary<string, string>>>(json) ?? new List<Dictionary<string, string>>())
+            if (string.IsNullOrWhiteSpace(json))
             {
-                MapPolygon Rectangle = new MapPolygon();
+                yield break;
+            }
 
-                if (!ElementsForRectangleSelection.TryGetValue("NO_Lat", out string NO_Lat_str)) continue;
-                if (!ElementsForRectangleSelection.TryGetValue("NO_Long", out string NO_Long_str)) continue;
-                if (!ElementsForRectangleSelection.TryGetValue("SE_Lat", out string SE_Lat_str)) continue;
-                if (!ElementsForRectangleSelection.TryGetValue("SE_Long", out string SE_Long_str)) continue;
+            List<Dictionary<string, string>> rectangleSelection;
+            try
+            {
+                rectangleSelection = Newtonsoft.Json.JsonConvert.DeserializeObject<List<Dictionary<string, string>>>(json);
+            }
+            catch (Newtonsoft.Json.JsonReaderException ex)
+            {
+                Javascript.Functions.PrintError(ex.Message);
+                yield break;
+            }
+            catch (Newtonsoft.Json.JsonSerializationException ex)
+            {
+                Javascript.Functions.PrintError(ex.Message);
+                yield break;
+            }
 
-                ElementsForRectangleSelection.TryGetValue("Name", out string Name);
-                ElementsForRectangleSelection.TryGetValue("MinZoom", out string MinZoomStr);
-                ElementsForRectangleSelection.TryGetValue("MaxZoom", out string MaxZoomStr);
-                ElementsForRectangleSelection.TryGetValue("StrokeThickness", out string StrokeThicknessStr);
-                ElementsForRectangleSelection.TryGetValue("Color", out string Color);
+            foreach (Dictionary<string, string> elementsForRectangleSelection in rectangleSelection)
+            {
+                MapPolygon rectangle = new MapPolygon();
+
+                if (!elementsForRectangleSelection.TryGetValue("NO_Lat", out string NO_Lat_str)) continue;
+                if (!elementsForRectangleSelection.TryGetValue("NO_Long", out string NO_Long_str)) continue;
+                if (!elementsForRectangleSelection.TryGetValue("SE_Lat", out string SE_Lat_str)) continue;
+                if (!elementsForRectangleSelection.TryGetValue("SE_Long", out string SE_Long_str)) continue;
+
+                elementsForRectangleSelection.TryGetValue("Name", out string name);
+                elementsForRectangleSelection.TryGetValue("MinZoom", out string MinZoomStr);
+                elementsForRectangleSelection.TryGetValue("MaxZoom", out string MaxZoomStr);
+                elementsForRectangleSelection.TryGetValue("StrokeThickness", out string StrokeThicknessStr);
+                elementsForRectangleSelection.TryGetValue("Color", out string color);
 
                 if (!double.TryParse(NO_Lat_str, out double NO_Lat)) continue;
                 if (!double.TryParse(NO_Long_str, out double NO_Long)) continue;
@@ -111,31 +146,28 @@ namespace MapsInMyFolder
 
                 Location NO = new Location(NO_Lat, NO_Long);
                 Location SE = new Location(SE_Lat, SE_Long);
-                Rectangle.Locations = new List<Location>() { NO, new Location(SE.Latitude, NO.Longitude), SE, new Location(NO.Latitude, SE.Longitude) };
-
-                yield return new Figure(Rectangle, Name, NO, SE, MinZoom, MaxZoom, StrokeThickness, Color);
+                rectangle.Locations = new List<Location>() { NO, new Location(SE.Latitude, NO.Longitude), SE, new Location(NO.Latitude, SE.Longitude) };
+                if (MapSelectable.IsZeroWidthRectangle(NO, SE))
+                {
+                    yield break;
+                }
+                yield return new Figure(rectangle, name, NO, SE, MinZoom, MaxZoom, StrokeThickness, color);
             }
         }
 
-
-        public void DrawFigureOnMapItemsControlFromJsonString(MapItemsControl mapviewerRectangles, string FiguresJsonString)
+        public void DrawFigureOnMapItemsControlFromJsonString(MapItemsControl mapviewerRectangles, string figuresJsonString, double zoomLevel)
         {
             ClearFigures(mapviewerRectangles);
-            foreach (MapFigures.Figure Figure in MapFigures.GetFiguresFromJsonString(FiguresJsonString))
+            foreach (Figure figure in GetFiguresFromJsonString(figuresJsonString))
             {
-                MapPolygon polygon = Figure.polygon;
-                polygon.Stroke = Collectif.HexValueToSolidColorBrush(Figure.Color, "#000");
-                polygon.StrokeThickness = Figure.StrokeThickness;
+                MapPolygon polygon = figure.Polygon;
+                polygon.Stroke = Collectif.HexValueToSolidColorBrush(figure.Color, "#000");
+                polygon.StrokeThickness = figure.StrokeThickness;
                 polygon.IsHitTestVisible = false;
-                Figure.polygon = polygon;
-                DrawFigure(mapviewerRectangles, Figure);
+                figure.Polygon = polygon;
+                DrawFigure(mapviewerRectangles, figure);
             }
+            UpdateFiguresFromZoomLevel(zoomLevel);
         }
-
-
-
-
-
     }
-
 }

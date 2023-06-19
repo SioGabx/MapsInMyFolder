@@ -47,7 +47,6 @@ namespace MapsInMyFolder
             try
             {
                 Thread.CurrentThread.CurrentCulture = new CultureInfo("en");
-                //Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
 
                 var settings = new CefSharp.Wpf.CefSettings();
                 string BrowserSubprocessPathPath = Path.GetFullPath("CefSharp.BrowserSubprocess.exe");
@@ -67,7 +66,7 @@ namespace MapsInMyFolder
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine("Impossible de nettoyer le cache" + cefsharpTempFolderPath + "\n" + ex.Message);
+                        Debug.WriteLine("Unable to clear the cache." + cefsharpTempFolderPath + "\n" + ex.Message);
                     }
                 }
                 string layersTempFolderPath = Path.Combine(Settings.temp_folder, "layers");
@@ -82,12 +81,11 @@ namespace MapsInMyFolder
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine("Impossible de nettoyer le cache" + layersTempFolderPath + "\n" + ex.Message);
+                        Debug.WriteLine("Unable to clear the cache." + layersTempFolderPath + "\n" + ex.Message);
                     }
                 }
                 Directory.CreateDirectory(cefsharpTempFolderPath);
                 settings.CachePath = cefsharpTempFolderPath;
-
                 if (!Directory.Exists(Settings.working_folder))
                 {
                     try
@@ -108,9 +106,9 @@ namespace MapsInMyFolder
                     {
                         Directory.CreateDirectory(Settings.working_folder);
                     }
-                    catch (Exception)
+                    catch (Exception ex)
                     {
-                        DebugMode.WriteLine("Erreur creation du dossier working_folder : " + Settings.working_folder);
+                        Debug.WriteLine(ex.ToString());
                     }
                 }
 
@@ -126,9 +124,18 @@ namespace MapsInMyFolder
                         defaultPage: "index.html" // will default to index.html
                     )
                 });
+
+                //settings.RegisterScheme(new CefCustomScheme
+                //{
+                //    SchemeName = "mapsinmyfolder",
+                //    DomainName = "get",
+                //    SchemeHandlerFactory = new CustomSchemeLoadFromApplicationHandlerFactory()
+                //});
+
+
+
                 settings.CefCommandLineArgs.Add("ignore-certificate-errors"); //cf https://stackoverflow.com/a/35564187/9947331
-
-
+                //CefSharpSettings.ConcurrentTaskExecution = true;
                 if (!Cef.IsInitialized)
                 {
                     //Perform dependency check to make sure all relevant resources are in our output directory.
@@ -138,9 +145,7 @@ namespace MapsInMyFolder
             }
             catch (Exception ex)
             {
-                //MessageBox.Show("Erreur de lancement : " + ex.Message + "\n\n StackTrace :  \n" + ex.StackTrace + "\n\n InnerException :  \n" + ex.InnerException);
-                //MessageBox.Show(ex.ToString(), "Erreur de lancement", MessageBoxButton.OK, MessageBoxImage.Error);
-                Message.NoReturnBoxAsync(ex.ToString(), "Erreur");
+                Message.NoReturnBoxAsync(ex.ToString(), "Error");
                 Collectif.RestartApplication();
             }
         }
@@ -160,9 +165,15 @@ namespace MapsInMyFolder
             {
                 Debug.WriteLine(e.Exception.ToString());
                 e.Handled = true;
-                File.WriteAllText(Path.Combine(Settings.working_folder, "crash.log"), e.Exception.Message + Environment.NewLine + e.Exception.StackTrace + Environment.NewLine + Environment.NewLine + "Error string \n" + e.Exception.ToString(), System.Text.Encoding.UTF8);
-                MessageBox.Show("Une erreur innatendu s'est produite, l'application va peut-être devoir se fermer ! \n" + e.Exception.ToString(), "Erreur fatale");
-                //Message.NoReturnBoxAsync("Une erreur innatendu s'est produite, l'application va devoir se fermer", "Erreur");
+                string Separator = "\n----------------------------------------------------------";
+                Separator += Separator + Separator;
+                File.AppendAllText(
+                    Path.Combine(Settings.working_folder, "crash.log"), Separator +
+                    "\nException.Message :\n" + e.Exception.Message +
+                    "\nException.StackTrace :\n" + e.Exception.StackTrace +
+                    "\n\nException.String :\n" + e.Exception.ToString(), System.Text.Encoding.UTF8);
+
+                MessageBox.Show("An error occurred, the application is now unstable. It is strongly recommended to restart the application!\n\n" + e.Exception.Message, "Fatal error.");
             }
             catch (Exception ex)
             {
