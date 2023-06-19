@@ -1,16 +1,11 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Documents;
 using System.Windows.Threading;
-using System.Xml.Serialization;
 
 namespace MapsInMyFolder.Commun
 {
@@ -233,7 +228,7 @@ namespace MapsInMyFolder.Commun
                 }
                 return TileLocationCalculator.TransformLocation(OriginWkt.ToString(), TargetWkt.ToString(), latitude, longitude);
             }
-   
+
             public static void Print(object print, int LayerId = 0)
             {
                 string printString = ConvertJSObjectToString(print);
@@ -339,7 +334,7 @@ namespace MapsInMyFolder.Commun
                     if (Thread.CurrentThread.GetApartmentState() == ApartmentState.STA)
                     {
                         string NotificationId = "LayerId_" + LayerId + "_" + notifId ?? "single";
-                        
+
                         void callback()
                         {
                             ExecuteScript(Layers.GetLayerById(LayerId).class_script, null, LayerId, javascriptCallback?.ToString());

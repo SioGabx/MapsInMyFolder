@@ -1,10 +1,6 @@
 ﻿using ProjNet.CoordinateSystems;
-using ProjNet.CoordinateSystems.Projections;
 using ProjNet.CoordinateSystems.Transformations;
 using System;
-using System.Diagnostics;
-using System.IO;
-using System.Xml.Serialization;
 
 namespace MapsInMyFolder.Commun
 {
@@ -25,7 +21,7 @@ namespace MapsInMyFolder.Commun
                 var CoordinateSystemFactory = new CoordinateSystemFactory();
                 var OriginCoordinateSystem = CoordinateSystemFactory.CreateFromWkt(OriginWkt);
                 var TargetCoordinateSystem = CoordinateSystemFactory.CreateFromWkt(TargetWkt);
-           
+
                 var CoordinateTransformation = new CoordinateTransformationFactory();
                 var ICoordinateTransformation = CoordinateTransformation.CreateFromCoordinateSystems(OriginCoordinateSystem, TargetCoordinateSystem);
                 return ICoordinateTransformation.MathTransform.Transform(LatLongLocationToConvert);

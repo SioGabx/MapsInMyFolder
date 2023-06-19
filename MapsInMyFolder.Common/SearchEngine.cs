@@ -1,20 +1,11 @@
-﻿using MapsInMyFolder.Commun;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Net.Http;
-using System.Security.Cryptography.X509Certificates;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Input;
-using System.Windows.Threading;
 using System.Xml;
 
 namespace MapsInMyFolder.Commun
@@ -131,7 +122,7 @@ namespace MapsInMyFolder.Commun
             return (returnListOfAddresses, returnSearchEngineResult);
         }
 
-        public static (List<string>, Dictionary<int, SearchEngineResult>) BingMapSearch(string encodedSearch, double mapLatitude, double mapLongitude )
+        public static (List<string>, Dictionary<int, SearchEngineResult>) BingMapSearch(string encodedSearch, double mapLatitude, double mapLongitude)
         {
             //OSM Search
             List<string> returnListOfAddresses = new List<string>();
@@ -230,7 +221,7 @@ namespace MapsInMyFolder.Commun
                 return responseString;
             }
 
-           
+
             string userLocation = "location={\"spatialReference\":{\"latestWkid\":4326,\"wkid\":4326},\"x\":" + mapLongitude + ",\"y\":" + mapLatitude + "}";
             string url = $"https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/findAddressCandidates?address={encodedSearch}&{userLocation}&outFields=*&outSR={{\"latestWkid\":4326,\"wkid\":4326}}&f=json";
             // Effectuer la recherche

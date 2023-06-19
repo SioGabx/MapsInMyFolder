@@ -48,7 +48,8 @@ namespace MapsInMyFolder.Commun
 
     public static class Tiles
     {
-        static Tiles(){
+        static Tiles()
+        {
             System.Net.ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls12;
         }
 

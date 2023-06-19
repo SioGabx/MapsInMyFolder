@@ -108,7 +108,7 @@ namespace MapsInMyFolder
                     }
                     catch (Exception ex)
                     {
-                       Debug.WriteLine(ex.ToString());
+                        Debug.WriteLine(ex.ToString());
                     }
                 }
 
@@ -132,7 +132,7 @@ namespace MapsInMyFolder
                 //    SchemeHandlerFactory = new CustomSchemeLoadFromApplicationHandlerFactory()
                 //});
 
-                
+
 
                 settings.CefCommandLineArgs.Add("ignore-certificate-errors"); //cf https://stackoverflow.com/a/35564187/9947331
                 //CefSharpSettings.ConcurrentTaskExecution = true;

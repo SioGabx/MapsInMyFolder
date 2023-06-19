@@ -1,7 +1,6 @@
 ﻿using ModernWpf.Controls;
 using System;
 using System.Diagnostics;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -17,7 +16,7 @@ namespace MapsInMyFolder.Commun
             {
                 text = "";
             }
-            
+
             if (string.IsNullOrEmpty(caption?.ToString()))
             {
                 caption = "MapsInMyFolder";
@@ -34,7 +33,7 @@ namespace MapsInMyFolder.Commun
                 Style = (Style)Application.Current.Resources["TextBoxCleanStyleDefault"],
                 HorizontalAlignment = HorizontalAlignment.Stretch,
                 Margin = new Thickness(0, 10, 0, 0),
-                        Height = 25,
+                Height = 25,
             };
             MessageContentDialogHelpers.FocusSenderOnLoad(textBox);
             StackPanel stackPanel = new StackPanel();

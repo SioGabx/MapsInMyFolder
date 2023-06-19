@@ -4,8 +4,6 @@ using ModernWpf.Controls;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Data.Common;
-using System.Data.SQLite;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
@@ -294,7 +292,7 @@ namespace MapsInMyFolder
             {
                 TextBoxSetValueAndLock(TextboxLayerIdentifier, LayerInEditMode.class_identifier);
             }
-            
+
             TextBoxSetValueAndLock(TextboxLayerDescription, LayerInEditMode.class_description);
             TextBoxSetValueAndLock(TextboxLayerScript, LayerInEditMode.class_script);
             TextBoxSetValueAndLock(TextboxRectangles, LayerInEditMode.class_rectangles);
@@ -534,7 +532,7 @@ namespace MapsInMyFolder
             }
             catch (Exception)
             {
-                return_value =  string.Empty;
+                return_value = string.Empty;
             }
 
             if (string.IsNullOrEmpty(return_value))
@@ -961,7 +959,7 @@ namespace MapsInMyFolder
                 var result = await Message.SetContentDialog(Languages.Current["editorMessageResetLayerProperty"], Languages.Current["dialogTitleOperationConfirm"], MessageDialogButton.YesCancel).ShowAsync();
                 if (result == ContentDialogResult.Primary)
                 {
-                    Database.ExecuteNonQuerySQLCommand("DELETE FROM EDITEDLAYERS WHERE ID=" + LayerId); 
+                    Database.ExecuteNonQuerySQLCommand("DELETE FROM EDITEDLAYERS WHERE ID=" + LayerId);
                     Leave(true);
                     DisposeElementBeforeLeave();
 

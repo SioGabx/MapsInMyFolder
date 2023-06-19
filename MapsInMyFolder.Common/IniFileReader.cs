@@ -25,7 +25,7 @@ namespace MapsInMyFolder.Commun
                 {
                     string key = trimmedLine.Substring(0, separatorIndex).Trim();
                     string value = trimmedLine.Substring(separatorIndex + 1).Trim();
-                    value = Collectif.HTMLEntities(value.Replace("\\n", "\n"),true);
+                    value = Collectif.HTMLEntities(value.Replace("\\n", "\n"), true);
                     keyValuePairs[key] = value;
                 }
             }

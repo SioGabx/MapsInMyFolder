@@ -164,18 +164,19 @@ namespace MapsInMyFolder.Commun
 
                 void SetProviders(int ArrayX, int ArrayY, int ComputedTileX, int ComputedTileY)
                 {
-                    try {
-                    VectorTileRenderer.Sources.PbfTileSource pbfTileSource = GetProviderFromXYZ(LayerID, urlBase, ComputedTileX, ComputedTileY, zoom, cache_tile, save_temp_directory_rawBPF, save_temp_directory, filename, settings_max_tiles_cache_days).Result;
-                    lock (PBF_SetProviders_Locker)
+                    try
                     {
-                        try
+                        VectorTileRenderer.Sources.PbfTileSource pbfTileSource = GetProviderFromXYZ(LayerID, urlBase, ComputedTileX, ComputedTileY, zoom, cache_tile, save_temp_directory_rawBPF, save_temp_directory, filename, settings_max_tiles_cache_days).Result;
+                        lock (PBF_SetProviders_Locker)
                         {
-                            providers[ArrayX][ArrayY] = pbfTileSource;
-                        }
-                        catch (Exception ex)
-                        {
-                            Debug.WriteLine("Erreur set providers :" + ex.Message);
-                        }
+                            try
+                            {
+                                providers[ArrayX][ArrayY] = pbfTileSource;
+                            }
+                            catch (Exception ex)
+                            {
+                                Debug.WriteLine("Erreur set providers :" + ex.Message);
+                            }
                         }
                     }
                     catch (Exception ex)

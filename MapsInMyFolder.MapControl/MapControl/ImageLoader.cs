@@ -64,7 +64,7 @@ namespace MapsInMyFolder.MapControl
                     }
                     else if (Settings.map_view_error_tile)
                     {
-                        image = await LoadImageAsync(Collectif.GetEmptyImageBufferFromText(response, tileSource.LayerID,fileformat)).ConfigureAwait(false);
+                        image = await LoadImageAsync(Collectif.GetEmptyImageBufferFromText(response, tileSource.LayerID, fileformat)).ConfigureAwait(false);
                     }
                 }
                 else

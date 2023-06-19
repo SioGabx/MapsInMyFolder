@@ -1,13 +1,6 @@
 ﻿using CefSharp;
-using MapsInMyFolder.Commun;
-using System.Diagnostics;
-using System.IO;
-using System.Text;
-using System.Web;
 using System;
-using System.Threading.Tasks;
-using CefSharp.Handler;
-using System.Security.Policy;
+using System.Web;
 
 namespace MapsInMyFolder
 {
@@ -32,8 +25,8 @@ namespace MapsInMyFolder
     {
         protected override IResourceRequestHandler GetResourceRequestHandler(IWebBrowser chromiumWebBrowser, IBrowser browser, IFrame frame, IRequest request, bool isNavigation, bool isDownload, string requestInitiator, ref bool disableDefaultHandling)
         {
-         
-                if (request.Url.StartsWith("mapsinmyfolder://get"))
+
+            if (request.Url.StartsWith("mapsinmyfolder://get"))
             {
                 return new CustomResourceRequestHandler();
             }
@@ -52,7 +45,7 @@ namespace MapsInMyFolder
             // Vous pouvez utiliser la classe HttpUtility.ParseQueryString pour analyser les paramètres
             var queryParams = HttpUtility.ParseQueryString(query);
 
-          
+
             string argsUrl = HttpUtility.UrlDecode(queryParams["url"]);
             string argsReferrer = HttpUtility.UrlDecode(queryParams["referrer"]);
 

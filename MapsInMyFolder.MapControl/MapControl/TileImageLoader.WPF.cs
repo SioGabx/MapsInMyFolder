@@ -46,7 +46,7 @@ namespace MapsInMyFolder.MapControl
                     }
                     else if (Settings.map_view_error_tile)
                     {
-                        buffer = Collectif.GetEmptyImageBufferFromText(response,LayerId, layers.class_format);
+                        buffer = Collectif.GetEmptyImageBufferFromText(response, LayerId, layers.class_format);
                     }
                 }
                 catch (Exception ex)

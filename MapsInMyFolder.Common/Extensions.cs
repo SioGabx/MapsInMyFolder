@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Net.Http.Headers;
-using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -87,9 +85,9 @@ namespace MapsInMyFolder.Commun
 
         public static void SetText(this TextBox textbox, string text, TextChangedEventHandler textChangedEvent)
         {
-                textbox.TextChanged -= textChangedEvent;
-                textbox.Text = text;
-                textbox.TextChanged += textChangedEvent;
+            textbox.TextChanged -= textChangedEvent;
+            textbox.Text = text;
+            textbox.TextChanged += textChangedEvent;
         }
         public static void SetSelectedIndex(this ComboBox combobox, int index)
         {

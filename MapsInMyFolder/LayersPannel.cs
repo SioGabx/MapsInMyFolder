@@ -6,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.Data.SQLite;
 using System.Diagnostics;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -17,7 +16,6 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media.Animation;
 using System.Windows.Threading;
 
 namespace MapsInMyFolder
@@ -719,7 +717,7 @@ namespace MapsInMyFolder
                     }
                 }
 
-                
+
 
                 const string base64Before = "[internal]";
                 string encodeURL(string url)
@@ -741,7 +739,7 @@ namespace MapsInMyFolder
 
                 previewBackgroundImageUrl = previewBackgroundImageUrl.TrimStart(base64Before);
                 previewFallbackBackgroundImageUrl = previewFallbackBackgroundImageUrl.TrimStart(base64Before);
-               
+
                 string previewJSON = "{\"preview\":{\"frontImage\":{\"url\":\"" + previewLayerFrontImageUrl + "\",\"referrer\":\"" + previewReferrer + "\"},\"backgroundImage\":{\"url\":\"" + previewBackgroundImageUrl + "\",\"referrer\":\"" + previewBackgroundReferrer + "\"}},\"previewFallback\":{\"frontImage\":{\"url\":\"" + previewFallbackLayerFrontImageUrl + "\",\"referrer\":\"" + previewReferrer + "\"},\"backgroundImage\":{\"url\":\"" + previewFallbackBackgroundImageUrl + "\",\"referrer\":\"" + previewBackgroundReferrer + "\"}}}";
 
                 return previewJSON;

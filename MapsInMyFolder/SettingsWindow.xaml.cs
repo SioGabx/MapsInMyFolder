@@ -516,7 +516,7 @@ namespace MapsInMyFolder
             foreach ((StackPanel SettingsPanel, Grid MenuLabel) in ListOfSubMenu)
             {
                 var UIElementPosition = SettingsPanel.TranslatePoint(new Point(0, 0), SettingsScrollViewer).Y;
-                 if (UIElementPosition - Margin <= 0 && UIElementPosition > -(SettingsPanel.ActualHeight - Margin))
+                if (UIElementPosition - Margin <= 0 && UIElementPosition > -(SettingsPanel.ActualHeight - Margin))
                 {
                     MenuLabel.Style = (Style)this.Resources["GridInViewNormalStyle"];
                 }

@@ -604,9 +604,9 @@ namespace MapsInMyFolder
                 {
                     Parallel.ForEach(urls, new ParallelOptions { MaxDegreeOfParallelism = Settings.max_download_tiles_in_parralele, CancellationToken = cancellationToken }, url =>
                         {
-                    WaitForInternet(downloadEngineClass);
-                    DownloadUrlAsync(url).Wait();
-                });
+                            WaitForInternet(downloadEngineClass);
+                            DownloadUrlAsync(url).Wait();
+                        });
                 }
                 catch (OperationCanceledException ex)
                 {

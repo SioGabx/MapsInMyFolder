@@ -8,8 +8,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows;
-using static MapsInMyFolder.Commun.Javascript;
 
 namespace MapsInMyFolder.Commun
 {
@@ -314,7 +312,7 @@ namespace MapsInMyFolder.Commun
             try
             {
                 Monitor.Enter(ExecuteScriptLocker);
-            
+
                 if (ScriptIsOld(ScriptTimestamp))
                 {
                     Functions.PrintError("Execution of the function has been canceled because its start date is too old and/or has been revoked.");
@@ -328,7 +326,7 @@ namespace MapsInMyFolder.Commun
 
                     if (!executedSuccessfully && !IsWaitingUserAction)
                     {
-                        Functions.PrintError("The execution of the function has been canceled as it took too long to respond."); 
+                        Functions.PrintError("The execution of the function has been canceled as it took too long to respond.");
                         Monitor.Exit(ExecuteScriptLocker);
                         return;
                     }
@@ -375,7 +373,7 @@ namespace MapsInMyFolder.Commun
                     Monitor.Exit(ExecuteScriptLocker);
                 }
             }
-    }
+        }
 
 
 

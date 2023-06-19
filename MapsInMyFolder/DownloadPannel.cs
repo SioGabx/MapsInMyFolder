@@ -179,7 +179,7 @@ namespace MapsInMyFolder
                 EasingFunction = new PowerEase { EasingMode = EasingMode.EaseInOut }
             };
             hide_anim.Completed += hide_anim_Completed;
-            download_panel.BeginAnimation(OpacityProperty, hide_anim); 
+            download_panel.BeginAnimation(OpacityProperty, hide_anim);
 
             void hide_anim_Completed(object sender, EventArgs e)
             {
@@ -377,7 +377,7 @@ namespace MapsInMyFolder
                         Message.NoReturnBoxAsync(ex.Message, Languages.Current["dialogTitleOperationFailed"]);
                     }
                 }, null);
-                
+
                 foreach (DownloadSettings eng in DownloadSettings.GetEngineList())
                 {
                     if (eng.state == Status.success)

@@ -1,5 +1,4 @@
-﻿using CefSharp;
-using MapsInMyFolder.Commun;
+﻿using MapsInMyFolder.Commun;
 using MapsInMyFolder.MapControl;
 using System;
 using System.Collections.Generic;
