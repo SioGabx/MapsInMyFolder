@@ -22,6 +22,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
+using static MapsInMyFolder.Commun.Javascript;
 
 namespace MapsInMyFolder.Commun
 {
@@ -172,7 +173,7 @@ namespace MapsInMyFolder.Commun
                 return new List<int>() { return_x, return_y };
             }
 
-            public static List<TilesUrl> GetListOfUrlFromLocation(Dictionary<string, double> location, int z, string urlbase, int LayerID, int downloadid, string varContext)
+            public static List<TileProperty> GetListOfUrlFromLocation(Dictionary<string, double> location, int z, string urlbase, int LayerID, int downloadid, string varContext)
             {
                 try
                 {
@@ -197,7 +198,7 @@ namespace MapsInMyFolder.Commun
 
 
 
-                    List<TilesUrl> tilesUrls = GenrateListOfUrlFromLocation(location, z, urlbase, -1, downloadid);
+                    List<TileProperty> tilesUrls = GenrateListOfUrlFromLocation(location, z, urlbase, -1, downloadid, calque.class_format);
 
                     return tilesUrls;
 
@@ -212,11 +213,11 @@ namespace MapsInMyFolder.Commun
                     Javascript.Functions.ClearVar(-1);
                 }
 
-                return new List<TilesUrl>();
+                return new List<TileProperty>();
             }
 
 
-            public static List<TilesUrl> GenrateListOfUrlFromLocation(Dictionary<string, double> location, int z, string urlbase, int LayerID, int downloadid)
+            public static List<TileProperty> GenrateListOfUrlFromLocation(Dictionary<string, double> location, int z, string urlbase, int LayerID, int downloadid, string format)
             {
                 var NO_tile = CoordonneesToTile(location["NO_Latitude"], location["NO_Longitude"], z);
                 var SE_tile = CoordonneesToTile(location["SE_Latitude"], location["SE_Longitude"], z);
@@ -225,25 +226,29 @@ namespace MapsInMyFolder.Commun
                 int SE_x = SE_tile.X;
                 int SE_y = SE_tile.Y;
 
-                List<TilesUrl> list_of_url_to_download = new List<TilesUrl>();
+                List<TileProperty> list_of_url_to_download = new List<TileProperty>();
                 int Download_X_tile = 0;
                 int Download_Y_tile = 0;
                 int max_x = Math.Abs(SE_x - NO_x) + 1;
                 int max_y = Math.Abs(SE_y - NO_y) + 1;
-                Debug.WriteLine("Getting all urls");
                 for (int i = 0; i < max_y; i++)
                 {
                     for (int a = 0; a < max_x; a++)
                     {
                         int tuileX = NO_x + Download_X_tile;
                         int tuileY = NO_y + Download_Y_tile;
-                        list_of_url_to_download.Add(new TilesUrl(tuileX, tuileY, z, Status.waitfordownloading, downloadid));
+                        string url = FromTileXYZ(urlbase, tuileX, tuileY, z, LayerID, InvokeFunction.getTile);
+                        TileProperty Tile = new TileProperty(url,tuileX, tuileY, z, Status.waitfordownloading, downloadid, format);
+                        if (format == "pbf")
+                        {
+                            Tile.SetNeighbour(LayerID, urlbase);
+                        }
+                        list_of_url_to_download.Add(Tile);
                         List<int> next_num_list = NextNumberFromPara(Download_X_tile, Download_Y_tile, max_x, max_y);
                         Download_X_tile = next_num_list[0];
                         Download_Y_tile = next_num_list[1];
                     }
                 }
-                Debug.WriteLine("End getting urls");
                 return list_of_url_to_download;
             }
         }

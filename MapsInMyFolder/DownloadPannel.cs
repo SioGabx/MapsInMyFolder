@@ -39,18 +39,18 @@ namespace MapsInMyFolder
                     int RESIZEHEIGHT = sqlite_datareader.GetInt32(sqlite_datareader.GetOrdinal("RESIZEHEIGHT"));
                     int DB_Download_QUALITY = sqlite_datareader.GetInt32(sqlite_datareader.GetOrdinal("QUALITY"));
                     string DB_Download_TIMESTAMP = sqlite_datareader.GetString(sqlite_datareader.GetOrdinal("TIMESTAMP"));
-                    string DB_Download_TEMP_DIRECTORY = sqlite_datareader.GetString(sqlite_datareader.GetOrdinal("TEMP_DIRECTORY"));
-                    string DB_Download_SAVE_DIRECTORY = sqlite_datareader.GetString(sqlite_datareader.GetOrdinal("SAVE_DIRECTORY"));
+                    string DB_Download_TEMP_DIRECTORY = Collectif.HTMLEntities(sqlite_datareader.GetString(sqlite_datareader.GetOrdinal("TEMP_DIRECTORY")), true);
+                    string DB_Download_SAVE_DIRECTORY = Collectif.HTMLEntities(sqlite_datareader.GetString(sqlite_datareader.GetOrdinal("SAVE_DIRECTORY")), true);
                     string DB_Download_COLORINTERPRETATION = sqlite_datareader.GetString(sqlite_datareader.GetOrdinal("COLORINTERPRETATION"));
                     string DB_Download_SCALEINFO = sqlite_datareader.GetString(sqlite_datareader.GetOrdinal("SCALEINFO"));
-                    string DB_Download_FILE_NAME = sqlite_datareader.GetString(sqlite_datareader.GetOrdinal("FILE_NAME"));
-                    string DB_Download_STATE = sqlite_datareader.GetString(sqlite_datareader.GetOrdinal("STATE"));
-                    string DB_Download_INFOS = sqlite_datareader.GetString(sqlite_datareader.GetOrdinal("INFOS")).Trim();
+                    string DB_Download_FILE_NAME = Collectif.HTMLEntities(sqlite_datareader.GetString(sqlite_datareader.GetOrdinal("FILE_NAME")), true);
+                    string DB_Download_STATE =sqlite_datareader.GetString(sqlite_datareader.GetOrdinal("STATE"));
+                    string DB_Download_INFOS = Collectif.HTMLEntities(sqlite_datareader.GetString(sqlite_datareader.GetOrdinal("INFOS")).Trim(), true);
                     double DB_Download_NO_LAT = sqlite_datareader.GetDouble(sqlite_datareader.GetOrdinal("NO_LAT"));
                     double DB_Download_NO_LONG = sqlite_datareader.GetDouble(sqlite_datareader.GetOrdinal("NO_LONG"));
                     double DB_Download_SE_LAT = sqlite_datareader.GetDouble(sqlite_datareader.GetOrdinal("SE_LAT"));
                     double DB_Download_SE_LONG = sqlite_datareader.GetDouble(sqlite_datareader.GetOrdinal("SE_LONG"));
-                    string DB_Download_VARCONTEXTE = sqlite_datareader.GetString(sqlite_datareader.GetOrdinal("VARCONTEXTE")).Trim();
+                    string DB_Download_VARCONTEXTE = Collectif.HTMLEntities(sqlite_datareader.GetString(sqlite_datareader.GetOrdinal("VARCONTEXTE")).Trim(), true);
                     string final_saveformat = System.IO.Path.GetExtension(DB_Download_FILE_NAME);
                     int downloadid = DB_Download_ID * -1;
                     string format = layers.class_format;
@@ -68,7 +68,7 @@ namespace MapsInMyFolder
 
                     ScaleInfo SCALEINFO = System.Text.Json.JsonSerializer.Deserialize<ScaleInfo>(DB_Download_SCALEINFO, new System.Text.Json.JsonSerializerOptions() { IncludeFields = true });
 
-                    List<TilesUrl> urls = null;
+                    List<TileProperty> urls = null;
                     CancellationTokenSource tokenSource2 = new CancellationTokenSource();
                     CancellationToken ct = tokenSource2.Token;
                     Status engine_status;

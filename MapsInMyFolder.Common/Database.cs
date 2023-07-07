@@ -373,7 +373,7 @@ namespace MapsInMyFolder.Commun
                 return -1;
             }
 
-            string InsertCommandText = $"INSERT INTO 'DOWNLOADS'('STATE','INFOS', 'FILE_NAME', 'NBR_TILES', 'ZOOM', 'NO_LAT', 'NO_LONG', 'SE_LAT', 'SE_LONG', 'LAYER_ID', 'TEMP_DIRECTORY', 'SAVE_DIRECTORY','TIMESTAMP','QUALITY','RESIZEWIDTH','RESIZEHEIGHT', 'COLORINTERPRETATION', 'SCALEINFO', 'VARCONTEXTE') VALUES('{STATE}','','{FILE_NAME}','{NBR_TILES}','{ZOOM}','{NO_LAT}','{NO_LONG}','{SE_LAT}','{SE_LONG}','{LAYER_ID}','{TEMP_DIRECTORY}','{SAVE_DIRECTORY}','{TIMESTAMP}','{QUALITY}','{RESIZEWIDTH}','{RESIZEHEIGHT}','{COLORINTERPRETATION}','{SCALEINFO}', '{VARCONTEXTE}');";
+            string InsertCommandText = $"INSERT INTO 'DOWNLOADS'('STATE','INFOS', 'FILE_NAME', 'NBR_TILES', 'ZOOM', 'NO_LAT', 'NO_LONG', 'SE_LAT', 'SE_LONG', 'LAYER_ID', 'TEMP_DIRECTORY', 'SAVE_DIRECTORY','TIMESTAMP','QUALITY','RESIZEWIDTH','RESIZEHEIGHT', 'COLORINTERPRETATION', 'SCALEINFO', 'VARCONTEXTE') VALUES('{STATE}','','{Collectif.HTMLEntities(FILE_NAME)}','{NBR_TILES}','{ZOOM}','{NO_LAT}','{NO_LONG}','{SE_LAT}','{SE_LONG}','{LAYER_ID}','{Collectif.HTMLEntities(TEMP_DIRECTORY)}','{Collectif.HTMLEntities(SAVE_DIRECTORY)}','{TIMESTAMP}','{QUALITY}','{RESIZEWIDTH}','{RESIZEHEIGHT}','{COLORINTERPRETATION}','{SCALEINFO}', '{Collectif.HTMLEntities(VARCONTEXTE)}');";
             //Make sur that select last_insert_rowid() is launch just after insert
             var DatabaseConnexion = DB_Connection();
             ExecuteNonQuerySQLCommand(DatabaseConnexion, InsertCommandText);

@@ -11,9 +11,8 @@ namespace MapsInMyFolder.Commun
 {
     public partial class TileLoader
     {
-        public async Task<HttpResponse> GetTilePBF(int LayerID, string urlBase, int TileX, int TileY, int TileZoom, string save_temp_directory, int render_tile_size, int TextSizeMultiplicateur, double OverflowTextCorrectingValue, bool pbfdisableadjacent = false)
+        public async Task<HttpResponse> GetTilePBF(int LayerID, TileProperty tilesUrl, string save_temp_directory, int render_tile_size, int TextSizeMultiplicateur, double OverflowTextCorrectingValue, bool pbfdisableadjacent = false)
         {
-            //System.Threading.Thread.CurrentThread.Priority = System.Threading.ThreadPriority.Highest;
             HttpResponse returnReponse = HttpResponse.HttpResponseError;
             try
             {
@@ -23,7 +22,7 @@ namespace MapsInMyFolder.Commun
                     return default(T);
                 }
 
-                var PBFRenderingTask = PBFRenderingAsync(0, LayerID, urlBase, TileX, TileY, TileZoom, save_temp_directory, render_tile_size, TextSizeMultiplicateur, OverflowTextCorrectingValue, pbfdisableadjacent);
+                var PBFRenderingTask = PBFRenderingAsync(LayerID, tilesUrl, save_temp_directory, render_tile_size, TextSizeMultiplicateur, OverflowTextCorrectingValue, pbfdisableadjacent);
                 var PBFRenderingTaskVsDummyDelayedTask = await Task.WhenAny(PBFRenderingTask, DelayedDummyResultTask<HttpResponse>(TimeSpan.FromSeconds(30)));
                 if (PBFRenderingTaskVsDummyDelayedTask == PBFRenderingTask)
                 {
@@ -55,7 +54,7 @@ namespace MapsInMyFolder.Commun
 
         static readonly object PBF_RenderingAsync_Locker = new object();
         static readonly object PBF_SetProviders_Locker = new object();
-        public async Task<HttpResponse> PBFRenderingAsync(int tache, int LayerID, string urlBase, int TileX, int TileY, int zoom, string save_temp_directory, int render_tile_size, int TextSizeMultiplicateur, double OverflowTextCorrectingValue, bool pbfdisableadjacent = false)
+        public async Task<HttpResponse> PBFRenderingAsync(int LayerID, TileProperty tilesUrl, string save_temp_directory, int render_tile_size, int TextSizeMultiplicateur, double OverflowTextCorrectingValue, bool pbfdisableadjacent = false)
         {
             int settings_max_tiles_cache_days = Settings.tiles_cache_expire_after_x_days;
             if (LayerID <= 0)
@@ -64,13 +63,13 @@ namespace MapsInMyFolder.Commun
                 settings_max_tiles_cache_days = -1;
             }
 
-            string save_temp_directory_rawBPF = save_temp_directory + "rawPBF/";
+            string save_temp_directory_rawBPF = Path.Combine(save_temp_directory,"rawPBF/");
             bool cache_tile = false;
             try
             {
                 bool do_download_this_tile = true;
 
-                string filename = TileX + "_" + TileY + ".pbf";
+                string filename = tilesUrl.x + "_" + tilesUrl.y + ".pbf";
                 if (!string.IsNullOrEmpty(save_temp_directory))
                 {
                     if (!Directory.Exists(save_temp_directory_rawBPF))
@@ -90,7 +89,7 @@ namespace MapsInMyFolder.Commun
                 string save_filename = save_temp_directory_rawBPF + filename;
                 if (do_download_this_tile)
                 {
-                    Uri uri = new Uri(Collectif.GetUrl.FromTileXYZ(urlBase, TileX, TileY, zoom, LayerID, Javascript.InvokeFunction.getTile));
+                    Uri uri = new Uri(tilesUrl.url);
                     response = await Collectif.ByteDownloadUri(uri, LayerID, true);
                     if (response?.ResponseMessage?.IsSuccessStatusCode == false || response?.Buffer is null)
                     {
@@ -151,22 +150,22 @@ namespace MapsInMyFolder.Commun
                 if (!pbfdisableadjacent)
                 {
                     Parallel.Invoke(
-                   () => SetProviders(0, 0, TileX - 1, TileY - 1),
-                   () => SetProviders(0, 1, TileX - 1, TileY),
-                   () => SetProviders(0, 2, TileX - 1, TileY + 1),
-                   () => SetProviders(1, 0, TileX, TileY - 1),
-                   () => SetProviders(1, 2, TileX, TileY + 1),
-                   () => SetProviders(2, 0, TileX + 1, TileY - 1),
-                   () => SetProviders(2, 1, TileX + 1, TileY),
-                   () => SetProviders(2, 2, TileX + 1, TileY + 1)
+                        () => SetProviders(0, 0),
+                        () => SetProviders(0, 1),
+                        () => SetProviders(0, 2),
+                        () => SetProviders(1, 0),
+                        () => SetProviders(1, 2),
+                        () => SetProviders(2, 0),
+                        () => SetProviders(2, 1),
+                        () => SetProviders(2, 2)
                     );
                 }
 
-                void SetProviders(int ArrayX, int ArrayY, int ComputedTileX, int ComputedTileY)
+                void SetProviders(int ArrayX, int ArrayY)
                 {
                     try
                     {
-                        VectorTileRenderer.Sources.PbfTileSource pbfTileSource = GetProviderFromXYZ(LayerID, urlBase, ComputedTileX, ComputedTileY, zoom, cache_tile, save_temp_directory_rawBPF, save_temp_directory, filename, settings_max_tiles_cache_days).Result;
+                        VectorTileRenderer.Sources.PbfTileSource pbfTileSource = GetProviderFromXYZ(tilesUrl.GetNeighbour(ArrayX, ArrayY), cache_tile, save_temp_directory_rawBPF, save_temp_directory, filename, settings_max_tiles_cache_days).Result;
                         lock (PBF_SetProviders_Locker)
                         {
                             try
@@ -232,7 +231,7 @@ namespace MapsInMyFolder.Commun
                             }
                             catch (Exception ex)
                             {
-                                Debug.WriteLine("Tache n°" + tache + " : Erreur " + j + "-" + i + " = " + ex.Message + "\n" + ex.ToString());
+                                Debug.WriteLine("Erreur " + j + "-" + i + " = " + ex.Message + "\n" + ex.ToString());
                             }
                         }
                     }
@@ -242,7 +241,7 @@ namespace MapsInMyFolder.Commun
                 ListOfEntitiesCollisions.TextElementsList.Clear();
                 ListOfEntitiesCollisions = null;
                 Roptions = null;
-                if (!(StreamPBFFile is null))
+                if (StreamPBFFile is not null)
                 {
                     StreamPBFFile.Flush();
                     StreamPBFFile.Close();
@@ -267,7 +266,7 @@ namespace MapsInMyFolder.Commun
                             GenerateCanvas = createCanvas
                         };
                         style.SetSourceProvider(0, pbfTileSource);
-                        return await Renderer.Render(style, bitmapf, 0, 0, zoom, 1, options: options, collisions: collisions);
+                        return await Renderer.Render(style, bitmapf, 0, 0, tilesUrl.z, 1, options: options, collisions: collisions);
                     }
                     else
                     {
@@ -297,7 +296,7 @@ namespace MapsInMyFolder.Commun
             }
             catch (Exception ex)
             {
-                Debug.WriteLine("Tache n°" + tache + " : Erreur f GetProviderFromXYZ" + ex.Message + "\n" + ex.ToString());
+                Debug.WriteLine("Erreur f GetProviderFromXYZ" + ex.Message + "\n" + ex.ToString());
             }
             return HttpResponse.HttpResponseError;
         }
@@ -320,11 +319,11 @@ namespace MapsInMyFolder.Commun
             return null;
         }
 
-        async Task<VectorTileRenderer.Sources.PbfTileSource> GetProviderFromXYZ(int layerID, string urlBase, int TileX_tp, int TileY_tp, int zoom, bool cache_tile, string save_temp_directory_rawBPF, string save_temp_directory, string filename, int settings_max_tiles_cache_days)
+        async Task<VectorTileRenderer.Sources.PbfTileSource> GetProviderFromXYZ(TileProperty tilesUrl, bool cache_tile, string save_temp_directory_rawBPF, string save_temp_directory, string filename, int settings_max_tiles_cache_days)
         {
-            if (!(TileX_tp < 0 || TileY_tp < 0 || zoom < 0))
+            if (!(tilesUrl.x < 0 || tilesUrl.y < 0 || tilesUrl.z < 0))
             {
-                string prov_filename = TileX_tp + "_" + TileY_tp + ".pbf";
+                string prov_filename = tilesUrl.x + "_" + tilesUrl.y + ".pbf";
                 bool do_download_this_tile_provider = true;
                 if (cache_tile)
                 {
@@ -336,7 +335,7 @@ namespace MapsInMyFolder.Commun
                     HttpResponse tp_response = HttpResponse.HttpResponseError;
                     try
                     {
-                        Uri temp_uri = new Uri(Collectif.GetUrl.FromTileXYZ(urlBase, TileX_tp, TileY_tp, zoom, layerID, Javascript.InvokeFunction.getTile));
+                        Uri temp_uri = new Uri(tilesUrl.url);
                         tp_response = await Collectif.ByteDownloadUri(temp_uri, 0, true).ConfigureAwait(false);
                         if (tp_response?.ResponseMessage?.IsSuccessStatusCode == false || tp_response?.Buffer is null)
                         {

@@ -6,18 +6,11 @@ namespace MapsInMyFolder.Commun
 {
     public partial class TileLoader
     {
-        public async Task<HttpResponse> GetTile(int layerID, string urlBase, int TileX, int TileY, int zoom)
+        public async Task<HttpResponse> GetTile(int layerID, TileProperty tilesUrl)
         {
-            //Debug.WriteLine("TileX :" + TileX);
-            Layers Layer = Layers.GetLayerById(layerID);
-            if (Layer is null)
-            {
-                return HttpResponse.HttpResponseError;
-            }
-
             try
             {
-                string url = Collectif.GetUrl.FromTileXYZ(urlBase, TileX, TileY, zoom, layerID, Javascript.InvokeFunction.getTile);
+                string url = tilesUrl.url;
                 if (string.IsNullOrWhiteSpace(url))
                 {
                     return HttpResponse.HttpResponseError;

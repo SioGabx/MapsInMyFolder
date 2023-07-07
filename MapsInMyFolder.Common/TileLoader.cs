@@ -1,7 +1,12 @@
-﻿using System;
+﻿using MapsInMyFolder.VectorTileRenderer;
+using System;
+using System.Collections.Generic;
+using System.Data.Common;
+using System.Data.Entity.Core.Common.CommandTrees.ExpressionBuilder;
 using System.IO;
 using System.Net;
 using System.Net.Http;
+using System.Security.Policy;
 using System.Threading.Tasks;
 
 namespace MapsInMyFolder.Commun
@@ -21,21 +26,55 @@ namespace MapsInMyFolder.Commun
         }
     }
 
-    public class TilesUrl
+    public class TileProperty
     {
+        public string url;
         public int x;
         public int y;
         public int z;
         public Status status;
         public int downloadid;
+        public string format;
+        private Dictionary<string, TileProperty> neighbourTiles;
 
-        public TilesUrl(int x, int y, int z, Status status, int downloadid)
+        public TileProperty(string url, int x, int y, int z, Status status, int downloadid, string format)
         {
+            this.url = url;
             this.x = x;
             this.y = y;
             this.z = z;
             this.status = status;
             this.downloadid = downloadid;
+            this.format = format;
+            this.neighbourTiles = null;
+        }
+
+        public TileProperty GetNeighbour(int row, int column)
+        {
+            if (neighbourTiles.TryGetValue($"{row}-{column}", out TileProperty neighbour))
+            {
+                return neighbour;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        public void SetNeighbour(int LayerId, string urlBase)
+        {
+            neighbourTiles = new Dictionary<string, TileProperty>();
+            for (int loopX = -1; loopX <= 1; loopX++)
+            {
+                for (int loopY = -1; loopY <= 1; loopY++)
+                {
+                    // Faites quelque chose avec les valeurs de x et y ici
+                    int ComputedX = x + loopX;
+                    int ComputedY = y + loopY;
+                    string ComputedURL = Collectif.GetUrl.FromTileXYZ(urlBase, ComputedX, ComputedY, z, LayerId, Javascript.InvokeFunction.getTile);
+                    neighbourTiles.Add($"{(loopX + 1)}-{(loopY + 1)}", new TileProperty(ComputedURL, ComputedX, ComputedY, this.z, Status.waitfordownloading, this.downloadid, this.format));
+                }
+            }
         }
     }
 
@@ -69,27 +108,33 @@ namespace MapsInMyFolder.Commun
     {
         public async Task<HttpResponse> GetImageAsync(string urlBase, int TileX, int TileY, int TileZoom, int layerID, string fileformat = null, string save_temp_directory = "", bool pbfdisableadjacent = false)
         {
-            Layers Layer = Layers.GetLayerById(layerID);
-            string SwitchFormat;
-            if (string.IsNullOrEmpty(fileformat) && !(Layer is null))
+            string url = Collectif.GetUrl.FromTileXYZ(urlBase, TileX, TileY, TileZoom, layerID, Javascript.InvokeFunction.getTile);
+
+            TileProperty tilesUrl = new TileProperty(url, TileX, TileY, TileZoom, Status.waitfordownloading, 0, fileformat);
+            if (fileformat == "pbf")
             {
-                SwitchFormat = Layer.class_format;
-            }
-            else
-            {
-                SwitchFormat = fileformat;
+                tilesUrl.SetNeighbour(layerID, urlBase);
             }
 
-            switch (SwitchFormat)
+            return await GetImageAsync(tilesUrl, layerID, fileformat, save_temp_directory, pbfdisableadjacent);
+        }
+
+        public async Task<HttpResponse> GetImageAsync(TileProperty tilesUrl, int layerID, string fileformat = null, string save_temp_directory = "", bool pbfdisableadjacent = false)
+        {
+            switch (fileformat)
             {
                 case "pbf":
                     const int TileSize = 1;
-                    return await GetTilePBF(layerID, urlBase, TileX, TileY, TileZoom, save_temp_directory, (int)Math.Floor((double)(Layer.class_tiles_size ?? 0) * TileSize), TileSize, 0.5, pbfdisableadjacent).ConfigureAwait(false);
+                    Layers Layer = Layers.GetLayerById(layerID);
+                    return await GetTilePBF(layerID, tilesUrl, save_temp_directory, (int)Math.Floor((double)(Layer.class_tiles_size ?? 0) * TileSize), TileSize, 0.5, pbfdisableadjacent).ConfigureAwait(false);
 
                 default:
-                    return await GetTile(layerID, urlBase, TileX, TileY, TileZoom).ConfigureAwait(false);
+                    return await GetTile(layerID, tilesUrl).ConfigureAwait(false);
             }
+
         }
+
+
 
 
         public string GetStyle(int layerID)

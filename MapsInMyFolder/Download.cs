@@ -145,7 +145,7 @@ namespace MapsInMyFolder
         public int dbid;
         public int layerid;
         public IEnumerable<HttpStatusCode> AlloweRequestErrors;
-        public IEnumerable<TilesUrl> urls;
+        public IEnumerable<TileProperty> urls;
         public CancellationTokenSource cancellationTokenSource;
         public CancellationToken cancellationToken;
         public string format;
@@ -178,7 +178,7 @@ namespace MapsInMyFolder
         public DownloadEngine(int id,
                                           int dbid,
                                           int layerid,
-                                          IEnumerable<TilesUrl> urls,
+                                          IEnumerable<TileProperty> urls,
                                           CancellationTokenSource cancellationTokenSource,
                                           CancellationToken cancellationToken,
                                           string format,
@@ -419,7 +419,7 @@ namespace MapsInMyFolder
                     { "SE_Longitude", download_Options.SE_PIN_Location.Longitude }
                 };
                 string engineVarContexte = JsonConvert.SerializeObject(Javascript.Functions.DumpVars(Layers.Current.class_id));
-                IEnumerable<TilesUrl> urls = Collectif.GetUrl.GetListOfUrlFromLocation(location, zoom, urlbase, Layers.Current.class_id, downloadId, engineVarContexte);
+                IEnumerable<TileProperty> urls = Collectif.GetUrl.GetListOfUrlFromLocation(location, zoom, urlbase, Layers.Current.class_id, downloadId, engineVarContexte);
                 CancellationTokenSource tokenSource2 = new CancellationTokenSource();
                 CancellationToken ct = tokenSource2.Token;
                 string timestamp = Convert.ToString(new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds());
@@ -445,7 +445,7 @@ namespace MapsInMyFolder
                     status = Status.noconnection;
                 }
 
-                string commandAdd = $"add_download({downloadId}, '{status}', '{filename}', 0, {nbrOfTiles}, '{info}', 'recent')";
+                string commandAdd = $"add_download({downloadId}, '{status}', '{Collectif.HTMLEntities(filename)}', 0, {nbrOfTiles}, '{Collectif.HTMLEntities(info)}', 'recent')";
                 MainPage.download_panel_browser?.ExecuteScriptAsync(commandAdd);
 
                 CheckIfReadyToStartDownload();
@@ -635,7 +635,7 @@ namespace MapsInMyFolder
 
         private async Task ParallelDownloadTilesTask(DownloadEngine downloadEngineClass)
         {
-            IEnumerable<TilesUrl> urls = downloadEngineClass.urls;
+            IEnumerable<TileProperty> urls = downloadEngineClass.urls;
             CancellationTokenSource cancellationTokenSource = downloadEngineClass.cancellationTokenSource;
             CancellationToken cancellationToken = downloadEngineClass.cancellationToken;
 
@@ -674,7 +674,7 @@ namespace MapsInMyFolder
             }
             else
             {
-                foreach (TilesUrl urlClass in downloadEngineClass.urls)
+                foreach (TileProperty urlClass in downloadEngineClass.urls)
                 {
                     if ((urlClass.status != Status.no_data) || !Settings.generate_transparent_tiles_on_404)
                     {
@@ -770,7 +770,7 @@ namespace MapsInMyFolder
 
             if (state == Status.error)
             {
-                Database.DB_Download_Update(engine.dbid, "INFOS", info);
+                Database.DB_Download_Update(engine.dbid, "INFOS", Collectif.HTMLEntities(info));
                 engine.state = Status.error;
                 AbordAndCancelWithTokenDownload(id);
                 commandExecuted += $"updateprogress({id}, \"100\");";
@@ -1137,7 +1137,7 @@ namespace MapsInMyFolder
                 return;
             }
             int number_of_url_class_waiting_for_downloading = 0;
-            foreach (TilesUrl urclass in download_engine?.urls)
+            foreach (TileProperty urclass in download_engine?.urls)
             {
                 if (urclass.status == Status.waitfordownloading)
                 {
@@ -1183,19 +1183,19 @@ namespace MapsInMyFolder
             }, null);
         }
 
-        public async Task DownloadUrlAsync(TilesUrl url)
+        public async Task DownloadUrlAsync(TileProperty tileProperty)
         {
-            DownloadEngine download_engine = DownloadEngine.GetEngineById(url.downloadid);
+            DownloadEngine download_engine = DownloadEngine.GetEngineById(tileProperty.downloadid);
             string format = download_engine.format;
             string save_temp_directory = download_engine.saveTempDirectory;
-            string filename = url.x + "_" + url.y + "." + format;
+            string filename = tileProperty.x + "_" + tileProperty.y + "." + format;
             bool do_download_this_tile = Collectif.CheckIfDownloadIsNeededOrCached(save_temp_directory, filename, Settings.tiles_cache_expire_after_x_days);
             Thread.CurrentThread.Priority = ThreadPriority.Highest;
 
             if (!do_download_this_tile)
             {
                 //Existing tile
-                url.status = Status.success;
+                tileProperty.status = Status.success;
 
                 await Task.Delay(20);
                 InternalUpdateProgressBar(download_engine);
@@ -1203,7 +1203,7 @@ namespace MapsInMyFolder
             }
             try
             {
-                HttpResponse httpResponse = await Tiles.Loader.GetImageAsync(download_engine.urlBase, url.x, url.y, url.z, download_engine.layerid, download_engine.format, save_temp_directory).ConfigureAwait(false);
+                HttpResponse httpResponse = await Tiles.Loader.GetImageAsync(tileProperty, download_engine.layerid, download_engine.format, save_temp_directory).ConfigureAwait(false);
                 if (httpResponse?.ResponseMessage?.IsSuccessStatusCode == true)
                 {
                     using var contentStream = Collectif.ByteArrayToStream(httpResponse.Buffer);
@@ -1213,12 +1213,12 @@ namespace MapsInMyFolder
                         await contentStream.CopyToAsync(fileStream);
                         if (httpResponse.ResponseMessage.StatusCode == HttpStatusCode.OK)
                         {
-                            url.status = Status.success;
+                            tileProperty.status = Status.success;
                         }
                     }
                     else
                     {
-                        url.status = Status.error;
+                        tileProperty.status = Status.error;
                     }
                 }
                 else
@@ -1226,27 +1226,26 @@ namespace MapsInMyFolder
                     Thread.Sleep(200);
                     if (httpResponse?.ResponseMessage?.StatusCode != null && download_engine.AlloweRequestErrors.Contains(httpResponse.ResponseMessage.StatusCode))
                     {
-                        url.status = Status.no_data;
+                        tileProperty.status = Status.no_data;
                     }
                     else
                     {
                         if (httpResponse?.ResponseMessage?.StatusCode == HttpStatusCode.NotFound && (Settings.generate_transparent_tiles_on_404 || Settings.generate_transparent_tiles_on_error))
                         {
-                            url.status = Status.no_data;
+                            tileProperty.status = Status.no_data;
                         }
                         else if (!Network.IsNetworkAvailable())
                         {
-                            url.status = Status.waitfordownloading;
+                            tileProperty.status = Status.waitfordownloading;
                         }
                         else if (Settings.generate_transparent_tiles_on_error)
                         {
-                            url.status = Status.no_data;
+                            tileProperty.status = Status.no_data;
                         }
                         else
                         {
-                            url.status = Status.error;
+                            tileProperty.status = Status.error;
                         }
-                       // Debug.WriteLine($"Download Fail: {url.url}: {(int)(httpResponse?.ResponseMessage?.StatusCode ?? 0)} {httpResponse?.ResponseMessage?.ReasonPhrase}");
                     }
 
                 }
@@ -1316,7 +1315,7 @@ namespace MapsInMyFolder
                             if (eng.state == Status.success && engineFilePath == targetFilePath)
                             {
                                 UpdateDownloadPanel(eng.id, Languages.Current["downloadStateReplaced"], "0", true, Status.deleted);
-                                Database.DB_Download_Update(eng.dbid, "INFOS", Languages.Current["downloadStateReplaced"]);
+                                Database.DB_Download_Update(eng.dbid, "INFOS", Collectif.HTMLEntities(Languages.Current["downloadStateReplaced"]));
                             }
                         }
                     }
