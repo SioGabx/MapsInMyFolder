@@ -178,7 +178,7 @@ namespace MapsInMyFolder
                     {
                         for (int index_y = 0; index_y < 2; index_y++)
                         {
-                            string urlbase = Collectif.GetUrl.FromTileXYZ(Layers.Current.class_tile_url, tileX + index_x, tileY + index_y, zoom, layerID, Collectif.GetUrl.InvokeFunction.getTile);
+                            string urlbase = Collectif.GetUrl.FromTileXYZ(Layers.Current.class_tile_url, tileX + index_x, tileY + index_y, zoom, layerID, Javascript.InvokeFunction.getTile);
                             listOfUrls.Add((urlbase, index_x, index_y));
                         }
                     }
@@ -1078,6 +1078,7 @@ namespace MapsInMyFolder
             strName = strName.Replace(Path.GetInvalidFileNameChars(), string.Empty);
             strName = strName.ReplaceLoop(" ", "_");
             strName = strName.ReplaceLoop("__", "_");
+            strName = strName.ReplaceLoop("_-_", "_");
 
             SaveFileDialog saveFileDialog1 = new SaveFileDialog()
             {

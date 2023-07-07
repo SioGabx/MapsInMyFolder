@@ -6,6 +6,8 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
@@ -52,7 +54,7 @@ namespace MapsInMyFolder
             mapviewerappercu.Center = MainPage._instance.mapviewer.Center;
             mapviewerappercu.ZoomLevel = MainPage._instance.mapviewer.ZoomLevel;
             TextBoxSetValueAndLock(TextboxLayerScript, Settings.tileloader_default_script);
-            CountryComboBox.ItemSource = Country.getList();
+            CountryComboBox.ItemSource = Country.GetList();
 
             SetContextMenu();
 
@@ -305,7 +307,7 @@ namespace MapsInMyFolder
             TextBoxSetValueAndLock(TextboxLayerStyle, LayerInEditMode.class_style);
 
             string[] class_country = LayerInEditMode.class_country.Split(';', StringSplitOptions.RemoveEmptyEntries);
-            List<Country> SelectedCountries = Country.getListFromEnglishName(class_country);
+            List<Country> SelectedCountries = Country.GetListFromEnglishName(class_country);
             if (SelectedCountries.Count != class_country.Length && LayerInEditMode.class_country != null)
             {
                 List<Country> CountryList = CountryComboBox.ItemSource.Cast<Country>().ToList();
@@ -326,10 +328,30 @@ namespace MapsInMyFolder
             }
 
             CountryComboBox.SelectedItems = SelectedCountries;
+
+            string[] class_httpstatuscode = LayerInEditMode.class_specialsoptions?.ErrorsToIgnore?.Split(';', StringSplitOptions.RemoveEmptyEntries);
+            var SelectedHttpStatusCode = new List<HttpStatusCodeDisplay>();
+            var listOfHttpStatusCode = new List<HttpStatusCodeDisplay>();
+            foreach (HttpStatusCode status in HttpStatusCodeDisplay.getList())
+            {
+                var item = new HttpStatusCodeDisplay(status, $"{(int)status} - {status}");
+                if (!listOfHttpStatusCode.Contains(item))
+                {
+                    listOfHttpStatusCode.Add(item);
+                    if (class_httpstatuscode.Contains(((int)status).ToString()))
+                    {
+                        SelectedHttpStatusCode.Add(item);
+                    }
+                }
+            }
+            AlloweRequestErrorsComboBox.ItemSource = listOfHttpStatusCode;
+            AlloweRequestErrorsComboBox.SelectedItems = SelectedHttpStatusCode;
+
             has_scale.IsChecked = LayerInEditMode.class_hasscale;
             Collectif.SetBackgroundOnUIElement(mapviewerappercu, LayerInEditMode?.class_specialsoptions?.BackgroundColor);
         }
 
+     
         void PutScriptTemplate(ICSharpCode.AvalonEdit.TextEditor textBox)
         {
             Collectif.InsertTextAtCaretPosition(textBox, Settings.tileloader_template_script);
@@ -751,7 +773,7 @@ namespace MapsInMyFolder
             string NAME = TextboxLayerName.Text.Trim();
             string DESCRIPTION = TextboxLayerDescription.Text.Trim();
             string CATEGORY = GetComboBoxValue(TextboxLayerCategory);
-            string COUNTRY = string.Join(';', CountryComboBox.SelectedValues("EnglishName"));
+            string COUNTRY = string.Join(';', CountryComboBox.SelectedValuesAsString("EnglishName"));
             string IDENTIFIER = TextboxLayerIdentifier.Text.Trim();
             string TILE_URL = TextboxLayerTileUrl.Text.Trim();
             int MIN_ZOOM = GetIntValueFromTextBox(TextBoxLayerMinZoom);
@@ -786,7 +808,8 @@ namespace MapsInMyFolder
             layers.class_specialsoptions = new Layers.SpecialsOptions()
             {
                 BackgroundColor = TextboxSpecialOptionBackgroundColor.Text,
-            };
+                ErrorsToIgnore = string.Join(';', AlloweRequestErrorsComboBox.SelectedValuesAsInt("Status"))
+        };
             layers.class_style = STYLE;
             layers.class_rectangles = RECTANGLES;
             layers.class_hasscale = has_scale.IsChecked ?? false;
@@ -817,7 +840,7 @@ namespace MapsInMyFolder
                 Javascript.Functions.Print(infotext, -2);
 
                 var (X, Y) = Collectif.CoordonneesToTile(location.Latitude, location.Longitude, Z);
-                string url = Collectif.Replacements(TextboxLayerTileUrl.Text, X.ToString(), Y.ToString(), Z.ToString(), InternalEditorId, Collectif.GetUrl.InvokeFunction.getTile);
+                string url = Collectif.Replacements(TextboxLayerTileUrl.Text, X.ToString(), Y.ToString(), Z.ToString(), InternalEditorId, Javascript.InvokeFunction.getTile);
 
                 int result = await Collectif.CheckIfDownloadSuccess(url);
                 Debug.WriteLine("-->" + result);
@@ -924,6 +947,22 @@ namespace MapsInMyFolder
                 Javascript.ExecuteCommand(commande, -2);
                 e.Handled = true;
             }
+
+
+            this.Dispatcher.InvokeAsync(() =>
+            {
+                var textBox = sender as TextBox;
+                bool textBoxHasOverflowContent = textBox.ExtentWidth + 5 > textBox.ViewportWidth;
+                if (textBoxHasOverflowContent)
+                {
+                    textBox.Padding = new Thickness(0, 0, 20, 15);
+                }
+                else
+                {
+                    textBox.Padding = new Thickness(0, 0, 20, 5);
+                }
+            });
+
         }
 
         private void ClickableLabel_MouseEnter(object sender, MouseEventArgs e)
@@ -1250,26 +1289,26 @@ namespace MapsInMyFolder
 
         private void PrintUrl_Click(object sender, RoutedEventArgs e)
         {
-            PrintPreviewUrls(Collectif.GetUrl.InvokeFunction.getTile);
+            PrintPreviewUrls(Javascript.InvokeFunction.getTile);
         }
 
         private void PrintPreviewUrl_Click(object sender, RoutedEventArgs e)
         {
-            PrintPreviewUrls(Collectif.GetUrl.InvokeFunction.getPreview);
+            PrintPreviewUrls(Javascript.InvokeFunction.getPreview);
         }
         private void PrintPreviewFallbackUrl_Click(object sender, RoutedEventArgs e)
         {
-            PrintPreviewUrls(Collectif.GetUrl.InvokeFunction.getPreviewFallback);
+            PrintPreviewUrls(Javascript.InvokeFunction.getPreviewFallback);
         }
 
-        private void PrintPreviewUrls(Collectif.GetUrl.InvokeFunction invokeFunction)
+        private void PrintPreviewUrls(Javascript.InvokeFunction invokeFunction)
         {
             string Url = GetUrl(invokeFunction);
             Javascript.Functions.Print(invokeFunction.ToString() + " : " + Url, -2);
             Clipboard.SetText(Url);
         }
 
-        private string GetUrl(Collectif.GetUrl.InvokeFunction invokeFunction)
+        private string GetUrl(Javascript.InvokeFunction invokeFunction)
         {
             int ZoomLevel = Convert.ToInt32(Math.Floor(mapviewerappercu.ZoomLevel));
             (int X, int Y) = Collectif.CoordonneesToTile(mapviewerappercu.Center.Latitude, mapviewerappercu.Center.Longitude, ZoomLevel);
@@ -1278,25 +1317,25 @@ namespace MapsInMyFolder
 
         private void SetPreviewUrl_Click(object sender, RoutedEventArgs e)
         {
-            const Collectif.GetUrl.InvokeFunction invokeFunction = Collectif.GetUrl.InvokeFunction.getPreview;
+            const Javascript.InvokeFunction invokeFunction = Javascript.InvokeFunction.getPreview;
             TextboxLayerScript.Text = Javascript.AddOrReplaceFunction(TextboxLayerScript.Text, invokeFunction.ToString(), GetPreviewFunction(invokeFunction));
             IndenterCode(sender, e, TextboxLayerScript);
         }
 
         private void SetPreviewFallbackUrl_Click(object sender, RoutedEventArgs e)
         {
-            const Collectif.GetUrl.InvokeFunction invokeFunction = Collectif.GetUrl.InvokeFunction.getPreviewFallback;
+            const Javascript.InvokeFunction invokeFunction = Javascript.InvokeFunction.getPreviewFallback;
             TextboxLayerScript.Text = Javascript.AddOrReplaceFunction(TextboxLayerScript.Text, invokeFunction.ToString(), GetPreviewFunction(invokeFunction));
             IndenterCode(sender, e, TextboxLayerScript);
         }
 
-        private string GetPreviewFunction(Collectif.GetUrl.InvokeFunction invokeFunction)
+        private string GetPreviewFunction(Javascript.InvokeFunction invokeFunction)
         {
             string TileUrl = TextboxLayerTileUrl.Text;
             string Script = TextboxLayerScript.Text;
             int ZoomLevel = Convert.ToInt32(Math.Floor(mapviewerappercu.ZoomLevel));
             (int X, int Y) = Collectif.CoordonneesToTile(mapviewerappercu.Center.Latitude, mapviewerappercu.Center.Longitude, ZoomLevel);
-            var (DefaultCallValue, ResultCallValue) = Collectif.GetUrl.CallFunctionAndGetResult(TileUrl, Script, X, Y, ZoomLevel, -2, Collectif.GetUrl.InvokeFunction.getTile);
+            var (DefaultCallValue, ResultCallValue) = Collectif.GetUrl.CallFunctionAndGetResult(TileUrl, Script, X, Y, ZoomLevel, -2, Javascript.InvokeFunction.getTile);
             string functionContent = $"\nfunction {invokeFunction}(args){{";
             if (ResultCallValue?.Keys != null)
             {

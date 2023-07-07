@@ -13,7 +13,8 @@ namespace MapsInMyFolder.Commun
 {
     public partial class Javascript
     {
-        public enum JavascriptAction { refreshMap }
+        public enum InvokeFunction { getTile, getPreview, getPreviewFallback, selectionChanged }
+        public enum JavascriptAction { refreshMap, clearCache }
         public static event EventHandler<JavascriptAction> JavascriptActionEvent;
 
         #region logs
@@ -118,11 +119,21 @@ namespace MapsInMyFolder.Commun
                 JavascriptActionEvent?.Invoke(LayerId, JavascriptAction.refreshMap);
                 return null;
             }));
+            engine.SetValue("clearCache", (Func<object>)(() => {
+                JavascriptActionEvent?.Invoke(LayerId, JavascriptAction.clearCache);
+                return null;
+            }));
+
             engine.SetValue("getStyle", (Func<object>)(() => Tiles.Loader.GetStyle(LayerId)));
             engine.SetValue("transformLocation", (Func<object, object, object, object, object>)((OriginWkt, TargetWkt, ProjX, ProjY) =>
          Functions.TransformLocation(OriginWkt, TargetWkt, ProjX, ProjY)));
             engine.SetValue("transformLocationFromWGS84", (Func<object, object, object, object>)((TargetWkt, ProjX, ProjY) =>
          Functions.TransformLocationFromWGS84(TargetWkt, ProjX, ProjY)));
+
+            engine.SetValue("btoa", (Func<object, object>)(stringToEncode => Functions.Base64Encode(stringToEncode, LayerId)));
+            engine.SetValue("atob", (Func<object, object>)(stringToDecode => Functions.Base64Decode(stringToDecode, LayerId)));
+
+
             return engine;
         }
 
@@ -168,7 +179,7 @@ namespace MapsInMyFolder.Commun
                 try
                 {
                     add = add.Execute(script);
-                    if (CheckIfFunctionExist(add, nameof(Collectif.GetUrl.InvokeFunction.getTile)))
+                    if (CheckIfFunctionExist(add, nameof(Javascript.InvokeFunction.getTile)))
                     {
                         return add;
                     }
@@ -282,8 +293,13 @@ namespace MapsInMyFolder.Commun
             }
             if (string.IsNullOrEmpty(script))
             {
-                script = Layers.GetLayerById(LayerId).class_script;
+                script = Layers.GetLayerById(LayerId)?.class_script;
             }
+            if (string.IsNullOrWhiteSpace(script) || !script.Contains(functionName))
+            {
+                return false;
+            }
+
             Engine add = EngineGetById(LayerId, script);
 
             if (add is null || string.IsNullOrEmpty(functionName))
@@ -301,7 +317,7 @@ namespace MapsInMyFolder.Commun
                 return false;
             }
         }
-        public static JsValue ExecuteScript(string script, Dictionary<string, object> arguments, int LayerId, Collectif.GetUrl.InvokeFunction InvokeFunction)
+        public static JsValue ExecuteScript(string script, Dictionary<string, object> arguments, int LayerId, Javascript.InvokeFunction InvokeFunction)
         {
             return ExecuteScript(script, arguments, LayerId, InvokeFunction.ToString());
         }

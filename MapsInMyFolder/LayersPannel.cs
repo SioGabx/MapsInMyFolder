@@ -294,7 +294,19 @@ namespace MapsInMyFolder
                         object actualValue = field.GetValue(LayerWithReplacement);
                         if (actualValue is null)
                         {
-                            field.SetValue(LayerWithReplacement, string.Empty);
+                            if (field.FieldType == typeof(string))
+                            {
+                                field.SetValue(LayerWithReplacement, string.Empty);
+                            }
+                            else if (field.FieldType == typeof(int))
+                            {
+                                field.SetValue(LayerWithReplacement, 0);
+                            }
+                            else
+                            {
+                                field.SetValue(LayerWithReplacement, null);
+                            }
+
                         }
                     }
 
@@ -690,10 +702,10 @@ namespace MapsInMyFolder
                 var TileNumber = Collectif.CoordonneesToTile(Latitude, Longitude, Zoom);
                 string previewLayerFrontImageUrl = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
                 string previewBackgroundImageUrl = string.Empty;
-                if (Javascript.CheckIfFunctionExist(id, Collectif.GetUrl.InvokeFunction.getPreview.ToString(), null))
+                if (Javascript.CheckIfFunctionExist(id, Javascript.InvokeFunction.getPreview.ToString(), null))
                 {
-                    previewLayerFrontImageUrl = Collectif.Replacements(layer.class_tile_url, TileNumber.X.ToString(), TileNumber.Y.ToString(), Zoom.ToString(), id, Collectif.GetUrl.InvokeFunction.getPreview);
-                    previewBackgroundImageUrl = Collectif.Replacements(backgroundLayer?.class_tile_url, TileNumber.X.ToString(), TileNumber.Y.ToString(), Zoom.ToString(), id, Collectif.GetUrl.InvokeFunction.getPreview);
+                    previewLayerFrontImageUrl = Collectif.Replacements(layer.class_tile_url, TileNumber.X.ToString(), TileNumber.Y.ToString(), Zoom.ToString(), id, Javascript.InvokeFunction.getPreview);
+                    previewBackgroundImageUrl = Collectif.Replacements(backgroundLayer?.class_tile_url, TileNumber.X.ToString(), TileNumber.Y.ToString(), Zoom.ToString(), id, Javascript.InvokeFunction.getPreview);
                     if (backgroundLayer?.class_tile_url == previewBackgroundImageUrl)
                     {
                         previewBackgroundImageUrl = "";
@@ -701,16 +713,16 @@ namespace MapsInMyFolder
                 }
                 else
                 {
-                    previewLayerFrontImageUrl = Collectif.Replacements(layer.class_tile_url, TileNumber.X.ToString(), TileNumber.Y.ToString(), Zoom.ToString(), id, Collectif.GetUrl.InvokeFunction.getTile);
-                    previewBackgroundImageUrl = Collectif.Replacements(backgroundLayer?.class_tile_url, TileNumber.X.ToString(), TileNumber.Y.ToString(), Zoom.ToString(), id, Collectif.GetUrl.InvokeFunction.getTile);
+                    previewLayerFrontImageUrl = Collectif.Replacements(layer.class_tile_url, TileNumber.X.ToString(), TileNumber.Y.ToString(), Zoom.ToString(), id, Javascript.InvokeFunction.getTile);
+                    previewBackgroundImageUrl = Collectif.Replacements(backgroundLayer?.class_tile_url, TileNumber.X.ToString(), TileNumber.Y.ToString(), Zoom.ToString(), id, Javascript.InvokeFunction.getTile);
                 }
 
                 string previewFallbackLayerFrontImageUrl = string.Empty;
                 string previewFallbackBackgroundImageUrl = string.Empty;
-                if (Javascript.CheckIfFunctionExist(id, Collectif.GetUrl.InvokeFunction.getPreviewFallback.ToString(), null))
+                if (Javascript.CheckIfFunctionExist(id, Javascript.InvokeFunction.getPreviewFallback.ToString(), null))
                 {
-                    previewFallbackLayerFrontImageUrl = Collectif.Replacements(layer.class_tile_url, TileNumber.X.ToString(), TileNumber.Y.ToString(), Zoom.ToString(), id, Collectif.GetUrl.InvokeFunction.getPreviewFallback);
-                    previewFallbackBackgroundImageUrl = Collectif.Replacements(backgroundLayer?.class_tile_url, TileNumber.X.ToString(), TileNumber.Y.ToString(), Zoom.ToString(), id, Collectif.GetUrl.InvokeFunction.getPreviewFallback);
+                    previewFallbackLayerFrontImageUrl = Collectif.Replacements(layer.class_tile_url, TileNumber.X.ToString(), TileNumber.Y.ToString(), Zoom.ToString(), id, Javascript.InvokeFunction.getPreviewFallback);
+                    previewFallbackBackgroundImageUrl = Collectif.Replacements(backgroundLayer?.class_tile_url, TileNumber.X.ToString(), TileNumber.Y.ToString(), Zoom.ToString(), id, Javascript.InvokeFunction.getPreviewFallback);
                     if (backgroundLayer?.class_tile_url == previewFallbackBackgroundImageUrl)
                     {
                         previewFallbackBackgroundImageUrl = "";
@@ -763,11 +775,11 @@ namespace MapsInMyFolder
             foreach (string str in splittedListOfId)
             {
                 int id_int = int.Parse(str.Trim());
-                Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
-                {
+                //Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
+                //{
                     DirectorySize += MainPage.ClearCache(id_int);
 
-                }, null);
+                //}, null);
                 Debug.WriteLine("Clear_cache layer " + id_int);
             }
             if (DirectorySize >= 0)

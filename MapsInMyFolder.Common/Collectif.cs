@@ -1,5 +1,7 @@
-﻿using Jint;
+﻿using Esprima.Ast;
+using Jint;
 using MapsInMyFolder.Commun;
+using MapsInMyFolder.VectorTileRenderer;
 using NetVips;
 using Newtonsoft.Json;
 using System;
@@ -44,20 +46,13 @@ namespace MapsInMyFolder.Commun
     {
         public static class GetUrl
         {
-            public enum InvokeFunction { getTile, getPreview, getPreviewFallback }
-
-            public static (Dictionary<string, object> DefaultCallValue, Dictionary<string, string> ResultCallValue) CallFunctionAndGetResult(string urlbase, string Script, int Tilex, int Tiley, int z, int LayerID, InvokeFunction InvokeFunction)
+            public static (Dictionary<string, object> DefaultCallValue, Dictionary<string, string> ResultCallValue) CallFunctionAndGetResult(string urlbase, string Script, int Tilex, int Tiley, int z, int LayerID, Javascript.InvokeFunction InvokeFunction)
             {
-                if (LayerID == -1)
-                {
-                    return (null, null);
-                }
-
                 var location_topleft = TileToCoordonnees(Tilex, Tiley, z);
                 var location_bottomright = TileToCoordonnees(Tilex + 1, Tiley + 1, z);
                 var (Latitude, Longitude) = GetCenterBetweenTwoPoints(location_topleft, location_bottomright);
 
-                Dictionary<string, object> argument = new Dictionary<string, object>()
+                Dictionary<string, object> arguments = new Dictionary<string, object>()
                 {
                       { "x",  Tilex.ToString() },
                       { "y",  Tiley.ToString() },
@@ -80,7 +75,7 @@ namespace MapsInMyFolder.Commun
                     Jint.Native.JsValue JavascriptMainResult = null;
                     try
                     {
-                        JavascriptMainResult = Javascript.ExecuteScript(Script, new Dictionary<string, object>(argument), LayerID, InvokeFunction);
+                        JavascriptMainResult = Javascript.ExecuteScript(Script, new Dictionary<string, object>(arguments), LayerID, InvokeFunction);
                     }
                     catch (Exception ex)
                     {
@@ -91,19 +86,14 @@ namespace MapsInMyFolder.Commun
                         object JavascriptMainResultObject = JavascriptMainResult.ToObject();
                         var JavascriptMainResultJson = JsonConvert.SerializeObject(JavascriptMainResultObject);
                         var JavascriptMainResultDictionary = JsonConvert.DeserializeObject<Dictionary<string, string>>(JavascriptMainResultJson);
-                        return (argument, JavascriptMainResultDictionary);
+                        return (arguments, JavascriptMainResultDictionary);
                     }
                 }
                 return (null, null);
             }
 
-            public static string FromTileXYZ(string urlbase, int Tilex, int Tiley, int z, int LayerID, InvokeFunction InvokeFunction)
+            public static string FromTileXYZ(string urlbase, int Tilex, int Tiley, int z, int LayerID, Javascript.InvokeFunction InvokeFunction)
             {
-                if (LayerID == -1)
-                {
-                    return urlbase;
-                }
-
                 Layers calque = Layers.GetLayerById(LayerID);
                 if (calque is null)
                 {
@@ -182,7 +172,51 @@ namespace MapsInMyFolder.Commun
                 return new List<int>() { return_x, return_y };
             }
 
-            public static List<TilesUrl> GetListOfUrlFromLocation(Dictionary<string, double> location, int z, string urlbase, int LayerID, int downloadid = 0)
+            public static List<TilesUrl> GetListOfUrlFromLocation(Dictionary<string, double> location, int z, string urlbase, int LayerID, int downloadid, string varContext)
+            {
+                try
+                {
+                    Layers calque = Layers.Convert.Copy(Layers.GetLayerById(LayerID));
+                    Layers.Add(-1, calque);
+
+                    var deserializedArray = JsonConvert.DeserializeObject<Dictionary<string, object>[]>(varContext);
+
+                    foreach (var dictionary in deserializedArray)
+                    {
+                        foreach (var kvp in dictionary)
+                        {
+                            string key = kvp.Key;
+                            object value = kvp.Value;
+
+                            if (value != null && !string.IsNullOrEmpty(key))
+                            {
+                                Javascript.Functions.SetVar(key, value, false, -1);
+                            }
+                        }
+                    }
+
+
+
+                    List<TilesUrl> tilesUrls = GenrateListOfUrlFromLocation(location, z, urlbase, -1, downloadid);
+
+                    return tilesUrls;
+
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex.ToString());
+                }
+                finally
+                {
+                    Layers.RemoveLayerById(-1);
+                    Javascript.Functions.ClearVar(-1);
+                }
+
+                return new List<TilesUrl>();
+            }
+
+
+            public static List<TilesUrl> GenrateListOfUrlFromLocation(Dictionary<string, double> location, int z, string urlbase, int LayerID, int downloadid)
             {
                 var NO_tile = CoordonneesToTile(location["NO_Latitude"], location["NO_Longitude"], z);
                 var SE_tile = CoordonneesToTile(location["SE_Latitude"], location["SE_Longitude"], z);
@@ -196,19 +230,20 @@ namespace MapsInMyFolder.Commun
                 int Download_Y_tile = 0;
                 int max_x = Math.Abs(SE_x - NO_x) + 1;
                 int max_y = Math.Abs(SE_y - NO_y) + 1;
+                Debug.WriteLine("Getting all urls");
                 for (int i = 0; i < max_y; i++)
                 {
                     for (int a = 0; a < max_x; a++)
                     {
                         int tuileX = NO_x + Download_X_tile;
                         int tuileY = NO_y + Download_Y_tile;
-                        string url_to_add_inside_list = FromTileXYZ(urlbase, tuileX, tuileY, z, LayerID, InvokeFunction.getTile);
-                        list_of_url_to_download.Add(new TilesUrl(url_to_add_inside_list, tuileX, tuileY, z, Status.waitfordownloading, downloadid));
+                        list_of_url_to_download.Add(new TilesUrl(tuileX, tuileY, z, Status.waitfordownloading, downloadid));
                         List<int> next_num_list = NextNumberFromPara(Download_X_tile, Download_Y_tile, max_x, max_y);
                         Download_X_tile = next_num_list[0];
                         Download_Y_tile = next_num_list[1];
                     }
                 }
+                Debug.WriteLine("End getting urls");
                 return list_of_url_to_download;
             }
         }
@@ -1139,7 +1174,7 @@ namespace MapsInMyFolder.Commun
                             if (MultiSelectCombobox.SelectedItems != null && MultiSelectCombobox.SelectedItems.Count > 0)
                             {
 
-                                hachCode = string.Join(";", MultiSelectCombobox.SelectedValues("EnglishName")).GetHashCode();
+                                hachCode = string.Join(";", MultiSelectCombobox.SelectedValuesAsString("EnglishName")).GetHashCode();
                             }
                             else
                             {
@@ -1292,7 +1327,7 @@ namespace MapsInMyFolder.Commun
             return str;
         }
 
-        public static string Replacements(string tileBaseUrl, string x, string y, string z, int LayerID, Collectif.GetUrl.InvokeFunction invokeFunction)
+        public static string Replacements(string tileBaseUrl, string x, string y, string z, int LayerID, Javascript.InvokeFunction invokeFunction)
         {
             if (string.IsNullOrEmpty(tileBaseUrl)) { return string.Empty; }
             return GetUrl.FromTileXYZ(tileBaseUrl, Convert.ToInt32(x), Convert.ToInt32(y), Convert.ToInt32(z), LayerID, invokeFunction).Replace(" ", "%20");
@@ -1414,6 +1449,10 @@ namespace MapsInMyFolder.Commun
 
         public static (int X, int Y) CoordonneesToTile(double Latitude, double Longitude, int zoom)
         {
+            if (Latitude is double.NaN || Longitude is double.NaN)
+            {
+                return (0, 0);
+            }
             try
             {
                 static double ValuetoRadians(float value)
@@ -1426,7 +1465,8 @@ namespace MapsInMyFolder.Commun
             }
             catch (Exception ex)
             {
-                Message.NoReturnBoxAsync("Unable to convert latitude and longitude into tile coordinates.\n" + ex.Message, Languages.Current["dialogTitleOperationFailed"]);
+                Debug.WriteLine(ex.ToString());
+                Message.NoReturnBoxAsync($"Unable to convert latitude and longitude into tile coordinates.\nLatitude : {Latitude}, Longitude : {Longitude}, Zoom : {zoom}\n" + ex.Message, Languages.Current["dialogTitleOperationFailed"]);
                 return (0, 0);
             }
         }

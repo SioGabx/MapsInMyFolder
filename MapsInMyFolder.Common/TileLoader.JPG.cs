@@ -17,7 +17,7 @@ namespace MapsInMyFolder.Commun
 
             try
             {
-                string url = Collectif.GetUrl.FromTileXYZ(urlBase, TileX, TileY, zoom, layerID, Collectif.GetUrl.InvokeFunction.getTile);
+                string url = Collectif.GetUrl.FromTileXYZ(urlBase, TileX, TileY, zoom, layerID, Javascript.InvokeFunction.getTile);
                 if (string.IsNullOrWhiteSpace(url))
                 {
                     return HttpResponse.HttpResponseError;

@@ -90,9 +90,9 @@ namespace MapsInMyFolder.Commun
                 string save_filename = save_temp_directory_rawBPF + filename;
                 if (do_download_this_tile)
                 {
-                    Uri uri = new Uri(Collectif.GetUrl.FromTileXYZ(urlBase, TileX, TileY, zoom, LayerID, Collectif.GetUrl.InvokeFunction.getTile));
+                    Uri uri = new Uri(Collectif.GetUrl.FromTileXYZ(urlBase, TileX, TileY, zoom, LayerID, Javascript.InvokeFunction.getTile));
                     response = await Collectif.ByteDownloadUri(uri, LayerID, true);
-                    if (response?.Buffer is null)
+                    if (response?.ResponseMessage?.IsSuccessStatusCode == false || response?.Buffer is null)
                     {
                         return response;
                     }
@@ -189,13 +189,13 @@ namespace MapsInMyFolder.Commun
                 Renderer.ICanvasCollisions ReturnCanvasAndCollisions;
                 Renderer.Collisions ListOfEntitiesCollisions = new MapsInMyFolder.VectorTileRenderer.Renderer.Collisions();
                 Renderer.ROptions Roptions = null;
-                if (!(providers[1][1] is null))
+                if (providers[1][1] is not null)
                 {
                     ReturnCanvasAndCollisions = await CreateBitmap(bitmap, 1, 1, providers[1][1], ListOfEntitiesCollisions, true, 3).ConfigureAwait(false);
 
                     providers[1][1] = null;
 
-                    if (!(ReturnCanvasAndCollisions is null))
+                    if (ReturnCanvasAndCollisions is not null)
                     {
                         bitmap = ReturnCanvasAndCollisions.bitmap;
                         Roptions = ReturnCanvasAndCollisions.Roptions;
@@ -218,11 +218,11 @@ namespace MapsInMyFolder.Commun
                             //Recherche de colisions
                             try
                             {
-                                if (!(providers[j][i] is null))
+                                if (providers[j][i] is not null)
                                 {
                                     ReturnCanvasAndCollisions = await CreateBitmap(bitmap, j, i, providers[j][i], ListOfEntitiesCollisions).ConfigureAwait(false);
                                     providers[j][i] = null;
-                                    if (!(ReturnCanvasAndCollisions is null))
+                                    if (ReturnCanvasAndCollisions is not null)
                                     {
                                         bitmap = ReturnCanvasAndCollisions.bitmap;
                                         ListOfEntitiesCollisions.TextElementsList = ReturnCanvasAndCollisions.ListOfEntitiesCollisions.TextElementsList;
@@ -249,7 +249,8 @@ namespace MapsInMyFolder.Commun
                     StreamPBFFile.Dispose();
                 }
                 ReturnCanvasAndCollisions = null;
-                async Task<Renderer.ICanvasCollisions> CreateBitmap(ICanvas bitmapf, int PosX, int PosY, VectorTileRenderer.Sources.PbfTileSource pbfTileSource, MapsInMyFolder.VectorTileRenderer.Renderer.Collisions collisions, bool createCanvas = false, int NbrTileHeightWidth = 1)
+
+                async Task<Renderer.ICanvasCollisions> CreateBitmap(ICanvas bitmapf, int PosX, int PosY, VectorTileRenderer.Sources.PbfTileSource pbfTileSource, Renderer.Collisions collisions, bool createCanvas = false, int NbrTileHeightWidth = 1)
                 {
                     if (pbfTileSource != null)
                     {
@@ -335,9 +336,9 @@ namespace MapsInMyFolder.Commun
                     HttpResponse tp_response = HttpResponse.HttpResponseError;
                     try
                     {
-                        Uri temp_uri = new Uri(Collectif.GetUrl.FromTileXYZ(urlBase, TileX_tp, TileY_tp, zoom, layerID, Collectif.GetUrl.InvokeFunction.getTile));
+                        Uri temp_uri = new Uri(Collectif.GetUrl.FromTileXYZ(urlBase, TileX_tp, TileY_tp, zoom, layerID, Javascript.InvokeFunction.getTile));
                         tp_response = await Collectif.ByteDownloadUri(temp_uri, 0, true).ConfigureAwait(false);
-                        if (tp_response?.Buffer is null)
+                        if (tp_response?.ResponseMessage?.IsSuccessStatusCode == false || tp_response?.Buffer is null)
                         {
                             return null;
                         }

@@ -255,8 +255,8 @@ namespace MapsInMyFolder
             nettoyer_cache_layers_au_demarrage.IsChecked = Settings.nettoyer_cache_layers_au_demarrage;
             search_application_update_on_startup.IsChecked = Settings.search_application_update_on_startup;
             search_database_update_on_startup.IsChecked = Settings.search_database_update_on_startup;
-            CountryComboBox.ItemSource = Country.getList();
-            CountryComboBox.SelectedItems = Country.getListFromEnglishName(Settings.filter_layers_based_on_country.Split(';', StringSplitOptions.RemoveEmptyEntries));
+            CountryComboBox.ItemSource = Country.GetList();
+            CountryComboBox.SelectedItems = Country.GetListFromEnglishName(Settings.filter_layers_based_on_country.Split(';', StringSplitOptions.RemoveEmptyEntries));
 
             DefaultValuesHachCode = Collectif.CheckIfInputValueHaveChange(SettingsScrollViewer);
             SettingsVersionInformation.Content = Update.GetActualProductVersionFormatedString();
@@ -358,7 +358,7 @@ namespace MapsInMyFolder
             Settings.nettoyer_cache_layers_au_demarrage = nettoyer_cache_layers_au_demarrage.IsChecked ?? false;
             Settings.layerpanel_put_non_letter_layername_at_the_end = layerpanel_put_non_letter_layername_at_the_end.IsChecked ?? false;
             Settings.layerpanel_favorite_at_top = layerpanel_favorite_at_top.IsChecked ?? false;
-            Settings.filter_layers_based_on_country = string.Join(';', CountryComboBox.SelectedValues("EnglishName"));
+            Settings.filter_layers_based_on_country = string.Join(';', CountryComboBox.SelectedValuesAsString("EnglishName"));
 
             string layerpanelDisplayStyleValue = layerpanel_displaystyle.SelectedValue.ToString().ToUpperInvariant();
             Settings.layerpanel_displaystyle = (ListDisplayType)Enum.Parse(typeof(ListDisplayType), layerpanelDisplayStyleValue);
@@ -379,7 +379,7 @@ namespace MapsInMyFolder
 
             Settings.search_application_update_on_startup = search_application_update_on_startup.IsChecked ?? false;
             Settings.search_database_update_on_startup = search_database_update_on_startup.IsChecked ?? false;
-            Settings.layers_Sort = string.Join(',', layersSort.SelectedValues());
+            Settings.layers_Sort = string.Join(',', layersSort.SelectedValuesAsString());
 
             Settings.visibility_pins = (visibility_pins.IsChecked ?? false) ? Visibility.Visible : Visibility.Hidden;
 

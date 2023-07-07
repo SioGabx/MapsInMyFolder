@@ -1,4 +1,5 @@
-﻿using MapsInMyFolder.Commun;
+﻿using Jint.Runtime;
+using MapsInMyFolder.Commun;
 using MapsInMyFolder.MapControl;
 using System;
 using System.Collections.Generic;
@@ -7,6 +8,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media.Animation;
+using static MapsInMyFolder.Commun.Collectif.GetUrl;
 using TextBox = System.Windows.Controls.TextBox;
 
 namespace MapsInMyFolder
@@ -280,7 +282,37 @@ namespace MapsInMyFolder
             Commun.Map.CurentSelection.NO_Longitude = ActiveRectangleSelection.NO.Longitude;
             Commun.Map.CurentSelection.SE_Latitude = ActiveRectangleSelection.SE.Latitude;
             Commun.Map.CurentSelection.SE_Longitude = ActiveRectangleSelection.SE.Longitude;
-            if (Settings.visibility_pins == Visibility.Visible)
+
+            if (Javascript.CheckIfFunctionExist(Layers.Current.class_id, Javascript.InvokeFunction.selectionChanged.ToString(), null))
+            {
+                string script = Layers.Current.class_script;
+
+                Dictionary<string, Dictionary<string, double>> selectionArguments = Javascript.Functions.GetSelection();
+                // Populate the original dictionary with some data
+
+                Dictionary<string, object> arguments = new Dictionary<string, object>();
+                foreach (var outerKey in selectionArguments.Keys)
+                {
+                    var innerDictionary = selectionArguments[outerKey];
+                    Dictionary<string, object> innerConvertedDictionary = new Dictionary<string, object>();
+                    foreach (var innerKey in innerDictionary.Keys)
+                    {
+                        innerConvertedDictionary[innerKey] = innerDictionary[innerKey];
+                    }
+                    arguments[outerKey] = innerConvertedDictionary;
+                }
+                try
+                {
+                    Javascript.ExecuteScript(script, new Dictionary<string, object>(arguments), Layers.Current.class_id, Javascript.InvokeFunction.selectionChanged);
+                }
+                catch (Exception ex)
+                {
+                    Javascript.Functions.PrintError(ex.Message);
+                }
+            }
+
+
+                if (Settings.visibility_pins == Visibility.Visible)
             {
                 NO_PIN.Content = $"{Languages.Current["mapLatitude"]} = {Math.Round(NO_PIN.Location.Latitude, 6)}\n{Languages.Current["mapLongitude"]} = {Math.Round(NO_PIN.Location.Longitude, 6)}";
                 SE_PIN.Content = $"{Languages.Current["mapLatitude"]} = {Math.Round(SE_PIN.Location.Latitude, 6)}\n{Languages.Current["mapLongitude"]} = {Math.Round(SE_PIN.Location.Longitude, 6)}";

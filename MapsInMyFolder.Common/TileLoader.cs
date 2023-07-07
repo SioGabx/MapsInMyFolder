@@ -23,16 +23,14 @@ namespace MapsInMyFolder.Commun
 
     public class TilesUrl
     {
-        public string url;
         public int x;
         public int y;
         public int z;
         public Status status;
         public int downloadid;
 
-        public TilesUrl(string url, int x, int y, int z, Status status, int downloadid)
+        public TilesUrl(int x, int y, int z, Status status, int downloadid)
         {
-            this.url = url;
             this.x = x;
             this.y = y;
             this.z = z;

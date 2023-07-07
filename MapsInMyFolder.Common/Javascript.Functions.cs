@@ -46,6 +46,7 @@ namespace MapsInMyFolder.Commun
 
             static public object GetVar(object variablename, int LayerId = 0)
             {
+                System.Diagnostics.Debug.WriteLine("GetVar + " + variablename.ToString() + " from layer + " + LayerId);
                 string variablenameString;
                 if (variablename is null)
                 {
@@ -64,7 +65,7 @@ namespace MapsInMyFolder.Commun
                     {
                         if (VariableKeyAndValue.ContainsKey(variablenameString))
                         {
-                            return VariableKeyAndValue[variablenameString];
+                           return VariableKeyAndValue[variablenameString];
                         }
                     }
                 }
@@ -95,17 +96,17 @@ namespace MapsInMyFolder.Commun
                 return false;
             }
 
-            public static void DisposeVariablesOfLayer(int LayerId)
+            static public Dictionary<string, object>[] DumpVars(int LayerId)
             {
-                DictionnaryOfVariablesKeyLayerId.Remove(LayerId);
-            }
-
-            public static void DisposeVariable(string variablename, int LayerId)
-            {
-                if (DictionnaryOfVariablesKeyLayerId.TryGetValue(LayerId, out Dictionary<string, object> VariableKeyAndValue))
+                if (!DictionnaryOfVariablesKeyLayerId.TryGetValue(0, out Dictionary<string, object> GlobalScope))
                 {
-                    VariableKeyAndValue.Remove(variablename);
+                    GlobalScope = new Dictionary<string, object>();
                 }
+                if (!DictionnaryOfVariablesKeyLayerId.TryGetValue(LayerId, out Dictionary<string, object> LocalScope))
+                {
+                    LocalScope = new Dictionary<string, object>();
+                }
+                return new Dictionary<string, object>[2] { LocalScope, GlobalScope };
             }
             #endregion
 
@@ -129,18 +130,25 @@ namespace MapsInMyFolder.Commun
 
             public static Dictionary<string, Dictionary<string, double>> GetSelection()
             {
+                var Middle = Collectif.GetCenterBetweenTwoPoints((Map.CurentSelection.NO_Latitude, Map.CurentSelection.NO_Longitude), (Map.CurentSelection.SE_Latitude, Map.CurentSelection.SE_Longitude));
                 return new Dictionary<string, Dictionary<string, double>>
                 {
                     {
                         "SE", new Dictionary<string, double>() {
                             {"lat",Map.CurentSelection.SE_Latitude },
-                            {"long",Map.CurentSelection.SE_Longitude }
+                            {"lng",Map.CurentSelection.SE_Longitude }
                         }
                     },
                     {
                         "NO", new Dictionary<string, double>() {
                             {"lat",Map.CurentSelection.NO_Latitude },
-                            {"long",Map.CurentSelection.NO_Longitude }
+                            {"lng",Map.CurentSelection.NO_Longitude }
+                        }
+                    },
+                    {
+                        "MID", new Dictionary<string, double>() {
+                            {"lat",Middle.Latitude },
+                            {"lng",Middle.Longitude }
                         }
                     }
                 };
@@ -255,7 +263,6 @@ namespace MapsInMyFolder.Commun
                 {
                     IsWaitingUserAction = true;
 
-                    //alert("pos");
                     if (string.IsNullOrEmpty(caption?.ToString()))
                     {
                         caption = Collectif.HTMLEntities(Layers.GetLayerById(LayerId).class_name, true) + " indique :";
@@ -278,7 +285,6 @@ namespace MapsInMyFolder.Commun
                     }));
                     Dispatcher.PushFrame(frame);
                     return Application.Current.Dispatcher.Invoke(new Func<string>(() => TextBox.Text));
-
                 }
                 finally
                 {
@@ -337,7 +343,10 @@ namespace MapsInMyFolder.Commun
 
                         void callback()
                         {
-                            ExecuteScript(Layers.GetLayerById(LayerId).class_script, null, LayerId, javascriptCallback?.ToString());
+                            if (javascriptCallback != null)
+                            {
+                                ExecuteScript(Layers.GetLayerById(LayerId).class_script, null, LayerId, javascriptCallback?.ToString());
+                            }
                         }
 
                         notification = new NText(texte.ToString(), caption?.ToString(), "MainPage", callback)
@@ -381,11 +390,40 @@ namespace MapsInMyFolder.Commun
                 stringBuilder.AppendLine(" - inputbox(\"message\", \"caption\") : Demande une saisie à l'utilisateur");
                 stringBuilder.AppendLine(" - notification(\"message\", \"caption\", \"callback\", \"notificationId\") : Envoie une notification à l'écran. Un callback peut être attaché et appelé lors du clic sur celle-ci");
                 stringBuilder.AppendLine(" - refreshMap() : Rafraîchit la carte à l'écran");
+                stringBuilder.AppendLine(" - clearCache() : Nettoie le cache du calque");
                 stringBuilder.AppendLine(" - getStyle() : Obtient la valeur du style");
                 stringBuilder.AppendLine(" - transformLocation(OriginWkt, TargetWkt, projX, projY) : Convertir la position X, Y d'un système de coordonnées vers un autre système (utilise Well Known Text definition)");
                 stringBuilder.AppendLine(" - transformLocationFromWGS84(TargetWkt, Latitude, Longitude) : Convertir les coordonnées vers un autre système de coordonnées (utilise Well Known Text definition)");
 
                 Print(stringBuilder.ToString(), LayerId);
+            }
+
+            static public string Base64Encode(object stringToBeDecoded, int LayerId = -2)
+            {
+                try
+                {
+                    byte[] toEncodeAsBytes = Encoding.ASCII.GetBytes(stringToBeDecoded.ToString());
+                    return Convert.ToBase64String(toEncodeAsBytes);
+                }
+                catch (Exception ex)
+                {
+                    PrintError(ex.Message, LayerId);
+                }
+                return null;
+            }
+
+            static public string Base64Decode(object stringToBeEncoded, int LayerId = -2)
+            {
+                try
+                {
+                    byte[] encodedDataAsBytes = Convert.FromBase64String(stringToBeEncoded.ToString());
+                    return Encoding.ASCII.GetString(encodedDataAsBytes);
+                }
+                catch (Exception ex)
+                {
+                    PrintError(ex.Message, LayerId);
+                }
+                return null;
             }
 
             static public void PrintError(string print, int LayerId = -2)

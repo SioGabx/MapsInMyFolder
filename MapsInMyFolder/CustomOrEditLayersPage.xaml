@@ -508,6 +508,27 @@
                             TextChanged="TextboxSpecialOptionBackgroundColor_TextChanged" />
                     </Grid>
 
+                    <Grid Margin="0,10,0,0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="20" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+                        <Label
+                            Grid.Row="0"
+                            Content="{Binding Source={x:Static commun:Languages.Current}, Path=[editorPropertyNameAllowedErrorsGenerateTransparentTiles]}"
+                            Foreground="#888989" />
+
+                        <cbcontrols:MultiSelectCombobox
+                            x:Name="AlloweRequestErrorsComboBox"
+                            Grid.Row="1"
+                            Height="Auto"
+                            MinHeight="16"
+                            HorizontalAlignment="Stretch"
+                            DisplayMemberPath="DisplayName"
+                            ItemSeparator=";"
+                            RequestBringIntoView="DisableAllRequestBringIntoView" />
+                    </Grid>
 
                     <Grid Margin="0,10,0,0">
                         <Grid.RowDefinitions>

@@ -50,7 +50,7 @@ namespace MapsInMyFolder.MapControl
 
             if (UriFormat != null)
             {
-                var uriString = Collectif.GetUrl.FromTileXYZ(UriFormat, x, y, zoomLevel, LayerID, Collectif.GetUrl.InvokeFunction.getTile);
+                var uriString = Collectif.GetUrl.FromTileXYZ(UriFormat, x, y, zoomLevel, LayerID, Javascript.InvokeFunction.getTile);
 
                 if (Subdomains != null && Subdomains.Length > 0)
                 {
