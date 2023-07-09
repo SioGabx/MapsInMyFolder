@@ -207,7 +207,7 @@ namespace MapsInMyFolder
             SearchLayerStart();
         }
 
-        public void UpdateNotification(object sender, (string NotificationId, string Destinateur) NotificationInternalArgs)
+        public async void UpdateNotification(object sender, (string NotificationId, string Destinateur) NotificationInternalArgs)
         {
             if (sender is Notification Notif)
             {
@@ -218,6 +218,10 @@ namespace MapsInMyFolder
                 Grid ContentGrid = Notif.Get();
                 if (Collectif.FindChildByName<Grid>(NotificationZone, NotificationInternalArgs.NotificationId) != null)
                 {
+                    if (Notif.replaceOld == false)
+                    {
+                        return;
+                    }
                     Grid NotificationZoneContentGrid = Collectif.FindChildByName<Grid>(NotificationZone, NotificationInternalArgs.NotificationId);
                     NotificationZone.Children.Remove(NotificationZoneContentGrid);
                     NotificationZone.Children.Insert(Math.Min(Notif.InsertPosition, NotificationZone.Children.Count), ContentGrid);
@@ -239,8 +243,8 @@ namespace MapsInMyFolder
                 void DeleteAfterAnimation(object sender, EventArgs e)
                 {
                     ContentGrid?.Children?.Clear();
+                    NotificationZone.Children.Remove(ContentGrid); 
                     ContentGrid = null;
-                    NotificationZone.Children.Remove(ContentGrid);
                     doubleAnimation.Completed -= DeleteAfterAnimation;
                 }
                 doubleAnimation.Completed += DeleteAfterAnimation;

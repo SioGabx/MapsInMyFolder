@@ -118,7 +118,7 @@ namespace MapsInMyFolder
             SetSelection(index);
         }
 
-        private void SetSelection(int index)
+        private async void SetSelection(int index)
         {
             if (index >= 0)
             {
@@ -140,6 +140,10 @@ namespace MapsInMyFolder
 
                         LayerTilePreview_RequestUpdate();
                         mapviewer.Cursor = Cursors.Arrow;
+                        await Task.Delay((int)Math.Round(Settings.animations_duration_millisecond * 0.7));
+                        LayerTilePreview_RequestUpdate();
+                        await Task.Delay((int)Math.Round(Settings.animations_duration_millisecond * 0.3));
+                        LayerTilePreview_RequestUpdate();
                     }
                 }
             }

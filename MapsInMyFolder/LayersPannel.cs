@@ -2,6 +2,7 @@
 using MapsInMyFolder.Commun;
 using MapsInMyFolder.MapControl;
 using ModernWpf.Controls;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Data.SQLite;
@@ -661,6 +662,12 @@ namespace MapsInMyFolder
 
         public void LayerTilePreview_RequestUpdate()
         {
+            var bbox = mapviewer.ViewRectToBoundingBox(new Rect(0, 0, mapviewer.ActualWidth, mapviewer.ActualHeight));
+            Commun.Map.CurentView.NO_Latitude = bbox.North;
+            Commun.Map.CurentView.NO_Longitude = bbox.West;     
+            Commun.Map.CurentView.SE_Latitude = bbox.South;
+            Commun.Map.CurentView.SE_Longitude = bbox.East;
+            
             layer_browser.ExecuteScriptAsyncWhenPageLoaded("UpdatePreview();");
             return;
         }

@@ -2,10 +2,12 @@
 using Esprima.Ast;
 using Jint;
 using Jint.Native;
+using MapsInMyFolder.VectorTileRenderer;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -110,10 +112,11 @@ namespace MapsInMyFolder.Commun
             engine.SetValue("setSelection", (Action<double, double, double, double, bool>)((NO_Latitude, NO_Longitude, SE_Latitude, SE_Longitude, ZoomToNewLocation) =>
                 Functions.SetSelection(NO_Latitude, NO_Longitude, SE_Latitude, SE_Longitude, ZoomToNewLocation, LayerId)));
             engine.SetValue("getSelection", (Func<object>)(() => Functions.GetSelection()));
+            engine.SetValue("getView", (Func<object>)(() => Functions.GetView()));
             engine.SetValue("alert", (Action<object, object>)((texte, caption) => Functions.Alert(LayerId, texte, caption)));
             engine.SetValue("inputbox", (Func<object, object, object>)((texte, caption) => Functions.InputBox(LayerId, texte, caption)));
-            engine.SetValue("notification", (Func<object, object, object, object, object>)((texte, caption, callback, notifId) =>
-                Functions.SendNotification(LayerId, texte, caption, callback, notifId)));
+            engine.SetValue("notification", (Func<object, object, object, object, object, object>)((texte, caption, callback, notifId, doreplace) =>
+                Functions.SendNotification(LayerId, texte, caption, callback, notifId, doreplace)));
             engine.SetValue("refreshMap", (Func<object>)(() =>
             {
                 JavascriptActionEvent?.Invoke(LayerId, JavascriptAction.refreshMap);
@@ -136,6 +139,40 @@ namespace MapsInMyFolder.Commun
 
             return engine;
         }
+
+        public static string getHelp()
+        {
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.AppendLine("AIDE");
+            stringBuilder.AppendLine("À chaque chargement de tuile, la fonction getTile est appelée avec des arguments");
+            stringBuilder.AppendLine("et doit retourner un objet contenant les remplacements à effectuer.");
+            stringBuilder.AppendLine("La documentation du logiciel est disponible à cette adresse : ");
+            stringBuilder.AppendLine("https://github.com/SioGabx/MapsInMyFolder");
+            stringBuilder.AppendLine("");
+            stringBuilder.AppendLine("FONCTIONS");
+            stringBuilder.AppendLine(" - print(string) : Affiche un message dans la console");
+            stringBuilder.AppendLine(" - printClear() : Efface la console");
+            stringBuilder.AppendLine(" - cls() : Efface la console");
+            stringBuilder.AppendLine(" - help() : Affiche cette aide");
+            stringBuilder.AppendLine(" - setVar(\"nom_variable\",\"valeur\") : Définit la valeur de la variable. Cette variable est conservée durant l'intégralité de l'exécution de l'application");
+            stringBuilder.AppendLine(" - getVar(\"nom_variable\") : Obtient la valeur de la variable.");
+            stringBuilder.AppendLine(" - clearVar(\"nom_variable\") : Supprime la variable.");
+            stringBuilder.AppendLine(" - getTileNumber(latitude, longitude, zoom) : Convertit les coordonnées en tiles");
+            stringBuilder.AppendLine(" - getLatLong(TileX, TileY, zoom) : Convertit les numéros de tiles en coordonnées");
+            stringBuilder.AppendLine(" - setSelection(top_latitude, top_longitude, bot_latitude, bot_longitude, zoomToBound) : Définit les coordonnées de la sélection courante");
+            stringBuilder.AppendLine(" - getSelection() : Obtient les coordonnées de la sélection courante");
+            stringBuilder.AppendLine(" - alert(\"message\", \"caption\") : Affiche un message à l'écran");
+            stringBuilder.AppendLine(" - inputbox(\"message\", \"caption\") : Demande une saisie à l'utilisateur");
+            stringBuilder.AppendLine(" - notification(\"message\", \"caption\", \"callback\", \"notificationId\", \"replaceOld\") : Envoie une notification à l'écran. Un callback peut être attaché et appelé lors du clic sur celle-ci");
+            stringBuilder.AppendLine(" - refreshMap() : Rafraîchit la carte à l'écran");
+            stringBuilder.AppendLine(" - clearCache() : Nettoie le cache du calque");
+            stringBuilder.AppendLine(" - getStyle() : Obtient la valeur du style");
+            stringBuilder.AppendLine(" - transformLocation(OriginWkt, TargetWkt, projX, projY) : Convertir la position X, Y d'un système de coordonnées vers un autre système (utilise Well Known Text definition)");
+            stringBuilder.AppendLine(" - transformLocationFromWGS84(TargetWkt, Latitude, Longitude) : Convertir les coordonnées vers un autre système de coordonnées (utilise Well Known Text definition)");
+
+           return stringBuilder.ToString();
+        }
+
 
         #region engines
         private static readonly Dictionary<int, CancellationTokenSource> JsListCancelTocken = new Dictionary<int, CancellationTokenSource>();
