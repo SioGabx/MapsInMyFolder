@@ -76,6 +76,22 @@ namespace MapsInMyFolder.Commun
                     }
                 }
             }
+
+
+            private string _ErrorsToIgnore;
+            public string ErrorsToIgnore
+            {
+                get
+                {
+                    return this._ErrorsToIgnore;
+                }
+                set
+                {
+                    this._ErrorsToIgnore = value;
+                }
+            }
+
+
             public override string ToString()
             {
                 return System.Text.Json.JsonSerializer.Serialize(this);
@@ -96,7 +112,11 @@ namespace MapsInMyFolder.Commun
 
             public static void ToCurentLayer(Layers layer)
             {
-                Current = (Layers)layer.MemberwiseClone();
+                Current = Copy(layer);
+            }
+
+            public static Layers Copy(Layers layer) {
+                return (Layers)layer.MemberwiseClone();
             }
         }
 

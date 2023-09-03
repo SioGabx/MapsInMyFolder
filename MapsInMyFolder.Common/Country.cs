@@ -10,13 +10,13 @@ namespace MapsInMyFolder.Commun
     {
         public string DisplayName { get; set; }
         public string EnglishName { get; set; }
-        public static IEnumerable<Country> getList()
+        public static IEnumerable<Country> GetList()
         {
             List<Country> CountryList = new List<Country>();
             foreach (var ci in CultureInfo.GetCultures(CultureTypes.AllCultures))
             {
-                string CurentCultureCountry = getCountryFromCultureName(ci.DisplayName);
-                string EnglishCultureCountry = getCountryFromCultureName(ci.EnglishName);
+                string CurentCultureCountry = GetCountryFromCultureName(ci.DisplayName);
+                string EnglishCultureCountry = GetCountryFromCultureName(ci.EnglishName);
                 //Debug.WriteLine(CurentCultureCountry + " / " + EnglishCultureCountry + " / " + ci.Name);
                 if (!string.IsNullOrWhiteSpace(CurentCultureCountry) && !string.IsNullOrWhiteSpace(EnglishCultureCountry))
                 {
@@ -31,10 +31,10 @@ namespace MapsInMyFolder.Commun
             return CountryList.GroupBy(x => x.EnglishName).Select(y => y.First()).OrderBy(z => z.DisplayName);
         }
 
-        public static List<Country> getListFromEnglishName(IEnumerable<string> ListOfEnglishName)
+        public static List<Country> GetListFromEnglishName(IEnumerable<string> ListOfEnglishName)
         {
             List<Country> CountryList = new List<Country>();
-            foreach (var ci in getList())
+            foreach (var ci in GetList())
             {
                 if (ListOfEnglishName.Contains(ci.EnglishName))
                 {
@@ -44,12 +44,12 @@ namespace MapsInMyFolder.Commun
             return CountryList;
         }
 
-        public static List<Country> getListFromEnglishName(string EnglishName)
+        public static List<Country> GetListFromEnglishName(string EnglishName)
         {
-            return getListFromEnglishName(new string[] { EnglishName });
+            return GetListFromEnglishName(new string[] { EnglishName });
         }
 
-        private static string getCountryFromCultureName(string Name)
+        private static string GetCountryFromCultureName(string Name)
         {
             string resultString = Regex.Match(Name, @"(?<=\().+?(?=\))", RegexOptions.RightToLeft).Value;
             if (resultString.Contains(','))

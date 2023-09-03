@@ -19,16 +19,18 @@ namespace MapsInMyFolder.Commun
         public string Destinateur = null;
         public bool DisappearAfterAMoment = false;
         public bool IsPersistant = false;
+        public bool replaceOld = true;
         protected string Information = "";
         protected string Title = "";
         protected Action OnClickCallback = null;
 
-        public Notification(string Information, string Title, string Destinateur, Action callback = null)
+        public Notification(string Information, string Title, string Destinateur, Action callback = null, bool doReplace = true)
         {
             this.Information = Information;
             this.Title = Title;
             this.OnClickCallback = callback;
             this.Destinateur = Destinateur;
+            this.replaceOld = doReplace;
         }
 
         public virtual void Text(string Information = null, string Title = null)
@@ -101,6 +103,7 @@ namespace MapsInMyFolder.Commun
     {
         public static class Elements
         {
+
             public static Grid ContentGrid(string NotificationId, Action OnClickCallback, Action CloseCallback)
             {
                 Grid ContentGrid = new Grid()
@@ -110,19 +113,19 @@ namespace MapsInMyFolder.Commun
                 };
                 ContentGrid.RowDefinitions.Add(new RowDefinition());
                 ContentGrid.ColumnDefinitions.Add(new ColumnDefinition());
-
                 ContentGrid.Name = NotificationId;
 
                 if (OnClickCallback != null)
                 {
-                    ContentGrid.MouseLeftButtonUp += ContentGrid_MouseLeftButtonUp;
+                    ContentGrid.MouseLeftButtonDown += ContentGrid_MouseLeftButtonDown;
 
-                    void ContentGrid_MouseLeftButtonUp(object sender, MouseButtonEventArgs o)
+                    void ContentGrid_MouseLeftButtonDown(object sender, MouseButtonEventArgs o)
                     {
                         o.Handled = true;
                         CloseCallback();
                         OnClickCallback();
-                        ContentGrid.MouseLeftButtonUp -= ContentGrid_MouseLeftButtonUp;
+                        ContentGrid.MouseLeftButtonDown -= ContentGrid_MouseLeftButtonDown;
+
                     }
                 }
 
@@ -262,7 +265,7 @@ namespace MapsInMyFolder.Commun
 
     public class NText : Notification
     {
-        public NText(string Information, string Title, string Destinateur, Action callback = null) : base(Information, Title, Destinateur, callback)
+        public NText(string Information, string Title, string Destinateur, Action callback = null, bool replaceOld = true) : base(Information, Title, Destinateur, callback, replaceOld)
         {
         }
 

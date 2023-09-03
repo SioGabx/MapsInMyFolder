@@ -126,6 +126,9 @@ namespace MapsInMyFolder
             {
                 case Javascript.JavascriptAction.refreshMap:
                     MainPage.RefreshMap();
+                    break;   
+                case Javascript.JavascriptAction.clearCache:
+                    MainPage.ClearCache((int)(sender), false);
                     break;
                 default:
                     Debug.WriteLine("Cette JSEvent action n'existe pas");

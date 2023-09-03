@@ -9,5 +9,12 @@
             public static double SE_Latitude;
             public static double SE_Longitude;
         }
+        public static class CurentView
+        {
+            public static double NO_Latitude;
+            public static double NO_Longitude;
+            public static double SE_Latitude;
+            public static double SE_Longitude;
+        }
     }
 }

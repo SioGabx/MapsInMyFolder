@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Net;
 using System.Net.Http.Headers;
 using System.Windows;
 using System.Windows.Controls;
@@ -178,7 +180,7 @@ namespace MapsInMyFolder.Commun
             return -1;
         }
 
-        public static IEnumerable<string> SelectedValues(this BlackPearl.Controls.CoreLibrary.MultiSelectCombobox MultiSelectCombobox, string DisplayMemberPath = null)
+        public static IEnumerable<string> SelectedValuesAsString(this BlackPearl.Controls.CoreLibrary.MultiSelectCombobox MultiSelectCombobox, string DisplayMemberPath = null)
         {
             if (string.IsNullOrEmpty(DisplayMemberPath))
             {
@@ -194,7 +196,29 @@ namespace MapsInMyFolder.Commun
                     }
                     else
                     {
-                        yield return ele.GetType().GetProperty(DisplayMemberPath).GetValue(ele).ToString().Trim();
+                        yield return ele.GetType().GetProperty(DisplayMemberPath)?.GetValue(ele)?.ToString()?.Trim();
+                    }
+                }
+            }
+        }
+
+        public static IEnumerable<int> SelectedValuesAsInt(this BlackPearl.Controls.CoreLibrary.MultiSelectCombobox MultiSelectCombobox, string DisplayMemberPath = null)
+        {
+            if (string.IsNullOrEmpty(DisplayMemberPath))
+            {
+                DisplayMemberPath = MultiSelectCombobox.DisplayMemberPath;
+            }
+            if (MultiSelectCombobox?.SelectedItems != null)
+            {
+                foreach (object ele in MultiSelectCombobox.SelectedItems)
+                {
+                    if (ele.GetType() == typeof(string))
+                    {
+                        yield return (int)ele;
+                    }
+                    else
+                    {
+                        yield return (int)(ele.GetType().GetProperty(DisplayMemberPath).GetValue(ele));
                     }
                 }
             }
@@ -217,6 +241,10 @@ namespace MapsInMyFolder.Commun
 
         public static bool Contains(this string[] array, string value)
         {
+            if (array == null)
+            {
+                return false;
+            }
             for (int i = 0; i < array.Length; i++)
             {
                 if (array[i] == value)
@@ -226,6 +254,12 @@ namespace MapsInMyFolder.Commun
             }
             return false;
         }
+
+        public static bool Contains(this IEnumerable<HttpStatusCode> httpStatusCodes, HttpStatusCode statusCode)
+        {
+            return httpStatusCodes.Any(c => c == statusCode);
+        }
+
 
         public static string Replace(this string Texte, IEnumerable<char> oldCharArray, string newString)
         {

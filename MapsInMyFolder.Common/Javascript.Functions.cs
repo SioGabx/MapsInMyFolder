@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -64,7 +65,7 @@ namespace MapsInMyFolder.Commun
                     {
                         if (VariableKeyAndValue.ContainsKey(variablenameString))
                         {
-                            return VariableKeyAndValue[variablenameString];
+                           return VariableKeyAndValue[variablenameString];
                         }
                     }
                 }
@@ -95,17 +96,17 @@ namespace MapsInMyFolder.Commun
                 return false;
             }
 
-            public static void DisposeVariablesOfLayer(int LayerId)
+            static public Dictionary<string, object>[] DumpVars(int LayerId)
             {
-                DictionnaryOfVariablesKeyLayerId.Remove(LayerId);
-            }
-
-            public static void DisposeVariable(string variablename, int LayerId)
-            {
-                if (DictionnaryOfVariablesKeyLayerId.TryGetValue(LayerId, out Dictionary<string, object> VariableKeyAndValue))
+                if (!DictionnaryOfVariablesKeyLayerId.TryGetValue(0, out Dictionary<string, object> GlobalScope))
                 {
-                    VariableKeyAndValue.Remove(variablename);
+                    GlobalScope = new Dictionary<string, object>();
                 }
+                if (!DictionnaryOfVariablesKeyLayerId.TryGetValue(LayerId, out Dictionary<string, object> LocalScope))
+                {
+                    LocalScope = new Dictionary<string, object>();
+                }
+                return new Dictionary<string, object>[2] { LocalScope, GlobalScope };
             }
             #endregion
 
@@ -129,22 +130,56 @@ namespace MapsInMyFolder.Commun
 
             public static Dictionary<string, Dictionary<string, double>> GetSelection()
             {
+                var Middle = Collectif.GetCenterBetweenTwoPoints((Map.CurentSelection.NO_Latitude, Map.CurentSelection.NO_Longitude), (Map.CurentSelection.SE_Latitude, Map.CurentSelection.SE_Longitude));
                 return new Dictionary<string, Dictionary<string, double>>
                 {
                     {
                         "SE", new Dictionary<string, double>() {
                             {"lat",Map.CurentSelection.SE_Latitude },
-                            {"long",Map.CurentSelection.SE_Longitude }
+                            {"lng",Map.CurentSelection.SE_Longitude }
                         }
                     },
                     {
                         "NO", new Dictionary<string, double>() {
                             {"lat",Map.CurentSelection.NO_Latitude },
-                            {"long",Map.CurentSelection.NO_Longitude }
+                            {"lng",Map.CurentSelection.NO_Longitude }
+                        }
+                    },
+                    {
+                        "MID", new Dictionary<string, double>() {
+                            {"lat",Middle.Latitude },
+                            {"lng",Middle.Longitude }
                         }
                     }
                 };
             }
+
+            public static Dictionary<string, Dictionary<string, double>> GetView()
+            {
+                var Middle = Collectif.GetCenterBetweenTwoPoints((Map.CurentView.NO_Latitude, Map.CurentView.NO_Longitude), (Map.CurentView.SE_Latitude, Map.CurentView.SE_Longitude));
+                return new Dictionary<string, Dictionary<string, double>>
+                {
+                    {
+                        "SE", new Dictionary<string, double>() {
+                            {"lat",Map.CurentView.SE_Latitude },
+                            {"lng",Map.CurentView.SE_Longitude }
+                        }
+                    },
+                    {
+                        "NO", new Dictionary<string, double>() {
+                            {"lat",Map.CurentView.NO_Latitude },
+                            {"lng",Map.CurentView.NO_Longitude }
+                        }
+                    },
+                    {
+                        "MID", new Dictionary<string, double>() {
+                            {"lat",Middle.Latitude },
+                            {"lng",Middle.Longitude }
+                        }
+                    }
+                };
+            }
+
 
             public static Dictionary<string, int> CoordonneesToTile(object objLatitude, object objLongitude, object objZoom)
             {
@@ -255,7 +290,6 @@ namespace MapsInMyFolder.Commun
                 {
                     IsWaitingUserAction = true;
 
-                    //alert("pos");
                     if (string.IsNullOrEmpty(caption?.ToString()))
                     {
                         caption = Collectif.HTMLEntities(Layers.GetLayerById(LayerId).class_name, true) + " indique :";
@@ -264,7 +298,7 @@ namespace MapsInMyFolder.Commun
                     var frame = new DispatcherFrame();
                     TextBox = Application.Current.Dispatcher.Invoke(new Func<TextBox>(() =>
                     {
-                        var (textBox, dialog) = Message.SetInputBoxDialog(texte, caption);
+                        var (textBox, dialog) = Message.SetInputBoxDialog(texte, string.Empty, caption);
 
                         void Dialog_Closed(object sender, EventArgs e)
                         {
@@ -278,7 +312,6 @@ namespace MapsInMyFolder.Commun
                     }));
                     Dispatcher.PushFrame(frame);
                     return Application.Current.Dispatcher.Invoke(new Func<string>(() => TextBox.Text));
-
                 }
                 finally
                 {
@@ -320,7 +353,7 @@ namespace MapsInMyFolder.Commun
             }
 
 
-            public static string SendNotification(int LayerId, object texte, object caption = null, object javascriptCallback = null, object notifId = null)
+            public static string SendNotification(int LayerId, object texte, object caption = null, object javascriptCallback = null, object notifId = null, object doReplaceObj = null)
             {
                 if (LayerId == -2 || LayerId != Layers.Current.class_id)
                 {
@@ -328,6 +361,14 @@ namespace MapsInMyFolder.Commun
                     return null;
                 }
                 Notification notification = null;
+
+                bool doReplace = true;
+                if (doReplaceObj != null && !bool.TryParse(doReplaceObj.ToString(), out doReplace))
+                {
+                    PrintError("replaceOld is not a valid boolean.");
+                }
+
+                Debug.WriteLine(doReplace);
 
                 void SetupNotification()
                 {
@@ -337,10 +378,13 @@ namespace MapsInMyFolder.Commun
 
                         void callback()
                         {
-                            ExecuteScript(Layers.GetLayerById(LayerId).class_script, null, LayerId, javascriptCallback?.ToString());
+                            if (javascriptCallback != null)
+                            {
+                                ExecuteScript(Layers.GetLayerById(LayerId).class_script, null, LayerId, javascriptCallback?.ToString());
+                            }
                         }
 
-                        notification = new NText(texte.ToString(), caption?.ToString(), "MainPage", callback)
+                        notification = new NText(texte.ToString(), caption?.ToString(), "MainPage", callback, doReplace)
                         {
                             NotificationId = NotificationId
                         };
@@ -358,34 +402,35 @@ namespace MapsInMyFolder.Commun
 
             static public void Help(int LayerId)
             {
-                StringBuilder stringBuilder = new StringBuilder();
-                stringBuilder.AppendLine("AIDE");
-                stringBuilder.AppendLine("À chaque chargement de tuile, la fonction getTile est appelée avec des arguments");
-                stringBuilder.AppendLine("et doit retourner un objet contenant les remplacements à effectuer.");
-                stringBuilder.AppendLine("La documentation du logiciel est disponible à cette adresse : ");
-                stringBuilder.AppendLine("https://github.com/SioGabx/MapsInMyFolder");
-                stringBuilder.AppendLine("");
-                stringBuilder.AppendLine("FONCTIONS");
-                stringBuilder.AppendLine(" - print(string) : Affiche un message dans la console");
-                stringBuilder.AppendLine(" - printClear() : Efface la console");
-                stringBuilder.AppendLine(" - cls() : Efface la console");
-                stringBuilder.AppendLine(" - help() : Affiche cette aide");
-                stringBuilder.AppendLine(" - setVar(\"nom_variable\",\"valeur\") : Définit la valeur de la variable. Cette variable est conservée durant l'intégralité de l'exécution de l'application");
-                stringBuilder.AppendLine(" - getVar(\"nom_variable\") : Obtient la valeur de la variable.");
-                stringBuilder.AppendLine(" - clearVar(\"nom_variable\") : Supprime la variable.");
-                stringBuilder.AppendLine(" - getTileNumber(latitude, longitude, zoom) : Convertit les coordonnées en tiles");
-                stringBuilder.AppendLine(" - getLatLong(TileX, TileY, zoom) : Convertit les numéros de tiles en coordonnées");
-                stringBuilder.AppendLine(" - setSelection(top_latitude, top_longitude, bot_latitude, bot_longitude, zoomToBound) : Définit les coordonnées de la sélection courante");
-                stringBuilder.AppendLine(" - getSelection() : Obtient les coordonnées de la sélection courante");
-                stringBuilder.AppendLine(" - alert(\"message\", \"caption\") : Affiche un message à l'écran");
-                stringBuilder.AppendLine(" - inputbox(\"message\", \"caption\") : Demande une saisie à l'utilisateur");
-                stringBuilder.AppendLine(" - notification(\"message\", \"caption\", \"callback\", \"notificationId\") : Envoie une notification à l'écran. Un callback peut être attaché et appelé lors du clic sur celle-ci");
-                stringBuilder.AppendLine(" - refreshMap() : Rafraîchit la carte à l'écran");
-                stringBuilder.AppendLine(" - getStyle() : Obtient la valeur du style");
-                stringBuilder.AppendLine(" - transformLocation(OriginWkt, TargetWkt, projX, projY) : Convertir la position X, Y d'un système de coordonnées vers un autre système (utilise Well Known Text definition)");
-                stringBuilder.AppendLine(" - transformLocationFromWGS84(TargetWkt, Latitude, Longitude) : Convertir les coordonnées vers un autre système de coordonnées (utilise Well Known Text definition)");
+                Print(getHelp(), LayerId);
+            }
 
-                Print(stringBuilder.ToString(), LayerId);
+            static public string Base64Encode(object stringToBeDecoded, int LayerId = -2)
+            {
+                try
+                {
+                    byte[] toEncodeAsBytes = Encoding.ASCII.GetBytes(stringToBeDecoded.ToString());
+                    return Convert.ToBase64String(toEncodeAsBytes);
+                }
+                catch (Exception ex)
+                {
+                    PrintError(ex.Message, LayerId);
+                }
+                return null;
+            }
+
+            static public string Base64Decode(object stringToBeEncoded, int LayerId = -2)
+            {
+                try
+                {
+                    byte[] encodedDataAsBytes = Convert.FromBase64String(stringToBeEncoded.ToString());
+                    return Encoding.ASCII.GetString(encodedDataAsBytes);
+                }
+                catch (Exception ex)
+                {
+                    PrintError(ex.Message, LayerId);
+                }
+                return null;
             }
 
             static public void PrintError(string print, int LayerId = -2)

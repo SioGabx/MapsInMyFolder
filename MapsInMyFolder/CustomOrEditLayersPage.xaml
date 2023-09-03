@@ -302,6 +302,7 @@
                             Grid.ColumnSpan="3"
                             VerticalAlignment="Center"
                             Content="{Binding Source={x:Static commun:Languages.Current}, Path=[editorOpenAreaEditor]}"
+                             ContentStringFormat="{}→ {0}"
                             Foreground="#888989"
                             IsTabStop="True"
                             MouseEnter="ClickableLabel_MouseEnter"
@@ -354,6 +355,7 @@
                             Grid.ColumnSpan="3"
                             VerticalAlignment="Center"
                             Content="{Binding Source={x:Static commun:Languages.Current}, Path=[editorAutoDetectZoom]}"
+                             ContentStringFormat="{}→ {0}"
                             Foreground="#888989"
                             IsTabStop="True"
                             MouseEnter="ClickableLabel_MouseEnter"
@@ -508,6 +510,27 @@
                             TextChanged="TextboxSpecialOptionBackgroundColor_TextChanged" />
                     </Grid>
 
+                    <Grid Margin="0,10,0,0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="20" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+                        <Label
+                            Grid.Row="0"
+                            Content="{Binding Source={x:Static commun:Languages.Current}, Path=[editorPropertyNameAllowedErrorsGenerateTransparentTiles]}"
+                            Foreground="#888989" />
+
+                        <cbcontrols:MultiSelectCombobox
+                            x:Name="AlloweRequestErrorsComboBox"
+                            Grid.Row="1"
+                            Height="Auto"
+                            MinHeight="16"
+                            HorizontalAlignment="Stretch"
+                            DisplayMemberPath="DisplayName"
+                            ItemSeparator=";"
+                            RequestBringIntoView="DisableAllRequestBringIntoView" />
+                    </Grid>
 
                     <Grid Margin="0,10,0,0">
                         <Grid.RowDefinitions>
@@ -550,20 +573,34 @@
                         <Grid.RowDefinitions>
                             <RowDefinition Height="20" />
                             <RowDefinition Height="20" />
+                            <RowDefinition Height="20" />
                             <RowDefinition />
                         </Grid.RowDefinitions>
                         <Label
-                            x:Name="ResetInfoLayerClikableLabel"
+                            x:Name="ImportExportInfoLayerClikableLabel"
                             Grid.Row="0"
+                            Content="{Binding Source={x:Static commun:Languages.Current}, Path=[editorImportExportLayerProperty]}"
+                            ContentStringFormat="{}→ {0}"
+                            Foreground="#888989"
+                            MouseEnter="ClickableLabel_MouseEnter"
+                            MouseLeave="ClickableLabel_MouseLeave"
+                            MouseUp="ImportExportInfoLayerClikableLabel_MouseUp" />
+
+
+                        <Label
+                            x:Name="ResetInfoLayerClikableLabel"
+                            Grid.Row="1"
                             Content="{Binding Source={x:Static commun:Languages.Current}, Path=[editorResetLayerProperty]}"
+                            ContentStringFormat="{}→ {0}"
                             Foreground="#888989"
                             MouseEnter="ClickableLabel_MouseEnter"
                             MouseLeave="ClickableLabel_MouseLeave"
                             MouseUp="ResetInfoLayerClikableLabel_MouseUp" />
                         <Label
                             x:Name="DeleteLayerClikableLabel"
-                            Grid.Row="1"
+                            Grid.Row="2"
                             Content="{Binding Source={x:Static commun:Languages.Current}, Path=[editorDeleteLayer]}"
+                            ContentStringFormat="{}→ {0}"
                             Foreground="#888989"
                             MouseEnter="ClickableLabel_MouseEnter"
                             MouseLeave="ClickableLabel_MouseLeave"

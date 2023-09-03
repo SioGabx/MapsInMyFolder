@@ -67,7 +67,7 @@ namespace MapsInMyFolder.Commun
         public static bool search_database_update_on_startup = true;
 
         public static SearchEngines search_engine = SearchEngines.OpenStreetMap;
-        public static Languages.Language application_languages = Languages.Language.English;
+        public static Languages.Language application_languages = Languages.Language.SystemLanguage;
 
         public static bool editor_autoupdatelayer = true;
 

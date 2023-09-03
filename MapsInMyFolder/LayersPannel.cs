@@ -99,7 +99,7 @@ namespace MapsInMyFolder
         {
             List<Layers> layersFavorite = new List<Layers>();
             List<Layers> layersClassicSort = new List<Layers>();
-            using SQLiteDataReader sqlite_datareader = Database.ExecuteExecuteReaderSQLCommand(query_command);
+            using SQLiteDataReader sqlite_datareader = Database.ExecuteExecuteReaderSQLCommand(query_command).Reader;
 
             while (sqlite_datareader.Read())
             {
@@ -294,7 +294,19 @@ namespace MapsInMyFolder
                         object actualValue = field.GetValue(LayerWithReplacement);
                         if (actualValue is null)
                         {
-                            field.SetValue(LayerWithReplacement, string.Empty);
+                            if (field.FieldType == typeof(string))
+                            {
+                                field.SetValue(LayerWithReplacement, string.Empty);
+                            }
+                            else if (field.FieldType == typeof(int))
+                            {
+                                field.SetValue(LayerWithReplacement, 0);
+                            }
+                            else
+                            {
+                                field.SetValue(LayerWithReplacement, null);
+                            }
+
                         }
                     }
 
@@ -546,81 +558,107 @@ namespace MapsInMyFolder
 
         public static async void ShowLayerWarning(int id)
         {
-            using (SQLiteDataReader editedlayers_sqlite_datareader = Database.ExecuteExecuteReaderSQLCommand($"SELECT * FROM 'EDITEDLAYERS' WHERE ID = {id}"))
+            int EditedDB_VERSION;
+            string EditedDB_SCRIPT;
+            string EditedDB_TILE_URL;
+
+            int LastDB_VERSION;
+            string LastDB_SCRIPT;
+            string LastDB_TILE_URL;
+
+
+            var DatabaseEditedLayerExecutable = Database.ExecuteExecuteReaderSQLCommand($"SELECT * FROM 'EDITEDLAYERS' WHERE ID = {id}");
+            using (DatabaseEditedLayerExecutable.conn)
             {
-                if (!editedlayers_sqlite_datareader.Read())
+                using (SQLiteDataReader editedlayers_sqlite_datareader = DatabaseEditedLayerExecutable.Reader)
+                {
+                    if (!editedlayers_sqlite_datareader.Read())
+                    {
+                        return;
+                    }
+
+                    EditedDB_VERSION = editedlayers_sqlite_datareader.GetIntFromOrdinal("VERSION") ?? 0;
+                    EditedDB_SCRIPT = editedlayers_sqlite_datareader.GetStringFromOrdinal("SCRIPT");
+                    EditedDB_TILE_URL = editedlayers_sqlite_datareader.GetStringFromOrdinal("TILE_URL");
+                }
+            }
+
+            var DatabaseLayerExecutable = Database.ExecuteExecuteReaderSQLCommand($"SELECT * FROM 'LAYERS' WHERE ID = {id}");
+            using (DatabaseLayerExecutable.conn)
+            {
+                using (SQLiteDataReader layers_sqlite_datareader = DatabaseLayerExecutable.Reader)
+                {
+                    layers_sqlite_datareader.Read();
+                    LastDB_VERSION = layers_sqlite_datareader.GetIntFromOrdinal("VERSION") ?? 0;
+                    LastDB_SCRIPT = layers_sqlite_datareader.GetStringFromOrdinal("SCRIPT");
+                    if (string.IsNullOrEmpty(LastDB_SCRIPT))
+                    {
+                        LastDB_SCRIPT = "";
+                    }
+                    LastDB_TILE_URL = layers_sqlite_datareader.GetStringFromOrdinal("TILE_URL");
+                }
+            }
+
+            if (EditedDB_VERSION != LastDB_VERSION)
+            {
+                bool HasActionToTake = false;
+                StackPanel AskMsg = new StackPanel();
+                string RemoveSQL = "";
+
+                if (EditedDB_SCRIPT != LastDB_SCRIPT && !string.IsNullOrWhiteSpace(EditedDB_SCRIPT))
+                {
+                    HasActionToTake = true;
+                    TextBlock textBlock = new TextBlock
+                    {
+                        Text = Languages.Current["layerMessageErrorUpdateScriptChanged"],
+                        TextWrapping = TextWrapping.Wrap
+                    };
+                    AskMsg.Children.Add(textBlock);
+                    AskMsg.Children.Add(Collectif.FormatDiffGetScrollViewer(EditedDB_SCRIPT, LastDB_SCRIPT));
+                    RemoveSQL += $"'SCRIPT'=NULL";
+                }
+
+                if (EditedDB_TILE_URL != LastDB_TILE_URL && !string.IsNullOrWhiteSpace(EditedDB_TILE_URL))
+                {
+                    HasActionToTake = true;
+                    TextBlock textBlock = new TextBlock
+                    {
+                        Text = Languages.Current["layerMessageErrorUpdateTileURLChanged"],
+                        TextWrapping = TextWrapping.Wrap
+                    };
+                    AskMsg.Children.Add(textBlock);
+                    AskMsg.Children.Add(Collectif.FormatDiffGetScrollViewer(EditedDB_TILE_URL, LastDB_TILE_URL));
+                    RemoveSQL += $"'TILE_URL'=NULL";
+                }
+
+                TextBlock textBlockAsk = new TextBlock
+                {
+                    Text = Languages.Current["layerMessageErrorUpdateAskFix"],
+                    TextWrapping = TextWrapping.Wrap,
+                    FontWeight = FontWeight.FromOpenTypeWeight(600)
+                };
+                AskMsg.Children.Add(textBlockAsk);
+                ContentDialogResult result = ContentDialogResult.Secondary;
+                if (HasActionToTake) { 
+                ContentDialog dialog = Message.SetContentDialog(AskMsg, "MapsInMyFolder", MessageDialogButton.YesNoCancel);
+
+                    result = await dialog.ShowAsync();
+                }
+                if (result == ContentDialogResult.Primary)
+                {
+                    Database.ExecuteNonQuerySQLCommand($"UPDATE 'main'.'EDITEDLAYERS' SET 'VERSION'='{LastDB_VERSION}',{RemoveSQL} WHERE ID = {id};");
+                }
+                else if (result == ContentDialogResult.Secondary)
+                {
+                    Database.ExecuteNonQuerySQLCommand($"UPDATE 'main'.'EDITEDLAYERS' SET 'VERSION'='{LastDB_VERSION}' WHERE ID = {id};");
+                }
+                else
                 {
                     return;
                 }
 
-                int EditedDB_VERSION = editedlayers_sqlite_datareader.GetIntFromOrdinal("VERSION") ?? 0;
-                string EditedDB_SCRIPT = editedlayers_sqlite_datareader.GetStringFromOrdinal("SCRIPT");
-                string EditedDB_TILE_URL = editedlayers_sqlite_datareader.GetStringFromOrdinal("TILE_URL");
-
-                using (SQLiteDataReader layers_sqlite_datareader = Database.ExecuteExecuteReaderSQLCommand($"SELECT * FROM 'LAYERS' WHERE ID = {id}"))
-                {
-                    layers_sqlite_datareader.Read();
-                    int LastDB_VERSION = layers_sqlite_datareader.GetIntFromOrdinal("VERSION") ?? 0;
-                    string LastDB_SCRIPT = layers_sqlite_datareader.GetStringFromOrdinal("SCRIPT");
-                    string LastDB_TILE_URL = layers_sqlite_datareader.GetStringFromOrdinal("TILE_URL");
-
-                    if (EditedDB_VERSION != LastDB_VERSION)
-                    {
-                        StackPanel AskMsg = new StackPanel();
-                        string RemoveSQL = "";
-
-                        if (EditedDB_SCRIPT != LastDB_SCRIPT && !string.IsNullOrWhiteSpace(EditedDB_SCRIPT))
-                        {
-                            TextBlock textBlock = new TextBlock
-                            {
-                                Text = Languages.Current["layerMessageErrorUpdateScriptChanged"],
-                                TextWrapping = TextWrapping.Wrap
-                            };
-                            AskMsg.Children.Add(textBlock);
-                            AskMsg.Children.Add(Collectif.FormatDiffGetScrollViewer(EditedDB_SCRIPT, LastDB_SCRIPT));
-                            RemoveSQL += $",'SCRIPT'=NULL";
-                        }
-
-                        if (EditedDB_TILE_URL != LastDB_TILE_URL && !string.IsNullOrWhiteSpace(EditedDB_TILE_URL))
-                        {
-                            TextBlock textBlock = new TextBlock
-                            {
-                                Text = Languages.Current["layerMessageErrorUpdateTileURLChanged"],
-                                TextWrapping = TextWrapping.Wrap
-                            };
-                            AskMsg.Children.Add(textBlock);
-                            AskMsg.Children.Add(Collectif.FormatDiffGetScrollViewer(EditedDB_TILE_URL, LastDB_TILE_URL));
-                            RemoveSQL += $",'TILE_URL'=NULL";
-                        }
-
-                        TextBlock textBlockAsk = new TextBlock
-                        {
-                            Text = Languages.Current["layerMessageErrorUpdateAskFix"],
-                            TextWrapping = TextWrapping.Wrap,
-                            FontWeight = FontWeight.FromOpenTypeWeight(600)
-                        };
-                        AskMsg.Children.Add(textBlockAsk);
-
-                        ContentDialog dialog = Message.SetContentDialog(AskMsg, "MapsInMyFolder", MessageDialogButton.YesNoCancel);
-                        ContentDialogResult result = await dialog.ShowAsync();
-
-                        if (result == ContentDialogResult.Primary)
-                        {
-                            Database.ExecuteNonQuerySQLCommand($"UPDATE 'main'.'EDITEDLAYERS' SET 'VERSION'='{LastDB_VERSION}'{RemoveSQL}  WHERE ID = {id};");
-                        }
-                        else if (result == ContentDialogResult.Secondary)
-                        {
-                            Database.ExecuteNonQuerySQLCommand($"UPDATE 'main'.'EDITEDLAYERS' SET 'VERSION'='{LastDB_VERSION}' WHERE ID = {id};");
-                        }
-                        else
-                        {
-                            return;
-                        }
-
-                        _instance.ReloadPage();
-                        _instance.Set_current_layer(Layers.Current.class_id);
-                    }
-                }
+                _instance.ReloadPage();
+                _instance.Set_current_layer(Layers.Current.class_id);
             }
         }
 
@@ -649,6 +687,12 @@ namespace MapsInMyFolder
 
         public void LayerTilePreview_RequestUpdate()
         {
+            var bbox = mapviewer.ViewRectToBoundingBox(new Rect(0, 0, mapviewer.ActualWidth, mapviewer.ActualHeight));
+            Commun.Map.CurentView.NO_Latitude = bbox.North;
+            Commun.Map.CurentView.NO_Longitude = bbox.West;
+            Commun.Map.CurentView.SE_Latitude = bbox.South;
+            Commun.Map.CurentView.SE_Longitude = bbox.East;
+
             layer_browser.ExecuteScriptAsyncWhenPageLoaded("UpdatePreview();");
             return;
         }
@@ -690,10 +734,10 @@ namespace MapsInMyFolder
                 var TileNumber = Collectif.CoordonneesToTile(Latitude, Longitude, Zoom);
                 string previewLayerFrontImageUrl = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
                 string previewBackgroundImageUrl = string.Empty;
-                if (Javascript.CheckIfFunctionExist(id, Collectif.GetUrl.InvokeFunction.getPreview.ToString(), null))
+                if (Javascript.CheckIfFunctionExist(id, Javascript.InvokeFunction.getPreview.ToString(), null))
                 {
-                    previewLayerFrontImageUrl = Collectif.Replacements(layer.class_tile_url, TileNumber.X.ToString(), TileNumber.Y.ToString(), Zoom.ToString(), id, Collectif.GetUrl.InvokeFunction.getPreview);
-                    previewBackgroundImageUrl = Collectif.Replacements(backgroundLayer?.class_tile_url, TileNumber.X.ToString(), TileNumber.Y.ToString(), Zoom.ToString(), id, Collectif.GetUrl.InvokeFunction.getPreview);
+                    previewLayerFrontImageUrl = Collectif.Replacements(layer.class_tile_url, TileNumber.X.ToString(), TileNumber.Y.ToString(), Zoom.ToString(), id, Javascript.InvokeFunction.getPreview);
+                    previewBackgroundImageUrl = Collectif.Replacements(backgroundLayer?.class_tile_url, TileNumber.X.ToString(), TileNumber.Y.ToString(), Zoom.ToString(), id, Javascript.InvokeFunction.getPreview);
                     if (backgroundLayer?.class_tile_url == previewBackgroundImageUrl)
                     {
                         previewBackgroundImageUrl = "";
@@ -701,16 +745,16 @@ namespace MapsInMyFolder
                 }
                 else
                 {
-                    previewLayerFrontImageUrl = Collectif.Replacements(layer.class_tile_url, TileNumber.X.ToString(), TileNumber.Y.ToString(), Zoom.ToString(), id, Collectif.GetUrl.InvokeFunction.getTile);
-                    previewBackgroundImageUrl = Collectif.Replacements(backgroundLayer?.class_tile_url, TileNumber.X.ToString(), TileNumber.Y.ToString(), Zoom.ToString(), id, Collectif.GetUrl.InvokeFunction.getTile);
+                    previewLayerFrontImageUrl = Collectif.Replacements(layer.class_tile_url, TileNumber.X.ToString(), TileNumber.Y.ToString(), Zoom.ToString(), id, Javascript.InvokeFunction.getTile);
+                    previewBackgroundImageUrl = Collectif.Replacements(backgroundLayer?.class_tile_url, TileNumber.X.ToString(), TileNumber.Y.ToString(), Zoom.ToString(), id, Javascript.InvokeFunction.getTile);
                 }
 
                 string previewFallbackLayerFrontImageUrl = string.Empty;
                 string previewFallbackBackgroundImageUrl = string.Empty;
-                if (Javascript.CheckIfFunctionExist(id, Collectif.GetUrl.InvokeFunction.getPreviewFallback.ToString(), null))
+                if (Javascript.CheckIfFunctionExist(id, Javascript.InvokeFunction.getPreviewFallback.ToString(), null))
                 {
-                    previewFallbackLayerFrontImageUrl = Collectif.Replacements(layer.class_tile_url, TileNumber.X.ToString(), TileNumber.Y.ToString(), Zoom.ToString(), id, Collectif.GetUrl.InvokeFunction.getPreviewFallback);
-                    previewFallbackBackgroundImageUrl = Collectif.Replacements(backgroundLayer?.class_tile_url, TileNumber.X.ToString(), TileNumber.Y.ToString(), Zoom.ToString(), id, Collectif.GetUrl.InvokeFunction.getPreviewFallback);
+                    previewFallbackLayerFrontImageUrl = Collectif.Replacements(layer.class_tile_url, TileNumber.X.ToString(), TileNumber.Y.ToString(), Zoom.ToString(), id, Javascript.InvokeFunction.getPreviewFallback);
+                    previewFallbackBackgroundImageUrl = Collectif.Replacements(backgroundLayer?.class_tile_url, TileNumber.X.ToString(), TileNumber.Y.ToString(), Zoom.ToString(), id, Javascript.InvokeFunction.getPreviewFallback);
                     if (backgroundLayer?.class_tile_url == previewFallbackBackgroundImageUrl)
                     {
                         previewFallbackBackgroundImageUrl = "";
@@ -763,11 +807,11 @@ namespace MapsInMyFolder
             foreach (string str in splittedListOfId)
             {
                 int id_int = int.Parse(str.Trim());
-                Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
-                {
-                    DirectorySize += MainPage.ClearCache(id_int);
+                //Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
+                //{
+                DirectorySize += MainPage.ClearCache(id_int);
 
-                }, null);
+                //}, null);
                 Debug.WriteLine("Clear_cache layer " + id_int);
             }
             if (DirectorySize >= 0)

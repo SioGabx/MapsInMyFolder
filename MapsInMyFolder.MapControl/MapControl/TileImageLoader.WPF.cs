@@ -37,7 +37,7 @@ namespace MapsInMyFolder.MapControl
                 Layers layers = Layers.GetLayerById(LayerId) ?? Layers.Empty();
                 try
                 {
-                    var response = await Tiles.Loader.GetImageAsync(uri, tile.XIndex, tile.Y, tile.ZoomLevel, LayerId, null, Collectif.GetSaveTempDirectory(layers.class_name, layers.class_identifier, tile.ZoomLevel)).ConfigureAwait(false);
+                    var response = await Tiles.Loader.GetImageAsync(uri, tile.XIndex, tile.Y, tile.ZoomLevel, LayerId, layers.class_format, Collectif.GetSaveTempDirectory(layers.class_name, layers.class_identifier, tile.ZoomLevel)).ConfigureAwait(false);
                     if (response != null && response.Buffer != null && response.ResponseMessage != null && response.ResponseMessage.IsSuccessStatusCode)
                     {
                         buffer = response.Buffer;
