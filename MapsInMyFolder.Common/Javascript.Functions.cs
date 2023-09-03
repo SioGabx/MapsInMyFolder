@@ -1,5 +1,4 @@
 ﻿using System;
-using System.CodeDom;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
@@ -299,7 +298,7 @@ namespace MapsInMyFolder.Commun
                     var frame = new DispatcherFrame();
                     TextBox = Application.Current.Dispatcher.Invoke(new Func<TextBox>(() =>
                     {
-                        var (textBox, dialog) = Message.SetInputBoxDialog(texte, caption);
+                        var (textBox, dialog) = Message.SetInputBoxDialog(texte, string.Empty, caption);
 
                         void Dialog_Closed(object sender, EventArgs e)
                         {

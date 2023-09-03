@@ -202,7 +202,7 @@
                     MinHeight="30"
                     Margin="10,0,0,0"
                     Background="White"
-                    MouseWheel="mapviewer_MouseWheel"
+                    MouseWheel="Mapviewer_MouseWheel"
                     ZoomLevel="18">
 
                     <map:Map.Center>

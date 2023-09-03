@@ -97,18 +97,18 @@ namespace MapsInMyFolder.Commun
 
         public static async void StartUpdating()
         {
-            var dialog = Message.SetContentDialog(Languages.GetWithArguments("updateMessageNewVersionAvailable", UpdateRelease.Tag_name, UpdateRelease.Body), "Confirmer", MessageDialogButton.YesNo);
-            ContentDialogResult result2 = ContentDialogResult.None;
+            var dialog = Message.SetContentDialog(Languages.GetWithArguments("updateMessageNewVersionAvailable", UpdateRelease.Tag_name, UpdateRelease.Body), Languages.Current["dialogTitleOperationConfirm"], MessageDialogButton.YesNo);
+            ContentDialogResult result = ContentDialogResult.None;
             try
             {
-                result2 = await dialog.ShowAsync();
+                result = await dialog.ShowAsync();
             }
             catch (Exception ex)
             {
                 Debug.WriteLine(ex.ToString());
             }
 
-            if (result2 != ContentDialogResult.Primary)
+            if (result != ContentDialogResult.Primary)
             {
                 return;
             }
@@ -130,11 +130,38 @@ namespace MapsInMyFolder.Commun
                 });
             };
             await client.StartDownload();
+            UpdateNotification.Remove();
 
-            UpdateNotification.Text(Languages.Current["updateNotificationStartInstalling"]);
-            UpdateNotification.SendUpdate();
-            Application.Current.Shutdown();
-            Process.Start(new ProcessStartInfo(UpdateFilePath) { UseShellExecute = true });
+            var dialog2 = Message.SetContentDialog(Languages.Current["updateMessageStartUpdateProcess"], Languages.Current["dialogTitleOperationConfirm"], MessageDialogButton.YesCancel);
+            ContentDialogResult result2 = ContentDialogResult.None;
+            try
+            {
+                result2 = await dialog2.ShowAsync();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.ToString());
+            }
+
+            if (result2 == ContentDialogResult.Primary)
+            {
+                ApplyUpdate();
+            }
+            else {
+                NText UpdateDownloadedNotification = new NText(Languages.Current["updateNotificationStartUpdateProcess"], "MapsInMyFolder", "MainPage", ApplyUpdate, true);
+                UpdateDownloadedNotification.Register();
+            }
         }
+
+        public static void ApplyUpdate()
+        {
+            NText UpdateNotification = new NText(Languages.Current["updateNotificationStartInstalling"], "MapsInMyFolder", "MainPage", null, true);
+            UpdateNotification.Register(); 
+
+            string UpdateFilePath = System.IO.Path.Combine(Settings.temp_folder, UpdateFileAsset.Id + UpdateFileAsset.Name);
+            Collectif.StartApplication(UpdateFilePath, TimeSpan.FromSeconds(3));
+            Application.Current.Shutdown();
+        }
+
     }
 }

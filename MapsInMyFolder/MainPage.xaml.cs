@@ -21,7 +21,7 @@ namespace MapsInMyFolder
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2211:Les champs non constants ne doivent pas être visibles", Justification = "for access everywhere")]
         public static MainPage _instance;
         bool isInitialised = false;
-        public static MapSelectable MapSelectable;
+        public static MapSelectable MapSelectable { get; set; }
         private static MapFigures MapFigures;
         public MainPage()
         {
@@ -119,7 +119,7 @@ namespace MapsInMyFolder
 
             StackPanel stackPanel = new StackPanel()
             {
-                Margin = new Thickness(10, 10, 5, 20),
+                Margin = new Thickness(10, 10, 5, 0),
             };
 
             stackPanel.Children.Add(new Label()
@@ -127,10 +127,10 @@ namespace MapsInMyFolder
                 Content = Languages.Current["mapSpecifySelectionCoordinates"],
             });
             Grid nordOuestGrid = getGrid();
-            var nordOuestTextBox = setDoubleColumnTextBox(nordOuestGrid, Languages.Current["editorSelectionsPropertyNameNorthwestLatitude"], Languages.Current["editorSelectionsPropertyNameNorthwestLongitude"]);
+            var (LeftTextBox, RightTextBox) = setDoubleColumnTextBox(nordOuestGrid, Languages.Current["editorSelectionsPropertyNameNorthwestLatitude"], Languages.Current["editorSelectionsPropertyNameNorthwestLongitude"]);
             stackPanel.Children.Add(nordOuestGrid);
-            var NOLatitudeTextBox = nordOuestTextBox.LeftTextBox;
-            var NOLongitudeTextBox = nordOuestTextBox.RightTextBox;
+            var NOLatitudeTextBox = LeftTextBox;
+            var NOLongitudeTextBox = RightTextBox;
             NOLatitudeTextBox.Text = Commun.Map.CurentSelection.NO_Latitude.ToString();
             NOLongitudeTextBox.Text = Commun.Map.CurentSelection.NO_Longitude.ToString();
 
@@ -142,6 +142,87 @@ namespace MapsInMyFolder
             var SELongitudeTextBox = sudEstTextBox.RightTextBox;
             SELatitudeTextBox.Text = Commun.Map.CurentSelection.SE_Latitude.ToString();
             SELongitudeTextBox.Text = Commun.Map.CurentSelection.SE_Longitude.ToString();
+
+            Label CopyLabel = new Label()
+            {
+                Content = "→ " + Languages.Current["mapSpecifySelectionCoordinatesCopy"],
+                Foreground = Collectif.HexValueToSolidColorBrush("888989"),
+                Margin = new Thickness(0,20,0,0)
+            };
+            CopyLabel.MouseLeftButtonUp += CopyLabel_MouseLeftButtonUp;
+            CopyLabel.Unloaded += CopyLabel_Unloaded;
+            CopyLabel.MouseEnter += Collectif.ClickableLabel_MouseEnter;
+            CopyLabel.MouseLeave += Collectif.ClickableLabel_MouseLeave;
+            stackPanel.Children.Add(CopyLabel);
+            void CopyLabel_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+            {
+                try
+                {
+                    CopyLabel.Cursor = Cursors.Arrow;
+                    Clipboard.SetText($"{NOLatitudeTextBox.Text},{NOLongitudeTextBox.Text},{SELatitudeTextBox.Text},{SELongitudeTextBox.Text}");
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex);
+                }
+            }
+            void CopyLabel_Unloaded(object sender, RoutedEventArgs e)
+            {
+                CopyLabel.MouseRightButtonUp -= CopyLabel_MouseLeftButtonUp;
+                CopyLabel.Unloaded -= CopyLabel_Unloaded;
+                CopyLabel.MouseEnter -= Collectif.ClickableLabel_MouseEnter;
+                CopyLabel.MouseLeave -= Collectif.ClickableLabel_MouseLeave;
+            }
+
+            Label PasteLabel = new Label()
+            {
+                Content = "→ " + Languages.Current["mapSpecifySelectionCoordinatesPaste"],
+                Foreground = Collectif.HexValueToSolidColorBrush("888989")
+            };
+            PasteLabel.MouseLeftButtonUp += PasteLabel_MouseLeftButtonUp;
+            PasteLabel.Unloaded += PasteLabel_Unloaded;
+            PasteLabel.MouseEnter += Collectif.ClickableLabel_MouseEnter;
+            PasteLabel.MouseLeave += Collectif.ClickableLabel_MouseLeave;
+            stackPanel.Children.Add(PasteLabel);
+            void PasteLabel_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+            {
+                try
+                {
+                    PasteLabel.Cursor = Cursors.Arrow;
+                    string locationData = Clipboard.GetText(TextDataFormat.Text);
+                    string[] locationDataValues = locationData.Split(',');
+
+                    // Assigner chaque valeur à une variable
+                    if (locationDataValues.Length == 4)
+                    {
+                        double NOLatitude = double.Parse(locationDataValues[0]);
+                        double NOLongitude = double.Parse(locationDataValues[1]);
+                        double SELatitude = double.Parse(locationDataValues[2]);
+                        double SELongitude = double.Parse(locationDataValues[3]);
+
+
+                        NOLatitudeTextBox.Text = NOLatitude.ToString();
+                        NOLongitudeTextBox.Text = NOLongitude.ToString();
+
+                        SELatitudeTextBox.Text = SELatitude.ToString();
+                        SELongitudeTextBox.Text = SELongitude.ToString();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex.Message);
+                }
+            }
+            void PasteLabel_Unloaded(object sender, RoutedEventArgs e)
+            {
+                PasteLabel.MouseRightButtonUp -= PasteLabel_MouseLeftButtonUp;
+                PasteLabel.Unloaded -= PasteLabel_Unloaded;
+                PasteLabel.MouseEnter -= Collectif.ClickableLabel_MouseEnter;
+                PasteLabel.MouseLeave -= Collectif.ClickableLabel_MouseLeave;
+            }
+
+
+
 
             var result = await Message.SetContentDialog(stackPanel, "MapsInMyFolder", MessageDialogButton.OKCancel).ShowAsync();
             if (result == ModernWpf.Controls.ContentDialogResult.Primary)
@@ -207,7 +288,7 @@ namespace MapsInMyFolder
             SearchLayerStart();
         }
 
-        public async void UpdateNotification(object sender, (string NotificationId, string Destinateur) NotificationInternalArgs)
+        public void UpdateNotification(object sender, (string NotificationId, string Destinateur) NotificationInternalArgs)
         {
             if (sender is Notification Notif)
             {
@@ -243,7 +324,7 @@ namespace MapsInMyFolder
                 void DeleteAfterAnimation(object sender, EventArgs e)
                 {
                     ContentGrid?.Children?.Clear();
-                    NotificationZone.Children.Remove(ContentGrid); 
+                    NotificationZone.Children.Remove(ContentGrid);
                     ContentGrid = null;
                     doubleAnimation.Completed -= DeleteAfterAnimation;
                 }
@@ -279,13 +360,13 @@ namespace MapsInMyFolder
 
         private void OnLocationUpdated(object sender = null, MapPolygon e = null)
         {
-            var ActiveRectangleSelection = MapSelectable.GetRectangleLocation();
-            NO_PIN.Location = ActiveRectangleSelection.NO;
-            SE_PIN.Location = ActiveRectangleSelection.SE;
-            Commun.Map.CurentSelection.NO_Latitude = ActiveRectangleSelection.NO.Latitude;
-            Commun.Map.CurentSelection.NO_Longitude = ActiveRectangleSelection.NO.Longitude;
-            Commun.Map.CurentSelection.SE_Latitude = ActiveRectangleSelection.SE.Latitude;
-            Commun.Map.CurentSelection.SE_Longitude = ActiveRectangleSelection.SE.Longitude;
+            var (NO, SE) = MapSelectable.GetRectangleLocation();
+            NO_PIN.Location = NO;
+            SE_PIN.Location = SE;
+            Commun.Map.CurentSelection.NO_Latitude = NO.Latitude;
+            Commun.Map.CurentSelection.NO_Longitude = NO.Longitude;
+            Commun.Map.CurentSelection.SE_Latitude = SE.Latitude;
+            Commun.Map.CurentSelection.SE_Longitude = SE.Longitude;
 
             if (Javascript.CheckIfFunctionExist(Layers.Current.class_id, Javascript.InvokeFunction.selectionChanged.ToString(), null))
             {
@@ -316,7 +397,7 @@ namespace MapsInMyFolder
             }
 
 
-                if (Settings.visibility_pins == Visibility.Visible)
+            if (Settings.visibility_pins == Visibility.Visible)
             {
                 NO_PIN.Content = $"{Languages.Current["mapLatitude"]} = {Math.Round(NO_PIN.Location.Latitude, 6)}\n{Languages.Current["mapLongitude"]} = {Math.Round(NO_PIN.Location.Longitude, 6)}";
                 SE_PIN.Content = $"{Languages.Current["mapLatitude"]} = {Math.Round(SE_PIN.Location.Latitude, 6)}\n{Languages.Current["mapLongitude"]} = {Math.Round(SE_PIN.Location.Longitude, 6)}";
@@ -348,11 +429,10 @@ namespace MapsInMyFolder
             }
         }
 
-        private void mapviewer_MouseWheel(object sender, MouseWheelEventArgs e)
+        private void Mapviewer_MouseWheel(object sender, MouseWheelEventArgs e)
         {
             MapFigures.UpdateFiguresFromZoomLevel(mapviewer.TargetZoomLevel);
             AnimateLabel(ZoomLevelIndicator);
-
         }
 
         private bool isAnimating = false; // Indique si l'animation est en cours d'exécution
@@ -380,13 +460,15 @@ namespace MapsInMyFolder
 
             fadeInAnimation.Duration = fadeInDuration;
             Storyboard storyboard = new Storyboard();
-            DoubleAnimation fadeOutAnimation = new DoubleAnimation();
-            fadeOutAnimation.From = 1.0;
-            fadeOutAnimation.To = 0.0;
-            fadeOutAnimation.Duration = fadeOutDuration;
+            DoubleAnimation fadeOutAnimation = new DoubleAnimation
+            {
+                From = 1.0,
+                To = 0.0,
+                Duration = fadeOutDuration,
 
-            // Démarre après l'animation d'apparition + 1 seconde
-            fadeOutAnimation.BeginTime = fadeInDuration + TimeSpan.FromSeconds(0.5);
+                // Démarre après l'animation d'apparition + 1 seconde
+                BeginTime = fadeInDuration + TimeSpan.FromSeconds(0.5)
+            };
 
             storyboard.Children.Add(fadeInAnimation);
             storyboard.Children.Add(fadeOutAnimation);

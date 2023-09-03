@@ -24,7 +24,7 @@ namespace MapsInMyFolder
             }
             DownloadEngine.Clear();
             string SelectCommandText = "SELECT * FROM 'DOWNLOADS' ORDER BY 'TIMESTAMP' ASC";
-            using var sqlite_datareader = Database.ExecuteExecuteReaderSQLCommand(SelectCommandText);
+            using var sqlite_datareader = Database.ExecuteExecuteReaderSQLCommand(SelectCommandText).Reader;
 
             while (sqlite_datareader.Read())
             {

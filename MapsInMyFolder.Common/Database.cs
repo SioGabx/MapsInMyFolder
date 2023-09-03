@@ -141,7 +141,7 @@ namespace MapsInMyFolder.Commun
             CreateEmptyDatabase(database_pathname);
         }
 
-        static public SQLiteDataReader ExecuteExecuteReaderSQLCommand(string querry)
+        static public (SQLiteDataReader Reader, SQLiteConnection conn) ExecuteExecuteReaderSQLCommand(string querry)
         {
             bool HasError = false;
             do
@@ -153,12 +153,12 @@ namespace MapsInMyFolder.Commun
                     if (conn is null)
                     {
                         Debug.WriteLine("La connection à la base de donnée est null");
-                        return null;
+                        return (null, null);
                     }
                     using (SQLiteCommand sqlite_cmd = conn.CreateCommand())
                     {
                         sqlite_cmd.CommandText = querry;
-                        return sqlite_cmd.ExecuteReader();
+                        return (sqlite_cmd.ExecuteReader(), conn);
                     }
                 }
                 catch (Exception ex)
@@ -174,7 +174,7 @@ namespace MapsInMyFolder.Commun
                     }
                 }
             } while (HasError);
-            return null;
+            return (null, null);
         }
 
         static public int ExecuteScalarSQLCommand(string querry)
@@ -210,8 +210,10 @@ namespace MapsInMyFolder.Commun
 
         static public int ExecuteNonQuerySQLCommand(string querry)
         {
-            using SQLiteConnection conn = DB_Connection();
-            return ExecuteNonQuerySQLCommand(conn, querry);
+            using (SQLiteConnection conn = DB_Connection())
+            {
+                return ExecuteNonQuerySQLCommand(conn, querry);
+            }
         }
 
         static public int ExecuteNonQuerySQLCommand(SQLiteConnection conn, string querry)
@@ -539,7 +541,7 @@ namespace MapsInMyFolder.Commun
 
         public static void FixEditedLayers()
         {
-            using (SQLiteDataReader editedlayers_sqlite_datareader = ExecuteExecuteReaderSQLCommand("SELECT * FROM 'EDITEDLAYERS'"))
+            using (SQLiteDataReader editedlayers_sqlite_datareader = ExecuteExecuteReaderSQLCommand("SELECT * FROM 'EDITEDLAYERS'").Reader)
             {
                 StringBuilder SQLExecute = new StringBuilder();
                 SQLExecute.Append("BEGIN TRANSACTION;");
@@ -550,7 +552,7 @@ namespace MapsInMyFolder.Commun
                     string EditedDB_SCRIPT = editedlayers_sqlite_datareader.GetStringFromOrdinal("SCRIPT");
                     string EditedDB_TILE_URL = editedlayers_sqlite_datareader.GetStringFromOrdinal("TILE_URL");
 
-                    using (SQLiteDataReader layers_sqlite_datareader = ExecuteExecuteReaderSQLCommand($"SELECT * FROM 'LAYERS' WHERE ID = {DB_Layer_ID}"))
+                    using (SQLiteDataReader layers_sqlite_datareader = ExecuteExecuteReaderSQLCommand($"SELECT * FROM 'LAYERS' WHERE ID = {DB_Layer_ID}").Reader)
                     {
                         layers_sqlite_datareader.Read();
                         int LastDB_VERSION = layers_sqlite_datareader.GetIntFromOrdinal("VERSION") ?? 0;
@@ -589,7 +591,7 @@ namespace MapsInMyFolder.Commun
 
             foreach (string key in map.Keys)
             {
-                using (SQLiteDataReader LayersTables = ExecuteExecuteReaderSQLCommand($"PRAGMA table_info({key})"))
+                using (SQLiteDataReader LayersTables = ExecuteExecuteReaderSQLCommand($"PRAGMA table_info({key})").Reader)
                 {
                     while (LayersTables.Read())
                     {
@@ -622,7 +624,7 @@ namespace MapsInMyFolder.Commun
             SQLExecute.Append("BEGIN TRANSACTION;");
             foreach (string key in map.Keys)
             {
-                using (SQLiteDataReader LayersTables = ExecuteExecuteReaderSQLCommand($"PRAGMA table_info({key})"))
+                using (SQLiteDataReader LayersTables = ExecuteExecuteReaderSQLCommand($"PRAGMA table_info({key})").Reader)
                 {
                     while (LayersTables.Read())
                     {
@@ -653,14 +655,14 @@ namespace MapsInMyFolder.Commun
             StringBuilder SQLExecute = new StringBuilder();
             SQLExecute.Append("BEGIN TRANSACTION;");
 
-            using (SQLiteDataReader sqlite_datareader = ExecuteExecuteReaderSQLCommand("SELECT sql FROM 'main'.'sqlite_master' WHERE name = 'LAYERS';"))
+            using (SQLiteDataReader sqlite_datareader = ExecuteExecuteReaderSQLCommand("SELECT sql FROM 'main'.'sqlite_master' WHERE name = 'LAYERS';").Reader)
             {
                 sqlite_datareader.Read();
                 SQLExecute.AppendLine(string.Concat(sqlite_datareader.GetString(0) + ";"));
             }
 
             Dictionary<string, string> TableCollumsNames = new Dictionary<string, string>();
-            using (SQLiteDataReader LayersTables = ExecuteExecuteReaderSQLCommand($"PRAGMA table_info(LAYERS)"))
+            using (SQLiteDataReader LayersTables = ExecuteExecuteReaderSQLCommand($"PRAGMA table_info(LAYERS)").Reader)
             {
                 while (LayersTables.Read())
                 {
@@ -672,7 +674,7 @@ namespace MapsInMyFolder.Commun
 
             foreach (string Table in new string[2] { "LAYERS", "CUSTOMSLAYERS" })
             {
-                using (SQLiteDataReader LayersTables = ExecuteExecuteReaderSQLCommand($"SELECT * FROM '{Table}';"))
+                using (SQLiteDataReader LayersTables = ExecuteExecuteReaderSQLCommand($"SELECT * FROM '{Table}';").Reader)
                 {
                     while (LayersTables.Read())
                     {
@@ -703,7 +705,7 @@ namespace MapsInMyFolder.Commun
                             ValuesList.Add(CollumnName, Collectif.HTMLEntities(Value));
                         }
 
-                        using (SQLiteDataReader EditedLayersTables = ExecuteExecuteReaderSQLCommand($"SELECT * FROM 'EDITEDLAYERS' WHERE ID={RowId};"))
+                        using (SQLiteDataReader EditedLayersTables = ExecuteExecuteReaderSQLCommand($"SELECT * FROM 'EDITEDLAYERS' WHERE ID={RowId};").Reader)
                         {
                             while (EditedLayersTables.Read())
                             {
@@ -742,7 +744,8 @@ namespace MapsInMyFolder.Commun
                                     {
                                         IntLayerVersion = 0;
                                     }
-                                    ValuesList["VERSION"] = IntLayerVersion++.ToString();
+
+                                    ValuesList["VERSION"] = (IntLayerVersion + 1).ToString();
                                 }
                             }
                         }

@@ -2,7 +2,6 @@
 using Esprima.Ast;
 using Jint;
 using Jint.Native;
-using MapsInMyFolder.VectorTileRenderer;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;

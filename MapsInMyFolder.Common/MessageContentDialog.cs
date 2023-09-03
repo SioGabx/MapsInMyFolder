@@ -9,7 +9,7 @@ namespace MapsInMyFolder.Commun
 
     public static class Message
     {
-        public static (TextBox textBox, ContentDialog dialog) SetInputBoxDialog(object text, object caption = null, MessageDialogButton messageBoxButton = MessageDialogButton.OK)
+        public static (TextBox textBox, ContentDialog dialog) SetInputBoxDialog(object text, object textboxdefaultvalue = null, object caption = null, MessageDialogButton messageBoxButton = MessageDialogButton.OK)
         {
 
             if (string.IsNullOrEmpty(text?.ToString()))
@@ -33,7 +33,8 @@ namespace MapsInMyFolder.Commun
                 Style = (Style)Application.Current.Resources["TextBoxCleanStyleDefault"],
                 HorizontalAlignment = HorizontalAlignment.Stretch,
                 Margin = new Thickness(0, 10, 0, 0),
-                Height = 25,
+                MinHeight = 25,
+                Text = textboxdefaultvalue.ToString()
             };
             MessageContentDialogHelpers.FocusSenderOnLoad(textBox);
             StackPanel stackPanel = new StackPanel();

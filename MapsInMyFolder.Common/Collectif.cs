@@ -317,6 +317,27 @@ namespace MapsInMyFolder.Commun
             Application.Current.Shutdown();
         }
 
+        public static void StartApplication(string path, TimeSpan delay)
+        {
+            ProcessStartInfo startInfo = new ProcessStartInfo
+            {
+                FileName = "cmd.exe",
+                Arguments = $"/c timeout {delay.Seconds} & start /min \"\" \"{path}\"",
+                CreateNoWindow = true,       // Ne pas créer de fenêtre CMD
+                UseShellExecute = false,     // N'utilise pas le shell
+                RedirectStandardOutput = true,
+                RedirectStandardError = true
+            };
+
+            Process process = new Process
+            {
+                StartInfo = startInfo
+            };
+            process.Start();
+        }
+
+
+
         public static SolidColorBrush HexValueToSolidColorBrush(string hexvalue, string defaulthexvalue = null)
         {
             if (!string.IsNullOrEmpty(hexvalue))
@@ -359,7 +380,8 @@ namespace MapsInMyFolder.Commun
             {
                 MaxHeight = 200,
                 Margin = new Thickness(0, 5, 0, 20),
-                VerticalScrollBarVisibility = ScrollBarVisibility.Auto
+                VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
+                HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled
             };
             StackPanel ScrollViewerElementContent = new StackPanel()
             {
@@ -380,9 +402,9 @@ namespace MapsInMyFolder.Commun
 
             TextBlock ContentTextBlock = new TextBlock()
             {
-                TextWrapping = TextWrapping.WrapWithOverflow,
+                TextWrapping = TextWrapping.Wrap,
                 Foreground = HexValueToSolidColorBrush("#FFE2E2E1"),
-                TextAlignment = TextAlignment.Justify
+                TextAlignment = TextAlignment.Justify,
             };
             List<Diff> diffs = dmp.diff_main(texteBase, texteModif);
             SolidColorBrush BackgroundGreen = HexValueToSolidColorBrush("#6b803f");
@@ -942,6 +964,27 @@ namespace MapsInMyFolder.Commun
             uIElement.UndoLimit = 0;
             uIElement.UndoLimit = undo_limit;
         }
+
+        public static void ClickableLabel_MouseEnter(object sender, MouseEventArgs e)
+        {
+            Label label_element = sender as Label;
+            if (label_element.IsEnabled)
+            {
+                label_element.Cursor = Cursors.Hand;
+                label_element.Foreground = Collectif.HexValueToSolidColorBrush("#b4b4b4");
+            }
+            else
+            {
+                label_element.Cursor = Cursors.Arrow;
+            }
+        }
+
+        public static void ClickableLabel_MouseLeave(object sender, MouseEventArgs e)
+        {
+            Label label_element = sender as Label;
+            label_element.Foreground = Collectif.HexValueToSolidColorBrush("#888989");
+        }
+
 
         public static void InsertTextAtCaretPosition(ICSharpCode.AvalonEdit.TextEditor TextBox, string text)
         {
