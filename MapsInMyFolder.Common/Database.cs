@@ -53,6 +53,9 @@ namespace MapsInMyFolder.Commun
         {
             SQLiteConnection.CreateFile(database_pathname);
             //DB_CreateTables(database_pathname).Dispose();
+            SQLiteConnection connection = DB_OpenConnection(database_pathname);
+
+            DB_CreateTables(connection);
             RefreshPanels.Invoke(null, EventArgs.Empty);
             await CheckIfNewerVersionAvailable();
         }
