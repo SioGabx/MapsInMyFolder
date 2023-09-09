@@ -1,8 +1,8 @@
 ![MIMF Banner](MapsInMyFolder/Media/MIMF_hero.jpg)
 
 <p align="center">
-<img alt="GitHub all releases" src="https://img.shields.io/github/downloads/SioGabx/MapsInMyFolder/total?color=%2316d68a&logo=github">
-<img alt="GitHub" src="https://img.shields.io/github/license/SioGabx/MapsInMyFolder">
+<a href="https://github.com/SioGabx/MapsInMyFolder/releases"><img alt="GitHub all releases" src="https://img.shields.io/github/downloads/SioGabx/MapsInMyFolder/total?color=%2316d68a&logo=github"></a>
+<a href="LICENSE.md"><img alt="GitHub" src="https://img.shields.io/github/license/SioGabx/MapsInMyFolder"></a>
 </p>
 
 # MapsInMyFolder
