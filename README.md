@@ -6,8 +6,8 @@
 </p>
 
 # MapsInMyFolder
-MapsInMyFolder is a windows application that allows you to download maps from various online map services, such as Google Maps, Bing Maps, OpenStreetMap, Yandex Maps, and more in very high quality.
-No more need to take a multitude of screenshots and assemble them on your editing software
+MapsInMyFolder is a windows application that allows you to download maps from various online map services, such as Google Maps, Bing Maps, OpenStreetMap, Yandex Maps, and more (in a very high quality).
+You don't need anymore to take a multitude of screenshots and assemble them on your editing software
 
 ## Features
 - **Map Download**: Access online maps from popular services like Google Maps, Bing Maps, OpenStreetMap, and more.
