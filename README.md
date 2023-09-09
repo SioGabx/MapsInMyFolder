@@ -1,4 +1,4 @@
-![MIMF Banner](MapsInMyFolder/Media/MIMF_hero.jpg)
+![MIMF Banner](MapsInMyFolder/Media/MIMF_hero.png)
 
 <p align="center">
 <a href="https://github.com/SioGabx/MapsInMyFolder/releases"><img alt="GitHub all releases" src="https://img.shields.io/github/downloads/SioGabx/MapsInMyFolder/total?color=%2316d68a&logo=github"></a>
