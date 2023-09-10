@@ -153,6 +153,7 @@ namespace MapsInMyFolder
                 }
             }
 
+            layer_startup_id.SelectedIndex = layer_startup_id.Items.Add(new NameHiddenIdValue(0, "Default"));
             foreach (Layers layer in Layers.GetLayersList())
             {
                 if (layer.class_id != -1 && string.Equals(layer.class_format, "JPEG", StringComparison.InvariantCultureIgnoreCase))
