@@ -53,6 +53,9 @@ namespace MapsInMyFolder.Commun
         {
             SQLiteConnection.CreateFile(database_pathname);
             //DB_CreateTables(database_pathname).Dispose();
+            SQLiteConnection connection = DB_OpenConnection(database_pathname);
+
+            DB_CreateTables(connection);
             RefreshPanels.Invoke(null, EventArgs.Empty);
             await CheckIfNewerVersionAvailable();
         }
@@ -488,6 +491,15 @@ namespace MapsInMyFolder.Commun
             bool IsUpdateSuccessful = await DB_DownloadFile(githubAssets.Download_url, downloadedDatabasePath);
             if (IsUpdateSuccessful)
             {
+                string ExistingDatabasePath = Path.Combine(Settings.working_folder, Settings.database_pathname);
+                if (File.Exists(ExistingDatabasePath)) {
+                    string backupFolderPath = Path.Combine(Settings.working_folder, "databaseBackup");
+                    Directory.CreateDirectory(backupFolderPath);
+                    string dateFormatee = DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss");
+                    File.Copy(ExistingDatabasePath, Path.Combine(backupFolderPath, $"olddb_{dateFormatee}.db"));
+                }
+
+
                 MergeDatabase(downloadedDatabasePath);
                 using (SQLiteConnection sqlite_conn = new SQLiteConnection("Data Source=" + downloadedDatabasePath + "; Version = 3; New = True; Compress = True;"))
                 {

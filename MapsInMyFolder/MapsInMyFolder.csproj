@@ -27,10 +27,10 @@
 
   <PropertyGroup>
     <NoWarn>NU1701</NoWarn>
-    <ApplicationIcon>icone\icone_v2.ico</ApplicationIcon>
+    <ApplicationIcon>Media\icone.ico</ApplicationIcon>
     <RepositoryUrl>https://github.com/SioGabx/MapsInMyFolder</RepositoryUrl>
     <Copyright>SioGabx</Copyright>
-    <Version>0.6.0-alpha</Version>
+    <Version>0.6.1-alpha</Version>
     
     <DisabledWarnings>CS8002</DisabledWarnings>
     <AnalysisLevel>6.0</AnalysisLevel>
@@ -47,6 +47,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Icone\**" />
+    <EmbeddedResource Remove="Icone\**" />
+    <None Remove="Icone\**" />
+    <Page Remove="Icone\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="closedhand.cur" />
     <None Remove="download_panel.html" />
     <None Remove="EditorTheme\Json.xshd" />
@@ -57,7 +64,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="Icone\icone_v2.ico" />
+    <Content Include="Media\icone.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
     <EmbeddedResource Include="EditorTheme\Javascript.xshd" />
     <EmbeddedResource Include="EditorTheme\Json.xshd" />
   </ItemGroup>

@@ -5,7 +5,7 @@
  <?include $(sys.CURRENTDIR)Files.wxi ?>
 
 <!--DONT FORGET TO CHANGE THE VERSION NUMER HERE AND IN MAPSINMYFOLDER.CSPROJ-->
-  <Product Id="*" Name="MapsInMyFolder" Language="1033" Version="0.6.0" Manufacturer="SioGabx" UpgradeCode="091b4d98-0e03-441f-8e40-acb9706db235">
+  <Product Id="*" Name="MapsInMyFolder" Language="1033" Version="0.6.1" Manufacturer="SioGabx" UpgradeCode="091b4d98-0e03-441f-8e40-acb9706db235">
     <Package InstallerVersion="200" Compressed="yes" InstallPrivileges="elevated" AdminImage="yes" Manufacturer="SioGabx" Description="This program provides the functionality to install MapsInMyFolder." Comments="This program provides the functionality to install MapsInMyFolder. See https://github.com/SioGabx/MapsInMyFolder" /><!--InstallScope="perUser"-->
     <Media Id="1" Cabinet="MyCabFile.cab" EmbedCab="yes"/>
     
@@ -28,10 +28,11 @@
       <Custom Action='DownloadAndInvokeBootstrapper' Before='InstallFinalize'>
         <![CDATA[NOT(REMOVE OR VC_REDIST_X64_EXISTS)]]>
       </Custom>
-      
+      <Custom Action="LaunchApp" After="InstallFinalize">NOT REMOVE</Custom>
     </InstallExecuteSequence>
     <CustomAction Id='DownloadAndInvokeBootstrapper' Directory="INSTALLFOLDER" Execute="deferred" ExeCommand='powershell.exe -windowstyle hidden Invoke-WebRequest -Uri "https://aka.ms/vs/17/release/vc_redist.x64.exe" -OutFile "$env:TEMP\vc_redist.x64.exe" ; &amp; $env:TEMP\vc_redist.x64.exe /install /quiet /norestart' Return='check' Impersonate="no"/>
-
+    <!--<CustomAction Id="LaunchApp" Directory="INSTALLFOLDER" ExeCommand="[INSTALLFOLDER]MapsInMyFolder.exe" Execute="deferred" Impersonate="no" Return="asyncNoWait" />-->
+    <CustomAction Id="LaunchApp" Directory="INSTALLFOLDER" ExeCommand="[INSTALLFOLDER]MapsInMyFolder.exe" Return="asyncNoWait"/>
     <!--<CustomAction Id="LaunchExe2" FileKey="VCredist.x64.exe" ExeCommand="/install /norestart" Execute="deferred" Return="ignore" />-->
     
     

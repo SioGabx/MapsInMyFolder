@@ -1,20 +1,26 @@
-<b>[WORK IN PROGRESS]</b>
-----
-This application allows you to download high quality maps from many suppliers (up to 65000 x 65000 pixels).
+![MIMF Banner](MapsInMyFolder/Media/MIMF_hero.png)
 
-It allows you to download "tiles" from the following providers without restrictions:
-- google maps (https://www.google.fr/maps)
-- geoportal (https://www.geoportail.gouv.fr/carte)
+<p align="center">
+<a href="https://github.com/SioGabx/MapsInMyFolder/releases"><img alt="GitHub all releases" src="https://img.shields.io/github/downloads/SioGabx/MapsInMyFolder/total?color=%2316d68a&logo=github"></a>
+<a href="LICENSE.md"><img alt="GitHub" src="https://img.shields.io/github/license/SioGabx/MapsInMyFolder"></a>
+</p>
 
-The application is currently exclusively in French
+# MapsInMyFolder
+MapsInMyFolder is a windows application that allows you to download maps from various online map services, such as Google Maps, Bing Maps, OpenStreetMap, Yandex Maps, and more (in a very high quality).
+You no longer need to take a multitude of screenshots and assemble them on your editing software
 
+## Features
+- **Map Download**: Access online maps from popular services like Google Maps, Bing Maps, OpenStreetMap, and more.
+- **Advanced Customization**: Set detail scale, select geographic area
+- **Add Custom Services**: Easily integrate your own online map providers.
+- **Intuitive Interface**: A modern and user-friendly interface.
+- **Fast Download**: Advanced download features.
 
-----
+MapsInMyFolder is the ideal software for anyone who needs to have large map images (satellite, roads, ...)
 
-Cette application permet de telecharger depuis de nombreux fournisseurs des cartes en haute qualitée (pouvant aller jusqu'à 65000 x 65000 pixels).
+## How to use it ?
+The complete documentation for this project is available on our [GitHub Wiki](https://github.com/SioGabx/MapsInMyFolder/wiki). This documentation details how to use our software.
 
-Elle permet de télécharger sans restrictions des "tuiles" des fournisseurs suivants :
-- google maps (https://www.google.fr/maps)
-- géoportail (https://www.geoportail.gouv.fr/carte)
-
-L'application est actuellment exclusivement en français
+## Why am I getting warnings from Windows when installing MapsInMyFolder ?
+The MapsInMyFolder files are not digitally signed which results in these kinds of warnings. Signing code is expensive, requires a bunch of paperwork. 
+If you do not trust the executable on github, you can install the software from the Windows Store. Alternatively, you can always build the code from source.
