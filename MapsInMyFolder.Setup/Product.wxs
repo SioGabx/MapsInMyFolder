@@ -5,7 +5,7 @@
  <?include $(sys.CURRENTDIR)Files.wxi ?>
 
 <!--DONT FORGET TO CHANGE THE VERSION NUMER HERE AND IN MAPSINMYFOLDER.CSPROJ-->
-  <Product Id="*" Name="MapsInMyFolder" Language="1033" Version="0.6.0" Manufacturer="SioGabx" UpgradeCode="091b4d98-0e03-441f-8e40-acb9706db235">
+  <Product Id="*" Name="MapsInMyFolder" Language="1033" Version="0.6.1" Manufacturer="SioGabx" UpgradeCode="091b4d98-0e03-441f-8e40-acb9706db235">
     <Package InstallerVersion="200" Compressed="yes" InstallPrivileges="elevated" AdminImage="yes" Manufacturer="SioGabx" Description="This program provides the functionality to install MapsInMyFolder." Comments="This program provides the functionality to install MapsInMyFolder. See https://github.com/SioGabx/MapsInMyFolder" /><!--InstallScope="perUser"-->
     <Media Id="1" Cabinet="MyCabFile.cab" EmbedCab="yes"/>
     
