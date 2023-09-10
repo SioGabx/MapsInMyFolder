@@ -40,7 +40,6 @@ namespace MapsInMyFolder.Commun
                 }
                 string GithubVersion = Collectif.FilterDigitOnly(Release.Tag_name, new System.Collections.Generic.List<char>() { '.' }, false, false);
                 bool IsNewerVersionAvailable = CompareVersion(GithubVersion);
-                IsNewerVersionAvailable = true;
                 if (IsNewerVersionAvailable)
                 {
                     UpdateRelease = Release;
