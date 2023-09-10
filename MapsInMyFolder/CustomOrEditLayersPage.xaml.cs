@@ -626,7 +626,7 @@ namespace MapsInMyFolder
                 {
                     Leave(true);
                     DisposeElementBeforeLeave();
-                    MainWindow._instance.FrameLoad_CustomOrEditLayers(LayerId);
+                    MainWindow.Instance.FrameLoad_CustomOrEditLayers(LayerId);
                 }
             }
         }
@@ -839,7 +839,7 @@ namespace MapsInMyFolder
             Javascript.EngineStopAll();
             Settings.map_show_tile_border = ShowTileBorderArchive;
             Settings.is_in_debug_mode = IsInDebugModeArchive;
-            MainWindow._instance.FrameBack(NoTransition);
+            MainWindow.Instance.FrameBack(NoTransition);
             Javascript.EngineClearList();
             MainPage._instance.ReloadPage();
         }
@@ -1069,7 +1069,7 @@ namespace MapsInMyFolder
                     Leave(true);
                     DisposeElementBeforeLeave();
 
-                    MainWindow._instance.FrameLoad_CustomOrEditLayers(LayerId);
+                    MainWindow.Instance.FrameLoad_CustomOrEditLayers(LayerId);
                 }
             }
             catch (Exception ex)
@@ -1261,7 +1261,7 @@ namespace MapsInMyFolder
             {
                 string infoText = (NumberOfErrors == 1) ?
                 Languages.Current["editorMessageErrorRectangleConversion"] : Languages.GetWithArguments("editorMessageErrorRectanglesConversion", NumberOfErrors);
-                Notification InfoUnusedRectangleDeleted = new NText(infoText, "MapsInMyFolder", "FullscreenMap", () => MainWindow._instance.FrameBack())
+                Notification InfoUnusedRectangleDeleted = new NText(infoText, "MapsInMyFolder", "FullscreenMap", () => MainWindow.Instance.FrameBack())
                 {
                     NotificationId = "InfoUnusedRectangleDeleted",
                     DisappearAfterAMoment = false,
@@ -1271,7 +1271,7 @@ namespace MapsInMyFolder
             }
             FullscreenRectanglesMap.SaveButton.Click += FullscreenMap_SaveButton_Click;
             FullscreenRectanglesMap.Unloaded += FullscreenRectanglesMap_Unloaded;
-            MainWindow._instance.MainContentFrame.Navigate(FullscreenRectanglesMap);
+            MainWindow.Instance.MainContentFrame.Navigate(FullscreenRectanglesMap);
 
             void FullscreenRectanglesMap_Unloaded(object sender2, RoutedEventArgs e2)
             {
@@ -1345,7 +1345,7 @@ namespace MapsInMyFolder
             }
             TextboxRectangles.TextArea.Document.Text = SerializedProperties;
             DoWeNeedToUpdateMoinsUnLayer();
-            MainWindow._instance.FrameBack();
+            MainWindow.Instance.FrameBack();
         }
 
         private void IsInDebugModeSwitch_Toggle(object sender, RoutedEventArgs e)

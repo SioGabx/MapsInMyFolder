@@ -98,7 +98,7 @@ namespace MapsInMyFolder.Commun
 
         public static async void StartUpdating()
         {
-            var dialog = Message.SetContentDialog(Languages.GetWithArguments("updateMessageNewVersionAvailable", UpdateRelease.Tag_name, UpdateRelease.Body), Languages.Current["dialogTitleOperationConfirm"], MessageDialogButton.YesNo);
+            var dialog = Message.SetContentDialog(Languages.GetWithArguments("updateMessageNewVersionAvailable", UpdateRelease.Tag_name) + "\n\n" + Languages.GetWithArguments("updateMessageNewVersionReleaseNote", UpdateRelease.Body), Languages.Current["dialogTitleOperationConfirm"], MessageDialogButton.YesNo);
             ContentDialogResult result = ContentDialogResult.None;
             try
             {

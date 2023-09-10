@@ -176,8 +176,8 @@ namespace MapsInMyFolder
 
         public void Download_panel_close()
         {
-            MainWindow._instance.open_download_panel_titlebar_button.Opacity = 1;
-            MainWindow._instance.open_download_panel_titlebar_button.IsHitTestVisible = true;
+            MainWindow.Instance.open_download_panel_titlebar_button.Opacity = 1;
+            MainWindow.Instance.open_download_panel_titlebar_button.IsHitTestVisible = true;
             DoubleAnimation hide_anim = new DoubleAnimation(0d, TimeSpan.FromMilliseconds(Settings.animations_duration_millisecond / 1.5))
             {
                 EasingFunction = new PowerEase { EasingMode = EasingMode.EaseInOut }
@@ -195,8 +195,8 @@ namespace MapsInMyFolder
         public void Download_panel_open()
         {
             download_panel.Opacity = 0;
-            MainWindow._instance.open_download_panel_titlebar_button.Opacity = 0.5;
-            MainWindow._instance.open_download_panel_titlebar_button.IsHitTestVisible = false;
+            MainWindow.Instance.open_download_panel_titlebar_button.Opacity = 0.5;
+            MainWindow.Instance.open_download_panel_titlebar_button.IsHitTestVisible = false;
             download_panel.Visibility = Visibility.Visible;
             DoubleAnimation show_anim = new DoubleAnimation(1, TimeSpan.FromMilliseconds(Settings.animations_duration_millisecond / 1.5))
             {
@@ -281,7 +281,7 @@ namespace MapsInMyFolder
                 {
                     try
                     {
-                        MainWindow._instance.RestartDownload(id_int);
+                        MainWindow.Instance.RestartDownload(id_int);
                     }
                     catch (Exception ex)
                     {
@@ -300,7 +300,7 @@ namespace MapsInMyFolder
                 {
                     try
                     {
-                        MainWindow._instance.RestartDownloadFromZero(id_int);
+                        MainWindow.Instance.RestartDownloadFromZero(id_int);
                     }
                     catch (Exception ex)
                     {
@@ -512,7 +512,7 @@ namespace MapsInMyFolder
                                 Download_cancel(id_int);
                             }
 
-                            MainWindow._instance?.MainPage?.download_panel_browser?.ExecuteScriptAsync("download_js_delete_db(" + id_int.ToString() + ");");
+                            MainWindow.Instance?.MainPage?.download_panel_browser?.ExecuteScriptAsync("download_js_delete_db(" + id_int.ToString() + ");");
                         }
                         catch (Exception ex)
                         {
@@ -530,7 +530,7 @@ namespace MapsInMyFolder
             }
             else
             {
-                MainWindow._instance?.MainPage?.download_panel_browser?.ExecuteScriptAsync("download_js_delete_db(" + id_int.ToString() + ");");
+                MainWindow.Instance?.MainPage?.download_panel_browser?.ExecuteScriptAsync("download_js_delete_db(" + id_int.ToString() + ");");
             }
         }
     }

@@ -492,7 +492,7 @@ namespace MapsInMyFolder
         private void Start_Download_Click(object sender, RoutedEventArgs e)
         {
             MapSelectable.CleanRectangleLocations();
-            MainWindow._instance.FrameLoad_PrepareDownload();
+            MainWindow.Instance.FrameLoad_PrepareDownload();
         }
     }
 }

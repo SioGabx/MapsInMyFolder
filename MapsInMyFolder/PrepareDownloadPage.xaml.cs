@@ -94,7 +94,7 @@ namespace MapsInMyFolder
             UpdateMigniatureParralele();
             GetCenterViewCityName();
             Label_SliderMinMax.Content = Languages.GetWithArguments("preparePropertyZoomLevelMinMax", Layers.Current.class_min_zoom, Layers.Current.class_max_zoom);
-            ZoomSlider.Value = Math.Round(MainWindow._instance.MainPage.mapviewer.ZoomLevel);
+            ZoomSlider.Value = Math.Round(MainWindow.Instance.MainPage.mapviewer.ZoomLevel);
             TextBox_quality_number.Text = "100";
             const int largeur = 128;
             const int stride = largeur / 8;
@@ -1145,7 +1145,7 @@ namespace MapsInMyFolder
             var selectionLocation = MainPage.MapSelectable.GetRectangleLocation();
             DownloadOptions downloadOptions = new DownloadOptions(0, saveDirectory, format, filename, "", "", 0, zoom, quality, "", selectionLocation.NO, selectionLocation.SE, resizeWidth, resizeHeight, interpretation, scaleInfo);
 
-            MainWindow._instance.PrepareDownloadBeforeStart(downloadOptions);
+            MainWindow.Instance.PrepareDownloadBeforeStart(downloadOptions);
             ClosePage();
             TextBoxScaleIsLock(false);
 
@@ -1177,7 +1177,7 @@ namespace MapsInMyFolder
             ImageTilePreview_1_1.BeginAnimation(OpacityProperty, hide_anim);
             ImageTilePreview_0_2.BeginAnimation(OpacityProperty, hide_anim);
             ImageTilePreview_1_2.BeginAnimation(OpacityProperty, hide_anim);
-            MainWindow._instance.FrameBack();
+            MainWindow.Instance.FrameBack();
         }
 
         private void GridImagePreviewInfoScrollViewer_SizeChanged(object sender, SizeChangedEventArgs e)

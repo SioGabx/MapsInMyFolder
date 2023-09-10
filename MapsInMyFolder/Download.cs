@@ -315,8 +315,8 @@ namespace MapsInMyFolder
         {
             Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
             {
-                _instance.MainPage.RefreshMap();
-                _instance.MainPage.LayerTilePreview_RequestUpdate();
+                Instance.MainPage.RefreshMap();
+                Instance.MainPage.LayerTilePreview_RequestUpdate();
             }, null);
 
             CheckIfReadyToStartDownload();
@@ -337,7 +337,7 @@ namespace MapsInMyFolder
                     if (Network.IsNetworkAvailable())
                     {
                         //start download
-                        _instance.RestartDownload(engine.id);
+                        Instance.RestartDownload(engine.id);
                         numDownloadsStarted++;
                     }
                     else
@@ -808,7 +808,7 @@ namespace MapsInMyFolder
                     {
                         engine.lastCommandNotImportant = commandExecuted;
                     }
-                    await _instance?.MainPage?.download_panel_browser?.EvaluateScriptAsync(commandExecuted);
+                    await Instance?.MainPage?.download_panel_browser?.EvaluateScriptAsync(commandExecuted);
 
                     if (isImportant)
                     {

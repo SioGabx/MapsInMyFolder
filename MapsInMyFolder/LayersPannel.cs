@@ -861,7 +861,7 @@ namespace MapsInMyFolder
             int prefilid_int = Convert.ToInt32(prefilid);
             Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
             {
-                MainWindow._instance.FrameLoad_CustomOrEditLayers(id_int, prefilid_int);
+                MainWindow.Instance.FrameLoad_CustomOrEditLayers(id_int, prefilid_int);
             }, null);
         }
 
@@ -871,7 +871,7 @@ namespace MapsInMyFolder
             Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
             {
                 //Debug.WriteLine("Layer_set_current " + id);
-                MainWindow._instance.MainPage.Set_current_layer(id_int);
+                MainWindow.Instance.MainPage.Set_current_layer(id_int);
             }, null);
         }
         public void Layer_show_warning(double id = 0)
@@ -887,21 +887,21 @@ namespace MapsInMyFolder
         {
             Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Send, (SendOrPostCallback)delegate
             {
-                MainWindow._instance.MainPage.SearchLayerStart(true);
+                MainWindow.Instance.MainPage.SearchLayerStart(true);
             }, null);
         }
 
         public string Request_search_string()
         {
-            return Application.Current.Dispatcher.Invoke(() => MainWindow._instance.MainPage.SearchGetText(), DispatcherPriority.Send);
+            return Application.Current.Dispatcher.Invoke(() => MainWindow.Instance.MainPage.SearchGetText(), DispatcherPriority.Send);
         }
 
         public void Refresh_panel()
         {
             Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
             {
-                MainWindow._instance.MainPage.ReloadPage();
-                MainWindow._instance.MainPage.SearchLayerStart();
+                MainWindow.Instance.MainPage.ReloadPage();
+                MainWindow.Instance.MainPage.SearchLayerStart();
             }, null);
         }
 
@@ -914,7 +914,7 @@ namespace MapsInMyFolder
             async Task<string> Gettilepreviewurlfromid_interne(double id)
             {
                 int id_int = Convert.ToInt32(id);
-                DispatcherOperation op = Application.Current.Dispatcher.BeginInvoke(new Func<string>(() => MainWindow._instance.MainPage.LayerTilePreview_ReturnUrl(id_int)));
+                DispatcherOperation op = Application.Current.Dispatcher.BeginInvoke(new Func<string>(() => MainWindow.Instance.MainPage.LayerTilePreview_ReturnUrl(id_int)));
                 await op;
                 return op.Result.ToString();
             }
