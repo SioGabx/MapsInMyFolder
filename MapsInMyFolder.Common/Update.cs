@@ -17,7 +17,8 @@ namespace MapsInMyFolder.Commun
         public static string GetActualVersionFormatedString()
         {
             Version version = AssemblyVersion;
-            return String.Format("{0}.{1}.{2}", version.Major, version.Minor, version.Build);
+            string formatedVersionNumbers = string.Format("{0}.{1}.{2}", version.Major, version.Minor, version.Build);
+            return formatedVersionNumbers;
         }
 
         public static string GetActualProductVersionFormatedString()
@@ -39,6 +40,7 @@ namespace MapsInMyFolder.Commun
                 }
                 string GithubVersion = Collectif.FilterDigitOnly(Release.Tag_name, new System.Collections.Generic.List<char>() { '.' }, false, false);
                 bool IsNewerVersionAvailable = CompareVersion(GithubVersion);
+                IsNewerVersionAvailable = true;
                 if (IsNewerVersionAvailable)
                 {
                     UpdateRelease = Release;
@@ -125,7 +127,7 @@ namespace MapsInMyFolder.Commun
             {
                 Application.Current.Dispatcher.Invoke(() =>
                 {
-                    UpdateNotification.Text(NotificationMsg + $" {progressPercentage}% - {Collectif.FormatBytes(totalBytesDownloaded)}/{Collectif.FormatBytes((long)totalFileSize)}");
+                    UpdateNotification.Text(NotificationMsg + $" {progressPercentage?.ToString("0.00")}% - {Collectif.FormatBytes(totalBytesDownloaded)}/{Collectif.FormatBytes((long)totalFileSize)}");
                     UpdateNotification.SetProgress((double)progressPercentage);
                 });
             };
