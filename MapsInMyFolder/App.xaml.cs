@@ -112,7 +112,10 @@ namespace MapsInMyFolder
                     }
                 }
 
-                settings.UserDataPath = cefsharpTempFolderPath;
+                settings.PersistSessionCookies = false;
+                settings.PersistUserPreferences = false;
+
+                settings.RootCachePath = cefsharpTempFolderPath;
                 settings.LogFile = Path.Combine(cefsharpTempFolderPath, "internalBrowserLogs.log");
                 settings.RegisterScheme(new CefCustomScheme
                 {

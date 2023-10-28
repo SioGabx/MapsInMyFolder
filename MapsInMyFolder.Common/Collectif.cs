@@ -100,7 +100,7 @@ namespace MapsInMyFolder.Commun
                 {
                     return string.Empty;
                 }
-                string Script = calque.class_script;
+                string Script = calque.Script;
                 var ValuesDictionnary = CallFunctionAndGetResult(urlbase, Script, Tilex, Tiley, z, LayerID, InvokeFunction);
                 if (ValuesDictionnary.ResultCallValue is null)
                 {
@@ -110,7 +110,7 @@ namespace MapsInMyFolder.Commun
                 string finalurl;
                 if (string.IsNullOrEmpty(urlbase))
                 {
-                    finalurl = calque.class_tile_url;
+                    finalurl = calque.TileUrl;
                 }
                 else
                 {
@@ -198,7 +198,7 @@ namespace MapsInMyFolder.Commun
 
 
 
-                    List<TileProperty> tilesUrls = GenrateListOfUrlFromLocation(location, z, urlbase, -1, downloadid, calque.class_format);
+                    List<TileProperty> tilesUrls = GenrateListOfUrlFromLocation(location, z, urlbase, -1, downloadid, calque.TilesFormat);
 
                     return tilesUrls;
 
@@ -745,7 +745,7 @@ namespace MapsInMyFolder.Commun
             }
 
             HttpResponse response = HttpResponse.HttpResponseError;
-            string originalReferer = Layers.GetLayerById(LayerId)?.class_site_url;
+            string originalReferer = Layers.GetLayerById(LayerId)?.SiteUrl;
 
             int maxRetry = Settings.max_redirection_download_tile;
             int retry = 0;
@@ -1351,7 +1351,7 @@ namespace MapsInMyFolder.Commun
 
         public static string FilterDigitOnly(string origin, List<char> char_supplementaire, bool onlyOnePoint = true, bool limitLenght = true)
         {
-            if (string.IsNullOrEmpty(origin)) { return String.Empty; }
+            if (string.IsNullOrEmpty(origin)) { return string.Empty; }
             string str = "";
             foreach (char caractere in origin)
             {

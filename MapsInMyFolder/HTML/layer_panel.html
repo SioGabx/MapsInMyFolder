@@ -16,6 +16,7 @@
 
         .displaynone,
         .hidden {
+            content-visibility: hidden !important;
             display: none !important;
         }
 
@@ -32,6 +33,7 @@
 
         .layerHidden {
             display: none;
+            content-visibility: hidden;
         }
 
         .showHiddenLayer .layerHidden {
@@ -42,6 +44,7 @@
 
         .layerFiltered {
             display: none;
+            content-visibility: hidden;
         }
 
         .showHiddenLayer .layerFiltered {
@@ -96,7 +99,7 @@
             position: relative;
             /*background-color: #303031;*/
             background-color: rgba(255, 255, 255, 0.5);
-            background-color: rgba(var(--background_layer_color_R, 255), var(--background_layer_color_G, 255), var(--background_layer_color_B, 255), var(--opacity_preview_background, 0.5));
+            background-color: rgba(var(--background_layer_color_R, 255), var(--background_layer_color_G, 255), var(--background_layer_color_B, 255), var(--opacity_preview_background-color, 0.7));
         }
 
         .layer_content {
@@ -107,17 +110,33 @@
             overflow-wrap: anywhere;
         }
 
-        .layer_main_div_background_image {
+
+        .layer_main_div_background_image,
+        .layer_main_div_front_image {
             position: absolute;
-            left: -1px;
             top: 0;
             width: 100%;
             height: 100%;
-            z-index: -1;
             background-repeat: no-repeat;
             background-origin: border-box;
             background-size: cover;
             background-position: center;
+        }
+
+        .layer_main_div_front_image {
+            background-image: var(--background-loading);
+        }
+
+        .layer_main_div_preview_images {
+            content-visibility: auto;
+            position: absolute;
+            top: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .layer_main_div_background_image {
+            opacity: var(--opacity_preview_background-image);
         }
 
         body {
@@ -237,10 +256,7 @@
 
         .eye.orange {
             opacity: 0;
-            /*            background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNDEuNzMiIGhlaWdodD0iMTQxLjczIiB2aWV3Qm94PSIwIDAgMTQxLjczIDE0MS43MyI+PHRpdGxlPnBpY3RvZ3JhbW1lczwvdGl0bGU+PHBhdGggZD0iTTcwLjg3LDU5Ljk0QTEwLjkzLDEwLjkzLDAsMSwwLDgxLjc5LDcwLjg3LDEwLjk0LDEwLjk0LDAsMCwwLDcwLjg3LDU5Ljk0WiIgc3R5bGU9ImZpbGw6I2YxODcxMztzdHJva2U6IzAwMDtzdHJva2Utd2lkdGg6MnB4Ii8+PHBhdGggZD0iTTEzNy42LDY3LjhhMTIxLjIsMTIxLjIsMCwwLDAtMTkuMzQtMTcuNjljLTE1Ljc3LTExLjY0LTMyLjE1LTE3LjgtNDcuMzktMTcuOHMtMzEuNjMsNi4xNi00Ny40LDE3LjhBMTIxLjc0LDEyMS43NCwwLDAsMCw0LjEzLDY3LjhhNC44MSw0LjgxLDAsMCwwLDAsNi4xM0ExMjEuMiwxMjEuMiwwLDAsMCwyMy40Nyw5MS42MmMxNS43NywxMS42NSwzMi4xNiwxNy44LDQ3LjQsMTcuOHMzMS42Mi02LjE1LDQ3LjM5LTE3LjhBMTIwLjY3LDEyMC42NywwLDAsMCwxMzcuNiw3My45Myw0LjgxLDQuODEsMCwwLDAsMTM3LjYsNjcuOFpNNzAuODcsOTUuODdhMjUsMjUsMCwxLDEsMjUtMjVBMjUsMjUsMCwwLDEsNzAuODcsOTUuODdaIiBzdHlsZT0iZmlsbDojZjE4NzEzO3N0cm9rZTojMDAwO3N0cm9rZS13aWR0aDoycHgiLz48L3N2Zz4=");  */
-            /*            background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNDEuNzMiIGhlaWdodD0iMTQxLjczIiB2aWV3Qm94PSIwIDAgMTQxLjczIDE0MS43MyI+PGRlZnM+PHN0eWxlPi5he2ZpbGw6bm9uZTtzdHJva2U6IzAxMDEwMTtzdHJva2UtbWl0ZXJsaW1pdDoxMDtzdHJva2Utd2lkdGg6NHB4O308L3N0eWxlPjwvZGVmcz48dGl0bGU+cGljdG9ncmFtbWVzPC90aXRsZT48cGF0aCBjbGFzcz0iYSIgZD0iTTcwLjg3LDU5Ljk0QTEwLjkzLDEwLjkzLDAsMSwwLDgxLjc5LDcwLjg3LDEwLjk0LDEwLjk0LDAsMCwwLDcwLjg3LDU5Ljk0WiIvPjxwYXRoIGNsYXNzPSJhIiBkPSJNMTM3LjYsNjcuOGExMjEuMiwxMjEuMiwwLDAsMC0xOS4zNC0xNy42OWMtMTUuNzctMTEuNjQtMzIuMTUtMTcuOC00Ny4zOS0xNy44cy0zMS42Myw2LjE2LTQ3LjQsMTcuOEExMjEuNzQsMTIxLjc0LDAsMCwwLDQuMTMsNjcuOGE0LjgxLDQuODEsMCwwLDAsMCw2LjEzQTEyMS4yLDEyMS4yLDAsMCwwLDIzLjQ3LDkxLjYyYzE1Ljc3LDExLjY1LDMyLjE2LDE3LjgsNDcuNCwxNy44czMxLjYyLTYuMTUsNDcuMzktMTcuOEExMjAuNjcsMTIwLjY3LDAsMCwwLDEzNy42LDczLjkzLDQuODEsNC44MSwwLDAsMCwxMzcuNiw2Ny44Wk03MC44Nyw5NS44N2EyNSwyNSwwLDEsMSwyNS0yNUEyNSwyNSwwLDAsMSw3MC44Nyw5NS44N1oiLz48cGF0aCBjbGFzcz0iYSIgZD0iTTgsMTMwLjg0LDEzMy43OCwxMC44OSIvPjwvc3ZnPg==");    */
             background-image: url("data:image/svg+xml;base64,PHN2ZyBpZD0iQ2FscXVlXzIiIGRhdGEtbmFtZT0iQ2FscXVlIDIiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjE0MS43MyIgaGVpZ2h0PSIxNDEuNzMiIHZpZXdCb3g9IjAgMCAxNDEuNzMgMTQxLjczIj48ZGVmcz48c3R5bGU+LmNscy0xe2ZpbGw6IzAxMDEwMTtzdHJva2U6Izc1NzU3ODtzdHJva2Utd2lkdGg6MnB4O308L3N0eWxlPjwvZGVmcz48dGl0bGU+cGljdG9ncmFtbWVzPC90aXRsZT48cGF0aCBjbGFzcz0iY2xzLTEiIGQ9Ik03MC44Nyw1OS45NEExMC45MywxMC45MywwLDEsMCw4MS43OSw3MC44NywxMC45NCwxMC45NCwwLDAsMCw3MC44Nyw1OS45NFoiLz48cGF0aCBjbGFzcz0iY2xzLTEiIGQ9Ik0xMzcuNiw2Ny44YTEyMS4yLDEyMS4yLDAsMCwwLTE5LjM0LTE3LjY5Yy0xNS43Ny0xMS42NC0zMi4xNS0xNy44LTQ3LjM5LTE3LjhzLTMxLjYzLDYuMTYtNDcuNCwxNy44QTEyMS43NCwxMjEuNzQsMCwwLDAsNC4xMyw2Ny44YTQuODEsNC44MSwwLDAsMCwwLDYuMTNBMTIxLjIsMTIxLjIsMCwwLDAsMjMuNDcsOTEuNjJjMTUuNzcsMTEuNjUsMzIuMTYsMTcuOCw0Ny40LDE3LjhzMzEuNjItNi4xNSw0Ny4zOS0xNy44QTEyMC42NywxMjAuNjcsMCwwLDAsMTM3LjYsNzMuOTMsNC44MSw0LjgxLDAsMCwwLDEzNy42LDY3LjhaTTcwLjg3LDk1Ljg3YTI1LDI1LDAsMSwxLDI1LTI1QTI1LDI1LDAsMCwxLDcwLjg3LDk1Ljg3WiIvPjwvc3ZnPg==");
-            /*            background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNDEuNzMiIGhlaWdodD0iMTQxLjczIiB2aWV3Qm94PSIwIDAgMTQxLjczIDE0MS43MyI+PGRlZnM+PHN0eWxlPi5he2ZpbGw6I2YxODcxMztzdHJva2U6IzAwMDtzdHJva2Utd2lkdGg6MnB4O308L3N0eWxlPjwvZGVmcz48dGl0bGU+cGljdG9ncmFtbWVzPC90aXRsZT48cGF0aCBjbGFzcz0iYSIgZD0iTTcwLjg3LDU5Ljk0QTEwLjkzLDEwLjkzLDAsMSwwLDgxLjc5LDcwLjg3LDEwLjk0LDEwLjk0LDAsMCwwLDcwLjg3LDU5Ljk0WiIvPjxwYXRoIGNsYXNzPSJhIiBkPSJNMTM3LjYsNjcuOGExMjEuMiwxMjEuMiwwLDAsMC0xOS4zNC0xNy42OWMtMTUuNzctMTEuNjQtMzIuMTUtMTcuOC00Ny4zOS0xNy44cy0zMS42Myw2LjE2LTQ3LjQsMTcuOEExMjEuNzQsMTIxLjc0LDAsMCwwLDQuMTMsNjcuOGE0LjgxLDQuODEsMCwwLDAsMCw2LjEzQTEyMS4yLDEyMS4yLDAsMCwwLDIzLjQ3LDkxLjYyYzE1Ljc3LDExLjY1LDMyLjE2LDE3LjgsNDcuNCwxNy44czMxLjYyLTYuMTUsNDcuMzktMTcuOEExMjAuNjcsMTIwLjY3LDAsMCwwLDEzNy42LDczLjkzLDQuODEsNC44MSwwLDAsMCwxMzcuNiw2Ny44Wk03MC44Nyw5NS44N2EyNSwyNSwwLDEsMSwyNS0yNUEyNSwyNSwwLDAsMSw3MC44Nyw5NS44N1oiLz48L3N2Zz4=");*/
             background-size: contain;
         }
 
@@ -281,14 +297,6 @@
 
         /*  ------------------ CONTEXT MENU ------------------ */
 
-
-        /*@import url('https://fonts.googleapis.com/css2?family=Roboto');*/
-
-        /*body{
-            height: 350vh;
-            width:120vw;
-        }
-        */
 
         .context_menu svg {
             transform: translateY(5px);
@@ -471,12 +479,6 @@
             column-rule-color: #888989;
         }
 
-        /*
-                .lock .icon {
-                    opacity: 0.15;
-                }
-        */
-
 
         .item_hr {
             border-top: 1px solid hsl(240, 4%, 20%);
@@ -597,19 +599,6 @@
     <!--  ------------------ CONTEXT MENU ------------------ -->
 
     <div class="context_menu" data-navtype="mouse">
-        <!--
-                <div class="menu item" id="rendre_courant">
-                    <div class="item-content">
-                        <div class="icon">
-                            <svg width="141.73" height="141.73" version="1.1" viewBox="0 0 141.73 141.73" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M11.73,25.59,71.08,81.68,130,25.59" />
-                                <path d="M11.73,67.28l59.35,56.08L130,67.28" />
-                            </svg>
-                        </div>
-                        <a href="#">Rendre le calque courant</a>
-                    </div>
-                </div>
-        -->
         <div class="menu item" id="ajouter_favori">
             <div class="item-content">
                 <div class="icon">
@@ -844,7 +833,7 @@
                             NodeArray[Index].classList.add("select");
                             if (lastelement != NodeArray[Index]) {
                                 //Execute c#
-                                layer_Csharp_call_from_js.layer_set_current(parseInt(eventTarget.id))
+                                LayerCEFSharpLink.layerSetAsCurrent(parseInt(eventTarget.id))
                             }
                         } catch (error) {
                             console.error(error);
@@ -932,7 +921,7 @@
                     liElement.classList.remove("layerHiddenStateProgress");
                 }
 
-                layer_Csharp_call_from_js.layer_visibility(parseInt(id), true)
+                LayerCEFSharpLink.layerVisibility(parseInt(id), true)
                 eye.title = "%layerContextMenuHideLayer%";
             } else {
                 //C# supprimer des favoris
@@ -943,7 +932,7 @@
                     liElement.classList.add("layerHiddenStateProgress");
                     liElement.classList.remove("layerVisible");
                 }
-                layer_Csharp_call_from_js.layer_visibility(parseInt(id), false)
+                LayerCEFSharpLink.layerVisibility(parseInt(id), false)
                 eye.title = "%layerContextMenuShowLayer%";
 
                 if (liElement.classList.contains("layerHiddenStateProgress")) {
@@ -960,7 +949,7 @@
                 event.stopPropagation();
                 event.preventDefault();
             }
-            layer_Csharp_call_from_js.layer_show_warning(parseInt(id));
+            LayerCEFSharpLink.layerShowWarningLegacyVersionNewerThanEdited(parseInt(id));
         }
 
         function ajouter_aux_favoris(event, star, id) {
@@ -990,20 +979,21 @@
                 if (!star.classList.contains("orange")) {
                     star.classList.add("orange")
                 }
-                layer_Csharp_call_from_js.layer_favorite(parseInt(id), true)
+                LayerCEFSharpLink.layerFavorite(parseInt(id), true)
                 star.title = "%layerContextMenuRemoveFavorite%";
             } else {
                 //C# supprimer des favoris
                 if (star.classList.contains("orange")) {
                     star.classList.remove("orange")
                 }
-                layer_Csharp_call_from_js.layer_favorite(parseInt(id), false)
+                LayerCEFSharpLink.layerFavorite(parseInt(id), false)
                 star.title = "%layerContextMenuAddFavorite%";
             }
         }
 
         function selectionner_calque_by_id(id, scroll = true) {
             console.log("selectionner_calque_by_id" + id);
+            //debugger;
             document.querySelectorAll('.select').forEach(function(layer) {
                 layer.classList.remove("select");
             });
@@ -1024,7 +1014,7 @@
                 });
             }
             if (lastelement != element) {
-                layer_Csharp_call_from_js.layer_set_current(parseInt(id));
+                LayerCEFSharpLink.layerSetAsCurrent(parseInt(id));
                 lastelement = element;
             }
 
@@ -1265,18 +1255,6 @@
             UpdatePreview();
         }
 
-        //let isScrolling = false;
-        //let scrollTimeout;
-        //window.addEventListener("scroll", () => {
-        //    clearTimeout(scrollTimeout);
-
-        //    // Set a new scroll timeout
-        //    scrollTimeout = setTimeout(function () {
-        //        isScrolling = false;
-        //        StartObserving();
-        //    }, 200);
-
-        //});
 
         let lastScrollTop = 0;
         let lastTimestamp = Date.now();
@@ -1310,240 +1288,83 @@
 
         measureScrollSpeed();
 
-        //        function InternalUpdatePreview(element_fiup) {
-        //            if (document.querySelector("ul").classList.value == "list" || document.querySelector("ul").classList.value == "list_alternat") {
-        //                return;
-        //            }
-        //            if (element_fiup !== null) {
-        //                if (element_fiup.classList.contains("hidden") || element_fiup.classList.contains("displaynone")) {
-        //                    return;
-        //                }
-        //                let mainDiv = element_fiup.querySelector(".layer_main_div");
-        //                let id = parseInt(element_fiup.id);
-        //
-        //                layer_Csharp_call_from_js.gettilepreviewurlfromid(id).then(function (urlResultString) {
-        //                    //console.log("urlResult : " + urlResultString);
-        //                    if (element_fiup.classList.contains("hidden") || element_fiup.classList.contains("displaynone")) {
-        //                        return;
-        //                    }
-        //                    let urlResult = JSON.parse(urlResultString);
-        //                    let css_opti = "url(\"" + urlResult.preview.frontImage.url + "\")";
-        //                    if ((mainDiv.style.backgroundImage != css_opti || mainDiv.querySelector(".layer_main_div_background_image").style.backgroundImage == "") && (urlResult != "") && element_fiup.classList.contains("inview")) {
-        //                        let fallbackurl = urlResult.previewFallback.frontImage.url;
-        //                        let fallbackbbackgroundurl = urlResult.previewFallback.frontImage.url;
-        //                        const img = new Image(); // width, height
-        //                        img.src = urlResult.preview.frontImage.url;
-        //                        img.addEventListener('load', function () {
-        //                            //console.log("Preview : " + id + "loaded");
-        //                            mainDiv.style.backgroundImage = "url(" + img.src + ")";
-        //                            if (element_fiup.classList.contains("inview")) {
-        //                                mainDiv.querySelector(".layer_main_div_background_image").style.backgroundImage = "url(" + urlResult.preview.backgroundImage.url + ")";
-        //                                mainDiv.style.setProperty("--opacity_preview_background", "");
-        //                            }
-        //                        });
-        //                        img.addEventListener('error', function () {
-        //                            if (fallbackurl === undefined) {
-        //                                emptyPreview();
-        //                            } else {
-        //                                const fallbackimg = new Image();
-        //                                fallbackimg.src = fallbackurl;
-        //                                fallbackimg.addEventListener('load', function () {
-        //                                    //console.log("Preview : " + id + "loaded");
-        //                                    mainDiv.style.backgroundImage = "url(" + fallbackimg.src + ")";
-        //                                    if (element_fiup.classList.contains("inview")) {
-        //                                        if (fallbackbbackgroundurl !== undefined) {
-        //                                            mainDiv.querySelector(".layer_main_div_background_image").style.backgroundImage = "url(" + fallbackbbackgroundurl + ")";
-        //                                            mainDiv.style.setProperty("--opacity_preview_background", "");
-        //                                        } else {
-        //                                            mainDiv.querySelector(".layer_main_div_background_image").style.backgroundImage = "url(" + urlResult.preview.backgroundImage.url + ")";
-        //                                            mainDiv.style.setProperty("--opacity_preview_background", "1");
-        //                                        }
-        //                                    }
-        //                                });
-        //
-        //                                fallbackimg.addEventListener('error', function () {
-        //                                    console.log("Failed to load fallback image : " + fallbackurl);
-        //                                    emptyPreview();
-        //                                });
-        //                            }
-        //
-        //                            function emptyPreview() {
-        //                                if (element_fiup.classList.contains("inview")) {
-        //                                    //console.log("Preview : " + id + "error");
-        //                                    mainDiv.style.backgroundImage = "url(data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7)"; //transparent 1pixel gif
-        //                                    mainDiv.querySelector(".layer_main_div_background_image").style.backgroundImage = "url(" + urlResult.preview.backgroundImage.url + ")";
-        //                                }
-        //                            }
-        //
-        //                        });
-        //                    }
-        //                });
-        //
-        //            } else {
-        //                console.error("null element ignore");
-        //            }
-        //        }
+        function InternalUpdatePreview(element_fiup) {
+            if (document.querySelector("ul").classList.value == "list" || document.querySelector("ul").classList.value == "list_alternat") {
+                return;
+            }
+            if (element_fiup !== null) {
+                if (element_fiup.classList.contains("hidden") || element_fiup.classList.contains("displaynone")) {
+                    return;
+                }
+                let mainDiv = element_fiup.querySelector(".layer_main_div");
+                let id = parseInt(element_fiup.id);
 
-        
-        
-                     function InternalUpdatePreview(element_fiup) {
-                    if (document.querySelector("ul").classList.value == "list" || document.querySelector("ul").classList.value == "list_alternat") {
+                LayerCEFSharpLink.layerGetTilePreviewUrlFromId(id).then(function(urlResultString) {
+                    console.log("urlResult : " + urlResultString);
+                    if (element_fiup.classList.contains("hidden") || element_fiup.classList.contains("displaynone")) {
                         return;
                     }
-                    if (element_fiup !== null) {
-                        if (element_fiup.classList.contains("hidden") || element_fiup.classList.contains("displaynone")) {
-                            return;
-                        }
-                        let mainDiv = element_fiup.querySelector(".layer_main_div");
-                        let id = parseInt(element_fiup.id);
-        
-                        layer_Csharp_call_from_js.gettilepreviewurlfromid(id).then(function (urlResultString) {
-                            console.log("urlResult : " + urlResultString);
-                            if (element_fiup.classList.contains("hidden") || element_fiup.classList.contains("displaynone")) {
-                                return;
-                            }
-                            let urlResult = JSON.parse(urlResultString);
-                            let css_opti = "url(\"" + urlResult.preview.frontImage.url + "\")";
-                            if ((mainDiv.style.backgroundImage != css_opti || mainDiv.querySelector(".layer_main_div_background_image").style.backgroundImage == "") && (urlResult != "") && element_fiup.classList.contains("inview")) {
-                                let fallbackurl = urlResult.previewFallback.frontImage.url;
-                                let fallbackbbackgroundurl = urlResult.previewFallback.backgroundImage.url;
-                                const img = new Image(); // width, height
-                                img.src = urlResult.preview.frontImage.url;
-                                img.addEventListener('load', function () {
-                                    //console.log("Preview : " + id + "loaded");
-                                    mainDiv.style.backgroundImage = "url(" + img.src + ")";
-                                    if (element_fiup.classList.contains("inview")) {
-                                        mainDiv.querySelector(".layer_main_div_background_image").style.backgroundImage = "url(" + urlResult.preview.backgroundImage.url + ")";
-                                        mainDiv.style.setProperty("--opacity_preview_background", "");
-                                    }
-                                });
-                                img.addEventListener('error', function () {
-                                    if (fallbackurl === undefined) {
-                                        emptyPreview();
-                                    } else {
-                                        const fallbackimg = new Image();
-                                        fallbackimg.src = fallbackurl;
-                                        fallbackimg.addEventListener('load', function () {
-                                            //console.log("Preview : " + id + "loaded");
-                                            mainDiv.style.backgroundImage = "url(" + fallbackimg.src + ")";
-                                            if (element_fiup.classList.contains("inview")) {
-                                                if (fallbackbbackgroundurl !== undefined) {
-                                                    mainDiv.querySelector(".layer_main_div_background_image").style.backgroundImage = "url(" + fallbackbbackgroundurl + ")";
-                                                    mainDiv.style.setProperty("--opacity_preview_background", "");
-                                                } else {
-                                                    mainDiv.querySelector(".layer_main_div_background_image").style.backgroundImage = "url(" + urlResult.preview.backgroundImage.url + ")";
-                                                    mainDiv.style.setProperty("--opacity_preview_background", "1");
-                                                }
-                                            }
-                                        });
-        
-                                        fallbackimg.addEventListener('error', function () {
-                                            console.log("Failed to load fallback image : " + fallbackurl);
-                                            emptyPreview();
-                                        });
-                                    }
-        
-                                    function emptyPreview() {
-                                        if (element_fiup.classList.contains("inview")) {
-                                            //console.log("Preview : " + id + "error");
-                                            mainDiv.style.backgroundImage = "url(data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7)"; //transparent 1pixel gif
-                                            mainDiv.querySelector(".layer_main_div_background_image").style.backgroundImage = "url(" + urlResult.preview.backgroundImage.url + ")";
-                                        }
-                                    }
-        
-                                });
+                    let urlResult = JSON.parse(urlResultString);
+                    let css_opti = "url(\"" + urlResult.preview.frontImage.url + "\")";
+
+                    let mainDivBackgroundImage = mainDiv.querySelector(".layer_main_div_background_image");
+                    let mainDivFrontImage = mainDiv.querySelector(".layer_main_div_front_image");
+
+                    if ((mainDivFrontImage.style.backgroundImage != css_opti || mainDivBackgroundImage.style.backgroundImage == "") && (urlResult != "") && element_fiup.classList.contains("inview")) {
+                        let fallbackurl = urlResult.previewFallback.frontImage.url;
+                        let fallbackbbackgroundurl = urlResult.previewFallback.backgroundImage.url;
+                        const img = new Image(); // width, height
+                        img.src = urlResult.preview.frontImage.url;
+                        img.addEventListener('load', function() {
+                            //console.log("Preview : " + id + "loaded");
+                            mainDivFrontImage.style.backgroundImage = "url(" + img.src + ")";
+                            if (element_fiup.classList.contains("inview")) {
+                                mainDivBackgroundImage.style.backgroundImage = "url(" + urlResult.preview.backgroundImage.url + ")";
+                                mainDiv.style.setProperty("--opacity_preview_background-image", "");
                             }
                         });
-        
-                    } else {
-                        console.error("null element ignore");
+                        img.addEventListener('error', function() {
+                            if (fallbackurl === undefined) {
+                                emptyPreview();
+                            } else {
+                                const fallbackimg = new Image();
+                                fallbackimg.src = fallbackurl;
+                                fallbackimg.addEventListener('load', function() {
+                                    //console.log("Preview : " + id + "loaded");
+                                    mainDivFrontImage.style.backgroundImage = "url(" + fallbackimg.src + ")";
+                                    if (element_fiup.classList.contains("inview")) {
+                                        if (fallbackbbackgroundurl !== undefined) {
+                                            mainDivBackgroundImage.style.backgroundImage = "url(" + fallbackbbackgroundurl + ")";
+                                            mainDiv.style.setProperty("--opacity_preview_background-image", "");
+                                        } else {
+                                            mainDivBackgroundImage.style.backgroundImage = "url(" + urlResult.preview.backgroundImage.url + ")";
+                                            mainDiv.style.setProperty("--opacity_preview_background-image", "1");
+                                        }
+                                    }
+                                });
+
+                                fallbackimg.addEventListener('error', function() {
+                                    console.log("Failed to load fallback image : " + fallbackurl);
+                                    emptyPreview();
+                                });
+                            }
+
+                            function emptyPreview() {
+                                if (element_fiup.classList.contains("inview")) {
+                                    //console.log("Preview : " + id + "error");
+                                    mainDivFrontImage.style.backgroundImage = "url(data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7)"; //transparent 1pixel gif
+                                    mainDivBackgroundImage.style.backgroundImage = "url(" + urlResult.preview.backgroundImage.url + ")";
+                                }
+                            }
+
+                        });
                     }
-                }
-        
-//        
-//        
-//function InternalUpdatePreview(element_fiup) {
-//    if (document.querySelector("ul").classList.value == "list" || document.querySelector("ul").classList.value == "list_alternat") {
-//        return;
-//    }
-//    if (element_fiup !== null) {
-//        if (element_fiup.classList.contains("hidden") || element_fiup.classList.contains("displaynone")) {
-//            return;
-//        }
-//        let mainDiv = element_fiup.querySelector(".layer_main_div");
-//        let id = parseInt(element_fiup.id);
-//
-//        layer_Csharp_call_from_js.gettilepreviewurlfromid(id).then(function (urlResultString) {
-//            //console.log("urlResult : " + urlResultString);
-//            if (element_fiup.classList.contains("hidden") || element_fiup.classList.contains("displaynone")) {
-//                return;
-//            }
-//            let urlResult = JSON.parse(urlResultString);
-//            let css_opti = "url(\"" + urlResult.preview.frontImage.url + "\")";
-//            if ((mainDiv.style.backgroundImage != css_opti || mainDiv.querySelector(".layer_main_div_background_image").style.backgroundImage == "") && (urlResult != "") && element_fiup.classList.contains("inview")) {
-//                let fallbackurl = urlResult.previewFallback.frontImage.url;
-//                let fallbackbbackgroundurl = urlResult.previewFallback.backgroundImage.url;
-//                const img = new Image(); // width, height
-//                if (urlResult.preview.frontImage.url.startsWith("[base64]")) {
-//                    layer_Csharp_call_from_js.convertimagetobase64(id, urlResult.preview.frontImage.url).then(function (base64Image) {
-//                        img.src = base64Image;
-//                        loadImage(element_fiup, mainDiv, img, urlResult.preview.backgroundImage.url, fallbackurl, fallbackbbackgroundurl);
-//                    });
-//                } else {
-//                    img.src = urlResult.preview.frontImage.url;
-//                    loadImage(element_fiup, mainDiv, img, urlResult.preview.backgroundImage.url, fallbackurl, fallbackbbackgroundurl);
-//                }
-//            }
-//        });
-//    } else {
-//        console.error("null element ignore");
-//    }
-//}
-//
-//function loadImage(element_fiup,mainDiv,img, backgroundUrl, fallbackUrl, fallbackBackgroundUrl) {
-//    img.addEventListener('load', function () {
-//        //console.log("Preview : " + id + "loaded");
-//        mainDiv.style.backgroundImage = "url(" + img.src + ")";
-//        if (element_fiup.classList.contains("inview")) {
-//            mainDiv.querySelector(".layer_main_div_background_image").style.backgroundImage = "url(" + backgroundUrl + ")";
-//            mainDiv.style.setProperty("--opacity_preview_background", "");
-//        }
-//    });
-//    img.addEventListener('error', function () {
-//        if (fallbackUrl === undefined) {
-//            emptyPreview();
-//        } else {
-//            const fallbackimg = new Image();
-//            fallbackimg.src = fallbackUrl;
-//            fallbackimg.addEventListener('load', function () {
-//                //console.log("Preview : " + id + "loaded");
-//                mainDiv.style.backgroundImage = "url(" + fallbackimg.src + ")";
-//                if (element_fiup.classList.contains("inview")) {
-//                    if (fallbackBackgroundUrl !== undefined) {
-//                        mainDiv.querySelector(".layer_main_div_background_image").style.backgroundImage = "url(" + fallbackBackgroundUrl + ")";
-//                        mainDiv.style.setProperty("--opacity_preview_background", "");
-//                    } else {
-//                        mainDiv.querySelector(".layer_main_div_background_image").style.backgroundImage = "url(" + backgroundUrl + ")";
-//                        mainDiv.style.setProperty("--opacity_preview_background", "1");
-//                    }
-//                }
-//            });
-//
-//            fallbackimg.addEventListener('error', function () {
-//                console.log("Failed to load fallback image : " + fallbackUrl);
-//                emptyPreview();
-//            });
-//        }
-//
-//        function emptyPreview() {
-//            if (element_fiup.classList.contains("inview")) {
-//                //console.log("Preview : " + id + "error");
-//                mainDiv.style.backgroundImage = "url(data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7)"; //transparent 1pixel gif
-//                mainDiv.querySelector(".layer_main_div_background_image").style.backgroundImage = "url(" + backgroundUrl + ")";
-//            }
-//        }
-//    });
-//}
+                });
+
+            } else {
+                console.error("null element ignore");
+            }
+        }
 
         function checkVisibility() {
             let items = document.querySelectorAll("li");
@@ -1551,9 +1372,9 @@
                 let isVisible = isElementInViewport(item);
                 if (isVisible) {
                     item.classList.add('inview');
-                    if (item.querySelector(".layer_main_div").style.backgroundImage.includes("R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7")) {
-                        item.querySelector(".layer_main_div").style.backgroundImage = "var(--background-loading)";
-                    }
+                    //                    if (item.querySelector(".layer_main_div").style.backgroundImage.includes("R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7")) {
+                    //                        item.querySelector(".layer_main_div").style.backgroundImage = "var(--background-loading)";
+                    //                    }
                 } else {
                     item.classList.remove('inview');
                 }
@@ -1772,23 +1593,6 @@
                     }
                 } //si supp, on retire de la liste
             }
-            /**/
-            if (e.which === 46) { //Supp
-                //                if (document.querySelector(".clickfocus") != null) {
-                //                    let dataState = document.querySelector(".clickfocus .download_main_div").getAttribute("data-state");
-                //                    download_Csharp_call_from_js.download_cancel_deleted_db(parseInt(document.querySelector(".clickfocus").getAttribute("id")));
-                //                    /*if (dataState == "success" || dataState == "cancel" || dataState == "error") {
-                //                        e.preventDefault();
-                //                        console.log(document.querySelector(".clickfocus"));
-                //                        download_js_delete_db(document.querySelector(".clickfocus").getAttribute("id"));
-                //                        hide_context_menu(e);
-                //                    } else {
-                //                        download_Csharp_call_from_js.download_cancel_deleted_db(parseInt(document.querySelector(".clickfocus").getAttribute("id")));
-                //                        hide_context_menu(e);
-                //                    }*/
-                //                }
-            }
-            /**/
 
         }
 
@@ -1996,15 +1800,7 @@
                 let id = get_context_menu_element().getAttribute("data-layer_binding");
                 let action = item.closest(".item").getAttribute("id");
                 console.log("Vous avez cliqué sur : " + item.closest(".item").querySelector("a").innerText + " element id = " + id);
-                /*
-<!--rendre_courant ajouter_favori retirer_favori modifier_calque-->
-                */
-                //                let element = document.querySelector(".star").classList.contains("orange");
                 let element_icmc = document.getElementById(id);
-                //                if (element === null) {
-                //                    console.log("Element was null, abord");
-                //                    return;
-                //                }
                 switch (action) {
                     case "rendre_courant":
                         selectionner_calque_by_id(id, false);
@@ -2049,7 +1845,7 @@
                         }
                         break;
                     case "modifier_calque":
-                        layer_Csharp_call_from_js.layer_edit(parseInt(id));
+                        LayerCEFSharpLink.layerMakeEdits(parseInt(id));
                         break;
                     case "supprimer_cache_calque":
 
@@ -2058,16 +1854,16 @@
                             getSelectedElements().forEach(function(element) {
                                 listOfId += element.id + ",";
                             });
-                            layer_Csharp_call_from_js.clear_cache(listOfId);
+                            LayerCEFSharpLink.clearCache(listOfId);
                         } else {
-                            layer_Csharp_call_from_js.clear_cache(id.toString());
+                            LayerCEFSharpLink.clearCache(id.toString());
                         }
                         break;
                     case "ajouter_calque":
-                        layer_Csharp_call_from_js.layer_edit(-1);
+                        LayerCEFSharpLink.layerMakeEdits(-1);
                         break;
                     case "ajouter_calque_template":
-                        layer_Csharp_call_from_js.layer_edit(-1, parseInt(id));
+                        LayerCEFSharpLink.layerMakeEdits(-1, parseInt(id));
                         break;
                     case "basculer_affichage_showmasque":
                         document.querySelector("ul").classList.add("showHiddenLayer"); //showHiddenLayer
@@ -2076,7 +1872,7 @@
                         document.querySelector("ul").classList.remove("showHiddenLayer"); //showHiddenLayer
                         break;
                     case "actualiser_panel":
-                        layer_Csharp_call_from_js.refresh_panel();
+                        LayerCEFSharpLink.layerRequestRefreshPanel();
                         break;
                     default:
                         break;
@@ -2088,7 +1884,7 @@
 
     </script>
     <script>
-        CefSharp.BindObjectAsync("layer_Csharp_call_from_js");
+        CefSharp.BindObjectAsync("LayerCEFSharpLink");
         for (let i = 0; i < 5; i++) {
             let element_iup = document.querySelectorAll("li")[i];
             if (!element_iup.classList.contains("hidden") && !element_iup.classList.contains("displaynone")) {
@@ -2098,7 +1894,7 @@
         }
 
 
-        layer_Csharp_call_from_js.request_search_string()
+        LayerCEFSharpLink.layerRequestGetSearchString()
             .then(function(initSearchValue) {
                 console.log("search " + initSearchValue);
                 if (initSearchValue != null && initSearchValue != undefined) {

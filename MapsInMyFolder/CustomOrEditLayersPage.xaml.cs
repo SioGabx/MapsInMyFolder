@@ -199,7 +199,7 @@ namespace MapsInMyFolder
         static void GenerateTempLayerInDicList()
         {
             Layers MoinsUnEditLayer = Layers.Empty();
-            MoinsUnEditLayer.class_id = InternalEditorId;
+            MoinsUnEditLayer.Id = InternalEditorId;
             Layers.Add(-2, MoinsUnEditLayer);
         }
 
@@ -211,23 +211,23 @@ namespace MapsInMyFolder
 
             foreach (Layers layer in Layers.GetLayersList())
             {
-                if (layer.class_id < 0)
+                if (layer.Id < 0)
                 {
                     continue;
                 }
-                string class_category = layer.class_category.Trim();
+                string class_category = layer.Category.Trim();
                 if (!Category.Contains(class_category) && !string.IsNullOrWhiteSpace(class_category))
                 {
                     Category.Add(class_category);
                     TextboxLayerCategory.Items.Add(class_category);
                 }
-                string class_site = layer.class_site.Trim();
+                string class_site = layer.SiteName.Trim();
                 if (!Site.Contains(class_site) && !string.IsNullOrWhiteSpace(class_site))
                 {
                     Site.Add(class_site);
                     TextboxLayerSite.Items.Add(class_site);
                 }
-                string class_site_url = layer.class_site_url.Trim();
+                string class_site_url = layer.SiteUrl.Trim();
                 if (!SiteUrl.Contains(class_site_url) && !string.IsNullOrWhiteSpace(class_site_url))
                 {
                     SiteUrl.Add(class_site_url);
@@ -253,37 +253,37 @@ namespace MapsInMyFolder
                 TextBoxSetValueAndLock(TextboxLayerTileWidth, "256");
                 return;
             }
-            TextboxLayerName.Text = LayerInEditMode.class_name;
-            if (LayerId > 0 && !string.IsNullOrEmpty(LayerInEditMode.class_name.Trim()))
+            TextboxLayerName.Text = LayerInEditMode.Name;
+            if (LayerId > 0 && !string.IsNullOrEmpty(LayerInEditMode.Name.Trim()))
             {
-                CalqueType.Content = string.Concat(Languages.Current["editorTitleLayer"], " - ", LayerInEditMode.class_name);
+                CalqueType.Content = string.Concat(Languages.Current["editorTitleLayer"], " - ", LayerInEditMode.Name);
             }
             else if (LayerId != prefilLayerId)
             {
                 CalqueType.Content = Languages.GetWithArguments("editorTitleNewLayerBasedOn", prefilLayerId);
             }
-            TextboxLayerCategory.Text = LayerInEditMode.class_category;
-            TextboxLayerSiteUrl.Text = LayerInEditMode.class_site_url;
-            TextboxLayerSite.Text = LayerInEditMode.class_site;
-            TextboxLayerFormat.Text = LayerInEditMode.class_format.ToUpperInvariant();
-            if (LayerInEditMode.class_format.EndsWith("jpeg") || LayerInEditMode.class_format.EndsWith("jpg"))
+            TextboxLayerCategory.Text = LayerInEditMode.Category;
+            TextboxLayerSiteUrl.Text = LayerInEditMode.SiteUrl;
+            TextboxLayerSite.Text = LayerInEditMode.SiteName;
+            TextboxLayerFormat.Text = LayerInEditMode.TilesFormat.ToUpperInvariant();
+            if (LayerInEditMode.TilesFormat.EndsWith("jpeg") || LayerInEditMode.TilesFormat.EndsWith("jpg"))
             {
                 TextboxLayerFormat.SelectedIndex = 0;
             }
-            else if (LayerInEditMode.class_format.EndsWith("png"))
+            else if (LayerInEditMode.TilesFormat.EndsWith("png"))
             {
                 TextboxLayerFormat.SelectedIndex = 1;
             }
-            else if (LayerInEditMode.class_format.EndsWith("pbf"))
+            else if (LayerInEditMode.TilesFormat.EndsWith("pbf"))
             {
                 TextboxLayerFormat.SelectedIndex = 2;
             }
             else
             {
-                TextboxLayerFormat.SelectedIndex = TextboxLayerFormat.Items.Add(LayerInEditMode.class_format.ToUpperInvariant());
+                TextboxLayerFormat.SelectedIndex = TextboxLayerFormat.Items.Add(LayerInEditMode.TilesFormat.ToUpperInvariant());
             }
 
-            string tileSize = LayerInEditMode.class_tiles_size.ToString();
+            string tileSize = LayerInEditMode.TilesSize.ToString();
             if (string.IsNullOrEmpty(tileSize.Trim()))
             {
                 tileSize = "256";
@@ -291,23 +291,35 @@ namespace MapsInMyFolder
 
             if (LayerId == prefilLayerId)
             {
-                TextBoxSetValueAndLock(TextboxLayerIdentifier, LayerInEditMode.class_identifier);
+                TextBoxSetValueAndLock(TextboxLayerIdentifier, LayerInEditMode.Identifier);
             }
 
-            TextBoxSetValueAndLock(TextboxLayerDescription, LayerInEditMode.class_description);
-            TextBoxSetValueAndLock(TextboxLayerScript, LayerInEditMode.class_script);
-            TextBoxSetValueAndLock(TextboxRectangles, LayerInEditMode.class_rectangles);
-            TextBoxSetValueAndLock(TextboxLayerName, LayerInEditMode.class_name);
-            TextBoxSetValueAndLock(TextBoxLayerMinZoom, LayerInEditMode.class_min_zoom.ToString());
-            TextBoxSetValueAndLock(TextBoxLayerMaxZoom, LayerInEditMode.class_max_zoom.ToString());
-            TextBoxSetValueAndLock(TextboxLayerTileUrl, LayerInEditMode.class_tile_url);
+            TextBoxSetValueAndLock(TextboxLayerDescription, LayerInEditMode.Description);
+            TextBoxSetValueAndLock(TextboxLayerScript, LayerInEditMode.Script);
+            TextBoxSetValueAndLock(TextboxRectangles, LayerInEditMode.BoundaryRectangles);
+            TextBoxSetValueAndLock(TextboxLayerName, LayerInEditMode.Name);
+            TextBoxSetValueAndLock(TextBoxLayerMinZoom, LayerInEditMode.MinZoom.ToString());
+            TextBoxSetValueAndLock(TextBoxLayerMaxZoom, LayerInEditMode.MaxZoom.ToString());
+            TextBoxSetValueAndLock(TextboxLayerTileUrl, LayerInEditMode.TileUrl);
             TextBoxSetValueAndLock(TextboxLayerTileWidth, tileSize);
-            TextBoxSetValueAndLock(TextboxSpecialOptionBackgroundColor, LayerInEditMode.class_specialsoptions.BackgroundColor?.TrimEnd('#'));
-            TextBoxSetValueAndLock(TextboxLayerStyle, LayerInEditMode.class_style);
 
-            string[] class_country = LayerInEditMode.class_country.Split(';', StringSplitOptions.RemoveEmptyEntries);
+            int MaxDownloadTilesInParralele = LayerInEditMode.SpecialsOptions.MaxDownloadTilesInParralele;
+            int WaitingBeforeStartAnotherTile = LayerInEditMode.SpecialsOptions.WaitingBeforeStartAnotherTile;
+            if (MaxDownloadTilesInParralele > 0)
+            {
+                TextBoxSetValueAndLock(TextboxSpecialOptioneditorPropertyNameMaxDownloadTilesInParralele, MaxDownloadTilesInParralele.ToString());
+            }
+            if (WaitingBeforeStartAnotherTile > 0)
+            {
+                TextBoxSetValueAndLock(TextboxSpecialOptioneditorPropertyNameWaitingBeforeStartAnotherTile, WaitingBeforeStartAnotherTile.ToString());
+            }
+            
+            TextBoxSetValueAndLock(TextboxSpecialOptionBackgroundColor, LayerInEditMode.SpecialsOptions.BackgroundColor?.TrimEnd('#'));
+            TextBoxSetValueAndLock(TextboxLayerStyle, LayerInEditMode.Style);
+
+            string[] class_country = LayerInEditMode.Country.Split(';', StringSplitOptions.RemoveEmptyEntries);
             List<Country> SelectedCountries = Country.GetListFromEnglishName(class_country);
-            if (SelectedCountries.Count != class_country.Length && LayerInEditMode.class_country != null)
+            if (SelectedCountries.Count != class_country.Length && LayerInEditMode.Country != null)
             {
                 List<Country> CountryList = CountryComboBox.ItemSource.Cast<Country>().ToList();
                 foreach (string country in class_country)
@@ -328,7 +340,7 @@ namespace MapsInMyFolder
 
             CountryComboBox.SelectedItems = SelectedCountries;
 
-            string[] class_httpstatuscode = LayerInEditMode.class_specialsoptions?.ErrorsToIgnore?.Split(';', StringSplitOptions.RemoveEmptyEntries);
+            string[] class_httpstatuscode = LayerInEditMode.SpecialsOptions?.ErrorsToIgnore?.Split(';', StringSplitOptions.RemoveEmptyEntries);
             var SelectedHttpStatusCode = new List<HttpStatusCodeDisplay>();
             var listOfHttpStatusCode = new List<HttpStatusCodeDisplay>();
             foreach (HttpStatusCode status in HttpStatusCodeDisplay.getList())
@@ -346,8 +358,8 @@ namespace MapsInMyFolder
             AlloweRequestErrorsComboBox.ItemSource = listOfHttpStatusCode;
             AlloweRequestErrorsComboBox.SelectedItems = SelectedHttpStatusCode;
 
-            has_scale.IsChecked = LayerInEditMode.class_hasscale;
-            Collectif.SetBackgroundOnUIElement(mapviewerappercu, LayerInEditMode?.class_specialsoptions?.BackgroundColor);
+            has_scale.IsChecked = LayerInEditMode.IsAtScale;
+            Collectif.SetBackgroundOnUIElement(mapviewerappercu, LayerInEditMode?.SpecialsOptions?.BackgroundColor);
         }
 
 
@@ -451,10 +463,10 @@ namespace MapsInMyFolder
                     Layers Layer = Layers.GetLayerById(Settings.layer_startup_id) ?? Layers.Empty();
                     basemap = new MapTileLayer
                     {
-                        TileSource = new TileSource { UriFormat = Layer.class_tile_url, LayerID = Layer.class_id },
-                        SourceName = Layer.class_identifier,
-                        MaxZoomLevel = Layer.class_max_zoom ?? 0,
-                        MinZoomLevel = Layer.class_min_zoom ?? 0,
+                        TileSource = new TileSource { UriFormat = Layer.TileUrl, LayerID = Layer.Id },
+                        SourceName = Layer.Identifier,
+                        MaxZoomLevel = Layer.MaxZoom ?? 0,
+                        MinZoomLevel = Layer.MinZoom ?? 0,
                         Description = ""
                     };
                 }
@@ -620,7 +632,7 @@ namespace MapsInMyFolder
                 }
                 catch (Exception ex)
                 {
-
+                    Debug.WriteLine(ex.Message);
                 }
                 finally
                 {
@@ -647,24 +659,24 @@ namespace MapsInMyFolder
             {
                 return string.Empty;
             }
-            string NAME = Collectif.HTMLEntities(layers.class_name);
-            string DESCRIPTION = Collectif.HTMLEntities(layers.class_description);
-            string CATEGORY = Collectif.HTMLEntities(layers.class_category);
-            string COUNTRY = Collectif.HTMLEntities(layers.class_country);
-            string IDENTIFIER = Collectif.HTMLEntities(layers.class_identifier);
-            string TILE_URL = Collectif.HTMLEntities(layers.class_tile_url);
-            string MIN_ZOOM = layers.class_min_zoom.ToString();
-            string MAX_ZOOM = layers.class_max_zoom.ToString();
-            string FORMAT = Collectif.HTMLEntities(layers.class_format);
-            string SITE = Collectif.HTMLEntities(layers.class_site);
-            string SITE_URL = Collectif.HTMLEntities(layers.class_site_url);
-            string STYLE = Collectif.HTMLEntities(layers.class_style);
-            string TILE_SIZE = layers.class_tiles_size.ToString();
-            string VISIBILITY = layers.class_visibility.ToString();
-            string SCRIPT = Collectif.HTMLEntities(layers.class_script);
-            string RECTANGLES = Collectif.HTMLEntities(layers.class_rectangles);
-            string SPECIALSOPTIONS = layers.class_specialsoptions.ToString();
-            string HAS_SCALE = (layers.class_hasscale ? 1 : 0).ToString();
+            string NAME = Collectif.HTMLEntities(layers.Name);
+            string DESCRIPTION = Collectif.HTMLEntities(layers.Description);
+            string CATEGORY = Collectif.HTMLEntities(layers.Category);
+            string COUNTRY = Collectif.HTMLEntities(layers.Country);
+            string IDENTIFIER = Collectif.HTMLEntities(layers.Identifier);
+            string TILE_URL = Collectif.HTMLEntities(layers.TileUrl);
+            string MIN_ZOOM = layers.MinZoom.ToString();
+            string MAX_ZOOM = layers.MaxZoom.ToString();
+            string FORMAT = Collectif.HTMLEntities(layers.TilesFormat);
+            string SITE = Collectif.HTMLEntities(layers.SiteName);
+            string SITE_URL = Collectif.HTMLEntities(layers.SiteUrl);
+            string STYLE = Collectif.HTMLEntities(layers.Style);
+            string TILE_SIZE = layers.TilesSize.ToString();
+            string VISIBILITY = layers.Visibility.ToString();
+            string SCRIPT = Collectif.HTMLEntities(layers.Script);
+            string RECTANGLES = Collectif.HTMLEntities(layers.BoundaryRectangles);
+            string SPECIALSOPTIONS = layers.SpecialsOptions.ToString();
+            string HAS_SCALE = (layers.IsAtScale ? 1 : 0).ToString();
             return ($"SET 'NAME'='{NAME}','DESCRIPTION'='{DESCRIPTION}','CATEGORY'='{CATEGORY}','COUNTRY'='{COUNTRY}','IDENTIFIER'='{IDENTIFIER}','TILE_URL'='{TILE_URL}','MIN_ZOOM'={MIN_ZOOM},'MAX_ZOOM'={MAX_ZOOM},'FORMAT'='{FORMAT}','SITE'='{SITE}','SITE_URL'='{SITE_URL}','STYLE'='{STYLE}','TILE_SIZE'={TILE_SIZE},'SCRIPT'='{SCRIPT}','VISIBILITY'='{VISIBILITY}','SPECIALSOPTIONS'='{SPECIALSOPTIONS}', 'RECTANGLES'='{RECTANGLES}', 'HAS_SCALE'={HAS_SCALE}");
         }
 
@@ -687,23 +699,23 @@ namespace MapsInMyFolder
                 Message.NoReturnBoxAsync(Languages.Current["editorMessageErrorDatabaseSave"], Languages.Current["dialogTitleOperationFailed"]);
                 return -1;
             }
-            string NAME = Collectif.HTMLEntities(layers.class_name);
-            string DESCRIPTION = Collectif.HTMLEntities(layers.class_description);
-            string CATEGORY = Collectif.HTMLEntities(layers.class_category);
-            string COUNTRY = Collectif.HTMLEntities(layers.class_country);
-            string IDENTIFIER = Collectif.HTMLEntities(layers.class_identifier);
-            string TILE_URL = Collectif.HTMLEntities(layers.class_tile_url);
-            string MIN_ZOOM = layers.class_min_zoom.ToString();
-            string MAX_ZOOM = layers.class_max_zoom.ToString();
-            string FORMAT = Collectif.HTMLEntities(layers.class_format);
-            string SITE = Collectif.HTMLEntities(layers.class_site);
-            string SITE_URL = Collectif.HTMLEntities(layers.class_site_url);
-            string STYLE = Collectif.HTMLEntities(layers.class_style);
-            string TILE_SIZE = layers.class_tiles_size.ToString();
-            string SCRIPT = Collectif.HTMLEntities(layers.class_script);
-            string RECTANGLES = Collectif.HTMLEntities(layers.class_rectangles);
-            string SPECIALSOPTIONS = layers.class_specialsoptions.ToString();
-            string HAS_SCALE = (layers.class_hasscale ? 1 : 0).ToString();
+            string NAME = Collectif.HTMLEntities(layers.Name);
+            string DESCRIPTION = Collectif.HTMLEntities(layers.Description);
+            string CATEGORY = Collectif.HTMLEntities(layers.Category);
+            string COUNTRY = Collectif.HTMLEntities(layers.Country);
+            string IDENTIFIER = Collectif.HTMLEntities(layers.Identifier);
+            string TILE_URL = Collectif.HTMLEntities(layers.TileUrl);
+            string MIN_ZOOM = layers.MinZoom.ToString();
+            string MAX_ZOOM = layers.MaxZoom.ToString();
+            string FORMAT = Collectif.HTMLEntities(layers.TilesFormat);
+            string SITE = Collectif.HTMLEntities(layers.SiteName);
+            string SITE_URL = Collectif.HTMLEntities(layers.SiteUrl);
+            string STYLE = Collectif.HTMLEntities(layers.Style);
+            string TILE_SIZE = layers.TilesSize.ToString();
+            string SCRIPT = Collectif.HTMLEntities(layers.Script);
+            string RECTANGLES = Collectif.HTMLEntities(layers.BoundaryRectangles);
+            string SPECIALSOPTIONS = layers.SpecialsOptions.ToString();
+            string HAS_SCALE = (layers.IsAtScale ? 1 : 0).ToString();
 
 
 
@@ -742,36 +754,36 @@ namespace MapsInMyFolder
             {
                 Layers DB_Layer = Layers.Empty();
 
-                List<Layers> LayersRead = MainPage.DB_Layer_Read($"SELECT * FROM LAYERS WHERE ID='{LayerId}'");
+                List<Layers> LayersRead = MainPage.LayerReadInDatabase($"SELECT * FROM LAYERS WHERE ID='{LayerId}'");
                 if (LayersRead.Count > 0)
                 {
                     DB_Layer = LayersRead[0];
                 }
                 else
                 {
-                    List<Layers> CustomLayersRead = MainPage.DB_Layer_Read($"SELECT * FROM CUSTOMSLAYERS WHERE ID='{LayerId}'");
+                    List<Layers> CustomLayersRead = MainPage.LayerReadInDatabase($"SELECT * FROM CUSTOMSLAYERS WHERE ID='{LayerId}'");
                     if (CustomLayersRead.Count > 0)
                     {
                         DB_Layer = CustomLayersRead[0];
                     }
                 }
 
-                NAME = getSavingOptimalValueWithNULL(NAME, DB_Layer.class_name);
-                DESCRIPTION = getSavingOptimalValueWithNULL(DESCRIPTION, DB_Layer.class_description);
-                CATEGORY = getSavingOptimalValueWithNULL(CATEGORY, DB_Layer.class_category);
-                COUNTRY = getSavingOptimalValueWithNULL(COUNTRY, DB_Layer.class_country);
-                IDENTIFIER = getSavingOptimalValueWithNULL(IDENTIFIER, DB_Layer.class_identifier);
-                MIN_ZOOM = getSavingOptimalValueWithNULL(MIN_ZOOM, DB_Layer.class_min_zoom.ToString());
-                MAX_ZOOM = getSavingOptimalValueWithNULL(MAX_ZOOM, DB_Layer.class_max_zoom.ToString());
-                TILE_URL = getSavingOptimalValueWithNULL(TILE_URL, DB_Layer.class_tile_url);
-                FORMAT = getSavingOptimalValueWithNULL(FORMAT, DB_Layer.class_format);
-                SITE = getSavingOptimalValueWithNULL(SITE, DB_Layer.class_site);
-                SITE_URL = getSavingOptimalValueWithNULL(SITE_URL, DB_Layer.class_site_url);
-                SCRIPT = getSavingOptimalValueWithNULL(SCRIPT, DB_Layer.class_script);
-                STYLE = getSavingOptimalValueWithNULL(STYLE, DB_Layer.class_style);
-                TILE_SIZE = getSavingOptimalValueWithNULL(TILE_SIZE, DB_Layer.class_tiles_size.ToString());
-                RECTANGLES = getSavingOptimalValueWithNULL(RECTANGLES, DB_Layer.class_rectangles);
-                SPECIALSOPTIONS = getSavingOptimalValueWithNULL(SPECIALSOPTIONS, DB_Layer.class_specialsoptions.ToString());
+                NAME = getSavingOptimalValueWithNULL(NAME, DB_Layer.Name);
+                DESCRIPTION = getSavingOptimalValueWithNULL(DESCRIPTION, DB_Layer.Description);
+                CATEGORY = getSavingOptimalValueWithNULL(CATEGORY, DB_Layer.Category);
+                COUNTRY = getSavingOptimalValueWithNULL(COUNTRY, DB_Layer.Country);
+                IDENTIFIER = getSavingOptimalValueWithNULL(IDENTIFIER, DB_Layer.Identifier);
+                MIN_ZOOM = getSavingOptimalValueWithNULL(MIN_ZOOM, DB_Layer.MinZoom.ToString());
+                MAX_ZOOM = getSavingOptimalValueWithNULL(MAX_ZOOM, DB_Layer.MaxZoom.ToString());
+                TILE_URL = getSavingOptimalValueWithNULL(TILE_URL, DB_Layer.TileUrl);
+                FORMAT = getSavingOptimalValueWithNULL(FORMAT, DB_Layer.TilesFormat);
+                SITE = getSavingOptimalValueWithNULL(SITE, DB_Layer.SiteName);
+                SITE_URL = getSavingOptimalValueWithNULL(SITE_URL, DB_Layer.SiteUrl);
+                SCRIPT = getSavingOptimalValueWithNULL(SCRIPT, DB_Layer.Script);
+                STYLE = getSavingOptimalValueWithNULL(STYLE, DB_Layer.Style);
+                TILE_SIZE = getSavingOptimalValueWithNULL(TILE_SIZE, DB_Layer.TilesSize.ToString());
+                RECTANGLES = getSavingOptimalValueWithNULL(RECTANGLES, DB_Layer.BoundaryRectangles);
+                SPECIALSOPTIONS = getSavingOptimalValueWithNULL(SPECIALSOPTIONS, DB_Layer.SpecialsOptions.ToString());
                 HAS_SCALE = getSavingOptimalValueWithNULL(HAS_SCALE, null);
             }
             catch (Exception ex)
@@ -790,8 +802,8 @@ namespace MapsInMyFolder
             }
             else if (Database.ExecuteScalarSQLCommand("SELECT COUNT(*) FROM 'main'.'EDITEDLAYERS' WHERE ID = " + LayerId) == 0)
             {
-                int FAVORITE = (Layers.GetLayerById(LayerId)?.class_favorite == true) ? 1 : 0;
-                int VERSION = Layers.GetLayerById(LayerId)?.class_version ?? 1;
+                int FAVORITE = (Layers.GetLayerById(LayerId)?.IsFavorite == true) ? 1 : 0;
+                int VERSION = Layers.GetLayerById(LayerId)?.Version ?? 1;
                 Database.ExecuteNonQuerySQLCommand("INSERT INTO 'main'.'EDITEDLAYERS'('ID', 'NAME', 'DESCRIPTION', 'CATEGORY', 'COUNTRY', 'IDENTIFIER', 'TILE_URL', 'MIN_ZOOM', 'MAX_ZOOM', 'FORMAT', 'SITE', 'SITE_URL', 'STYLE', 'TILE_SIZE', 'FAVORITE', 'SCRIPT', 'VISIBILITY', 'SPECIALSOPTIONS', 'RECTANGLES', 'VERSION', 'HAS_SCALE') " +
                 $"VALUES({LayerId}, {NAME}, {DESCRIPTION}, {CATEGORY},{COUNTRY}, {IDENTIFIER}, {TILE_URL}, {MIN_ZOOM}, {MAX_ZOOM}, {FORMAT}, {SITE}, {SITE_URL},{STYLE}, {TILE_SIZE}, {FAVORITE},  {SCRIPT},  '{Visibility.Visible}',  {SPECIALSOPTIONS}, {RECTANGLES}, {VERSION}, {HAS_SCALE})");
             }
@@ -827,9 +839,9 @@ namespace MapsInMyFolder
             DisposeElementBeforeLeave();
             SaveLayer();
             Leave();
-            if (Layers.Current.class_id == LayerId)
+            if (Layers.Current.Id == LayerId)
             {
-                MainPage._instance.Set_current_layer(Layers.Current.class_id);
+                MainPage._instance.SetCurrentLayer(Layers.Current.Id);
             }
         }
 
@@ -868,28 +880,39 @@ namespace MapsInMyFolder
                 GenerateTempLayerInDicList();
                 layers = Layers.GetLayerById(-2);
             }
-            layers.class_name = NAME;
-            layers.class_description = DESCRIPTION;
-            layers.class_category = CATEGORY;
-            layers.class_country = COUNTRY;
-            layers.class_identifier = IDENTIFIER;
-            layers.class_tile_url = TILE_URL;
-            layers.class_min_zoom = MIN_ZOOM;
-            layers.class_max_zoom = MAX_ZOOM;
-            layers.class_format = FORMAT;
-            layers.class_site = SITE;
-            layers.class_site_url = SITE_URL;
-            layers.class_tiles_size = string.IsNullOrEmpty(TILE_SIZE.ToString()) ? 256 : TILE_SIZE;
-            layers.class_script = SCRIPT;
-            layers.class_rectangles = RECTANGLES;
-            layers.class_specialsoptions = new Layers.SpecialsOptions()
+            layers.Name = NAME;
+            layers.Description = DESCRIPTION;
+            layers.Category = CATEGORY;
+            layers.Country = COUNTRY;
+            layers.Identifier = IDENTIFIER;
+            layers.TileUrl = TILE_URL;
+            layers.MinZoom = MIN_ZOOM;
+            layers.MaxZoom = MAX_ZOOM;
+            layers.TilesFormat = FORMAT;
+            layers.SiteName = SITE;
+            layers.SiteUrl = SITE_URL;
+            layers.TilesSize = string.IsNullOrEmpty(TILE_SIZE.ToString()) ? 256 : TILE_SIZE;
+            layers.Script = SCRIPT;
+            layers.BoundaryRectangles = RECTANGLES;
+            layers.SpecialsOptions = new Layers.LayersSpecialsOptions()
             {
                 BackgroundColor = TextboxSpecialOptionBackgroundColor.Text,
-                ErrorsToIgnore = string.Join(';', AlloweRequestErrorsComboBox.SelectedValuesAsInt("Status"))
+                ErrorsToIgnore = string.Join(';', AlloweRequestErrorsComboBox.SelectedValuesAsInt("Status")),
+                MaxDownloadTilesInParralele = 0,//Convert.ToInt32(TextboxSpecialOptioneditorPropertyNameMaxDownloadTilesInParralele.Text),
+                WaitingBeforeStartAnotherTile = 0//Convert.ToInt32(TextboxSpecialOptioneditorPropertyNameWaitingBeforeStartAnotherTile.Text),
             };
-            layers.class_style = STYLE;
-            layers.class_rectangles = RECTANGLES;
-            layers.class_hasscale = has_scale.IsChecked ?? false;
+            if (int.TryParse(TextboxSpecialOptioneditorPropertyNameMaxDownloadTilesInParralele.Text, out int MaxDownloadTilesInParralele))
+            {
+                layers.SpecialsOptions.MaxDownloadTilesInParralele = MaxDownloadTilesInParralele;
+            }
+            if (int.TryParse(TextboxSpecialOptioneditorPropertyNameWaitingBeforeStartAnotherTile.Text, out int WaitingBeforeStartAnotherTile))
+            {
+                layers.SpecialsOptions.WaitingBeforeStartAnotherTile = WaitingBeforeStartAnotherTile;
+            }
+
+            layers.Style = STYLE;
+            layers.BoundaryRectangles = RECTANGLES;
+            layers.IsAtScale = has_scale.IsChecked ?? false;
             Layers.Add(-2, layers);
         }
 
@@ -969,7 +992,7 @@ namespace MapsInMyFolder
             TextboxLayerScript.TextArea.Caret.PositionChanged -= TextboxLayerScript_Caret_PositionChanged;
             TextboxLayerScriptConsoleSender.PreviewKeyDown -= TextboxLayerScriptConsoleSender_KeyDown;
             //make sure to reload base layer if curent layer is png
-            Layers.Current.class_format = "jpeg";
+            Layers.Current.TilesFormat = "jpeg";
         }
 
         System.Timers.Timer UpdateTimer;
@@ -1166,6 +1189,15 @@ namespace MapsInMyFolder
         private void TextboxSpecialOptionBackgroundColor_TextChanged(object sender, TextChangedEventArgs e)
         {
             Collectif.FilterDigitOnlyWhileWritingInTextBox((TextBox)sender, new List<char>() { 'A', 'a', 'B', 'b', 'C', 'c', 'D', 'd', 'E', 'e', 'F', 'f', '#' });
+        }
+        
+        private void TextboxSpecialOptioneditorPropertyNameWaitingBeforeStartAnotherTile_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            Collectif.FilterDigitOnlyWhileWritingInTextBox((TextBox)sender, limitLenght:true);
+        }
+        private void TextboxSpecialOptioneditorPropertyNameMaxDownloadTilesInParralele_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            Collectif.FilterDigitOnlyWhileWritingInTextBox((TextBox)sender, limitLenght:true);
         }
 
         private void DisableTextBoxRequestBringIntoView(object sender, RequestBringIntoViewEventArgs e)
@@ -1631,5 +1663,19 @@ namespace MapsInMyFolder
             }
         }
 
+        private void TextboxSpecialOptioneditorPropertyNameMaxDownloadTilesInParralele_LostFocus(object sender, RoutedEventArgs e)
+        {
+            if (TextboxSpecialOptioneditorPropertyNameMaxDownloadTilesInParralele.Text == "0")
+            {
+                TextboxSpecialOptioneditorPropertyNameMaxDownloadTilesInParralele.Text = string.Empty;
+            }
+        }
+        private void TextboxSpecialOptioneditorPropertyNameWaitingBeforeStartAnotherTile_LostFocus(object sender, RoutedEventArgs e)
+        {
+            if (TextboxSpecialOptioneditorPropertyNameWaitingBeforeStartAnotherTile.Text == "0")
+            {
+                TextboxSpecialOptioneditorPropertyNameWaitingBeforeStartAnotherTile.Text = string.Empty;
+            }
+        }
     }
 }

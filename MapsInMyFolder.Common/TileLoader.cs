@@ -126,7 +126,7 @@ namespace MapsInMyFolder.Commun
                 case "pbf":
                     const int TileSize = 1;
                     Layers Layer = Layers.GetLayerById(layerID);
-                    return await GetTilePBF(layerID, tilesUrl, save_temp_directory, (int)Math.Floor((double)(Layer.class_tiles_size ?? 0) * TileSize), TileSize, 0.5, pbfdisableadjacent).ConfigureAwait(false);
+                    return await GetTilePBF(layerID, tilesUrl, save_temp_directory, (int)Math.Floor((double)(Layer.TilesSize ?? 0) * TileSize), TileSize, 0.5, pbfdisableadjacent).ConfigureAwait(false);
 
                 default:
                     return await GetTile(layerID, tilesUrl).ConfigureAwait(false);
@@ -144,7 +144,7 @@ namespace MapsInMyFolder.Commun
 
             try
             {
-                styleValueOrUrlOrPath = layers?.class_style;
+                styleValueOrUrlOrPath = layers?.Style;
             }
             catch (Exception ex)
             {
@@ -160,7 +160,7 @@ namespace MapsInMyFolder.Commun
 
             if (IsUrlStyle(styleValueOrUrlOrPath))
             {
-                string path = GetStyleFilePath(layers.class_name, layers.class_identifier, styleValueOrUrlOrPath);
+                string path = GetStyleFilePath(layers.Name, layers.Identifier, styleValueOrUrlOrPath);
                 if (File.Exists(path))
                 {
                     return File.ReadAllText(path);

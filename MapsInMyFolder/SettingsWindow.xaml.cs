@@ -156,10 +156,10 @@ namespace MapsInMyFolder
             layer_startup_id.SelectedIndex = layer_startup_id.Items.Add(new NameHiddenIdValue(0, "Default"));
             foreach (Layers layer in Layers.GetLayersList())
             {
-                if (layer.class_id != -1 && string.Equals(layer.class_format, "JPEG", StringComparison.InvariantCultureIgnoreCase))
+                if (layer.Id != -1 && string.Equals(layer.TilesFormat, "JPEG", StringComparison.InvariantCultureIgnoreCase))
                 {
-                    int index = layer_startup_id.Items.Add(new NameHiddenIdValue(layer.class_id, layer.class_name));
-                    if (layer.class_id == Settings.layer_startup_id)
+                    int index = layer_startup_id.Items.Add(new NameHiddenIdValue(layer.Id, layer.Name));
+                    if (layer.Id == Settings.layer_startup_id)
                     {
                         layer_startup_id.SelectedIndex = index;
                     }

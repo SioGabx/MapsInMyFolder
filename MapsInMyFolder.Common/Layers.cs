@@ -1,61 +1,64 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace MapsInMyFolder.Commun
 {
     public class Layers
     {
-        public int class_id { get; set; }
-        public bool class_favorite { get; set; }
-        public string class_name { get; set; }
-        public string class_description { get; set; }
-        public string class_category { get; set; }
-        public string class_country { get; set; }
-        public string class_identifier { get; set; }
-        public string class_tile_url { get; set; }
-        public string class_site { get; set; }
-        public string class_site_url { get; set; }
-        public int? class_min_zoom { get; set; }
-        public int? class_max_zoom { get; set; }
-        public string class_format { get; set; }
-        public string class_style { get; set; }
-        public int? class_tiles_size { get; set; }
-        public string class_script { get; set; }
-        public string class_visibility { get; set; }
-        public SpecialsOptions class_specialsoptions { get; set; }
-        public string class_rectangles { get; set; }
-        public int class_version { get; set; }
-        public bool class_hasscale { get; set; }
+        public int Id { get; set; }
+        public bool IsFavorite { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public string Category { get; set; }
+        public string Country { get; set; }
+        public string Identifier { get; set; }
+        public string TileUrl { get; set; }
+        public string SiteName { get; set; }
+        public string SiteUrl { get; set; }
+        public int? MinZoom { get; set; }
+        public int? MaxZoom { get; set; }
+        public string TilesFormat { get; set; }
+        public bool TilesFormatHasTransparency = false;
+        public string Style { get; set; }
+        public int? TilesSize { get; set; }
+        public string Script { get; set; }
+        public string Visibility { get; set; }
+        public LayersSpecialsOptions SpecialsOptions { get; set; }
+        public string BoundaryRectangles { get; set; }
+        public int Version { get; set; }
+        public bool DoShowWarningLegacyVersionNewerThanEdited = false;
+        public bool IsAtScale { get; set; }
 
 
-        public Layers(int class_id, bool class_favorite, string class_name, string class_description, string class_category, string class_country, string class_identifier, string class_tile_url, string class_site, string class_site_url, int? class_min_zoom, int? class_max_zoom, string class_format, string class_style, int? class_tiles_size, string class_script, string class_visibility, SpecialsOptions class_specialsoptions, string class_rectangles, int class_version, bool class_hasscale)
+        public Layers(int Id, bool IsFavorite, string Name, string Description, string Category, string Country, string Identifier, string TileUrl, string SiteName, string SiteUrl, int? MinZoom, int? MaxZoom, string TilesFormat, string Style, int? TilesSize, string Script, string Visibility, LayersSpecialsOptions SpecialsOptions, string BoundaryRectangles, int Version, bool IsAtScale)
         {
-            this.class_id = class_id;
-            this.class_favorite = class_favorite;
-            this.class_name = class_name;
-            this.class_description = class_description;
-            this.class_category = class_category;
-            this.class_country = class_country;
-            this.class_identifier = class_identifier;
-            this.class_tile_url = class_tile_url;
-            this.class_site = class_site;
-            this.class_site_url = class_site_url;
-            this.class_min_zoom = class_min_zoom;
-            this.class_max_zoom = class_max_zoom;
-            this.class_format = class_format;
-            this.class_style = class_style;
-            this.class_tiles_size = class_tiles_size;
-            this.class_script = class_script;
-            this.class_visibility = class_visibility;
-            this.class_specialsoptions = class_specialsoptions;
-            this.class_rectangles = class_rectangles;
-            this.class_version = class_version;
-            this.class_hasscale = class_hasscale;
+            this.Id = Id;
+            this.IsFavorite = IsFavorite;
+            this.Name = Name;
+            this.Description = Description;
+            this.Category = Category;
+            this.Country = Country;
+            this.Identifier = Identifier;
+            this.TileUrl = TileUrl;
+            this.SiteName = SiteName;
+            this.SiteUrl = SiteUrl;
+            this.MinZoom = MinZoom;
+            this.MaxZoom = MaxZoom;
+            this.TilesFormat = TilesFormat;
+            this.Style = Style;
+            this.TilesSize = TilesSize;
+            this.Script = Script;
+            this.Visibility = Visibility;
+            this.SpecialsOptions = SpecialsOptions;
+            this.BoundaryRectangles = BoundaryRectangles;
+            this.Version = Version;
+            this.IsAtScale = IsAtScale;
         }
 
         public static Layers Current = Empty();
 
-        public class SpecialsOptions
+        public class LayersSpecialsOptions
         {
             private string _BackgroundColor;
             public string BackgroundColor
@@ -91,6 +94,31 @@ namespace MapsInMyFolder.Commun
                 }
             }
 
+            private int _MaxDownloadtilesInParralele;
+            public int MaxDownloadTilesInParralele
+            {
+                get
+                {
+                    return this._MaxDownloadtilesInParralele;
+                }
+                set
+                {
+                    this._MaxDownloadtilesInParralele = Math.Max(value, 0);
+                }
+            }
+            
+            private int _WaitingBeforeStartAnotherTile;
+            public int WaitingBeforeStartAnotherTile
+            {
+                get
+                {
+                    return this._WaitingBeforeStartAnotherTile;
+                }
+                set
+                {
+                    this._WaitingBeforeStartAnotherTile = value;
+                }
+            }
 
             public override string ToString()
             {
@@ -100,14 +128,14 @@ namespace MapsInMyFolder.Commun
 
         public static Layers Empty(int LayerId = -1)
         {
-            return new Layers(LayerId, false, "", "An error occurred while reading the data. \n Backup data provided by OpenStreetMap.", "", "", "", "http://tile.openstreetmap.org/{z}/{x}/{y}.png", "", "", null, null, "jpeg", "", 256, "function getTile(args){return args;}", "Visible", new SpecialsOptions(), "", 0, true);
+            return new Layers(LayerId, false, "", "An error occurred while reading the data. \n Backup data provided by OpenStreetMap.", "", "", "", "http://tile.openstreetmap.org/{z}/{x}/{y}.png", "", "", null, null, "jpeg", "", 256, "function getTile(args){return args;}", "Visible", new LayersSpecialsOptions(), "", 0, true);
         }
 
         public static class Convert
         {
             public static Layers CurentLayerToLayer()
             {
-                return GetLayerById(Current.class_id);
+                return GetLayerById(Current.Id);
             }
 
             public static void ToCurentLayer(Layers layer)

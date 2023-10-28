@@ -57,8 +57,8 @@ namespace MapsInMyFolder
 
         void Init()
         {
-            Init_download_panel();
-            Init_layer_panel();
+            InitDownloadPanel();
+            InitLayerPanel();
             isInitialised = true;
             Notification.UpdateNotification += UpdateNotification;
             layer_browser.ToolTipOpening += (o, e) => e.Handled = true;
@@ -232,7 +232,7 @@ namespace MapsInMyFolder
                 double.TryParse(SELatitudeTextBox.Text, out double SE_Lat) &&
                 double.TryParse(SELongitudeTextBox.Text, out double SE_Long))
                 {
-                    Javascript.Functions.SetSelection(NO_Lat, NO_Long, SE_Lat, SE_Long, true, Layers.Current.class_id);
+                    Javascript.Functions.SetSelection(NO_Lat, NO_Long, SE_Lat, SE_Long, true, Layers.Current.Id);
                 }
             }
         }
@@ -368,9 +368,9 @@ namespace MapsInMyFolder
             Commun.Map.CurentSelection.SE_Latitude = SE.Latitude;
             Commun.Map.CurentSelection.SE_Longitude = SE.Longitude;
 
-            if (Javascript.CheckIfFunctionExist(Layers.Current.class_id, Javascript.InvokeFunction.selectionChanged.ToString(), null))
+            if (Javascript.CheckIfFunctionExist(Layers.Current.Id, Javascript.InvokeFunction.selectionChanged.ToString(), null))
             {
-                string script = Layers.Current.class_script;
+                string script = Layers.Current.Script;
 
                 Dictionary<string, Dictionary<string, double>> selectionArguments = Javascript.Functions.GetSelection();
                 // Populate the original dictionary with some data
@@ -388,7 +388,7 @@ namespace MapsInMyFolder
                 }
                 try
                 {
-                    Javascript.ExecuteScript(script, new Dictionary<string, object>(arguments), Layers.Current.class_id, Javascript.InvokeFunction.selectionChanged);
+                    Javascript.ExecuteScript(script, new Dictionary<string, object>(arguments), Layers.Current.Id, Javascript.InvokeFunction.selectionChanged);
                 }
                 catch (Exception ex)
                 {

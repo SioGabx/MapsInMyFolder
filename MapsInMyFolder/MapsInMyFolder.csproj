@@ -83,20 +83,21 @@
 
   <ItemGroup>
     <PackageReference Include="AvalonEdit" Version="6.3.0.90" />
-    <PackageReference Include="BlackPearl.Controls.CoreLibrary" Version="2.1.1" />
-    <PackageReference Include="cef.redist.x64" Version="107.1.12" />
-    <PackageReference Include="CefSharp.Common" Version="107.1.120" />
-    <PackageReference Include="CefSharp.Common.NETCore" Version="107.1.120" />
-    <PackageReference Include="CefSharp.Wpf" Version="107.1.120" />
-    <PackageReference Include="CefSharp.Wpf.NETCore" Version="107.1.120" />
-    <PackageReference Include="Jint" Version="3.0.0-beta-2043" />
+    <PackageReference Include="BlackPearl.Controls.Library" Version="2.0.4" />
+    <PackageReference Include="cef.redist.x64" Version="117.2.4" />
+    <PackageReference Include="CefSharp.Common" Version="117.2.40" />
+    <PackageReference Include="CefSharp.Common.NETCore" Version="117.2.40" />
+    <PackageReference Include="CefSharp.Wpf" Version="117.2.40" />
+    <PackageReference Include="CefSharp.Wpf.NETCore" Version="117.2.40" />
+    <PackageReference Include="Esprima" Version="3.0.1" />
+    <PackageReference Include="Jint" Version="3.0.0-beta-2053" />
     <PackageReference Include="ModernWpfUis" Version="1.4.0" />
-    <PackageReference Include="NetVips" Version="2.3.0" />
-    <PackageReference Include="NetVips.Native" Version="8.14.2" />
-    <PackageReference Include="NetVips.Native.win-x64" Version="8.14.2" />
+    <PackageReference Include="NetVips" Version="2.3.1" />
+    <PackageReference Include="NetVips.Native" Version="8.14.5" />
+    <PackageReference Include="NetVips.Native.win-x64" Version="8.14.5" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="ProjNet" Version="2.0.0" />
-    <PackageReference Include="System.Data.SQLite" Version="1.0.117" />
+    <PackageReference Include="System.Data.SQLite" Version="1.0.118" />
     <PackageReference Include="wix" Version="3.11.2" />
   </ItemGroup>
 
@@ -108,6 +109,15 @@
     <ProjectReference Include="..\MapsInMyFolder.Common\MapsInMyFolder.Commun.csproj" />
     <ProjectReference Include="..\MapsInMyFolder.MapControl\MapControl\MapsInMyFolder.MapControl.csproj" />
     <ProjectReference Include="..\MapsInMyFolder.VectorTileRenderer\MapsInMyFolder.VectorTileRenderer.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="BlackPearl.Controls.Common">
+      <HintPath>..\..\BlackPearl\devs\BlackPearl-devs2-nilay-dragdrop\BlackPearl\Source\CoreLibrary\bin\Release\net461\BlackPearl.Controls.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="BlackPearl.Controls.CoreLibrary">
+      <HintPath>..\..\BlackPearl\devs\BlackPearl-devs2-nilay-dragdrop\BlackPearl\Source\CoreLibrary\bin\Release\net461\BlackPearl.Controls.CoreLibrary.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
   <ItemGroup>

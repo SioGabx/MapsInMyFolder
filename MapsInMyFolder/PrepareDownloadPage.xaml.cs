@@ -46,8 +46,8 @@ namespace MapsInMyFolder
             updateTimer.Elapsed += UpdateTimerElapsed_UpdateMigniatureParralele;
             updateTimer.AutoReset = false;
             updateTimer.Start();
-            int minimumZoom = Layers.Current.class_min_zoom ?? 0;
-            int maximumZoom = Layers.Current.class_max_zoom ?? 0;
+            int minimumZoom = Layers.Current.MinZoom ?? 0;
+            int maximumZoom = Layers.Current.MaxZoom ?? 0;
             ZoomSlider.Value = Math.Min(Math.Max(ZoomSlider.Value, minimumZoom), maximumZoom);
 
 
@@ -68,7 +68,7 @@ namespace MapsInMyFolder
         }
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            SolidColorBrush brush = Collectif.HexValueToSolidColorBrush(Layers.Current.class_specialsoptions.BackgroundColor);
+            SolidColorBrush brush = Collectif.HexValueToSolidColorBrush(Layers.Current.SpecialsOptions.BackgroundColor);
             StackPanel_ImageTilePreview_0.Background = brush;
             StackPanel_ImageTilePreview_1.Background = brush;
             StackPanel_ImageTilePreview_2.Background = brush;
@@ -93,7 +93,7 @@ namespace MapsInMyFolder
             lastRequestZoom = -1;
             UpdateMigniatureParralele();
             GetCenterViewCityName();
-            Label_SliderMinMax.Content = Languages.GetWithArguments("preparePropertyZoomLevelMinMax", Layers.Current.class_min_zoom, Layers.Current.class_max_zoom);
+            Label_SliderMinMax.Content = Languages.GetWithArguments("preparePropertyZoomLevelMinMax", Layers.Current.MinZoom, Layers.Current.MaxZoom);
             ZoomSlider.Value = Math.Round(MainWindow.Instance.MainPage.mapviewer.ZoomLevel);
             TextBox_quality_number.Text = "100";
             const int largeur = 128;
@@ -106,8 +106,8 @@ namespace MapsInMyFolder
             ImageTilePreview_0_2.Source = emptyImage;
             ImageTilePreview_1_2.Source = emptyImage;
             StartDownloadButton.Focus();
-            ZoomSlider.Maximum = Math.Max(21, Layers.Current.class_max_zoom ?? 21);
-            if (Layers.Current.class_hasscale)
+            ZoomSlider.Maximum = Math.Max(21, Layers.Current.MaxZoom ?? 21);
+            if (Layers.Current.IsAtScale)
             {
                 TextBox_Scale.Visibility = Visibility.Visible;
                 TextBox_NoScale.Visibility = Visibility.Collapsed;
@@ -137,7 +137,7 @@ namespace MapsInMyFolder
 
             ImageIsLoading.BeginAnimation(OpacityProperty, Collectif.GetOpacityAnimation(1, 0.2));
             lastRequestZoom = ZoomSlider.Value;
-            int layerID = Layers.Current.class_id;
+            int layerID = Layers.Current.Id;
 
             if (MainPage.MapSelectable is null)
             {
@@ -150,7 +150,7 @@ namespace MapsInMyFolder
             var locaMillieux = Collectif.GetCenterBetweenTwoPoints(noPinLocation, sePinLocation);
 
             int zoom = Convert.ToInt32(ZoomSlider.Value);
-            int maximumZoom = Layers.Current.class_max_zoom ?? 0;
+            int maximumZoom = Layers.Current.MaxZoom ?? 0;
 
             if (zoom > maximumZoom)
             {
@@ -178,7 +178,7 @@ namespace MapsInMyFolder
                     {
                         for (int index_y = 0; index_y < 2; index_y++)
                         {
-                            string urlbase = Collectif.GetUrl.FromTileXYZ(Layers.Current.class_tile_url, tileX + index_x, tileY + index_y, zoom, layerID, Javascript.InvokeFunction.getTile);
+                            string urlbase = Collectif.GetUrl.FromTileXYZ(Layers.Current.TileUrl, tileX + index_x, tileY + index_y, zoom, layerID, Javascript.InvokeFunction.getTile);
                             listOfUrls.Add((urlbase, index_x, index_y));
                         }
                     }
@@ -190,7 +190,7 @@ namespace MapsInMyFolder
                             return;
                         }
 
-                        HttpResponse httpResponse = Tiles.Loader.GetImageAsync(url.url, tileX + url.index_x, tileY + url.index_y, zoom, layerID,Layers.Current.class_format, pbfdisableadjacent: true).Result;
+                        HttpResponse httpResponse = Tiles.Loader.GetImageAsync(url.url, tileX + url.index_x, tileY + url.index_y, zoom, layerID,Layers.Current.TilesFormat, pbfdisableadjacent: true).Result;
 
                         if (updateMigniatureParraleleToken.IsCancellationRequested && updateMigniatureParraleleToken.CanBeCanceled)
                         {
@@ -224,13 +224,13 @@ namespace MapsInMyFolder
                     qualityInt = 1;
                 }
 
-                string format = Layers.Current.class_format;
+                string format = Layers.Current.TilesFormat;
                 if (format != "png")
                 {
                     format = "jpeg";
                 }
 
-                NetVips.VOption saveVOption = Collectif.GetSaveVOption(format, qualityInt, Layers.Current.class_tiles_size);
+                NetVips.VOption saveVOption = Collectif.GetSaveVOption(format, qualityInt, Layers.Current.TilesSize);
 
                 BitmapSource ApplyEffectOnImageFromBuffer(byte[] imgArray)
                 {
@@ -439,17 +439,17 @@ namespace MapsInMyFolder
 
             void Update_Label_TileSize()
             {
-                Label_LargeurTuile.Content = Layers.Current.class_tiles_size;
+                Label_LargeurTuile.Content = Layers.Current.TilesSize;
             }
 
             void Update_Label_LayerName()
             {
-                Label_NomCalque.Content = Layers.Current.class_name;
+                Label_NomCalque.Content = Layers.Current.Name;
             }
 
             void Update_Label_TileSource()
             {
-                Label_Source.Content = Layers.Current.class_site_url;
+                Label_Source.Content = Layers.Current.SiteUrl;
             }
 
             void Update_Label_NbrTiles()
@@ -572,7 +572,7 @@ namespace MapsInMyFolder
             const double InchPerMeters = 0.0254;
             const double EarthEquatorialRadiusInMeters = 6378137;
 
-            double metterPerPx = EarthEquatorialRadiusInMeters * 2 * Math.PI / (double)Layers.Current.class_tiles_size;
+            double metterPerPx = EarthEquatorialRadiusInMeters * 2 * Math.PI / (double)Layers.Current.TilesSize;
             double latitude = GetSelectionCenterLocation().Latitude;
             double zoom = ZoomSlider.Value;
             double latitudeCos = Math.Cos(latitude * Math.PI / 180);
@@ -601,7 +601,7 @@ namespace MapsInMyFolder
             var redimSize = GetSizeAfterRedim();
             var optimalScale = ScaleInfo.SearchOptimalScale(distanceInMeterPerPixels, redimSize.Width);
 
-            bool checkBoxAddScaleToImageEnable = IsEnoughPlaceForScale(redimSize.Width, redimSize.Height, optimalScale.Scale) && Layers.Current.class_hasscale;
+            bool checkBoxAddScaleToImageEnable = IsEnoughPlaceForScale(redimSize.Width, redimSize.Height, optimalScale.Scale) && Layers.Current.IsAtScale;
             CheckBoxAddScaleToImage.IsEnabled = checkBoxAddScaleToImageEnable;
 
             if (checkBoxAddScaleToImageEnable)
@@ -610,7 +610,7 @@ namespace MapsInMyFolder
             }
             else
             {
-                if (Layers.Current.class_hasscale)
+                if (Layers.Current.IsAtScale)
                 {
                     CheckBoxAddScaleToImage.Content = Languages.Current["preparePropertyNameAddScaleBar"] + " " + Languages.Current["preparePropertyNameAddScaleBarErrorsTooSmall"];
                 }
@@ -669,7 +669,7 @@ namespace MapsInMyFolder
             double SE_PIN_Latitude = SelectionLocation.SE.Latitude;
             double SE_PIN_Longitude = SelectionLocation.SE.Longitude;
             int Zoom = Convert.ToInt16(Math.Floor(ZoomSlider.Value));
-            return RognageInfo.GetRognageValue(NO_PIN_Latitude, NO_PIN_Longitude, SE_PIN_Latitude, SE_PIN_Longitude, Zoom, Layers.Current.class_tiles_size);
+            return RognageInfo.GetRognageValue(NO_PIN_Latitude, NO_PIN_Longitude, SE_PIN_Latitude, SE_PIN_Longitude, Zoom, Layers.Current.TilesSize);
         }
         (int width, int height) GetResizedImageSize()
         {
@@ -1061,15 +1061,15 @@ namespace MapsInMyFolder
                 return filter1 + "|" + filter2;
             }
 
-            if (string.Equals(Layers.Current.class_format, "png", StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(Layers.Current.TilesFormat, "png", StringComparison.OrdinalIgnoreCase))
             {
                 filter = pngFilter;
             }
-            else if (string.Equals(Layers.Current.class_format, "jpeg", StringComparison.OrdinalIgnoreCase))
+            else if (string.Equals(Layers.Current.TilesFormat, "jpeg", StringComparison.OrdinalIgnoreCase))
             {
                 filter = jpgFilter;
             }
-            else if (string.Equals(Layers.Current.class_format, "pbf", StringComparison.OrdinalIgnoreCase))
+            else if (string.Equals(Layers.Current.TilesFormat, "pbf", StringComparison.OrdinalIgnoreCase))
             {
                 filter = filterConcat(jpgFilter, pngFilter);
             }
@@ -1138,7 +1138,7 @@ namespace MapsInMyFolder
             var drawScaleInfo = ScaleInfo.SearchOptimalScale(distanceInMeterPerPixels, resizeWidth);
             bool drawScale = (CheckBoxAddScaleToImage.IsChecked ?? false) &&
                              IsEnoughPlaceForScale(resizeWidth, resizeHeight, drawScaleInfo.Scale) &&
-                             Layers.Current.class_hasscale;
+                             Layers.Current.IsAtScale;
 
             ScaleInfo scaleInfo = new ScaleInfo(initialScale, targetScale, distanceInMeterPerPixels, drawScale, drawScaleInfo.Scale, drawScaleInfo.PixelLenght);
 
