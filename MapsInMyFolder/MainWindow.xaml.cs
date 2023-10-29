@@ -227,7 +227,7 @@ namespace MapsInMyFolder
 
         private void Window_ContentRendered(object sender, EventArgs e)
         {
-            MainPage.SetCurrentLayer(Settings.layer_startup_id);
+            MainPage.SetCurrentLayer(Layers.StartupLayerId);
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)

@@ -12,8 +12,8 @@ namespace MapsInMyFolder.Commun
         public string EnglishName { get; set; }
         public static IEnumerable<Country> GetList()
         {
-			//TODO : https://learn.microsoft.com/en-us/dotnet/api/system.globalization.cultureinfo.twoletterisolanguagename?view=net-7.0
-			//https://yammadev.github.io/flag-icons/
+            //TODO : https://learn.microsoft.com/en-us/dotnet/api/system.globalization.cultureinfo.twoletterisolanguagename?view=net-7.0
+            //https://yammadev.github.io/flag-icons/
             List<Country> CountryList = new List<Country>();
             foreach (var ci in CultureInfo.GetCultures(CultureTypes.AllCultures))
             {

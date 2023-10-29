@@ -178,5 +178,9 @@ namespace MapsInMyFolder.Commun
         {
             XMLParser.Settings.Write(fieldName, fieldValue.ToString());
         }
+        public static object GetIndividualSettings(string fieldName)
+        {
+            return XMLParser.Settings.Read(fieldName);
+        }
     }
 }

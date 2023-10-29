@@ -31,7 +31,7 @@ namespace MapsInMyFolder
             MapFigures = new MapFigures();
             InitializeComponent();
             IsInDebugModeSwitch.IsChecked = IsInDebugModeArchive;
-            LayerId = Settings.layer_startup_id;
+            LayerId = Layers.StartupLayerId;
         }
 
         private static MapFigures MapFigures { get; set; }
@@ -460,7 +460,7 @@ namespace MapsInMyFolder
             {
                 if (BackgroundSwitch?.IsChecked == true)
                 {
-                    Layers Layer = Layers.GetLayerById(Settings.layer_startup_id) ?? Layers.Empty();
+                    Layers Layer = Layers.GetLayerById(Layers.StartupLayerId) ?? Layers.Empty();
                     basemap = new MapTileLayer
                     {
                         TileSource = new TileSource { UriFormat = Layer.TileUrl, LayerID = Layer.Id },
@@ -795,7 +795,7 @@ namespace MapsInMyFolder
             {
                 int CustomLayersMaxID = Database.ExecuteScalarSQLCommand("SELECT MAX(ID) FROM 'main'.'CUSTOMSLAYERS'");
                 int EditedLayersMaxID = Database.ExecuteScalarSQLCommand("SELECT MAX(ID) FROM 'main'.'EDITEDLAYERS'");
-                int ID = 1000000 + Math.Max(CustomLayersMaxID, EditedLayersMaxID) + 1;
+                int ID = Math.Max(1000000, Math.Max(CustomLayersMaxID, EditedLayersMaxID)) + 1;
                 Database.ExecuteNonQuerySQLCommand("INSERT INTO 'main'.'CUSTOMSLAYERS'('ID','NAME', 'DESCRIPTION', 'CATEGORY', 'COUNTRY', 'IDENTIFIER', 'TILE_URL', 'MIN_ZOOM', 'MAX_ZOOM', 'FORMAT', 'SITE', 'SITE_URL', 'STYLE', 'TILE_SIZE', 'FAVORITE', 'SCRIPT', 'VISIBILITY', 'SPECIALSOPTIONS', 'RECTANGLES', 'VERSION', 'HAS_SCALE') " +
                 $"VALUES({ID}, {NAME}, {DESCRIPTION}, {CATEGORY},{COUNTRY}, {IDENTIFIER}, {TILE_URL}, {MIN_ZOOM}, {MAX_ZOOM}, {FORMAT}, {SITE}, {SITE_URL}, {STYLE},{TILE_SIZE}, {0} , {SCRIPT},  '{Visibility.Visible}',  {SPECIALSOPTIONS}, {RECTANGLES}, {1}, {HAS_SCALE})");
                 return ID;

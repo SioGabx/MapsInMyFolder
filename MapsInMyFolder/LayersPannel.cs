@@ -84,16 +84,23 @@ namespace MapsInMyFolder
         {
             if (!e.IsLoading)
             {
-                int LayerId = Layers.Current.Id;
-                string scroll = ", true";
-                if (LayerId == -1)
-                {
-                    LayerId = Settings.layer_startup_id;
-                    scroll = "";
-                }
-                layer_browser.GetMainFrame().EvaluateScriptAsync($"selectionner_calque_by_id({LayerId}{scroll})");
+                layer_browser.GetMainFrame().EvaluateScriptAsync(LayerGetDefaultSelectByIdScript());
             }
         }
+
+        public static string LayerGetDefaultSelectByIdScript()
+        {
+            int LayerId = Layers.Current.Id;
+            string scroll = ", true";
+            if (LayerId == -1)
+            {
+                LayerId = Layers.StartupLayerId;
+                scroll = "";
+            }
+            return $"lastelement = document.getElementById({LayerId}); selectionner_calque_by_id({LayerId}{scroll})";
+        }
+
+
 
         public static List<Layers> LayerReadInDatabase(string query_command)
         {
@@ -278,7 +285,7 @@ namespace MapsInMyFolder
                 {
                     legacyLayerWithReplacements.Category = "";
                 }
-
+                legacyLayerWithReplacements.Country = legacyLayerWithReplacements.Country?.Replace("*", "World");
                 List<string> listOfAllFormatsAcceptedWithTransparency = new List<string> { "png" };
                 if (!string.IsNullOrWhiteSpace(legacyLayerWithReplacements.TilesFormat) && listOfAllFormatsAcceptedWithTransparency.Contains(legacyLayerWithReplacements.TilesFormat))
                 {
@@ -319,12 +326,22 @@ namespace MapsInMyFolder
             generated_layers.AppendLine("\">");
 
             List<Layers> layersRejectedAtFirstIteration = new List<Layers>();
+            string[] layersSpecificsCountryToKeep = Settings.filter_layers_based_on_country.Split(';', StringSplitOptions.RemoveEmptyEntries);
             for (int iterationOfLayerTreatments = 0; iterationOfLayerTreatments <= 1; iterationOfLayerTreatments++)
             {
                 bool isFirstIterationDoRejectLayer = iterationOfLayerTreatments == 0;
-                string[] layersSpecificsCountryToKeep = Settings.filter_layers_based_on_country.Split(';', StringSplitOptions.RemoveEmptyEntries);
+                IEnumerable<Layers> EnumerableLayers;
 
-                foreach (Layers layer in Layers.GetLayersList())
+                if (isFirstIterationDoRejectLayer)
+                {
+                    EnumerableLayers = Layers.GetLayersList();
+                }
+                else
+                {
+                    EnumerableLayers = layersRejectedAtFirstIteration;
+                }
+
+                foreach (Layers layer in EnumerableLayers)
                 {
                     if (isFirstIterationDoRejectLayer && Settings.layerpanel_put_non_letter_layername_at_the_end)
                     {
@@ -357,6 +374,13 @@ namespace MapsInMyFolder
                         {
                             LayerShouldBeCountryFiltered = false;
                         }
+                    }
+
+                    bool ShowCountry = true;
+                    string CountryHTML = string.Empty;
+                    if (ShowCountry)
+                    {
+                        CountryHTML = " - " + layer.Country;
                     }
 
                     string layerVisibilityHTML;
@@ -414,7 +438,7 @@ namespace MapsInMyFolder
                         <div class=""layer_content"" data-layer=""{layer.Identifier}"" title=""{Collectif.HTMLEntities(layer.Description)}"">
                             <div class=""layer_texte"">
                                 <p class=""display_name"">{Collectif.HTMLEntities(layer.Name)}</p>
-                                <p class=""zoom"">[{layer.MinZoom}-{layer.MaxZoom}] - {layer.SiteName}</p>
+                                <p class=""zoom"">[{layer.MinZoom}-{layer.MaxZoom}]{CountryHTML} - {layer.SiteName}</p>
                                 <p class=""layer_website{supplement_class}"">{layer.SiteName}</p>
                                 <p class=""layer_category{supplement_class}"">{layer.Category}</p>
                             </div>
@@ -428,6 +452,7 @@ namespace MapsInMyFolder
             }
 
             generated_layers.AppendLine("</ul>");
+            generated_layers.AppendLine($"<script>{LayerGetDefaultSelectByIdScript()}</script>");
             string resource_data = Collectif.ReadResourceString("HTML/layer_panel.html");
             resource_data = Languages.ReplaceInString(resource_data);
             return resource_data.Replace("<!--htmllayerplaceholder-->", generated_layers.ToString());
@@ -438,28 +463,35 @@ namespace MapsInMyFolder
             SetCurrentLayer(Layers.Current.Id);
         }
 
+
+
         public void SetCurrentLayer(int id)
         {
-            int layer_startup_id = Settings.layer_startup_id;
+
             bool lastLayerHasTransparency = Layers.Current.TilesFormatHasTransparency;
-
-
-            Layers layer = Layers.GetLayerById(id);
-
             if (Layers.Count() == 0)
             {
                 Layers.Add(0, Layers.Empty(0));
             }
 
-            if (layer is null || layer_startup_id == 0)
+            if (Layers.StartupLayerId == 0)
+            {
+                IEnumerable<Layers> AllLayers = Layers.GetLayersList();
+                Layers SelectedDefaultLayer = AllLayers.FirstOrDefault(layer =>
+                {
+                    bool isJpeg = layer.TilesFormat == "jpeg" || layer.TilesFormat == "jpg";
+                    bool hasUrl = !string.IsNullOrWhiteSpace(layer.TileUrl);
+                    return isJpeg && hasUrl;
+                }, AllLayers.First());
+                Layers.StartupLayerId = SelectedDefaultLayer.Id;
+            }
+            Layers layer = Layers.GetLayerById(id) ?? Layers.GetLayerById(Layers.StartupLayerId);
+
+            if (layer is null)
             {
                 layer = Layers.GetLayersList().First();
-                Settings.layer_startup_id = layer.Id;
-                if (layer_startup_id == 0)
-                {
-                    layer_startup_id = layer.Id;
-                }
             }
+
 
             if (layer is not null)
             {
@@ -478,26 +510,19 @@ namespace MapsInMyFolder
 
                         if (layer.Identifier is not null)
                         {
-                            try
+                            Layers StartupLayer = Layers.GetLayerById(Layers.StartupLayerId);
+                            if (StartupLayer != null)
                             {
-                                Layers StartupLayer = Layers.GetLayerById(layer_startup_id);
-                                if (StartupLayer != null)
+                                UIElement basemap = new MapTileLayer
                                 {
-                                    UIElement basemap = new MapTileLayer
-                                    {
-                                        TileSource = new TileSource { UriFormat = StartupLayer?.TileUrl, LayerID = layer_startup_id },
-                                        SourceName = StartupLayer.Identifier + new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds(),
-                                        MaxZoomLevel = StartupLayer.MaxZoom ?? 0,
-                                        MinZoomLevel = StartupLayer.MinZoom ?? 0,
-                                        Description = "",
-                                        Opacity = Settings.background_layer_opacity
-                                    };
-                                    mapviewer.MapLayer = basemap;
-                                }
-                            }
-                            catch (Exception ex)
-                            {
-                                Debug.WriteLine("Erreur changement de calque : " + ex.Message);
+                                    TileSource = new TileSource { UriFormat = StartupLayer?.TileUrl, LayerID = Layers.StartupLayerId },
+                                    SourceName = StartupLayer.Identifier + new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds(),
+                                    MaxZoomLevel = StartupLayer.MaxZoom ?? 0,
+                                    MinZoomLevel = StartupLayer.MinZoom ?? 0,
+                                    Description = "",
+                                    Opacity = Settings.background_layer_opacity
+                                };
+                                mapviewer.MapLayer = basemap;
                             }
                         }
                     }
@@ -730,7 +755,7 @@ namespace MapsInMyFolder
 
             try
             {
-                int layer_startup_id = Settings.layer_startup_id;
+                int layer_startup_id = Layers.StartupLayerId;
                 Layers backgroundLayer = Layers.GetLayerById(layer_startup_id);
 
                 int min_zoom = layer.MinZoom ?? 0;
@@ -814,11 +839,12 @@ namespace MapsInMyFolder
                 {
                     return HttpUtility.UrlEncode(url);
                 }
+
                 bool UseReferrerForPreviews = true;
 
                 string previewReferrer = Collectif.AddHttpToUrl(layer?.SiteUrl);
                 string previewBackgroundReferrer = Collectif.AddHttpToUrl(backgroundLayer?.SiteUrl);
-                
+
                 if (UseReferrerForPreviews)
                 {
                     if (!string.IsNullOrWhiteSpace(previewReferrer))

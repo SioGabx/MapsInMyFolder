@@ -45,9 +45,8 @@ namespace MapsInMyFolder
             // Vous pouvez utiliser la classe HttpUtility.ParseQueryString pour analyser les paramètres
             var queryParams = HttpUtility.ParseQueryString(query);
 
-
-            string argsUrl = HttpUtility.UrlDecode(queryParams["url"]);
-            string argsReferrer = HttpUtility.UrlDecode(queryParams["referrer"]);
+            string argsUrl = queryParams["url"];
+            string argsReferrer = queryParams["referrer"];
 
             request.SetReferrer(argsReferrer, ReferrerPolicy.Origin);
             request.Url = argsUrl;

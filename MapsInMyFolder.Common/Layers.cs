@@ -57,6 +57,7 @@ namespace MapsInMyFolder.Commun
         }
 
         public static Layers Current = Empty();
+        public static int StartupLayerId = Settings.layer_startup_id;
 
         public class LayersSpecialsOptions
         {

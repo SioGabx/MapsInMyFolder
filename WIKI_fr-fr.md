@@ -51,3 +51,61 @@ Le serveur du fournisseur de tuiles reçoit la demande, génère les tuiles corr
 
 * **Assemblage des tuiles :** 
 Une fois les tuiles récupérées, l'application les assemble pour former la carte complète séléctionnée ou sont agencées de manière à créer une vue continue de la carte.
+
+
+
+
+
+
+## Obtenir MapsInMyFolder
+Pour obtenir MapsInMyFolder, suivez ces étapes simples :
+
+1. Rendez-vous sur la page des releases de MapsInMyFolder à cette adresse : https://github.com/SioGabx/MapsInMyFolder/releases/latest/.
+
+2. Sur la page des releases, vous trouverez la dernière version de MapsInMyFolder. Téléchargez le fichier MSI en cliquant sur le lien de téléchargement correspondant.
+
+3. Une fois le fichier MSI téléchargé, localisez-le dans votre dossier de téléchargement ou le dossier que vous avez spécifié.
+
+4. Double-cliquez sur le fichier MSI pour lancer l'assistant d'installation.
+
+## Avertissements de Windows Defender et Windows UAC
+### Windows Defender
+Lorsque vous téléchargez et exécutez le fichier d'installation de MapsInMyFolder, il est possible que Windows Defender, l'antivirus intégré de Windows, affiche un avertissement. Cela est courant avec des fichiers exécutables non signés numériquement. Les fichiers MapsInMyFolder ne sont pas signés numériquement en raison des coûts et des formalités liés à la signature de code. Si vous ne faites pas confiance à l'exécutable disponible sur GitHub, vous avez également la possibilité de compiler le code à partir des sources.
+
+Pour continuer l'installation en toute sécurité, suivez ces étapes :
+
+1. Si Windows Defender affiche un avertissement, cliquez sur "Informations complémentaires" pour afficher davantage de détails.
+
+2. Vous verrez une option intitulée "Exécuter quand même". Cliquez sur cette option pour autoriser l'installation de MapsInMyFolder.
+
+3. L'installation se poursuivra normalement.
+
+### Windows UAC (Contrôle de compte d'utilisateur)
+Lorsque vous lancez l'assistant d'installation de MapsInMyFolder, Windows peut également afficher un avertissement pour demander une confirmation en raison des modifications apportées à votre appareil. Suivez ces étapes pour continuer en toute sécurité :
+
+1. Vous verrez une boîte de dialogue Windows UAC demandant "Voulez-vous autoriser cette application à apporter des modifications à votre appareil ?" Cliquez sur "Oui" pour continuer.
+
+2. L'installation se poursuivra normalement.
+
+Ces avertissements sont des mesures de sécurité standard pour garantir que vous êtes conscient des modifications apportées à votre système. MapsInMyFolder est un logiciel sûr, mais il est important de toujours être prudent lors de l'installation de tout logiciel.
+
+Félicitations ! Vous avez maintenant installé MapsInMyFolder. Si vous rencontrez des problèmes d'installation ou avez des questions, vous pouvez créer une issue sur GitHub en cliquant ici : https://github.com/SioGabx/MapsInMyFolder/issues/new 
+
+
+## Utilisation
+
+### Première utilisation
+Au premier démarage de MapsInMyFolder, le logiciel cherchera une base de donnée. En cas d'absence, MapsInMyFolder vous proposera plusieurs choix : de crée une base de donnée vide (sans aucun calques) ou de telecharger une base de donnée complete téléchargeable sur ce dépot Github
+
+### 
+
+
+
+
+
+
+
+
+
+
+
