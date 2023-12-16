@@ -35,6 +35,7 @@
     <DisabledWarnings>CS8002</DisabledWarnings>
     <AnalysisLevel>6.0</AnalysisLevel>
     <PackageProjectUrl>https://github.com/SioGabx/MapsInMyFolder</PackageProjectUrl>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -84,17 +85,17 @@
   <ItemGroup>
     <PackageReference Include="AvalonEdit" Version="6.3.0.90" />
     <PackageReference Include="BlackPearl.Controls.Library" Version="2.0.4" />
-    <PackageReference Include="cef.redist.x64" Version="117.2.4" />
-    <PackageReference Include="CefSharp.Common" Version="117.2.40" />
-    <PackageReference Include="CefSharp.Common.NETCore" Version="117.2.40" />
-    <PackageReference Include="CefSharp.Wpf" Version="117.2.40" />
-    <PackageReference Include="CefSharp.Wpf.NETCore" Version="117.2.40" />
+    <PackageReference Include="cef.redist.x64" Version="119.4.3" />
+    <PackageReference Include="CefSharp.Common" Version="119.4.30" />
+    <PackageReference Include="CefSharp.Common.NETCore" Version="119.4.30" />
+    <PackageReference Include="CefSharp.Wpf" Version="119.4.30" />
+    <PackageReference Include="CefSharp.Wpf.NETCore" Version="119.4.30" />
     <PackageReference Include="Esprima" Version="3.0.1" />
     <PackageReference Include="Jint" Version="3.0.0-beta-2053" />
     <PackageReference Include="ModernWpfUis" Version="1.4.0" />
-    <PackageReference Include="NetVips" Version="2.3.1" />
-    <PackageReference Include="NetVips.Native" Version="8.14.5" />
-    <PackageReference Include="NetVips.Native.win-x64" Version="8.14.5" />
+    <PackageReference Include="NetVips" Version="2.4.0" />
+    <PackageReference Include="NetVips.Native" Version="8.15.0" />
+    <PackageReference Include="NetVips.Native.win-x64" Version="8.15.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="ProjNet" Version="2.0.0" />
     <PackageReference Include="System.Data.SQLite" Version="1.0.118" />

@@ -1,12 +1,8 @@
-﻿using MapsInMyFolder.VectorTileRenderer;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Data.Common;
-using System.Data.Entity.Core.Common.CommandTrees.ExpressionBuilder;
 using System.IO;
 using System.Net;
 using System.Net.Http;
-using System.Security.Policy;
 using System.Threading.Tasks;
 
 namespace MapsInMyFolder.Commun

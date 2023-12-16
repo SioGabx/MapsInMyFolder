@@ -38,7 +38,8 @@
     <SignAssembly>false</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>MapsInMyFolder.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
@@ -116,8 +117,8 @@
       <HintPath>..\packages\ModernWpfUis.1.4.0\lib\net462\ModernWpf.Controls.dll</HintPath>
     </Reference>
     <Reference Include="netstandard" />
-    <Reference Include="NetVips, Version=2.3.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\NetVips.2.3.1\lib\net452\NetVips.dll</HintPath>
+    <Reference Include="NetVips, Version=2.4.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\NetVips.2.4.0\lib\net452\NetVips.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -219,7 +220,6 @@
     </None>
     <Compile Include="ApiKey.Override.cs" Condition="Exists('ApiKey.Override.cs')" />
     <None Include="app.config" />
-    <None Include="MapsInMyFolder.snk" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

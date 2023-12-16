@@ -148,7 +148,8 @@ namespace MapsInMyFolder.Commun
             {
                 ApplyUpdate();
             }
-            else {
+            else
+            {
                 NText UpdateDownloadedNotification = new NText(Languages.Current["updateNotificationStartUpdateProcess"], "MapsInMyFolder", "MainPage", ApplyUpdate, true);
                 UpdateDownloadedNotification.Register();
             }
@@ -157,7 +158,7 @@ namespace MapsInMyFolder.Commun
         public static void ApplyUpdate()
         {
             NText UpdateNotification = new NText(Languages.Current["updateNotificationStartInstalling"], "MapsInMyFolder", "MainPage", null, true);
-            UpdateNotification.Register(); 
+            UpdateNotification.Register();
 
             string UpdateFilePath = System.IO.Path.Combine(Settings.temp_folder, UpdateFileAsset.Id + UpdateFileAsset.Name);
             Collectif.StartApplication(UpdateFilePath, TimeSpan.FromSeconds(3));

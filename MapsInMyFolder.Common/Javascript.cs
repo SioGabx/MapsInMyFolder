@@ -121,7 +121,8 @@ namespace MapsInMyFolder.Commun
                 JavascriptActionEvent?.Invoke(LayerId, JavascriptAction.refreshMap);
                 return null;
             }));
-            engine.SetValue("clearCache", (Func<object>)(() => {
+            engine.SetValue("clearCache", (Func<object>)(() =>
+            {
                 JavascriptActionEvent?.Invoke(LayerId, JavascriptAction.clearCache);
                 return null;
             }));
@@ -169,7 +170,7 @@ namespace MapsInMyFolder.Commun
             stringBuilder.AppendLine(" - transformLocation(OriginWkt, TargetWkt, projX, projY) : Convertir la position X, Y d'un système de coordonnées vers un autre système (utilise Well Known Text definition)");
             stringBuilder.AppendLine(" - transformLocationFromWGS84(TargetWkt, Latitude, Longitude) : Convertir les coordonnées vers un autre système de coordonnées (utilise Well Known Text definition)");
 
-           return stringBuilder.ToString();
+            return stringBuilder.ToString();
         }
 
 

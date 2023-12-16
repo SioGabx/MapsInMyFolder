@@ -1,5 +1,4 @@
-﻿using Jint.Runtime;
-using MapsInMyFolder.Commun;
+﻿using MapsInMyFolder.Commun;
 using MapsInMyFolder.MapControl;
 using System;
 using System.Collections.Generic;
@@ -8,7 +7,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media.Animation;
-using static MapsInMyFolder.Commun.Collectif.GetUrl;
 using TextBox = System.Windows.Controls.TextBox;
 
 namespace MapsInMyFolder
@@ -147,7 +145,7 @@ namespace MapsInMyFolder
             {
                 Content = "→ " + Languages.Current["mapSpecifySelectionCoordinatesCopy"],
                 Foreground = Collectif.HexValueToSolidColorBrush("888989"),
-                Margin = new Thickness(0,20,0,0)
+                Margin = new Thickness(0, 20, 0, 0)
             };
             CopyLabel.MouseLeftButtonUp += CopyLabel_MouseLeftButtonUp;
             CopyLabel.Unloaded += CopyLabel_Unloaded;

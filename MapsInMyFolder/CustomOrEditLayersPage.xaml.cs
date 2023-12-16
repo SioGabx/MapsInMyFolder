@@ -313,7 +313,7 @@ namespace MapsInMyFolder
             {
                 TextBoxSetValueAndLock(TextboxSpecialOptioneditorPropertyNameWaitingBeforeStartAnotherTile, WaitingBeforeStartAnotherTile.ToString());
             }
-            
+
             TextBoxSetValueAndLock(TextboxSpecialOptionBackgroundColor, LayerInEditMode.SpecialsOptions.BackgroundColor?.TrimEnd('#'));
             TextBoxSetValueAndLock(TextboxLayerStyle, LayerInEditMode.Style);
 
@@ -624,7 +624,6 @@ namespace MapsInMyFolder
             if (InputBox.textBox.Text.Trim() != UpdateSQLCommand.Trim() && result == ContentDialogResult.Primary)
             {
                 Debug.WriteLine("Executing");
-                LayerId = SaveLayer();
                 LayerId = SaveLayer();
                 try
                 {
@@ -1190,14 +1189,14 @@ namespace MapsInMyFolder
         {
             Collectif.FilterDigitOnlyWhileWritingInTextBox((TextBox)sender, new List<char>() { 'A', 'a', 'B', 'b', 'C', 'c', 'D', 'd', 'E', 'e', 'F', 'f', '#' });
         }
-        
+
         private void TextboxSpecialOptioneditorPropertyNameWaitingBeforeStartAnotherTile_TextChanged(object sender, TextChangedEventArgs e)
         {
-            Collectif.FilterDigitOnlyWhileWritingInTextBox((TextBox)sender, limitLenght:true);
+            Collectif.FilterDigitOnlyWhileWritingInTextBox((TextBox)sender, limitLenght: true);
         }
         private void TextboxSpecialOptioneditorPropertyNameMaxDownloadTilesInParralele_TextChanged(object sender, TextChangedEventArgs e)
         {
-            Collectif.FilterDigitOnlyWhileWritingInTextBox((TextBox)sender, limitLenght:true);
+            Collectif.FilterDigitOnlyWhileWritingInTextBox((TextBox)sender, limitLenght: true);
         }
 
         private void DisableTextBoxRequestBringIntoView(object sender, RequestBringIntoViewEventArgs e)

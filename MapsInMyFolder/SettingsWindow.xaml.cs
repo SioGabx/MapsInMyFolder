@@ -7,8 +7,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace MapsInMyFolder
 {
@@ -529,13 +531,14 @@ namespace MapsInMyFolder
             }
         }
 
-        private void DatabaseExport_Click(object sender, RoutedEventArgs e)
+        private async void DatabaseExport_Click(object sender, RoutedEventArgs e)
         {
+            this.Cursor = Cursors.AppStarting;
             SaveFileDialog DatabasesaveFileDialog = new SaveFileDialog
             {
                 Filter = "SQL database |*.db|Text|*.txt",
                 DefaultExt = "db",
-                FileName = "exported_database.db",
+                FileName = "ExportedDatabase.db",
                 CheckPathExists = true,
                 AddExtension = true,
                 RestoreDirectory = true,
@@ -547,7 +550,10 @@ namespace MapsInMyFolder
             {
                 try
                 {
-                    Database.Export(DatabasesaveFileDialog.FileName);
+                    await Task.Run(() =>
+                    {
+                        Database.Export(DatabasesaveFileDialog.FileName);
+                    }); ;
                     Process.Start("explorer.exe", "/select,\"" + DatabasesaveFileDialog.FileName + "\"");
                     return;
                 }
@@ -556,6 +562,7 @@ namespace MapsInMyFolder
                     Message.NoReturnBoxAsync(Languages.Current["settingsMessageErrorDatabaseExport"] + " " + ex.Message, Languages.Current["dialogTitleOperationFailed"]);
                 }
             }
+            this.Cursor = Cursors.Arrow;
         }
     }
 }

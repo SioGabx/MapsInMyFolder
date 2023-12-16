@@ -190,7 +190,7 @@ namespace MapsInMyFolder
                             return;
                         }
 
-                        HttpResponse httpResponse = Tiles.Loader.GetImageAsync(url.url, tileX + url.index_x, tileY + url.index_y, zoom, layerID,Layers.Current.TilesFormat, pbfdisableadjacent: true).Result;
+                        HttpResponse httpResponse = Tiles.Loader.GetImageAsync(url.url, tileX + url.index_x, tileY + url.index_y, zoom, layerID, Layers.Current.TilesFormat, pbfdisableadjacent: true).Result;
 
                         if (updateMigniatureParraleleToken.IsCancellationRequested && updateMigniatureParraleleToken.CanBeCanceled)
                         {

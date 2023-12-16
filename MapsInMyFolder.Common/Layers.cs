@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SQLite;
+using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 
 namespace MapsInMyFolder.Commun
 {
@@ -107,7 +110,7 @@ namespace MapsInMyFolder.Commun
                     this._MaxDownloadtilesInParralele = Math.Max(value, 0);
                 }
             }
-            
+
             private int _WaitingBeforeStartAnotherTile;
             public int WaitingBeforeStartAnotherTile
             {
@@ -144,7 +147,8 @@ namespace MapsInMyFolder.Commun
                 Current = Copy(layer);
             }
 
-            public static Layers Copy(Layers layer) {
+            public static Layers Copy(Layers layer)
+            {
                 return (Layers)layer.MemberwiseClone();
             }
         }
@@ -189,5 +193,159 @@ namespace MapsInMyFolder.Commun
         {
             return GetLayersList().Count();
         }
+
+        public static Layers GetLayerFromSQLiteDataReader(SQLiteDataReader sQLiteDataReader)
+        {
+            string GetStringFromOrdinal(string name)
+            {
+                return Database.GetStringFromOrdinal(sQLiteDataReader, name);
+            }
+            int? GetIntFromOrdinal(string name)
+            {
+                return Database.GetIntFromOrdinal(sQLiteDataReader, name);
+            }
+
+            int? DB_Layer_ID = GetIntFromOrdinal("ID");
+            string DB_Layer_NAME = GetStringFromOrdinal("NAME").RemoveNewLineChar();
+            bool DB_Layer_FAVORITE = System.Convert.ToBoolean(GetIntFromOrdinal("FAVORITE"));
+            string DB_Layer_DESCRIPTION = GetStringFromOrdinal("DESCRIPTION");
+            string DB_Layer_CATEGORY = GetStringFromOrdinal("CATEGORY").RemoveNewLineChar();
+            string DB_Layer_COUNTRY = GetStringFromOrdinal("COUNTRY").RemoveNewLineChar();
+            string DB_Layer_IDENTIFIER = GetStringFromOrdinal("IDENTIFIER").RemoveNewLineChar();
+            string DB_Layer_TILE_URL = GetStringFromOrdinal("TILE_URL").RemoveNewLineChar();
+            int? DB_Layer_MIN_ZOOM = GetIntFromOrdinal("MIN_ZOOM");
+            int? DB_Layer_MAX_ZOOM = GetIntFromOrdinal("MAX_ZOOM");
+            string DB_Layer_FORMAT = GetStringFromOrdinal("FORMAT");
+            string DB_Layer_SITE = GetStringFromOrdinal("SITE").RemoveNewLineChar();
+            string DB_Layer_SITE_URL = GetStringFromOrdinal("SITE_URL").RemoveNewLineChar();
+            string DB_Layer_STYLE = GetStringFromOrdinal("STYLE");
+            int? DB_Layer_TILE_SIZE = GetIntFromOrdinal("TILE_SIZE");
+            string DB_Layer_SCRIPT = GetStringFromOrdinal("SCRIPT");
+            string DB_Layer_VISIBILITY = GetStringFromOrdinal("VISIBILITY");
+            string DB_Layer_SPECIALSOPTIONS = GetStringFromOrdinal("SPECIALSOPTIONS");
+            string DB_Layer_RECTANGLES = GetStringFromOrdinal("RECTANGLES");
+            int DB_Layer_VERSION = GetIntFromOrdinal("VERSION") ?? 0;
+            bool DB_Layer_HAS_SCALE = System.Convert.ToBoolean(GetIntFromOrdinal("HAS_SCALE"));
+
+            bool doCreateSpecialsOptionsClass = true;
+            LayersSpecialsOptions DeserializeSpecialsOptions = null;
+            try
+            {
+                if (!string.IsNullOrEmpty(DB_Layer_SPECIALSOPTIONS))
+                {
+                    DeserializeSpecialsOptions = System.Text.Json.JsonSerializer.Deserialize<Layers.LayersSpecialsOptions>(DB_Layer_SPECIALSOPTIONS);
+                    doCreateSpecialsOptionsClass = false;
+                }
+            }
+            catch (Exception)
+            {
+                Debug.WriteLine("Invalide JSON inside layer :" + DB_Layer_ID + " named : " + DB_Layer_NAME);
+            }
+            finally
+            {
+                if (doCreateSpecialsOptionsClass)
+                {
+                    DeserializeSpecialsOptions = new Layers.LayersSpecialsOptions();
+                }
+            }
+
+            if (!string.IsNullOrEmpty(DB_Layer_SCRIPT))
+            {
+                DB_Layer_SCRIPT = Collectif.HTMLEntities(DB_Layer_SCRIPT, true);
+            }
+
+            return new Layers((int)DB_Layer_ID, DB_Layer_FAVORITE, DB_Layer_NAME, DB_Layer_DESCRIPTION, DB_Layer_CATEGORY, DB_Layer_COUNTRY, DB_Layer_IDENTIFIER, DB_Layer_TILE_URL, DB_Layer_SITE, DB_Layer_SITE_URL, DB_Layer_MIN_ZOOM, DB_Layer_MAX_ZOOM, DB_Layer_FORMAT, DB_Layer_STYLE, DB_Layer_TILE_SIZE, DB_Layer_SCRIPT, DB_Layer_VISIBILITY, DeserializeSpecialsOptions, DB_Layer_RECTANGLES, DB_Layer_VERSION, DB_Layer_HAS_SCALE);
+        }
+        public static void LayersMergeLegacyWithEdited(List<Layers> legacyLayers, List<Layers> editedLayers)
+        {
+            Layers.Clear();
+            Dictionary<int, Layers> editedLayersDictionnary = editedLayers.ToDictionary(l => l.Id, l => l);
+            foreach (Layers legacyLayer in legacyLayers)
+            {
+                int legacyLayerVersion = legacyLayer.Version;
+                bool legacyLayerHasReplacement = editedLayersDictionnary.TryGetValue(legacyLayer.Id, out Layers replacementLayer);
+
+                BindingFlags fieldsBindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static;
+                Layers legacyLayerWithReplacements = legacyLayer;
+                if (legacyLayerHasReplacement)
+                {
+                    foreach (FieldInfo field in typeof(Layers).GetFields(fieldsBindingFlags))
+                    {
+                        object replacementValue = field.GetValue(replacementLayer);
+                        if (replacementValue is null)
+                        {
+                            continue;
+                        }
+                        Type replacementValueType = replacementValue.GetType();
+
+                        if (replacementValueType == typeof(string))
+                        {
+                            if (replacementValue is string replacementValueTypeToString)
+                            {
+                                field.SetValue(legacyLayerWithReplacements, replacementValueTypeToString);
+                            }
+                        }
+                        else
+                        {
+                            field.SetValue(legacyLayerWithReplacements, replacementValue);
+                        }
+                    }
+
+
+                    if (legacyLayer.Version > replacementLayer.Version)
+                    {
+                        legacyLayerWithReplacements.DoShowWarningLegacyVersionNewerThanEdited = true;
+                    }
+                }
+
+                if (legacyLayerWithReplacements?.Visibility?.Trim() == "DELETED")
+                {
+                    continue;
+                }
+
+                if (string.IsNullOrEmpty(legacyLayerWithReplacements.Script))
+                {
+                    legacyLayerWithReplacements.Script = Settings.tileloader_default_script;
+                }
+                if (string.IsNullOrEmpty(legacyLayerWithReplacements.Visibility))
+                {
+                    legacyLayerWithReplacements.Visibility = "Visible";
+                }
+                if (legacyLayerWithReplacements.Category == "/")
+                {
+                    legacyLayerWithReplacements.Category = "";
+                }
+                legacyLayerWithReplacements.Country = legacyLayerWithReplacements.Country?.Replace("*", "World");
+                List<string> listOfAllFormatsAcceptedWithTransparency = new List<string> { "png" };
+                if (!string.IsNullOrWhiteSpace(legacyLayerWithReplacements.TilesFormat) && listOfAllFormatsAcceptedWithTransparency.Contains(legacyLayerWithReplacements.TilesFormat))
+                {
+                    legacyLayerWithReplacements.TilesFormatHasTransparency = true;
+                }
+
+                //make sure there is no null values inside the layer
+                foreach (FieldInfo field in typeof(Layers).GetFields(fieldsBindingFlags))
+                {
+                    object actualValue = field.GetValue(legacyLayerWithReplacements);
+                    if (actualValue is null)
+                    {
+                        if (field.FieldType == typeof(string))
+                        {
+                            field.SetValue(legacyLayerWithReplacements, string.Empty);
+                        }
+                        else if (field.FieldType == typeof(int))
+                        {
+                            field.SetValue(legacyLayerWithReplacements, 0);
+                        }
+                        else
+                        {
+                            field.SetValue(legacyLayerWithReplacements, null);
+                        }
+                    }
+                }
+
+                Layers.Add(System.Convert.ToInt32(legacyLayerWithReplacements.Id), legacyLayerWithReplacements);
+            }
+        }
+
     }
 }

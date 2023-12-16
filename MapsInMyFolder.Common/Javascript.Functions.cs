@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -65,7 +64,7 @@ namespace MapsInMyFolder.Commun
                     {
                         if (VariableKeyAndValue.ContainsKey(variablenameString))
                         {
-                           return VariableKeyAndValue[variablenameString];
+                            return VariableKeyAndValue[variablenameString];
                         }
                     }
                 }
@@ -367,8 +366,6 @@ namespace MapsInMyFolder.Commun
                 {
                     PrintError("replaceOld is not a valid boolean.");
                 }
-
-                Debug.WriteLine(doReplace);
 
                 void SetupNotification()
                 {

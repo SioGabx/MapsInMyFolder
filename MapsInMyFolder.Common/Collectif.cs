@@ -1,7 +1,5 @@
-﻿using Esprima.Ast;
-using Jint;
+﻿using Jint;
 using MapsInMyFolder.Commun;
-using MapsInMyFolder.VectorTileRenderer;
 using NetVips;
 using Newtonsoft.Json;
 using System;
@@ -196,7 +194,7 @@ namespace MapsInMyFolder.Commun
                         }
                     }
 
-
+                    Javascript.EngineDeleteById(-1);
 
                     List<TileProperty> tilesUrls = GenrateListOfUrlFromLocation(location, z, urlbase, -1, downloadid, calque.TilesFormat);
 
@@ -238,7 +236,7 @@ namespace MapsInMyFolder.Commun
                         int tuileX = NO_x + Download_X_tile;
                         int tuileY = NO_y + Download_Y_tile;
                         string url = FromTileXYZ(urlbase, tuileX, tuileY, z, LayerID, InvokeFunction.getTile);
-                        TileProperty Tile = new TileProperty(url,tuileX, tuileY, z, Status.waitfordownloading, downloadid, format);
+                        TileProperty Tile = new TileProperty(url, tuileX, tuileY, z, Status.waitfordownloading, downloadid, format);
                         if (format == "pbf")
                         {
                             Tile.SetNeighbour(LayerID, urlbase);
@@ -1394,7 +1392,7 @@ namespace MapsInMyFolder.Commun
                     }
 
                     HttpResponseMessage httpResponse = response.ResponseMessage;
-                    Debug.WriteLine(httpResponse.StatusCode.ToString());
+                    Debug.WriteLine("CheckIfDownloadSuccess :" + httpResponse.StatusCode.ToString());
                     if (httpResponse.IsSuccessStatusCode)
                     {
                         return HttpStatusCode.OK;
