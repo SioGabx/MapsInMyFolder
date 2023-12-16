@@ -156,7 +156,8 @@ namespace MapsInMyFolder
             }
 
 
-            layer_startup_id.SelectedIndex = layer_startup_id.Items.Add(new NameHiddenIdValue(0, "Default"));
+            layer_startup_id.SelectedIndex = layer_startup_id.Items.Add(new NameHiddenIdValue(0, "_Default"));
+            layer_startup_id.Items.Add(new NameHiddenIdValue(Layers.Current.Id, "_" + Languages.Current["layerCurrent"]));
             foreach (Layers layer in Layers.GetLayersList())
             {
                 if (layer.Id != -1 && string.Equals(layer.TilesFormat, "JPEG", StringComparison.InvariantCultureIgnoreCase))
