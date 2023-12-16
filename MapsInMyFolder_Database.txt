@@ -71,7 +71,10 @@ INSERT INTO 'LAYERS' (ID,NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,M
 INSERT INTO 'LAYERS' (ID,NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('31','Zones de revitalisation rurale','Les zones de revitalisation rurale sont des ensembles de communes rurales de faible densit&eacute; d&eacute;mographique pour lesquelles un certain nombre de mesures d&apos;aide de nature &eacute;conomique a &eacute;t&eacute; engag&eacute;. Ces communes sont d&eacute;finies par arr&ecirc;t&eacute;.','Terrictoires','France','COMMUNES.ZRR','http://wxs.ign.fr/an7nvfzojv5wa96dsga5nk8w/geoportail/wmts?layer=COMMUNES.ZRR&amp;style=normal&amp;tilematrixset=PM&amp;Service=WMTS&amp;Request=GetTile&amp;Version=1.0.0&amp;Format=image/png&amp;TileMatrix={z}&amp;TileCol={x}&amp;TileRow={y}','6','17','png','Geoportail','geoportail.gouv.fr',NULL,'256','0',NULL,NULL,NULL,NULL,'2','1');
 INSERT INTO 'LAYERS' (ID,NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('32','Zonage du dispositif Pinel en Bretagne 2020-2021','La r&eacute;duction d&apos;imp&ocirc;t « Pinel &raquo; (code g&eacute;n&eacute;ral des imp&ocirc;ts) s&apos;applique &agrave; l&apos;investissement locatif r&eacute;alis&eacute; dans les zones o&ugrave; la tension entre l&apos;offre et la demande de logements est la plus forte. La loi n°2019-1479 du 28 d&eacute;cembre 2019 de finances pour 2020, pr&eacute;voit &agrave; titre exp&eacute;rimental, un dispositif d&eacute;rogatoire au droit commun pour la Bretagne. Ainsi, les communes ou parties de communes &eacute;ligibles &agrave; la r&eacute;duction d&apos;imp&ocirc;t « Pinel &raquo; sont fix&eacute;es par arr&ecirc;t&eacute; du pr&eacute;fet de r&eacute;gion. Cet arr&ecirc;t&eacute; est pris apr&egrave;s avis du pr&eacute;sident du conseil r&eacute;gional et du comit&eacute; r&eacute;gional de l&apos;habitat et de l&apos;h&eacute;bergement. Cet article pr&eacute;voit &eacute;galement que le pr&eacute;fet de r&eacute;gion fixe, par arr&ecirc;t&eacute;, les plafonds de loyer et de ressources du locataire pour chaque commune ou partie de commune &eacute;ligible et par type de logement. L&apos;une des particularit&eacute;s de cette exp&eacute;rimentation r&eacute;side dans l&apos;&eacute;ligibilit&eacute; du dispositif qui peut &ecirc;tre limit&eacute;e &agrave; une partie seulement du territoire communal. Lorsqu&apos;une commune n&apos;est &eacute;ligible que pour une partie de son territoire, deux approches sont distingu&eacute;es, &agrave; savoir &agrave; la maille de l&apos;IRIS (correspondant &agrave; un quartier) ou &agrave; la maille du carreau de 200 m&egrave;tres sur 200 m&egrave;tres.','Terrictoires','France','DREAL.ZONAGE_PINEL','http://wxs.ign.fr/an7nvfzojv5wa96dsga5nk8w/geoportail/wmts?layer=DREAL.ZONAGE_PINEL&amp;style=normal&amp;tilematrixset=PM&amp;Service=WMTS&amp;Request=GetTile&amp;Version=1.0.0&amp;Format=image/png&amp;TileMatrix={z}&amp;TileCol={x}&amp;TileRow={y}','6','18','png','Geoportail','geoportail.gouv.fr',NULL,'256','0',NULL,NULL,NULL,NULL,'2','1');
 INSERT INTO 'LAYERS' (ID,NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('33','Emprise des Sch&eacute;mas d&apos;Am&eacute;nagement et de Gestion des Eaux','Repr&eacute;sentation des zones disposant d&apos;un SAGE (Sch&eacute;ma d&apos;Am&eacute;nagement et de Gestion des Eaux). Un SAGE est un document de planification &eacute;labor&eacute; de mani&egrave;re collective, pour un p&eacute;rim&egrave;tre hydrographique coh&eacute;rent. Il fixe des objectifs g&eacute;n&eacute;raux d&apos;utilisation, de mise en valeur, de protection quantitative et qualitative de la ressource en eau.','Terrictoires','France','EAU.SAGE','http://wxs.ign.fr/an7nvfzojv5wa96dsga5nk8w/geoportail/wmts?layer=EAU.SAGE&amp;style=normal&amp;tilematrixset=PM&amp;Service=WMTS&amp;Request=GetTile&amp;Version=1.0.0&amp;Format=image/png&amp;TileMatrix={z}&amp;TileCol={x}&amp;TileRow={y}','6','18','png','Geoportail','geoportail.gouv.fr',NULL,'256','0',NULL,NULL,NULL,NULL,'2','1');
-INSERT INTO 'LAYERS' (ID,NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('34','Estompage','Couche d&apos;ombrage calcul&eacute;e &agrave; partir des donn&eacute;es altim&eacute;triques de l&apos;IGN permettant de mieux appr&eacute;hender le relief. L&apos;estompage propos&eacute; est r&eacute;alis&eacute; &agrave; partir des donn&eacute;es MNT BDAlti au pas de 25m avec deux soleils : un au nord-est de hauteur 45°, l&apos;autre z&eacute;nithal.','Altitude','France','ELEVATION.ELEVATIONGRIDCOVERAGE.SHADOW','http://wxs.ign.fr/an7nvfzojv5wa96dsga5nk8w/geoportail/wmts?layer=ELEVATION.ELEVATIONGRIDCOVERAGE.SHADOW&amp;style=estompage_grayscale&amp;tilematrixset=PM&amp;Service=WMTS&amp;Request=GetTile&amp;Version=1.0.0&amp;Format=image/png&amp;TileMatrix={z}&amp;TileCol={x}&amp;TileRow={y}','0','15','png','Geoportail','geoportail.gouv.fr',NULL,'256','0',NULL,NULL,NULL,NULL,'2','1');
+INSERT INTO 'LAYERS' (ID,NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('34','Estompage (Relief)','Couche d&apos;ombrage calcul&eacute;e &agrave; partir des donn&eacute;es altim&eacute;triques de l&apos;IGN permettant de mieux appr&eacute;hender le relief. L&apos;estompage propos&eacute; est r&eacute;alis&eacute; &agrave; partir des donn&eacute;es MNT BDAlti au pas de 25m avec deux soleils : un au nord-est de hauteur 45°, l&apos;autre z&eacute;nithal.','Altitude','France','ELEVATION.ELEVATIONGRIDCOVERAGE.SHADOW','http://wxs.ign.fr/an7nvfzojv5wa96dsga5nk8w/geoportail/wmts?layer=ELEVATION.ELEVATIONGRIDCOVERAGE.SHADOW&amp;style=estompage_grayscale&amp;tilematrixset=PM&amp;Service=WMTS&amp;Request=GetTile&amp;Version=1.0.0&amp;Format=image/png&amp;TileMatrix={z}&amp;TileCol={x}&amp;TileRow={y}','0','15','png','Geoportail','geoportail.gouv.fr',NULL,'256','0','//default script
+function getTile(args) {
+   return args;
+}','Visible','{&quot;BackgroundColor&quot;:&quot;&quot;,&quot;ErrorsToIgnore&quot;:&quot;&quot;,&quot;MaxDownloadTilesInParralele&quot;:0,&quot;WaitingBeforeStartAnotherTile&quot;:0}',NULL,'3','1');
 INSERT INTO 'LAYERS' (ID,NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('35','Seuils de pente pour l&apos;agriculture','La carte exp&eacute;rimentale des seuils de pente pour l&apos;agriculture est d&eacute;riv&eacute;e du MNT RGEAlti, mod&egrave;le num&eacute;rique de terrain maill&eacute; au pas de 1 m. Les seuils de repr&eacute;sentation de cette carte sont : 7&percnt; &agrave; 10&percnt; : bleu, 10&percnt; &agrave; 15&percnt; : mauve, 15&percnt; &agrave; 20&percnt; : orange, plus de 20&percnt; : rouge. Donn&eacute;es disponibles en France M&eacute;tropolitaine du 1/4265 au 1/69885283 - mise &agrave; jour du 30/06/2017.','Altitude','France','ELEVATION.ELEVATIONGRIDCOVERAGE.THRESHOLD','http://wxs.ign.fr/an7nvfzojv5wa96dsga5nk8w/geoportail/wmts?layer=ELEVATION.ELEVATIONGRIDCOVERAGE.THRESHOLD&amp;style=ELEVATION.ELEVATIONGRIDCOVERAGE.THRESHOLD&amp;tilematrixset=PM&amp;Service=WMTS&amp;Request=GetTile&amp;Version=1.0.0&amp;Format=image/png&amp;TileMatrix={z}&amp;TileCol={x}&amp;TileRow={y}','3','17','png','Geoportail','geoportail.gouv.fr',NULL,'256','0',NULL,NULL,NULL,NULL,'2','1');
 INSERT INTO 'LAYERS' (ID,NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('36','Trait de c&ocirc;te Histolitt','Formalisation de la limite entre le domaine terrestre et le domaine marin.','Altitude','France','ELEVATION.LEVEL0','http://wxs.ign.fr/an7nvfzojv5wa96dsga5nk8w/geoportail/wmts?layer=ELEVATION.LEVEL0&amp;style=normal&amp;tilematrixset=PM&amp;Service=WMTS&amp;Request=GetTile&amp;Version=1.0.0&amp;Format=image/png&amp;TileMatrix={z}&amp;TileCol={x}&amp;TileRow={y}','6','18','png','Geoportail','geoportail.gouv.fr',NULL,'256','0',NULL,NULL,NULL,NULL,'2','1');
 INSERT INTO 'LAYERS' (ID,NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('37','Altitude','La couche altitude se compose d&apos;un MNT (Mod&egrave;le Num&eacute;rique de Terrain) affich&eacute; en teintes hypsom&eacute;triques et issu de la BD ALTI&reg;.','Littoral','France','ELEVATION.SLOPES','http://wxs.ign.fr/an7nvfzojv5wa96dsga5nk8w/geoportail/wmts?layer=ELEVATION.SLOPES&amp;style=normal&amp;tilematrixset=PM&amp;Service=WMTS&amp;Request=GetTile&amp;Version=1.0.0&amp;Format=image/jpeg&amp;TileMatrix={z}&amp;TileCol={x}&amp;TileRow={y}','6','14','jpeg','Geoportail','geoportail.gouv.fr',NULL,'256','0',NULL,NULL,NULL,NULL,'2','1');
@@ -136,8 +139,6 @@ INSERT INTO 'LAYERS' (ID,NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,M
 INSERT INTO 'LAYERS' (ID,NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('63','Plan IGN v2','Cartographie multi-&eacute;chelles sur le territoire national, issue des bases de donn&eacute;es vecteur de l&apos;IGN, mis &agrave; jour r&eacute;guli&egrave;rement et r&eacute;alis&eacute;e selon un processus enti&egrave;rement automatis&eacute;.','Cartes','France','GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2','http://wxs.ign.fr/an7nvfzojv5wa96dsga5nk8w/geoportail/wmts?layer=GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2&amp;style=normal&amp;tilematrixset=PM&amp;Service=WMTS&amp;Request=GetTile&amp;Version=1.0.0&amp;Format=image/png&amp;TileMatrix={z}&amp;TileCol={x}&amp;TileRow={y}','0','19','png','Geoportail','geoportail.gouv.fr',NULL,'256','0',NULL,NULL,NULL,NULL,'2','1');
 INSERT INTO 'LAYERS' (ID,NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('64','Carte des pentes','Carte des zones ayant une valeur de pente sup&eacute;rieure &agrave; 30°-35°-40°-45° d&apos;apr&egrave;s la BD ALTI au pas de 5m','Altitude','France','GEOGRAPHICALGRIDSYSTEMS.SLOPES.MOUNTAIN','http://wxs.ign.fr/an7nvfzojv5wa96dsga5nk8w/geoportail/wmts?layer=GEOGRAPHICALGRIDSYSTEMS.SLOPES.MOUNTAIN&amp;style=normal&amp;tilematrixset=PM&amp;Service=WMTS&amp;Request=GetTile&amp;Version=1.0.0&amp;Format=image/png&amp;TileMatrix={z}&amp;TileCol={x}&amp;TileRow={y}','0','17','png','Geoportail','geoportail.gouv.fr',NULL,'256','0',NULL,NULL,NULL,NULL,'2','1');
 INSERT INTO 'LAYERS' (ID,NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('65','Carte des pentes pour l&apos;agriculture sur la m&eacute;tropole','Carte des zones ayant une valeur de pente sup&eacute;rieure &agrave; 10&percnt; - source : RGEALTI 2017 au pas de 5m - disponible jusqu&apos;au 1/17062 - m&eacute;tropole uniquement - mise &agrave; jour le 12/10/2017','Altitude','France','GEOGRAPHICALGRIDSYSTEMS.SLOPES.PAC','http://wxs.ign.fr/an7nvfzojv5wa96dsga5nk8w/geoportail/wmts?layer=GEOGRAPHICALGRIDSYSTEMS.SLOPES.PAC&amp;style=GEOGRAPHICALGRIDSYSTEMS.SLOPES.PAC&amp;tilematrixset=PM&amp;Service=WMTS&amp;Request=GetTile&amp;Version=1.0.0&amp;Format=image/png&amp;TileMatrix={z}&amp;TileCol={x}&amp;TileRow={y}','0','15','png','Geoportail','geoportail.gouv.fr',NULL,'256','0',NULL,NULL,NULL,NULL,'2','1');
-INSERT INTO 'LAYERS' (ID,NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('66','Plan Terrier V1 (XVIIIe si&egrave;cle)','Plan Terrier Corse V1 (XVIIIe si&egrave;cle) - GEOGRAPHICALGRIDSYSTEMS.TERRIER_V1','Terrier','France','GEOGRAPHICALGRIDSYSTEMS.TERRIER_V1','http://wxs.ign.fr/an7nvfzojv5wa96dsga5nk8w/geoportail/wmts?layer=GEOGRAPHICALGRIDSYSTEMS.TERRIER_V1&amp;style=nolegend&amp;tilematrixset=PM&amp;Service=WMTS&amp;Request=GetTile&amp;Version=1.0.0&amp;Format=image/png&amp;TileMatrix={z}&amp;TileCol={x}&amp;TileRow={y}','6','18','png','Geoportail','geoportail.gouv.fr',NULL,'256','0',NULL,NULL,NULL,NULL,'2','1');
-INSERT INTO 'LAYERS' (ID,NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('67','Plan Terrier V2 (XVIIIe si&egrave;cle)','Plan Terrier, cartographie ancienne du XVIII&egrave;me si&egrave;cle sur la Corse version est une version num&eacute;ris&eacute;e par les archives militaires du Minist&egrave;re de la D&eacute;fense','Terrier','France','GEOGRAPHICALGRIDSYSTEMS.TERRIER_V2','http://wxs.ign.fr/an7nvfzojv5wa96dsga5nk8w/geoportail/wmts?layer=GEOGRAPHICALGRIDSYSTEMS.TERRIER_V2&amp;style=nolegend&amp;tilematrixset=PM&amp;Service=WMTS&amp;Request=GetTile&amp;Version=1.0.0&amp;Format=image/png&amp;TileMatrix={z}&amp;TileCol={x}&amp;TileRow={y}','6','18','png','Geoportail','geoportail.gouv.fr',NULL,'256','0',NULL,NULL,NULL,NULL,'2','1');
 INSERT INTO 'LAYERS' (ID,NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('68','D&eacute;nominations g&eacute;ographiques','Affichage des noms des villes, villages, lieux-dits ...','Divers','France','GEOGRAPHICALNAMES.NAMES','http://wxs.ign.fr/an7nvfzojv5wa96dsga5nk8w/geoportail/wmts?layer=GEOGRAPHICALNAMES.NAMES&amp;style=normal&amp;tilematrixset=PM&amp;Service=WMTS&amp;Request=GetTile&amp;Version=1.0.0&amp;Format=image/png&amp;TileMatrix={z}&amp;TileCol={x}&amp;TileRow={y}','6','18','png','Geoportail','geoportail.gouv.fr',NULL,'256','0',NULL,NULL,NULL,NULL,'2','1');
 INSERT INTO 'LAYERS' (ID,NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('69','Zones d&apos;importance pour la conservation des oiseaux','Les zones d&apos;importance pour la conservation des oiseaux sont fournies par Ligue pour la protection des oiseaux (LPO) relayant en France l&apos;action du r&eacute;seau international BirdLife. http://www.geoportail.gouv.fr/depot/fiches/mnhn/actualite_donnees_mnhn.pdf','Biodiversit&eacute;','France','HABITATSANSBIOTOPES.ZICO','http://wxs.ign.fr/an7nvfzojv5wa96dsga5nk8w/geoportail/wmts?layer=HABITATSANSBIOTOPES.ZICO&amp;style=normal&amp;tilematrixset=PM&amp;Service=WMTS&amp;Request=GetTile&amp;Version=1.0.0&amp;Format=image/png&amp;TileMatrix={z}&amp;TileCol={x}&amp;TileRow={y}','6','16','png','Geoportail','geoportail.gouv.fr',NULL,'256','0',NULL,NULL,NULL,NULL,'2','1');
 INSERT INTO 'LAYERS' (ID,NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('70','Cours d&apos;eau BCAE 2020','Le code rural et de la p&ecirc;che maritime pr&eacute;voit que les agriculteurs qui demandent des aides de la PAC implantent des bandes enherb&eacute;es le long de certains cours d&apos;eau au titre des bonnes conditions agricoles et environnementales (BCAE). Cette carte repr&eacute;sente les cours d&apos;eau concern&eacute;s pour les d&eacute;partements list&eacute;s ci-dessous. Pour les autres d&eacute;partements, veuillez-vous r&eacute;f&eacute;rer &agrave; l&apos;arr&ecirc;t&eacute; du 24 avril 2015 relatif aux BCAE Cette carte est en vigueur du 1er janvier 2020 au 31 d&eacute;cembre 2020.','BCAE','France','HYDROGRAPHY.BCAE.2020','http://wxs.ign.fr/an7nvfzojv5wa96dsga5nk8w/geoportail/wmts?layer=HYDROGRAPHY.BCAE.2020&amp;style=nolegend&amp;tilematrixset=PM&amp;Service=WMTS&amp;Request=GetTile&amp;Version=1.0.0&amp;Format=image/png&amp;TileMatrix={z}&amp;TileCol={x}&amp;TileRow={y}','6','17','png','Geoportail','geoportail.gouv.fr',NULL,'256','0',NULL,NULL,NULL,NULL,'2','1');
@@ -184,11 +185,29 @@ function getPreview(args) {
     args.url = &quot;https://i.ibb.co/dtqstTD/cartes-ign-personnalisable-pur-e-Paris-14.jpg&quot;
     return args;
 }','Visible','{&quot;BackgroundColor&quot;:&quot;&quot;}',NULL,'2','1');
-INSERT INTO 'LAYERS' (ID,NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('109','Google Maps - Panorama (StreetView)','Panorama','Panorama','*','GMAP_PANO','https://streetviewpixels-pa.googleapis.com/v1/tile?cb_client=maps_sv.tactile&amp;panoid=tfCGZJhpZUYpp6nxlTiSig&amp;x={x}&amp;y={y}&amp;zoom={z}','0','5','jpeg','Google Maps','www.google.fr/maps/',NULL,'512','0','function getPreview(args){
+INSERT INTO 'LAYERS' (ID,NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('109','Google Maps - Panorama (StreetView)','Panorama','Panorama','World','GMAP_PANO','https://streetviewpixels-pa.googleapis.com/v1/tile?cb_client=maps_sv.tactile&amp;panoid={panoid}&amp;x={x}&amp;y={y}&amp;zoom={z}','0','5','jpeg','Google Maps','www.google.fr/maps/',NULL,'512','0','function getPreview(args){
 let returnvalue = new Object();
 returnvalue.url = &quot;https://streetviewpixels-pa.googleapis.com/v1/thumbnail?panoid=lLe2R7rdiBd56tPzgbjUFg&amp;cb_client=search.revgeo_and_fetch.gps&amp;w=515&amp;h=256&amp;yaw=295&amp;pitch=0&amp;thumbfov=115&quot;;
 return returnvalue;
-}','Visible','{&quot;BackgroundColor&quot;:&quot;&quot;,&quot;ErrorsToIgnore&quot;:&quot;&quot;}',NULL,'3','0');
+}
+
+function getTile(args){
+notification(&quot;Cliquez ici pour definir le panorama&quot;,&quot;Street View&quot;,&quot;define&quot;)
+let panoid = getVar(&quot;panoid&quot;);
+if (panoid == undefined){
+panoid = &quot;TxgAb1HfILw_iyvSke43nQ&quot;
+}
+args.panoid = panoid;
+return args;
+}
+
+
+function define(){
+var url = inputbox(&quot;Collez l&apos;url du panorama&quot;, &quot;Street View&quot;)
+var panoid = url.split(&quot;!1s&quot;)[1].split(&quot;!2e&quot;)[0].replace(/&percnt;2F/g,&apos;/&apos;);
+setVar(&quot;panoid&quot;, panoid);
+refreshMap();
+}','Visible','{&quot;BackgroundColor&quot;:&quot;&quot;,&quot;ErrorsToIgnore&quot;:&quot;&quot;}',NULL,'4','0');
 INSERT INTO 'LAYERS' (ID,NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('110','Google Maps - Satellite','Google Maps propose de nombreuses images collect&eacute;es par des satellites en orbite autour de la Terre. Fournies par diff&eacute;rents op&eacute;rateurs satellite, elles sont combin&eacute;es pour former une mosaïque de clich&eacute;s pris sur plusieurs jours, mois et ann&eacute;es. Elles sont ensuite affich&eacute;es sous la forme d&apos;une image mixte, que vous voyez dans Google Maps. 
 Vous pouvez voir ici les toutes derni&egrave;res images satellite ajout&eacute;es &agrave; Google Maps.','Satellite','*','GMAP_SATELLITE','http://mt0.google.com/vt/lyrs=s&amp;hl=en&amp;x={x}&amp;y={y}&amp;z={z}','0','21','jpeg','Google Maps','www.google.fr/maps/',NULL,'256','1','function getTile(args) {
     return args;
@@ -837,7 +856,7 @@ return args;
 INSERT INTO 'LAYERS' (ID,NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('263','Photographies a&eacute;riennes - Historique 1965-1980','Couverture en photographies a&eacute;riennes de la France des ann&eacute;es 1965 &agrave; 1980. Cette couverture a &eacute;t&eacute; r&eacute;alis&eacute;e &agrave; partir des photographies a&eacute;riennes historiques num&eacute;ris&eacute;es par l&apos;IGN. Elle est disponible sur la France m&eacute;tropolitaine, les d&eacute;partements et r&eacute;gions d&apos;Outre-Mer (la Guyane n&apos;est que partiellement couverte) et les collectivit&eacute;s d&apos;Outre-Mer sauf la Polyn&eacute;sie fran&ccedil;aise. Les photographies sont orthorectifi&eacute;es, c&apos;est-Ã -dire corrig&eacute;es des d&eacute;formations dues &agrave; la prise de vue et au relief du terrain, et assembl&eacute;es pour fournir une visualisation continue superposable avec le R&eacute;f&eacute;rentiel &agrave; Grande Echelle (RGE&reg;) ou les cartes.','Satellite historique','France','ORTHOIMAGERY.ORTHOPHOTOS.1965-1980','http://wxs.ign.fr/an7nvfzojv5wa96dsga5nk8w/geoportail/wmts?layer=ORTHOIMAGERY.ORTHOPHOTOS.1965-1980&amp;style=BDORTHOHISTORIQUE&amp;tilematrixset=PM&amp;Service=WMTS&amp;Request=GetTile&amp;Version=1.0.0&amp;Format=image/png&amp;TileMatrix={z}&amp;TileCol={x}&amp;TileRow={y}','3','18','png','Geoportail','geoportail.gouv.fr',NULL,'256','0','function getTile(args) {
    return args;
 }','Visible',NULL,NULL,'2','1');
-INSERT INTO 'LAYERS' (ID,NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('264','Photographies a&eacute;riennes - Historique 1980-1995','Couverture en photographies a&eacute;riennes de la France des ann&eacute;es 1980 &agrave; 1995. Cette couverture a &eacute;t&eacute; r&eacute;alis&eacute;e &agrave; partir des photographies a&eacute;riennes historiques num&eacute;ris&eacute;es par l&apos;IGN. Elle est disponible sur la France m&eacute;tropolitaine, les d&eacute;partements et r&eacute;gions d&apos;Outre-Mer (la Guyane n&apos;est que partiellement couverte) et les collectivit&eacute;s d&apos;Outre-Mer sauf la Polyn&eacute;sie fran&ccedil;aise. Les photographies sont orthorectifi&eacute;es, c&apos;est-Ã -dire corrig&eacute;es des d&eacute;formations dues &agrave; la prise de vue et au relief du terrain, et assembl&eacute;es pour fournir une visualisation continue superposable avec le R&eacute;f&eacute;rentiel &agrave; Grande Echelle (RGE&reg;) ou les cartes.','Satellite historique','France','ORTHOIMAGERY.ORTHOPHOTOS.1980-1995','http://wxs.ign.fr/an7nvfzojv5wa96dsga5nk8w/geoportail/wmts?layer=ORTHOIMAGERY.ORTHOPHOTOS.1980-1995&amp;style=BDORTHOHISTORIQUE&amp;tilematrixset=PM&amp;Service=WMTS&amp;Request=GetTile&amp;Version=1.0.0&amp;Format=image/png&amp;TileMatrix={z}&amp;TileCol={x}&amp;TileRow={y}','3','18','png','Geoportail','geoportail.gouv.fr',NULL,'256','1','function getTile(args) {
+INSERT INTO 'LAYERS' (ID,NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('264','Photographies a&eacute;riennes - Historique 1980-1995','Couverture en photographies a&eacute;riennes de la France des ann&eacute;es 1980 &agrave; 1995. Cette couverture a &eacute;t&eacute; r&eacute;alis&eacute;e &agrave; partir des photographies a&eacute;riennes historiques num&eacute;ris&eacute;es par l&apos;IGN. Elle est disponible sur la France m&eacute;tropolitaine, les d&eacute;partements et r&eacute;gions d&apos;Outre-Mer (la Guyane n&apos;est que partiellement couverte) et les collectivit&eacute;s d&apos;Outre-Mer sauf la Polyn&eacute;sie fran&ccedil;aise. Les photographies sont orthorectifi&eacute;es, c&apos;est-Ã -dire corrig&eacute;es des d&eacute;formations dues &agrave; la prise de vue et au relief du terrain, et assembl&eacute;es pour fournir une visualisation continue superposable avec le R&eacute;f&eacute;rentiel &agrave; Grande Echelle (RGE&reg;) ou les cartes.','Satellite historique','France','ORTHOIMAGERY.ORTHOPHOTOS.1980-1995','http://wxs.ign.fr/an7nvfzojv5wa96dsga5nk8w/geoportail/wmts?layer=ORTHOIMAGERY.ORTHOPHOTOS.1980-1995&amp;style=BDORTHOHISTORIQUE&amp;tilematrixset=PM&amp;Service=WMTS&amp;Request=GetTile&amp;Version=1.0.0&amp;Format=image/png&amp;TileMatrix={z}&amp;TileCol={x}&amp;TileRow={y}','3','18','png','Geoportail','geoportail.gouv.fr',NULL,'256','0','function getTile(args) {
    return args;
 }','Visible','{&quot;BackgroundColor&quot;:&quot;&quot;,&quot;ErrorsToIgnore&quot;:&quot;&quot;}','[
   {
@@ -13451,35 +13470,6 @@ function getPreview(args) {
     &quot;SE_Long&quot;: 6.295781
   }
 ]','2','1');
-INSERT INTO 'LAYERS' (ID,NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('963','Nancy - Parkings','Cartes ArcGIS de la biblioth&egrave;que de M&eacute;tropole du Grand Nancy
-https://grand-nancy.maps.arcgis.com/home/gallery.html',NULL,'France','Nancy - Parkings','https://geoservices.grand-nancy.org/arcgis/rest/services/public/VOIRIE_Parking/MapServer/export?bbox={bbox}&amp;bboxSR=102100&amp;imageSR=102100&amp;size={tilesize}&percnt;2C{tilesize}&amp;dpi=120&amp;format=png32&amp;transparent=true&amp;layers=show&percnt;3A0&percnt;2C0&amp;rotation=-359.9999800032023&amp;f=image','0','20','png','ArcGIS','grand-nancy.maps.arcgis.com',NULL,'512','0','function getTile(args) {
-    let TargetSpatialReferenceWkt = &apos;PROJCS[&quot;WGS 84 / Pseudo-Mercator&quot;, GEOGCS[&quot;WGS 84&quot;, DATUM[&quot;World Geodetic System 1984&quot;, SPHEROID[&quot;WGS 84&quot;, 6378137, 298.257223563, AUTHORITY[&quot;EPSG&quot;, &quot;7030&quot;]], AUTHORITY[&quot;EPSG&quot;, &quot;6326&quot;]], PRIMEM[&quot;Greenwich&quot;, 0, AUTHORITY[&quot;EPSG&quot;, &quot;8901&quot;]], UNIT[&quot;degree&quot;, 0.017453292519943295, AUTHORITY[&quot;EPSG&quot;, &quot;9102&quot;]], AUTHORITY[&quot;EPSG&quot;, &quot;4326&quot;]], UNIT[&quot;metre&quot;, 1, AUTHORITY[&quot;EPSG&quot;, &quot;9001&quot;]], PROJECTION[&quot;Popular Visualisation Pseudo-Mercator&quot;, AUTHORITY[&quot;EPSG&quot;, &quot;3856&quot;]], PARAMETER[&quot;latitude_of_origin&quot;, 0], PARAMETER[&quot;central_meridian&quot;, 0], PARAMETER[&quot;false_easting&quot;, 0], PARAMETER[&quot;false_northing&quot;, 0], AUTHORITY[&quot;EPSG&quot;, &quot;3857&quot;], AXIS[&quot;East&quot;, EAST], AXIS[&quot;North&quot;, NORTH]]&apos;;
-    let topBBox = transformLocationFromWGS84(TargetSpatialReferenceWkt, args.t_lng, args.t_lat);
-    let botBBox = transformLocationFromWGS84(TargetSpatialReferenceWkt, args.b_lng, args.b_lat);
-    args.bbox = topBBox[0] + &quot;,&quot; + topBBox[1] + &quot;,&quot; + botBBox[0] + &quot;,&quot; + botBBox[1];
-    args.tilesize = &quot;512&quot;;
-    return args;
-}
-function getPreview(args) {
-    args.x = &quot;16946&quot;;
-    args.y = &quot;11296&quot;;
-    args.z = &quot;15&quot;;
-    args.bbox = &quot;687321.7583403048,6222585.598639626,688544.7507928676,6221362.606187062&quot;;
-     args.tilesize = &quot;256&quot;;
-    return args;
-}','Visible','{&quot;BackgroundColor&quot;:&quot;&quot;}','[
-  {
-    &quot;Name&quot;: &quot;M&eacute;tropole du Grand Nancy&quot;,
-    &quot;Color&quot;: &quot;#000000&quot;,
-    &quot;StrokeThickness&quot;: 5.0,
-    &quot;MinZoom&quot;: &quot;∞&quot;,
-    &quot;MaxZoom&quot;: &quot;∞&quot;,
-    &quot;NO_Lat&quot;: 48.742796,
-    &quot;NO_Long&quot;: 6.064494,
-    &quot;SE_Lat&quot;: 48.603306,
-    &quot;SE_Long&quot;: 6.295781
-  }
-]','2','1');
 INSERT INTO 'LAYERS' (ID,NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('964','Nancy - Limites administratives','Cartes ArcGIS de la biblioth&egrave;que de M&eacute;tropole du Grand Nancy
 https://grand-nancy.maps.arcgis.com/home/gallery.html','/','France','Nancy - Limites administratives','https://geo.grandnancy.eu/server/rest/services/ADMINISTRATIF_Limites/MapServer/export?bbox={bbox}&amp;bboxSR=102100&amp;imageSR=102100&amp;size={tilesize}&percnt;2C{tilesize}&amp;dpi=120&amp;format=png32&amp;transparent=true&amp;dynamicLayers={dynamicLayers}&amp;f=image','0','20','png','ArcGIS','grand-nancy.maps.arcgis.com','[
   {
@@ -14711,7 +14701,7 @@ INSERT INTO 'LAYERS' (ID,NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,M
     }
   ],
   &quot;id&quot;: &quot;2tie12isr&quot;
-}','256','1','function getTile(args) {
+}','256','0','function getTile(args) {
     return args;
 }
 function getPreview(args) {
@@ -14822,10 +14812,6 @@ function getQuadKey(x, y, z) {
         }
         return quadKey.join(&apos;&apos;);
     }','Visible','{&quot;BackgroundColor&quot;:&quot;&quot;}',NULL,'2','1');
-INSERT INTO 'LAYERS' (ID,NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('997','4UMaps topographic outdoor, hiking and mountainbike maps','4UMaps sont des cartes de villes, des cartes topographiques ext&eacute;rieures, des cartes de v&eacute;lo et de randonn&eacute;e bas&eacute;es sur les donn&eacute;es OpenStreetmap..Elles montrent tout ce qui est n&eacute;cessaire pour vos activit&eacute;s de pleine nature comme la marche, le VTT, le v&eacute;lo, l&apos;escalade, etc. Les courbes de niveau, l&apos;ombrage des reliefs, l&apos;altitude et le nom des sommets, les routes, les pistes, les chemins et les sentiers, ainsi que les sources, les supermarch&eacute;s, les restaurants, les h&ocirc;tels, les refuges, etc figurent sur les cartes 4UMaps.','Cartes','*','4umaps topographic outdoor, hiking and mountainbike maps','https://tileserver.4umaps.com/{z}/{x}/{y}.png','1','15','jpeg','4UMaps','4umaps.com',NULL,'256','0','//default script
-function getTile(args) {
-   return args;
-}','Visible','{&quot;BackgroundColor&quot;:&quot;&quot;}',NULL,'2','1');
 INSERT INTO 'LAYERS' (ID,NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('998','Geofabrik Topo','Geofabrik Topo is a map style with pale colors and fewer features. It is well suited for maps with overlays. It contains contour lines and hillshading. Labelling follows the same rules as Geofabrik English.','/','*','Geofabrik Topo','https://a.tile.geofabrik.de/15173cf79060ee4a66573954f6017ab0/{z}/{x}/{y}.png','0','20','jpeg','Geofabrik','www.geofabrik.de',NULL,'256','0','function getTile(args) {
    return args;
 }','Visible','{&quot;BackgroundColor&quot;:&quot;&quot;}',NULL,'2','1');
@@ -14849,7 +14835,7 @@ topographiques afin d&apos;aider &agrave; l&apos;&eacute;laboration de projets p
 Refuges.info, est fond&eacute; sur une base de donn&eacute;es renseign&eacute;e par les visiteurs.','/','*','Refuges.info','https://maps.refuges.info/hiking/{z}/{x}/{y}.png','0','18','jpeg','Refuges.info','www.refuges.info',NULL,'256','0','function getTile(args) {
    return args;
 }','Visible','{&quot;BackgroundColor&quot;:&quot;&quot;}',NULL,'2','1');
-INSERT INTO 'LAYERS' (NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('ArcGIS - Detailed global contour','This vector tile layer provides a detailed global contour set with labels. Contours are in meters (for most of the world) and feet (for the 48 contiguous US states plus Hawaii). They are visible from LOD11 (~1:144K) to the largest scale. The source of the vector tiles in this layer is World_Contours_v2. This vector tile layer contains the same content and style used in the World Topographic Map (with Contours) tile layer, which is delivered as a multisource map style designed for the new Map Viewer.
+INSERT INTO 'LAYERS' (ID,NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('1003','ArcGIS - Detailed global contour','This vector tile layer provides a detailed global contour set with labels. Contours are in meters (for most of the world) and feet (for the 48 contiguous US states plus Hawaii). They are visible from LOD11 (~1:144K) to the largest scale. The source of the vector tiles in this layer is World_Contours_v2. This vector tile layer contains the same content and style used in the World Topographic Map (with Contours) tile layer, which is delivered as a multisource map style designed for the new Map Viewer.
 https://www.arcgis.com/home/item.html?id=51ca3ce6a16d4080ad955dacd6dd2fe2
 
 Style : 
@@ -15142,13 +15128,13 @@ function getPreview(args) {
     args.url = &quot;https://i.ibb.co/4dY5hMZ/arcgis-detailed-global-contour-in-ft-Marseille-14.jpg&quot;
     return args;
 }','Visible','{&quot;BackgroundColor&quot;:&quot;#efefef&quot;,&quot;ErrorsToIgnore&quot;:&quot;400&quot;}',NULL,'2','1');
-INSERT INTO 'LAYERS' (NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('Google Maps - Street View Map','Google Maps - Street View Map
+INSERT INTO 'LAYERS' (ID,NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('1004','Google Maps - Street View Map','Google Maps - Street View Map
 
 get on https://nakarte.me/','Cartes','*','Google Maps - Street View Map','https://maps.googleapis.com/maps/vt?pb=!1m5!1m4!1i{z}!2i{x}!3i{y}!4i256!2m8!1e2!2ssvv!4m2!1scb_client!2sapiv3!4m2!1scc!2s*211m3*211e3*212b1*213e2*211m3*211e2*212b1*213e2!3m5!3sUS!12m1!1e40!12m1!1e18!4e0','0','22','png','Google Maps','www.google.fr/maps/',NULL,'256','0','//default script
 function getTile(args) {
    return args;
 }','Visible','{&quot;BackgroundColor&quot;:&quot;&quot;}',NULL,'2','1');
-INSERT INTO 'LAYERS' (NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('Bing Microsoft-Batiments',NULL,'/','*','Bing Microsoft-Batiments','https://t.ssl.ak.dynamic.tiles.virtualearth.net/comp/ch/{quadkey}?mkt=fr-FR&amp;it=z,bf','16','19','jpeg','Bing','https://www.bing.com/maps/',NULL,'256','0','//default script
+INSERT INTO 'LAYERS' (ID,NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('1005','Bing Microsoft-Batiments',NULL,'/','*','Bing Microsoft-Batiments','https://t.ssl.ak.dynamic.tiles.virtualearth.net/comp/ch/{quadkey}?mkt=fr-FR&amp;it=z,bf','16','19','jpeg','Bing','https://www.bing.com/maps/',NULL,'256','0','//default script
 function getTile(args) {
     args.quadkey = getQuadKey(args.x, args.y,args.z);
    return args;
@@ -15170,7 +15156,7 @@ function getQuadKey(x, y, z) {
         }
         return quadKey.join(&apos;&apos;);
     }','Visible','{&quot;BackgroundColor&quot;:&quot;&quot;,&quot;ErrorsToIgnore&quot;:&quot;&quot;}',NULL,'1','1');
-INSERT INTO 'LAYERS' (NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('Bing Microsoft-Hybrid (No label)',NULL,'/','*','Bing Microsoft-Hybrid (No label)','http://ecn.dynamic.t2.tiles.virtualearth.net/comp/ch/{quadkey}?it=A,G','1','19','jpeg','Bing','https://www.bing.com/maps/',NULL,'256','0','//default script
+INSERT INTO 'LAYERS' (ID,NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('1006','Bing Microsoft-Hybrid (No label)',NULL,'/','*','Bing Microsoft-Hybrid (No label)','http://ecn.dynamic.t2.tiles.virtualearth.net/comp/ch/{quadkey}?it=A,G','1','19','jpeg','Bing','https://www.bing.com/maps/',NULL,'256','0','//default script
 function getTile(args) {
     args.quadkey = getQuadKey(args.x, args.y,args.z);
    return args;
@@ -15194,7 +15180,7 @@ function getQuadKey(x, y, z) {
         }
         return quadKey.join(&apos;&apos;);
     }','Visible','{&quot;BackgroundColor&quot;:&quot;&quot;,&quot;ErrorsToIgnore&quot;:&quot;&quot;}',NULL,'1','1');
-INSERT INTO 'LAYERS' (NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('Bing Microsoft-Hybrid (No road)',NULL,'/','*','Bing Microsoft-Hybrid (No road)','http://ecn.dynamic.t2.tiles.virtualearth.net/comp/ch/{quadkey}?it=A,L','1','19','jpeg','Bing','https://www.bing.com/maps/',NULL,'256','0','//default script
+INSERT INTO 'LAYERS' (ID,NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('1007','Bing Microsoft-Hybrid (No road)',NULL,'/','*','Bing Microsoft-Hybrid (No road)','http://ecn.dynamic.t2.tiles.virtualearth.net/comp/ch/{quadkey}?it=A,L','1','19','jpeg','Bing','https://www.bing.com/maps/',NULL,'256','0','//default script
 function getTile(args) {
     args.quadkey = getQuadKey(args.x, args.y,args.z);
    return args;
@@ -15218,7 +15204,7 @@ function getQuadKey(x, y, z) {
         }
         return quadKey.join(&apos;&apos;);
     }','Visible','{&quot;BackgroundColor&quot;:&quot;&quot;,&quot;ErrorsToIgnore&quot;:&quot;&quot;}',NULL,'1','1');
-INSERT INTO 'LAYERS' (NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('Bing Microsoft-Hybrid (with places)',NULL,'/','*','Bing Microsoft-Hybrid (with places)','https://t1.ssl.ak.dynamic.tiles.virtualearth.net/comp/ch/{quadkey}?mkt=en-IN&amp;ur=in&amp;it=A,G,L,LA&amp;shading=hill&amp;og=365&amp;n=z&amp;c4w=1&amp;&amp;osm=1','1','19','jpeg','Bing','https://www.bing.com/maps/',NULL,'256','0','//default script
+INSERT INTO 'LAYERS' (ID,NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('1008','Bing Microsoft-Hybrid (with places)',NULL,'/','*','Bing Microsoft-Hybrid (with places)','https://t1.ssl.ak.dynamic.tiles.virtualearth.net/comp/ch/{quadkey}?mkt=en-IN&amp;ur=in&amp;it=A,G,L,LA&amp;shading=hill&amp;og=365&amp;n=z&amp;c4w=1&amp;&amp;osm=1','1','19','jpeg','Bing','https://www.bing.com/maps/',NULL,'256','0','//default script
 function getTile(args) {
     args.quadkey = getQuadKey(args.x, args.y,args.z);
    return args;
@@ -15241,7 +15227,7 @@ function getQuadKey(x, y, z) {
         }
         return quadKey.join(&apos;&apos;);
     }','Visible','{&quot;BackgroundColor&quot;:&quot;&quot;,&quot;ErrorsToIgnore&quot;:&quot;&quot;}',NULL,'1','1');
-INSERT INTO 'LAYERS' (NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('Bing Microsoft-Road (3D buildings - no label)',NULL,'/','*','Bing Microsoft-Road (3D buildings)','http://ak.dynamic.t2.tiles.virtualearth.net/comp/ch/{quadkey}?mkt=en-us&amp;it=G,BX&amp;shading=hill&amp;og=45&amp;n=z','1','19','jpeg','Bing','https://www.bing.com/maps/',NULL,'256','0','//default script
+INSERT INTO 'LAYERS' (ID,NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('1009','Bing Microsoft-Road (3D buildings - no label)',NULL,'/','*','Bing Microsoft-Road (3D buildings)','http://ak.dynamic.t2.tiles.virtualearth.net/comp/ch/{quadkey}?mkt=en-us&amp;it=G,BX&amp;shading=hill&amp;og=45&amp;n=z','1','19','jpeg','Bing','https://www.bing.com/maps/',NULL,'256','0','//default script
 function getTile(args) {
     args.quadkey = getQuadKey(args.x, args.y,args.z);
    return args;
@@ -15263,7 +15249,7 @@ function getQuadKey(x, y, z) {
         }
         return quadKey.join(&apos;&apos;);
     }','Visible','{&quot;BackgroundColor&quot;:&quot;&quot;,&quot;ErrorsToIgnore&quot;:&quot;&quot;}',NULL,'1','1');
-INSERT INTO 'LAYERS' (NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('Bing Microsoft-Road (3D buildings - with places)',NULL,'/','*','Bing Microsoft-Road (3D buildings)','http://ak.dynamic.t2.tiles.virtualearth.net/comp/ch/{quadkey}?mkt=en-us&amp;it=G,VE,BX,L,LA&amp;shading=hill&amp;og=45&amp;n=z','1','19','jpeg','Bing','https://www.bing.com/maps/',NULL,'256','0','//default script
+INSERT INTO 'LAYERS' (ID,NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('1010','Bing Microsoft-Road (3D buildings - with places)',NULL,'/','*','Bing Microsoft-Road (3D buildings)','http://ak.dynamic.t2.tiles.virtualearth.net/comp/ch/{quadkey}?mkt=en-us&amp;it=G,VE,BX,L,LA&amp;shading=hill&amp;og=45&amp;n=z','1','19','jpeg','Bing','https://www.bing.com/maps/',NULL,'256','0','//default script
 function getTile(args) {
     args.quadkey = getQuadKey(args.x, args.y,args.z);
    return args;
@@ -15285,7 +15271,7 @@ function getQuadKey(x, y, z) {
         }
         return quadKey.join(&apos;&apos;);
     }','Visible','{&quot;BackgroundColor&quot;:&quot;&quot;,&quot;ErrorsToIgnore&quot;:&quot;&quot;}',NULL,'2','1');
-INSERT INTO 'LAYERS' (NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('Bing Microsoft-Road (3D buildings)',NULL,'/','*','Bing Microsoft-Road (3D buildings)','http://ak.dynamic.t2.tiles.virtualearth.net/comp/ch/{quadkey}?mkt=en-us&amp;it=G,VE,BX,L&amp;shading=hill&amp;og=45&amp;n=z','1','19','jpeg','Bing','https://www.bing.com/maps/',NULL,'256','0','//default script
+INSERT INTO 'LAYERS' (ID,NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('1011','Bing Microsoft-Road (3D buildings)',NULL,'/','*','Bing Microsoft-Road (3D buildings)','http://ak.dynamic.t2.tiles.virtualearth.net/comp/ch/{quadkey}?mkt=en-us&amp;it=G,VE,BX,L&amp;shading=hill&amp;og=45&amp;n=z','1','19','jpeg','Bing','https://www.bing.com/maps/',NULL,'256','0','//default script
 function getTile(args) {
     args.quadkey = getQuadKey(args.x, args.y,args.z);
    return args;
@@ -15307,7 +15293,7 @@ function getQuadKey(x, y, z) {
         }
         return quadKey.join(&apos;&apos;);
     }','Visible','{&quot;BackgroundColor&quot;:&quot;&quot;,&quot;ErrorsToIgnore&quot;:&quot;&quot;}',NULL,'1','1');
-INSERT INTO 'LAYERS' (NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('Bing Microsoft-Road Only',NULL,'/','*','Bing Microsoft-Road Only','http://ecn.t2.tiles.virtualearth.net/tiles/ho{quadkey}.png?g=673&amp;mkt=en-US&amp;n=z&amp;stl=h','1','19','png','Bing','https://www.bing.com/maps/',NULL,'256','0','//default script
+INSERT INTO 'LAYERS' (ID,NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('1012','Bing Microsoft-Road Only',NULL,'/','*','Bing Microsoft-Road Only','http://ecn.t2.tiles.virtualearth.net/tiles/ho{quadkey}.png?g=673&amp;mkt=en-US&amp;n=z&amp;stl=h','1','19','png','Bing','https://www.bing.com/maps/',NULL,'256','0','//default script
 function getTile(args) {
     args.quadkey = getQuadKey(args.x, args.y,args.z);
    return args;
@@ -15329,7 +15315,7 @@ function getQuadKey(x, y, z) {
         }
         return quadKey.join(&apos;&apos;);
     }','Visible','{&quot;BackgroundColor&quot;:&quot;&quot;,&quot;ErrorsToIgnore&quot;:&quot;&quot;}',NULL,'2','1');
-INSERT INTO 'LAYERS' (NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('Bing Microsoft-Road with buildings',NULL,'/','*','Bing Microsoft-Road with buildings','http://ak.dynamic.t2.tiles.virtualearth.net/comp/ch/{quadkey}?mkt=en-us&amp;it=G,VE,BF,L&amp;shading=hill&amp;og=45&amp;n=z','1','19','jpeg','Bing','https://www.bing.com/maps/',NULL,'256','0','//default script
+INSERT INTO 'LAYERS' (ID,NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('1013','Bing Microsoft-Road with buildings',NULL,'/','*','Bing Microsoft-Road with buildings','http://ak.dynamic.t2.tiles.virtualearth.net/comp/ch/{quadkey}?mkt=en-us&amp;it=G,VE,BF,L&amp;shading=hill&amp;og=45&amp;n=z','1','19','jpeg','Bing','https://www.bing.com/maps/',NULL,'256','0','//default script
 function getTile(args) {
     args.quadkey = getQuadKey(args.x, args.y,args.z);
    return args;
@@ -15351,7 +15337,7 @@ function getQuadKey(x, y, z) {
         }
         return quadKey.join(&apos;&apos;);
     }','Visible','{&quot;BackgroundColor&quot;:&quot;&quot;,&quot;ErrorsToIgnore&quot;:&quot;&quot;}',NULL,'1','1');
-INSERT INTO 'LAYERS' (NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('Google Maps - Tilted View (45°) : Northward','Google Earth is one of the world&apos;s most comprehensive 3D maps available. In addition to global satellite and terrain coverage, over the past several years we&apos;ve been adding highly detailed 3D imagery of entire cities and towns. You can see a map of these places here. With these updates you can explore the iconic architecture of cities like New York City and Paris and get amazing views of landmarks like the Grand Canyon — all in 3D.
+INSERT INTO 'LAYERS' (ID,NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('1014','Google Maps - Tilted View (45°) : Northward','Google Earth is one of the world&apos;s most comprehensive 3D maps available. In addition to global satellite and terrain coverage, over the past several years we&apos;ve been adding highly detailed 3D imagery of entire cities and towns. You can see a map of these places here. With these updates you can explore the iconic architecture of cities like New York City and Paris and get amazing views of landmarks like the Grand Canyon — all in 3D.
 
 Available boundary of city in 3D can be found here :
 https://earth.google.com/web/data=CiQSIhIgZDY1OGRjYWIzNjlhMTFlOGFjNmU2OWJjN2I2ZDI2Y2E
@@ -15466,7 +15452,7 @@ function getPreviewFallback(args) {
     &quot;SE_Long&quot;: 2.602908
   }
 ]','2','1');
-INSERT INTO 'LAYERS' (NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('Google Maps - Tilted View (45°) : Eastward','Google Earth is one of the world&apos;s most comprehensive 3D maps available. In addition to global satellite and terrain coverage, over the past several years we&apos;ve been adding highly detailed 3D imagery of entire cities and towns. You can see a map of these places here. With these updates you can explore the iconic architecture of cities like New York City and Paris and get amazing views of landmarks like the Grand Canyon — all in 3D.
+INSERT INTO 'LAYERS' (ID,NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('1015','Google Maps - Tilted View (45°) : Eastward','Google Earth is one of the world&apos;s most comprehensive 3D maps available. In addition to global satellite and terrain coverage, over the past several years we&apos;ve been adding highly detailed 3D imagery of entire cities and towns. You can see a map of these places here. With these updates you can explore the iconic architecture of cities like New York City and Paris and get amazing views of landmarks like the Grand Canyon — all in 3D.
 
 Available boundary of city in 3D can be found here :
 https://earth.google.com/web/data=CiQSIhIgZDY1OGRjYWIzNjlhMTFlOGFjNmU2OWJjN2I2ZDI2Y2E
@@ -15576,7 +15562,7 @@ function getPreviewFallback(args) {
     &quot;SE_Long&quot;: 2.602908
   }
 ]','2','1');
-INSERT INTO 'LAYERS' (NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('Google Maps - Tilted View (45°) : Southward','Google Earth is one of the world&apos;s most comprehensive 3D maps available. In addition to global satellite and terrain coverage, over the past several years we&apos;ve been adding highly detailed 3D imagery of entire cities and towns. You can see a map of these places here. With these updates you can explore the iconic architecture of cities like New York City and Paris and get amazing views of landmarks like the Grand Canyon — all in 3D.
+INSERT INTO 'LAYERS' (ID,NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('1016','Google Maps - Tilted View (45°) : Southward','Google Earth is one of the world&apos;s most comprehensive 3D maps available. In addition to global satellite and terrain coverage, over the past several years we&apos;ve been adding highly detailed 3D imagery of entire cities and towns. You can see a map of these places here. With these updates you can explore the iconic architecture of cities like New York City and Paris and get amazing views of landmarks like the Grand Canyon — all in 3D.
 
 Available boundary of city in 3D can be found here :
 https://earth.google.com/web/data=CiQSIhIgZDY1OGRjYWIzNjlhMTFlOGFjNmU2OWJjN2I2ZDI2Y2E
@@ -15690,7 +15676,7 @@ function getPreviewFallback(args) {
     &quot;SE_Long&quot;: 2.602908
   }
 ]','2','1');
-INSERT INTO 'LAYERS' (NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('Google Maps - Tilted View (45°) : Westward','Google Earth is one of the world&apos;s most comprehensive 3D maps available. In addition to global satellite and terrain coverage, over the past several years we&apos;ve been adding highly detailed 3D imagery of entire cities and towns. You can see a map of these places here. With these updates you can explore the iconic architecture of cities like New York City and Paris and get amazing views of landmarks like the Grand Canyon — all in 3D.
+INSERT INTO 'LAYERS' (ID,NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('1017','Google Maps - Tilted View (45°) : Westward','Google Earth is one of the world&apos;s most comprehensive 3D maps available. In addition to global satellite and terrain coverage, over the past several years we&apos;ve been adding highly detailed 3D imagery of entire cities and towns. You can see a map of these places here. With these updates you can explore the iconic architecture of cities like New York City and Paris and get amazing views of landmarks like the Grand Canyon — all in 3D.
 
 Available boundary of city in 3D can be found here :
 https://earth.google.com/web/data=CiQSIhIgZDY1OGRjYWIzNjlhMTFlOGFjNmU2OWJjN2I2ZDI2Y2E
@@ -15804,25 +15790,25 @@ function getPreviewFallback(args) {
     &quot;SE_Long&quot;: 2.602908
   }
 ]','2','1');
-INSERT INTO 'LAYERS' (NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('Localisation des points d&apos;injection de biom&eacute;thane','Legende : https://wxs.ign.fr/static/legends/ENR/POINTS.INJECTION.BIOMETHANE-legend.png','Methane','France','POINTS.INJECTION.BIOMETHANE','http://wxs.ign.fr/an7nvfzojv5wa96dsga5nk8w/geoportail/wmts?layer=POINTS.INJECTION.BIOMETHANE&amp;style=POINTS.INJECTION.BIOMETHANE&amp;tilematrixset=PM&amp;Service=WMTS&amp;Request=GetTile&amp;Version=1.0.0&amp;Format=image/png&amp;TileMatrix={z}&amp;TileCol={x}&amp;TileRow={y}','6','18','png','Geoportail','geoportail.gouv.fr',NULL,'256','0','function getTile(args) {
+INSERT INTO 'LAYERS' (ID,NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('1018','Localisation des points d&apos;injection de biom&eacute;thane','Legende : https://wxs.ign.fr/static/legends/ENR/POINTS.INJECTION.BIOMETHANE-legend.png','Methane','France','POINTS.INJECTION.BIOMETHANE','http://wxs.ign.fr/an7nvfzojv5wa96dsga5nk8w/geoportail/wmts?layer=POINTS.INJECTION.BIOMETHANE&amp;style=POINTS.INJECTION.BIOMETHANE&amp;tilematrixset=PM&amp;Service=WMTS&amp;Request=GetTile&amp;Version=1.0.0&amp;Format=image/png&amp;TileMatrix={z}&amp;TileCol={x}&amp;TileRow={y}','6','18','png','Geoportail','geoportail.gouv.fr',NULL,'256','0','function getTile(args) {
 return args;
 }','Visible','{&quot;BackgroundColor&quot;:&quot;&quot;,&quot;ErrorsToIgnore&quot;:&quot;&quot;}',NULL,'1','1');
-INSERT INTO 'LAYERS' (NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('Potentiel m&eacute;thanisable par canton','Legende : https://wxs.ign.fr/static/legends/ENR/REPARTITION.POTENTIEL.METHANISATION.2050-legend.png','Methane','France','REPARTITION.POTENTIEL.METHANISATION.2050','http://wxs.ign.fr/an7nvfzojv5wa96dsga5nk8w/geoportail/wmts?layer=REPARTITION.POTENTIEL.METHANISATION.2050&amp;style=REPARTITION.POTENTIEL.METHANISATION.2050&amp;tilematrixset=PM&amp;Service=WMTS&amp;Request=GetTile&amp;Version=1.0.0&amp;Format=image/png&amp;TileMatrix={z}&amp;TileCol={x}&amp;TileRow={y}','6','18','png','Geoportail','geoportail.gouv.fr',NULL,'256','0','function getTile(args) {
+INSERT INTO 'LAYERS' (ID,NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('1019','Potentiel m&eacute;thanisable par canton','Legende : https://wxs.ign.fr/static/legends/ENR/REPARTITION.POTENTIEL.METHANISATION.2050-legend.png','Methane','France','REPARTITION.POTENTIEL.METHANISATION.2050','http://wxs.ign.fr/an7nvfzojv5wa96dsga5nk8w/geoportail/wmts?layer=REPARTITION.POTENTIEL.METHANISATION.2050&amp;style=REPARTITION.POTENTIEL.METHANISATION.2050&amp;tilematrixset=PM&amp;Service=WMTS&amp;Request=GetTile&amp;Version=1.0.0&amp;Format=image/png&amp;TileMatrix={z}&amp;TileCol={x}&amp;TileRow={y}','6','18','png','Geoportail','geoportail.gouv.fr',NULL,'256','0','function getTile(args) {
 return args;
 }','Visible','{&quot;BackgroundColor&quot;:&quot;&quot;,&quot;ErrorsToIgnore&quot;:&quot;&quot;}',NULL,'1','1');
-INSERT INTO 'LAYERS' (NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('Estimation de besoins de chaleur - secteur industriel','Estimation de besoins de chaleur - secteur industriel
+INSERT INTO 'LAYERS' (ID,NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('1020','Estimation de besoins de chaleur - secteur industriel','Estimation de besoins de chaleur - secteur industriel
 Legende : https://wxs.ign.fr/static/legends/ENR/BESOIN.CHALEUR.INDUSTRIEL-legend.png','/','France','Estimation de besoins de chaleur','http://wxs.ign.fr/an7nvfzojv5wa96dsga5nk8w/geoportail/wmts?layer=BESOIN.CHALEUR.INDUSTRIEL&amp;style=BESOIN.CHALEUR.INDUSTRIEL&amp;tilematrixset=PM&amp;Service=WMTS&amp;Request=GetTile&amp;Version=1.0.0&amp;Format=image/png&amp;TileMatrix={z}&amp;TileCol={x}&amp;TileRow={y}','6','18','png','Geoportail','geoportail.gouv.fr',NULL,'256','0','function getTile(args) {
 return args;
 }','Visible','{&quot;BackgroundColor&quot;:&quot;&quot;,&quot;ErrorsToIgnore&quot;:&quot;&quot;}',NULL,'2','1');
-INSERT INTO 'LAYERS' (NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('Estimation de besoins de chaleur - secteur r&eacute;sidentiel','Estimation de besoins de chaleur - secteur r&eacute;sidentiel
+INSERT INTO 'LAYERS' (ID,NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('1021','Estimation de besoins de chaleur - secteur r&eacute;sidentiel','Estimation de besoins de chaleur - secteur r&eacute;sidentiel
 Legende : https://wxs.ign.fr/static/legends/ENR/BESOIN.CHALEUR.RESIDENTIEL-legend.png','/','France','Estimation de besoins de chaleur - secteur r&eacute;sidentiel','http://wxs.ign.fr/an7nvfzojv5wa96dsga5nk8w/geoportail/wmts?layer=BESOIN.CHALEUR.RESIDENTIEL&amp;style=BESOIN.CHALEUR.RESIDENTIEL&amp;tilematrixset=PM&amp;Service=WMTS&amp;Request=GetTile&amp;Version=1.0.0&amp;Format=image/png&amp;TileMatrix={z}&amp;TileCol={x}&amp;TileRow={y}','6','18','png','Geoportail','geoportail.gouv.fr',NULL,'256','0','function getTile(args) {
 return args;
 }','Visible','{&quot;BackgroundColor&quot;:&quot;&quot;,&quot;ErrorsToIgnore&quot;:&quot;&quot;}',NULL,'1','1');
-INSERT INTO 'LAYERS' (NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('Estimation de besoins de chaleur - secteur tertiaire','Estimation de besoins de chaleur - secteur tertiaire
+INSERT INTO 'LAYERS' (ID,NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('1022','Estimation de besoins de chaleur - secteur tertiaire','Estimation de besoins de chaleur - secteur tertiaire
 Legende : https://wxs.ign.fr/static/legends/ENR/BESOIN.CHALEUR.TERTIAIRE-legend.png','/','France','Estimation de besoins de chaleur - secteur tertiaire','http://wxs.ign.fr/an7nvfzojv5wa96dsga5nk8w/geoportail/wmts?layer=BESOIN.CHALEUR.TERTIAIRE&amp;style=BESOIN.CHALEUR.TERTIAIRE&amp;tilematrixset=PM&amp;Service=WMTS&amp;Request=GetTile&amp;Version=1.0.0&amp;Format=image/png&amp;TileMatrix={z}&amp;TileCol={x}&amp;TileRow={y}','6','18','png','Geoportail','geoportail.gouv.fr',NULL,'256','0','function getTile(args) {
 return args;
 }','Visible','{&quot;BackgroundColor&quot;:&quot;&quot;,&quot;ErrorsToIgnore&quot;:&quot;&quot;}',NULL,'1','1');
-INSERT INTO 'LAYERS' (NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('Potentiel de d&eacute;veloppement des r&eacute;seaux de chaleur et de froid en PACA','Potentiel de d&eacute;veloppement des r&eacute;seaux de chaleur et de froid en PACA
+INSERT INTO 'LAYERS' (ID,NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('1023','Potentiel de d&eacute;veloppement des r&eacute;seaux de chaleur et de froid en PACA','Potentiel de d&eacute;veloppement des r&eacute;seaux de chaleur et de froid en PACA
 Legende : https://wxs.ign.fr/static/legends/ENR/POTENTIEL.RESEAU.CHAUD.FROID.PACA-legend.png','/','France','Potentiel de d&eacute;veloppement des r&eacute;seaux de chaleur et de froid en PACA','http://wxs.ign.fr/an7nvfzojv5wa96dsga5nk8w/geoportail/wmts?layer=POTENTIEL.RESEAU.CHAUD.FROID.PACA&amp;style=POTENTIEL.RESEAU.CHAUD.FROID.PACA&amp;tilematrixset=PM&amp;Service=WMTS&amp;Request=GetTile&amp;Version=1.0.0&amp;Format=image/png&amp;TileMatrix={z}&amp;TileCol={x}&amp;TileRow={y}','6','18','png','Geoportail','geoportail.gouv.fr',NULL,'256','0','function getTile(args) {
     return args;
 }
@@ -15832,7 +15818,7 @@ function getPreview(args) {
     args.z = &quot;11&quot;;
     return args;
 }','Visible','{&quot;BackgroundColor&quot;:&quot;&quot;,&quot;ErrorsToIgnore&quot;:&quot;&quot;}',NULL,'1','1');
-INSERT INTO 'LAYERS' (NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('Potentiel de d&eacute;veloppement des r&eacute;seaux de chaleur en PACA','Potentiel de d&eacute;veloppement des r&eacute;seaux de chaleur en PACA
+INSERT INTO 'LAYERS' (ID,NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('1024','Potentiel de d&eacute;veloppement des r&eacute;seaux de chaleur en PACA','Potentiel de d&eacute;veloppement des r&eacute;seaux de chaleur en PACA
 Legende : https://wxs.ign.fr/static/legends/ENR/POTENTIEL.RESEAU.CHALEUR.PACA-legend.png','/','France','Potentiel de d&eacute;veloppement des r&eacute;seaux de chaleur en PACA','http://wxs.ign.fr/an7nvfzojv5wa96dsga5nk8w/geoportail/wmts?layer=POTENTIEL.RESEAU.CHALEUR.PACA&amp;style=POTENTIEL.RESEAU.CHALEUR.PACA&amp;tilematrixset=PM&amp;Service=WMTS&amp;Request=GetTile&amp;Version=1.0.0&amp;Format=image/png&amp;TileMatrix={z}&amp;TileCol={x}&amp;TileRow={y}','6','18','png','Geoportail','geoportail.gouv.fr',NULL,'256','0','function getTile(args) {
     return args;
 }
@@ -15842,7 +15828,7 @@ function getPreview(args) {
     args.z = &quot;11&quot;;
     return args;
 }','Visible','{&quot;BackgroundColor&quot;:&quot;&quot;,&quot;ErrorsToIgnore&quot;:&quot;&quot;}',NULL,'1','1');
-INSERT INTO 'LAYERS' (NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('Localisation des installations de production de chaleur par Biogaz','Localisation des installations de production de chaleur par Biogaz
+INSERT INTO 'LAYERS' (ID,NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('1025','Localisation des installations de production de chaleur par Biogaz','Localisation des installations de production de chaleur par Biogaz
 Legende : https://wxs.ign.fr/static/legends/ENR/SITE.PRODUCTION.CHALEUR.BIOGAZ-legend.png','/','France','Localisation des installations de production de chaleur par Biogaz','http://wxs.ign.fr/an7nvfzojv5wa96dsga5nk8w/geoportail/wmts?layer=SITE.PRODUCTION.CHALEUR.BIOGAZ&amp;style=SITE.PRODUCTION.CHALEUR.BIOGAZ&amp;tilematrixset=PM&amp;Service=WMTS&amp;Request=GetTile&amp;Version=1.0.0&amp;Format=image/png&amp;TileMatrix={z}&amp;TileCol={x}&amp;TileRow={y}','6','14','png','Geoportail','geoportail.gouv.fr',NULL,'256','0','function getTile(args) {
     return args;
 }
@@ -15852,7 +15838,7 @@ function getPreview(args) {
     args.z = &quot;7&quot;;
     return args;
 }','Visible','{&quot;BackgroundColor&quot;:&quot;&quot;,&quot;ErrorsToIgnore&quot;:&quot;&quot;}',NULL,'2','1');
-INSERT INTO 'LAYERS' (NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('Localisation des installations de production d&apos;&eacute;lectricit&eacute; pouvant valoriser de la chaleur','Localisation des installations de production d&apos;&eacute;lectricit&eacute; pouvant valoriser de la chaleur
+INSERT INTO 'LAYERS' (ID,NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('1026','Localisation des installations de production d&apos;&eacute;lectricit&eacute; pouvant valoriser de la chaleur','Localisation des installations de production d&apos;&eacute;lectricit&eacute; pouvant valoriser de la chaleur
 Legende : https://wxs.ign.fr/static/legends/ENR/SITE.PRODUCTION.CHALEUR.COGENERATION-legend.png','/','France','Localisation des installations de production d&apos;&eacute;lectricit&eacute; pouvant valoriser de la chaleur','http://wxs.ign.fr/an7nvfzojv5wa96dsga5nk8w/geoportail/wmts?layer=SITE.PRODUCTION.CHALEUR.COGENERATION&amp;style=SITE.PRODUCTION.CHALEUR.COGENERATION&amp;tilematrixset=PM&amp;Service=WMTS&amp;Request=GetTile&amp;Version=1.0.0&amp;Format=image/png&amp;TileMatrix={z}&amp;TileCol={x}&amp;TileRow={y}','6','14','png','Geoportail','geoportail.gouv.fr',NULL,'256','0','function getTile(args) {
     return args;
 }
@@ -15862,7 +15848,7 @@ function getPreview(args) {
     args.z = &quot;7&quot;;
     return args;
 }','Visible','{&quot;BackgroundColor&quot;:&quot;&quot;,&quot;ErrorsToIgnore&quot;:&quot;&quot;}',NULL,'1','1');
-INSERT INTO 'LAYERS' (NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('Localisation des installations de production de chaleur par incin&eacute;ration des d&eacute;chets','Localisation des installations de production de chaleur par incin&eacute;ration des d&eacute;chets
+INSERT INTO 'LAYERS' (ID,NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('1027','Localisation des installations de production de chaleur par incin&eacute;ration des d&eacute;chets','Localisation des installations de production de chaleur par incin&eacute;ration des d&eacute;chets
 Legende : https://wxs.ign.fr/static/legends/ENR/SITE.PRODUCTION.CHALEUR.DECHETS-legend.png','/','France','Localisation des installations de production de chaleur par incin&eacute;ration des d&eacute;chets','http://wxs.ign.fr/an7nvfzojv5wa96dsga5nk8w/geoportail/wmts?layer=SITE.PRODUCTION.CHALEUR.DECHETS&amp;style=SITE.PRODUCTION.CHALEUR.DECHETS&amp;tilematrixset=PM&amp;Service=WMTS&amp;Request=GetTile&amp;Version=1.0.0&amp;Format=image/png&amp;TileMatrix={z}&amp;TileCol={x}&amp;TileRow={y}','6','14','png','Geoportail','geoportail.gouv.fr',NULL,'256','0','function getTile(args) {
     return args;
 }
@@ -15872,7 +15858,7 @@ function getPreview(args) {
     args.z = &quot;7&quot;;
     return args;
 }','Visible','{&quot;BackgroundColor&quot;:&quot;&quot;,&quot;ErrorsToIgnore&quot;:&quot;&quot;}',NULL,'1','1');
-INSERT INTO 'LAYERS' (NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('Localisation des r&eacute;seaux de chaleur en Bretagne','Localisation des r&eacute;seaux de chaleur en Bretagne
+INSERT INTO 'LAYERS' (ID,NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('1028','Localisation des r&eacute;seaux de chaleur en Bretagne','Localisation des r&eacute;seaux de chaleur en Bretagne
 Legende : https://wxs.ign.fr/static/legends/ENR/SITE.PRODUCTION.CHALEUR.RC.BRETAGNE-legend.png','/','France','Localisation des r&eacute;seaux de chaleur en Bretagne','http://wxs.ign.fr/an7nvfzojv5wa96dsga5nk8w/geoportail/wmts?layer=SITE.PRODUCTION.CHALEUR.RC.BRETAGNE&amp;style=SITE.PRODUCTION.CHALEUR.RC.BRETAGNE&amp;tilematrixset=PM&amp;Service=WMTS&amp;Request=GetTile&amp;Version=1.0.0&amp;Format=image/png&amp;TileMatrix={z}&amp;TileCol={x}&amp;TileRow={y}','6','14','png','Geoportail','geoportail.gouv.fr',NULL,'256','0','function getTile(args) {
     return args;
 }
@@ -15882,7 +15868,7 @@ function getPreview(args) {
     args.z = &quot;7&quot;;
     return args;
 }','Visible','{&quot;BackgroundColor&quot;:&quot;&quot;,&quot;ErrorsToIgnore&quot;:&quot;&quot;}',NULL,'1','1');
-INSERT INTO 'LAYERS' (NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('Localisation des r&eacute;seaux de chaleur et de froid en France','Localisation des r&eacute;seaux de chaleur et de froid en France
+INSERT INTO 'LAYERS' (ID,NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('1029','Localisation des r&eacute;seaux de chaleur et de froid en France','Localisation des r&eacute;seaux de chaleur et de froid en France
 Legende : https://wxs.ign.fr/static/legends/ENR/SITE.PRODUCTION.CHALEUR.RC-legend.png','/','France','Localisation des r&eacute;seaux de chaleur et de froid en France','http://wxs.ign.fr/an7nvfzojv5wa96dsga5nk8w/geoportail/wmts?layer=SITE.PRODUCTION.CHALEUR.RC&amp;style=SITE.PRODUCTION.CHALEUR.RC&amp;tilematrixset=PM&amp;Service=WMTS&amp;Request=GetTile&amp;Version=1.0.0&amp;Format=image/png&amp;TileMatrix={z}&amp;TileCol={x}&amp;TileRow={y}','6','14','png','Geoportail','geoportail.gouv.fr',NULL,'256','0','function getTile(args) {
     return args;
 }
@@ -15892,7 +15878,7 @@ function getPreview(args) {
     args.z = &quot;7&quot;;
     return args;
 }','Visible','{&quot;BackgroundColor&quot;:&quot;&quot;,&quot;ErrorsToIgnore&quot;:&quot;&quot;}',NULL,'2','1');
-INSERT INTO 'LAYERS' (NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('Localisation des r&eacute;seaux de chaleur en PACA','Localisation des r&eacute;seaux de chaleur en PACA
+INSERT INTO 'LAYERS' (ID,NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('1030','Localisation des r&eacute;seaux de chaleur en PACA','Localisation des r&eacute;seaux de chaleur en PACA
 Legende : https://wxs.ign.fr/static/legends/ENR/SITE.PRODUCTION.CHALEUR.RC.PACA-legend.png','/','France','Localisation des r&eacute;seaux de chaleur en PACA','http://wxs.ign.fr/an7nvfzojv5wa96dsga5nk8w/geoportail/wmts?layer=SITE.PRODUCTION.CHALEUR.RC.PACA&amp;style=SITE.PRODUCTION.CHALEUR.RC.PACA&amp;tilematrixset=PM&amp;Service=WMTS&amp;Request=GetTile&amp;Version=1.0.0&amp;Format=image/png&amp;TileMatrix={z}&amp;TileCol={x}&amp;TileRow={y}','6','14','png','Geoportail','geoportail.gouv.fr',NULL,'256','0','function getTile(args) {
     return args;
 }
@@ -15902,6 +15888,67 @@ function getPreview(args) {
     args.z = &quot;7&quot;;
     return args;
 }','Visible','{&quot;BackgroundColor&quot;:&quot;&quot;,&quot;ErrorsToIgnore&quot;:&quot;&quot;}',NULL,'2','1');
-PRAGMA user_version=6;
+INSERT INTO 'LAYERS' (NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('Nancy - Photographies a&eacute;riennes (2016)','La Communaut&eacute; Urbaine du Grand Nancy met &agrave; disposition plusieurs orthophotographies (photos a&eacute;riennes) sous licence libre dans le cadre de l&apos;OpenData. L&apos;association OpenStreetMap France a plac&eacute; l&apos;une d&apos;elles sur un serveur WMS, notamment utilisable comme carte de fond pour contribuer &agrave; OpenStreetMap sur le secteur de Nancy. Ces photographies ont &eacute;t&eacute; r&eacute;alis&eacute;es par la soci&eacute;t&eacute; Aeroscan
+https://wiki.openstreetmap.org/wiki/Nancy/Orthophotographie','Satellite','France','Nancy - Photographies a&eacute;riennes (2016)','https://wms.openstreetmap.fr/tms/1.0.0/nancy_2016/{z}/{x}/{y}','0','22','jpeg','OpenStreetMap','openstreetmap.org',NULL,'256','0','function getTile(args) {
+    return args;
+}
+
+function getPreviewFallback(args) {
+    args.x = &quot;67787&quot;;
+    args.y = &quot;45182&quot;;
+    args.z = &quot;17&quot;;
+    return args;
+}','Visible','{&quot;BackgroundColor&quot;:&quot;&quot;,&quot;ErrorsToIgnore&quot;:&quot;&quot;,&quot;MaxDownloadTilesInParralele&quot;:0,&quot;WaitingBeforeStartAnotherTile&quot;:0}','[
+  {
+    &quot;Name&quot;: &quot;M&eacute;tropole du Grand Nancy&quot;,
+    &quot;Color&quot;: &quot;#000000&quot;,
+    &quot;StrokeThickness&quot;: 5.0,
+    &quot;MinZoom&quot;: &quot;∞&quot;,
+    &quot;MaxZoom&quot;: &quot;∞&quot;,
+    &quot;NO_Lat&quot;: 48.742796,
+    &quot;NO_Long&quot;: 6.070223,
+    &quot;SE_Lat&quot;: 48.603306,
+    &quot;SE_Long&quot;: 6.295781
+  }
+]','2','1');
+INSERT INTO 'LAYERS' (NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('OpenStreetMap',NULL,'Cartes','World','OpenStreetMap','http://tile.openstreetmap.org/{z}/{x}/{y}.png','0','19','jpeg','OpenStreetMap','openstreetmap.org',NULL,'256','0','//default script
+function getTile(args) {
+   return args;
+}','Visible','{&quot;BackgroundColor&quot;:&quot;&quot;,&quot;ErrorsToIgnore&quot;:&quot;&quot;,&quot;MaxDownloadTilesInParralele&quot;:0,&quot;WaitingBeforeStartAnotherTile&quot;:0}',NULL,'2','1');
+INSERT INTO 'LAYERS' (NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('Nancy - Photographies a&eacute;riennes (2012)','La Communaut&eacute; Urbaine du Grand Nancy met &agrave; disposition plusieurs orthophotographies (photos a&eacute;riennes) sous licence libre dans le cadre de l&apos;OpenData. L&apos;association OpenStreetMap France a plac&eacute; l&apos;une d&apos;elles sur un serveur WMS, notamment utilisable comme carte de fond pour contribuer &agrave; OpenStreetMap sur le secteur de Nancy. Ces photographies ont &eacute;t&eacute; r&eacute;alis&eacute;es par la soci&eacute;t&eacute; Aeroscan
+https://wiki.openstreetmap.org/wiki/Nancy/Orthophotographie','Satellite','France','Nancy - Photographies a&eacute;riennes (2012)','https://wms.openstreetmap.fr/tms/1.0.0/nancy_2012/{z}/{x}/{y}','0','22','jpeg','OpenStreetMap','openstreetmap.org',NULL,'256','0','function getTile(args) {
+    return args;
+}
+
+function getPreviewFallback(args) {
+    args.x = &quot;67787&quot;;
+    args.y = &quot;45182&quot;;
+    args.z = &quot;17&quot;;
+    return args;
+}','Visible','{&quot;BackgroundColor&quot;:&quot;&quot;,&quot;ErrorsToIgnore&quot;:&quot;&quot;,&quot;MaxDownloadTilesInParralele&quot;:0,&quot;WaitingBeforeStartAnotherTile&quot;:0}','[
+  {
+    &quot;Name&quot;: &quot;M&eacute;tropole du Grand Nancy&quot;,
+    &quot;Color&quot;: &quot;#000000&quot;,
+    &quot;StrokeThickness&quot;: 5.0,
+    &quot;MinZoom&quot;: &quot;∞&quot;,
+    &quot;MaxZoom&quot;: &quot;∞&quot;,
+    &quot;NO_Lat&quot;: 48.742796,
+    &quot;NO_Long&quot;: 6.070223,
+    &quot;SE_Lat&quot;: 48.603306,
+    &quot;SE_Long&quot;: 6.295781
+  }
+]','2','1');
+INSERT INTO 'LAYERS' (NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('MapBox Satellite',NULL,'Satellite','World','MapBox Satellite','https://api.mapbox.com/v4/mapbox.satellite/{z}/{x}/{y}.png?sku=101YzS3RT214V&amp;access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4M29iazA2Z2gycXA4N2pmbDZmangifQ.-g_vE53SD2WrJ6tFX7QHmA','0','22','jpeg','mapbox','mapbox.com',NULL,'256','0','function getTile(args) {
+    return args;
+}','Visible','{&quot;BackgroundColor&quot;:&quot;&quot;,&quot;ErrorsToIgnore&quot;:&quot;&quot;,&quot;MaxDownloadTilesInParralele&quot;:0,&quot;WaitingBeforeStartAnotherTile&quot;:0}',NULL,'2','1');
+INSERT INTO 'LAYERS' (NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('OpenStreetMap - GPS',NULL,'Cartes','World','OpenStreetMap - GPS','https://gps.tile.openstreetmap.org/lines/{z}/{x}/{y}.png','0','19','png','OpenStreetMap','openstreetmap.org',NULL,'256','0','//default script
+function getTile(args) {
+   return args;
+}','Visible','{&quot;BackgroundColor&quot;:&quot;&quot;,&quot;ErrorsToIgnore&quot;:&quot;&quot;,&quot;MaxDownloadTilesInParralele&quot;:0,&quot;WaitingBeforeStartAnotherTile&quot;:0}',NULL,'2','1');
+INSERT INTO 'LAYERS' (NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('World Topo Map caca','This map is designed to be used as a basemap by GIS professionals and as a reference map by anyone. The map includes administrative boundaries, cities, water features, physiographic features, parks, landmarks, highways, roads, railways, and airports overlaid on land cover and shaded relief imagery for added context. The map provides coverage for the world down to a scale of ~1:72k. Coverage is provided down to ~1:4k for the following areas: Australia and New Zealand; India; Europe; Canada; Mexico; the continental United States and Hawaii; South America and Central America; Africa; and most of the Middle East. Coverage down to ~1:1k and ~1:2k is available in select urban areas. This basemap was compiled from a variety of best available sources from several data providers, including the U.S. Geological Survey (USGS), U.S. Environmental Protection Agency (EPA), U.S. National Park Service (NPS), Food and Agriculture Organization of the United Nations (FAO), Department of Natural Resources Canada (NRCAN), GeoBase, Agriculture and Agri-Food Canada, Garmin, HERE, Esri, OpenStreetMap contributors, and the GIS User Community. For more information on this map, including our terms of use, visit us online at http://goto.arcgisonline.com/maps/World_Topo_Map','Cartes','*','ARCGIS_World_Topo_Map','https://services.arcgisonline.com/arcgis/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}','0','19','jpeg','ArcGIS','www.arcgis.com',NULL,'256','0','//default script
+function getTile(args) {
+   return args;
+}','Visible','{&quot;BackgroundColor&quot;:&quot;&quot;,&quot;ErrorsToIgnore&quot;:&quot;&quot;}',NULL,'2','1');
+PRAGMA user_version=7;
 COMMIT;
  

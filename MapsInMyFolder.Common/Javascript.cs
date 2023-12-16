@@ -121,7 +121,8 @@ namespace MapsInMyFolder.Commun
                 JavascriptActionEvent?.Invoke(LayerId, JavascriptAction.refreshMap);
                 return null;
             }));
-            engine.SetValue("clearCache", (Func<object>)(() => {
+            engine.SetValue("clearCache", (Func<object>)(() =>
+            {
                 JavascriptActionEvent?.Invoke(LayerId, JavascriptAction.clearCache);
                 return null;
             }));
@@ -139,7 +140,7 @@ namespace MapsInMyFolder.Commun
             return engine;
         }
 
-        public static string getHelp()
+        public static string GetHelp()
         {
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.AppendLine("AIDE");
@@ -169,7 +170,7 @@ namespace MapsInMyFolder.Commun
             stringBuilder.AppendLine(" - transformLocation(OriginWkt, TargetWkt, projX, projY) : Convertir la position X, Y d'un système de coordonnées vers un autre système (utilise Well Known Text definition)");
             stringBuilder.AppendLine(" - transformLocationFromWGS84(TargetWkt, Latitude, Longitude) : Convertir les coordonnées vers un autre système de coordonnées (utilise Well Known Text definition)");
 
-           return stringBuilder.ToString();
+            return stringBuilder.ToString();
         }
 
 
@@ -329,7 +330,7 @@ namespace MapsInMyFolder.Commun
             }
             if (string.IsNullOrEmpty(script))
             {
-                script = Layers.GetLayerById(LayerId)?.class_script;
+                script = Layers.GetLayerById(LayerId)?.Script;
             }
             if (string.IsNullOrWhiteSpace(script) || !script.Contains(functionName))
             {
@@ -399,7 +400,7 @@ namespace MapsInMyFolder.Commun
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine("ExecuteScript " + ex.Message);
+                    Debug.WriteLine("ExecuteScript - function " + InvokeFunctionString + "in layer n" + LayerId + " / " + ex.Message);
                     if (ex.Message == "Can only invoke functions")
                     {
                         Functions.PrintError(InvokeFunctionString + "=> " + ex.Message);

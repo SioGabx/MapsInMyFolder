@@ -722,27 +722,27 @@
         function download_js_start(el, id) {
             el.parentElement.parentElement.querySelector(".infostxt").innerText = "%downloadStateRestarting%";
             el.parentElement.parentElement.setAttribute("data-state", "progress");
-            download_Csharp_call_from_js.download_restart(parseInt(id));
+            DownloadCEFSharpLink.downloadRestart(parseInt(id));
         }
 
         function download_js_stop(id) {
-            download_Csharp_call_from_js.download_stop(parseInt(id));
+            DownloadCEFSharpLink.downloadStop(parseInt(id));
         }
 
         function download_js_openfolder(id) {
-            download_Csharp_call_from_js.download_openfolder(parseInt(id));
+            DownloadCEFSharpLink.downloadOpenFolder(parseInt(id));
         }
 
         function download_js_openfile(id) {
-            download_Csharp_call_from_js.download_openfile(parseInt(id));
+            DownloadCEFSharpLink.downloadOpenFile(parseInt(id));
         }
 
         function download_js_opentempfolder(id) {
-            download_Csharp_call_from_js.download_opentempfolder(parseInt(id));
+            DownloadCEFSharpLink.downloadOpenTempFolder(parseInt(id));
         }
 
         function download_js_delete(id) {
-            download_Csharp_call_from_js.download_deletefile(parseInt(id));
+            DownloadCEFSharpLink.downloadDeleteFile(parseInt(id));
         }
 
         function download_js_delete_db(id) {
@@ -765,7 +765,7 @@
 
             }, 200)
 
-            download_Csharp_call_from_js.download_delete_db(parseInt(id));
+            DownloadCEFSharpLink.downloadDeleteInDatabase(parseInt(id));
 
 
 
@@ -774,32 +774,32 @@
         }
 
         function download_js_reselect_area(id) {
-            download_Csharp_call_from_js.download_reselect_area(parseInt(id));
+            DownloadCEFSharpLink.downloadReselectArea(parseInt(id));
         }
 
         function download_js_copyloc(id) {
-            download_Csharp_call_from_js.download_copyloc(parseInt(id));
+            DownloadCEFSharpLink.downloadCopyLocations(parseInt(id));
         }
 
         function download_js_copypath(id) {
-            download_Csharp_call_from_js.download_copypath(parseInt(id));
+            DownloadCEFSharpLink.DownloadCopyFilePath(parseInt(id));
         }
 
         function download_js_makecourant(id) {
-            download_Csharp_call_from_js.download_makecourant(parseInt(id));
+            DownloadCEFSharpLink.downloadSetLayerAsCurrent(parseInt(id));
         }
 
         function download_js_cancel(id) {
-            download_Csharp_call_from_js.download_cancel(parseInt(id));
+            DownloadCEFSharpLink.downloadCancel(parseInt(id));
             document.getElementById(id).getElementsByClassName("infostxt")[0].textContent = "%downloadStateCanceled%.";
         }
 
         function download_js_restart(id) {
-            download_Csharp_call_from_js.download_restart(parseInt(id));
+            DownloadCEFSharpLink.downloadRestart(parseInt(id));
             document.getElementById(id).getElementsByClassName("infostxt")[0].textContent = "%downloadStateRestarting%";
         }
         function download_js_restart_from0(id) {
-            download_Csharp_call_from_js.download_restart_from0(parseInt(id));
+            DownloadCEFSharpLink.downloadRestartFromStart(parseInt(id));
             document.getElementById(id).getElementsByClassName("infostxt")[0].textContent = "%downloadStateRestarting%";
         }
 
@@ -1150,14 +1150,14 @@
             if (e.which === 46) { //Supp
                 if (document.querySelector(".clickfocus") != null) {
                     let dataState = document.querySelector(".clickfocus .download_main_div").getAttribute("data-state");
-                    download_Csharp_call_from_js.download_cancel_deleted_db(parseInt(document.querySelector(".clickfocus").getAttribute("id")));
+                    DownloadCEFSharpLink.downloadCancelAndDeletedInDatabase(parseInt(document.querySelector(".clickfocus").getAttribute("id")));
                     /*if (dataState == "success" || dataState == "cancel" || dataState == "error") {
                         e.preventDefault();
                         console.log(document.querySelector(".clickfocus"));
                         download_js_delete_db(document.querySelector(".clickfocus").getAttribute("id"));
                         hide_context_menu(e);
                     } else {
-                        download_Csharp_call_from_js.download_cancel_deleted_db(parseInt(document.querySelector(".clickfocus").getAttribute("id")));
+                        DownloadCEFSharpLink.downloadCancelAndDeletedInDatabase(parseInt(document.querySelector(".clickfocus").getAttribute("id")));
                         hide_context_menu(e);
                     }*/
                 }
@@ -1351,7 +1351,7 @@
                         download_js_delete(id);
                         break;
                     case "supprimer_liste":
-                        download_Csharp_call_from_js.download_cancel_deleted_db(parseInt(id));
+                        DownloadCEFSharpLink.downloadCancelAndDeletedInDatabase(parseInt(id));
                         // download_js_delete_db(id);
                         break;
                     case "afficher_temp_folder":
@@ -1375,7 +1375,7 @@
 
     </script>
     <script>
-        CefSharp.BindObjectAsync("download_Csharp_call_from_js");
+        CefSharp.BindObjectAsync("DownloadCEFSharpLink");
     </script>
 
 </body>

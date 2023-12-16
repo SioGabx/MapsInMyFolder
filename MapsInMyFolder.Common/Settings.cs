@@ -15,7 +15,7 @@ namespace MapsInMyFolder.Commun
 
     public static class Settings
     {
-        public static int layer_startup_id = 0;
+        public static int layer_startup_id = 0; //0 to select the first layer
         public static double background_layer_opacity = 0.3;
         public static int background_layer_color_R = 230;
         public static int background_layer_color_G = 230;
@@ -177,6 +177,10 @@ namespace MapsInMyFolder.Commun
         public static void SaveIndividualSettings(string fieldName, object fieldValue)
         {
             XMLParser.Settings.Write(fieldName, fieldValue.ToString());
+        }
+        public static object GetIndividualSettings(string fieldName)
+        {
+            return XMLParser.Settings.Read(fieldName);
         }
     }
 }

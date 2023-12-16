@@ -165,13 +165,13 @@ namespace MapsInMyFolder.Commun
             }
         }
 
-        public static int IndexOf<T>(this IEnumerable<T> enumerable, T element, IEqualityComparer<T> comparer = null)
+        public static int IndexOf<T>(this IEnumerable<T> enumerable, T element, IEqualityComparer<T> Comparer = null)
         {
             int i = 0;
-            comparer = comparer ?? EqualityComparer<T>.Default;
+            Comparer ??= EqualityComparer<T>.Default;
             foreach (var currentElement in enumerable)
             {
-                if (comparer.Equals(currentElement, element))
+                if (Comparer.Equals(currentElement, element))
                 {
                     return i;
                 }

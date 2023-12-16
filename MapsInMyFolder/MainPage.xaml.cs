@@ -1,5 +1,4 @@
-﻿using Jint.Runtime;
-using MapsInMyFolder.Commun;
+﻿using MapsInMyFolder.Commun;
 using MapsInMyFolder.MapControl;
 using System;
 using System.Collections.Generic;
@@ -8,7 +7,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media.Animation;
-using static MapsInMyFolder.Commun.Collectif.GetUrl;
 using TextBox = System.Windows.Controls.TextBox;
 
 namespace MapsInMyFolder
@@ -57,8 +55,8 @@ namespace MapsInMyFolder
 
         void Init()
         {
-            Init_download_panel();
-            Init_layer_panel();
+            InitDownloadPanel();
+            InitLayerPanel();
             isInitialised = true;
             Notification.UpdateNotification += UpdateNotification;
             layer_browser.ToolTipOpening += (o, e) => e.Handled = true;
@@ -147,7 +145,7 @@ namespace MapsInMyFolder
             {
                 Content = "→ " + Languages.Current["mapSpecifySelectionCoordinatesCopy"],
                 Foreground = Collectif.HexValueToSolidColorBrush("888989"),
-                Margin = new Thickness(0,20,0,0)
+                Margin = new Thickness(0, 20, 0, 0)
             };
             CopyLabel.MouseLeftButtonUp += CopyLabel_MouseLeftButtonUp;
             CopyLabel.Unloaded += CopyLabel_Unloaded;
@@ -232,7 +230,7 @@ namespace MapsInMyFolder
                 double.TryParse(SELatitudeTextBox.Text, out double SE_Lat) &&
                 double.TryParse(SELongitudeTextBox.Text, out double SE_Long))
                 {
-                    Javascript.Functions.SetSelection(NO_Lat, NO_Long, SE_Lat, SE_Long, true, Layers.Current.class_id);
+                    Javascript.Functions.SetSelection(NO_Lat, NO_Long, SE_Lat, SE_Long, true, Layers.Current.Id);
                 }
             }
         }
@@ -368,9 +366,9 @@ namespace MapsInMyFolder
             Commun.Map.CurentSelection.SE_Latitude = SE.Latitude;
             Commun.Map.CurentSelection.SE_Longitude = SE.Longitude;
 
-            if (Javascript.CheckIfFunctionExist(Layers.Current.class_id, Javascript.InvokeFunction.selectionChanged.ToString(), null))
+            if (Javascript.CheckIfFunctionExist(Layers.Current.Id, Javascript.InvokeFunction.selectionChanged.ToString(), null))
             {
-                string script = Layers.Current.class_script;
+                string script = Layers.Current.Script;
 
                 Dictionary<string, Dictionary<string, double>> selectionArguments = Javascript.Functions.GetSelection();
                 // Populate the original dictionary with some data
@@ -388,7 +386,7 @@ namespace MapsInMyFolder
                 }
                 try
                 {
-                    Javascript.ExecuteScript(script, new Dictionary<string, object>(arguments), Layers.Current.class_id, Javascript.InvokeFunction.selectionChanged);
+                    Javascript.ExecuteScript(script, new Dictionary<string, object>(arguments), Layers.Current.Id, Javascript.InvokeFunction.selectionChanged);
                 }
                 catch (Exception ex)
                 {
@@ -492,7 +490,7 @@ namespace MapsInMyFolder
         private void Start_Download_Click(object sender, RoutedEventArgs e)
         {
             MapSelectable.CleanRectangleLocations();
-            MainWindow._instance.FrameLoad_PrepareDownload();
+            MainWindow.Instance.FrameLoad_PrepareDownload();
         }
     }
 }

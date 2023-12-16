@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -65,7 +64,7 @@ namespace MapsInMyFolder.Commun
                     {
                         if (VariableKeyAndValue.ContainsKey(variablenameString))
                         {
-                           return VariableKeyAndValue[variablenameString];
+                            return VariableKeyAndValue[variablenameString];
                         }
                     }
                 }
@@ -112,7 +111,7 @@ namespace MapsInMyFolder.Commun
 
             public static void SetSelection(double NO_Latitude, double NO_Longitude, double SE_Latitude, double SE_Longitude, bool ZoomToNewLocation, int LayerId)
             {
-                if (Layers.Current.class_id == LayerId)
+                if (Layers.Current.Id == LayerId)
                 {
                     instance.Location = new Dictionary<string, double>(){
                         {"SE_Latitude",SE_Latitude },
@@ -292,7 +291,7 @@ namespace MapsInMyFolder.Commun
 
                     if (string.IsNullOrEmpty(caption?.ToString()))
                     {
-                        caption = Collectif.HTMLEntities(Layers.GetLayerById(LayerId).class_name, true) + " indique :";
+                        caption = Collectif.HTMLEntities(Layers.GetLayerById(LayerId).Name, true) + " indique :";
                     }
                     TextBox TextBox;
                     var frame = new DispatcherFrame();
@@ -328,7 +327,7 @@ namespace MapsInMyFolder.Commun
                     //alert("pos");
                     if (string.IsNullOrEmpty(caption?.ToString()))
                     {
-                        caption = Collectif.HTMLEntities(Layers.GetLayerById(LayerId).class_name, true) + " indique :";
+                        caption = Collectif.HTMLEntities(Layers.GetLayerById(LayerId).Name, true) + " indique :";
                     }
 
                     var frame = new DispatcherFrame();
@@ -355,7 +354,7 @@ namespace MapsInMyFolder.Commun
 
             public static string SendNotification(int LayerId, object texte, object caption = null, object javascriptCallback = null, object notifId = null, object doReplaceObj = null)
             {
-                if (LayerId == -2 || LayerId != Layers.Current.class_id)
+                if (LayerId == -2 || LayerId != Layers.Current.Id)
                 {
                     PrintError("Unable to send a notification from the editor or if the layer is not active.");
                     return null;
@@ -368,8 +367,6 @@ namespace MapsInMyFolder.Commun
                     PrintError("replaceOld is not a valid boolean.");
                 }
 
-                Debug.WriteLine(doReplace);
-
                 void SetupNotification()
                 {
                     if (Thread.CurrentThread.GetApartmentState() == ApartmentState.STA)
@@ -380,7 +377,7 @@ namespace MapsInMyFolder.Commun
                         {
                             if (javascriptCallback != null)
                             {
-                                ExecuteScript(Layers.GetLayerById(LayerId).class_script, null, LayerId, javascriptCallback?.ToString());
+                                ExecuteScript(Layers.GetLayerById(LayerId).Script, null, LayerId, javascriptCallback?.ToString());
                             }
                         }
 
@@ -402,7 +399,7 @@ namespace MapsInMyFolder.Commun
 
             static public void Help(int LayerId)
             {
-                Print(getHelp(), LayerId);
+                Print(GetHelp(), LayerId);
             }
 
             static public string Base64Encode(object stringToBeDecoded, int LayerId = -2)

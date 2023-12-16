@@ -44,8 +44,8 @@ namespace MapsInMyFolder.MapControl
                         {
                             return null;
                         }
-                        SaveTempDir = Collectif.GetSaveTempDirectory(layers.class_name, layers.class_identifier, z);
-                        fileformat = layers.class_format;
+                        SaveTempDir = Collectif.GetSaveTempDirectory(layers.Name, layers.Identifier, z);
+                        fileformat = layers.TilesFormat;
                     }
                     if (z != -1)
                     {

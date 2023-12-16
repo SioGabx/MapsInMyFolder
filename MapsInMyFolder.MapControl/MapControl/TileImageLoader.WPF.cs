@@ -37,7 +37,7 @@ namespace MapsInMyFolder.MapControl
                 Layers layers = Layers.GetLayerById(LayerId) ?? Layers.Empty();
                 try
                 {
-                    var response = await Tiles.Loader.GetImageAsync(uri, tile.XIndex, tile.Y, tile.ZoomLevel, LayerId, layers.class_format, Collectif.GetSaveTempDirectory(layers.class_name, layers.class_identifier, tile.ZoomLevel)).ConfigureAwait(false);
+                    var response = await Tiles.Loader.GetImageAsync(uri, tile.XIndex, tile.Y, tile.ZoomLevel, LayerId, layers.TilesFormat, Collectif.GetSaveTempDirectory(layers.Name, layers.Identifier, tile.ZoomLevel)).ConfigureAwait(false);
                     if (response != null && response.Buffer != null && response.ResponseMessage != null && response.ResponseMessage.IsSuccessStatusCode)
                     {
                         buffer = response.Buffer;
@@ -46,7 +46,7 @@ namespace MapsInMyFolder.MapControl
                     }
                     else if (Settings.map_view_error_tile)
                     {
-                        buffer = Collectif.GetEmptyImageBufferFromText(response, LayerId, layers.class_format);
+                        buffer = Collectif.GetEmptyImageBufferFromText(response, LayerId, layers.TilesFormat);
                     }
                 }
                 catch (Exception ex)

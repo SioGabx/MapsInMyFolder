@@ -130,7 +130,10 @@
                         BorderThickness="0,0,0,2"
                         SnapsToDevicePixels="True">
                         <Grid>
-                            <RichTextBox
+                            <Grid.Resources>
+                                <Style BasedOn="{StaticResource {x:Type RichTextBox}}" TargetType="cbcontrols:MultiSelectCombobox_CustomRichTextBox" />
+                            </Grid.Resources>
+                            <cbcontrols:MultiSelectCombobox_CustomRichTextBox
                                 Name="rtxt"
                                 Padding="5,5,0,2"
                                 VerticalContentAlignment="Center"
@@ -146,7 +149,7 @@
                                     <Style BasedOn="{StaticResource MultiselectCombobox.RunStyle}" TargetType="Run" />
                                 </RichTextBox.Resources>
 
-                            </RichTextBox>
+                            </cbcontrols:MultiSelectCombobox_CustomRichTextBox>
 
                             <Popup
                                 Name="popup"
@@ -221,8 +224,13 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
+  
     </Style>
 
+    
+    
+    
+    
     <Style x:Key="TextBoxCleanStyleDefault" TargetType="{x:Type TextBox}">
         <Setter Property="Foreground" Value="#5A5A5A" />
         <Setter Property="BorderBrush" Value="#5A5A5A" />

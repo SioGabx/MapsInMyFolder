@@ -96,6 +96,8 @@ function telechargerTexte(nomFichier, contenu) {
 ### > Géoportail - France
 
 Script to parse Capabilities :
+http://wxs.ign.fr/an7nvfzojv5wa96dsga5nk8w/geoportail/wmts?SERVICE=WMTS&REQUEST=GetCapabilities
+
 ```javascript
 console.log("loading...");
 const url = "https://wxs.ign.fr/an7nvfzojv5wa96dsga5nk8w/geoportail/wmts?SERVICE=WMTS&REQUEST=GetCapabilities";
@@ -110,6 +112,9 @@ function parse(xmlString) {
     const xmlDoc = parser.parseFromString(xmlString, "application/xml");
     const layers = xmlDoc.getElementsByTagName("Layer");
 
+ // Créer un tableau pour stocker les données des couches
+    let layerData = [];
+
     for (let i = 0; i < layers.length; i++) {
         const layer = layers[i];
 
@@ -117,6 +122,10 @@ function parse(xmlString) {
         const description = layer.getElementsByTagName("ows:Abstract")[0].textContent;
         const keywords = layer.getElementsByTagName("ows:Keywords")[0].textContent;
         const bbox = layer.getElementsByTagName("ows:WGS84BoundingBox")[0];
+		let style = "";
+		try {
+		layer.getElementsByTagName("Style")[0].getElementsByTagName("ows:Identifier")[0].textContent;
+		} catch (error) {}
         const identifier = layer.getElementsByTagName("ows:Identifier")[0].textContent;
         let legendUrl = null;
         try {
@@ -150,12 +159,49 @@ function parse(xmlString) {
         console.log("Mots-clés: ", keywords);
         console.log("Bounding box: ", bbox.getAttribute("minx"), bbox.getAttribute("miny"), bbox.getAttribute("maxx"), bbox.getAttribute("maxy"));
         console.log("Identifiant: ", identifier);
+		console.log("Style: ", style);
         console.log("URL de légende: ", legendUrl);
         console.log("Format: ", format);
         console.log("TileMatrixSet: ", tileMatrixSet);
         console.log("Min Zoom: ", minTileMatrixSetLimit);
         console.log("Max Zoom: ", maxTileMatrixSetLimit);
+		
+		      layerData.push({
+            title: title,
+            description: description,
+            keywords: keywords,
+            bbox: {
+                minx: bbox.getAttribute("minx"),
+                miny: bbox.getAttribute("miny"),
+                maxx: bbox.getAttribute("maxx"),
+                maxy: bbox.getAttribute("maxy")
+            },
+            identifier: identifier,
+            style: style,
+            legendUrl: legendUrl,
+            format: format,
+            tileMatrixSet: tileMatrixSet,
+            minZoom: minTileMatrixSetLimit,
+            maxZoom: maxTileMatrixSetLimit
+        });
     }
+	
+	const jsonData = JSON.stringify(layerData);
+
+    // Créer un lien de téléchargement
+    const downloadLink = document.createElement("a");
+    downloadLink.href = "data:application/json;charset=utf-8," + encodeURIComponent(jsonData);
+    downloadLink.download = "layer_data.json";
+    downloadLink.style.display = "none";
+
+    // Ajouter le lien de téléchargement à la page
+    document.body.appendChild(downloadLink);
+
+    // Simuler un clic sur le lien de téléchargement
+    downloadLink.click();
+
+    // Supprimer le lien de téléchargement de la page
+    document.body.removeChild(downloadLink);
 }
 ```
 

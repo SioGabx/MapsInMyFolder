@@ -8,15 +8,12 @@ using System.Data.SQLite;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Threading;
 
 namespace MapsInMyFolder
 {
@@ -50,15 +47,12 @@ namespace MapsInMyFolder
             });
         }
 
-
-
-        public void Init_layer_panel()
+        public void InitLayerPanel()
         {
             if (layer_browser is null) { return; }
             try
             {
-                //layer_browser.JavascriptObjectRepository.UnRegisterAll();
-                layer_browser.JavascriptObjectRepository.Register("layer_Csharp_call_from_js", new Layer_Csharp_call_from_js());
+                layer_browser.JavascriptObjectRepository.Register("LayerCEFSharpLink", new LayerCEFSharpLink());
             }
             catch (Exception ex)
             {
@@ -66,7 +60,7 @@ namespace MapsInMyFolder
             }
             try
             {
-                layer_browser.ExecuteScriptAsync("CefSharp.BindObjectAsync(\"layer_Csharp_call_from_js\");");
+                layer_browser.ExecuteScriptAsync("CefSharp.BindObjectAsync(\"LayerCEFSharpLink\");");
             }
             catch (Exception ex)
             {
@@ -76,7 +70,7 @@ namespace MapsInMyFolder
 
         public void ReloadPage()
         {
-            layer_browser.LoadHtml(DB_Layer_Load(), "http://siogabx.fr");
+            layer_browser.LoadHtml(LayersLoad(), "http://siogabx.fr");
         }
 
 
@@ -84,18 +78,25 @@ namespace MapsInMyFolder
         {
             if (!e.IsLoading)
             {
-                int LayerId = Layers.Current.class_id;
-                string scroll = ", false";
-                if (LayerId == -1)
-                {
-                    LayerId = Settings.layer_startup_id;
-                    scroll = "";
-                }
-                layer_browser.GetMainFrame().EvaluateScriptAsync($"selectionner_calque_by_id({LayerId}{scroll})");
+                layer_browser.GetMainFrame().EvaluateScriptAsync(LayerGetDefaultSelectByIdScript());
             }
         }
 
-        public static List<Layers> DB_Layer_Read(string query_command)
+        public static string LayerGetDefaultSelectByIdScript()
+        {
+            int LayerId = Layers.Current.Id;
+            string scroll = ", true";
+            if (LayerId == -1)
+            {
+                LayerId = Layers.StartupLayerId;
+                scroll = "";
+            }
+            return $"lastelement = document.getElementById({LayerId}); selectionner_calque_by_id({LayerId}{scroll})";
+        }
+
+
+
+        public static List<Layers> LayerReadInDatabase(string query_command)
         {
             List<Layers> layersFavorite = new List<Layers>();
             List<Layers> layersClassicSort = new List<Layers>();
@@ -105,67 +106,8 @@ namespace MapsInMyFolder
             {
                 try
                 {
-                    SQLiteDataReader sqlite_datareaderCopy = sqlite_datareader;
-                    string GetStringFromOrdinal(string name)
-                    {
-                        return Database.GetStringFromOrdinal(sqlite_datareaderCopy, name);
-                    }
-                    int? GetIntFromOrdinal(string name)
-                    {
-                        return Database.GetIntFromOrdinal(sqlite_datareaderCopy, name);
-                    }
-
-                    int? DB_Layer_ID = GetIntFromOrdinal("ID");
-                    string DB_Layer_NAME = GetStringFromOrdinal("NAME").RemoveNewLineChar();
-                    bool DB_Layer_FAVORITE = Convert.ToBoolean(GetIntFromOrdinal("FAVORITE"));
-                    string DB_Layer_DESCRIPTION = GetStringFromOrdinal("DESCRIPTION");
-                    string DB_Layer_CATEGORY = GetStringFromOrdinal("CATEGORY").RemoveNewLineChar();
-                    string DB_Layer_COUNTRY = GetStringFromOrdinal("COUNTRY").RemoveNewLineChar();
-                    string DB_Layer_IDENTIFIER = GetStringFromOrdinal("IDENTIFIER").RemoveNewLineChar();
-                    string DB_Layer_TILE_URL = GetStringFromOrdinal("TILE_URL").RemoveNewLineChar();
-                    int? DB_Layer_MIN_ZOOM = GetIntFromOrdinal("MIN_ZOOM");
-                    int? DB_Layer_MAX_ZOOM = GetIntFromOrdinal("MAX_ZOOM");
-                    string DB_Layer_FORMAT = GetStringFromOrdinal("FORMAT");
-                    string DB_Layer_SITE = GetStringFromOrdinal("SITE").RemoveNewLineChar();
-                    string DB_Layer_SITE_URL = GetStringFromOrdinal("SITE_URL").RemoveNewLineChar();
-                    string DB_Layer_STYLE = GetStringFromOrdinal("STYLE");
-                    int? DB_Layer_TILE_SIZE = GetIntFromOrdinal("TILE_SIZE");
-                    string DB_Layer_SCRIPT = GetStringFromOrdinal("SCRIPT");
-                    string DB_Layer_VISIBILITY = GetStringFromOrdinal("VISIBILITY");
-                    string DB_Layer_SPECIALSOPTIONS = GetStringFromOrdinal("SPECIALSOPTIONS");
-                    string DB_Layer_RECTANGLES = GetStringFromOrdinal("RECTANGLES");
-                    int DB_Layer_VERSION = GetIntFromOrdinal("VERSION") ?? 0;
-                    bool DB_Layer_HAS_SCALE = Convert.ToBoolean(GetIntFromOrdinal("HAS_SCALE"));
-
-                    bool doCreateSpecialsOptionsClass = true;
-                    Layers.SpecialsOptions DeserializeSpecialsOptions = null;
-                    try
-                    {
-                        if (!string.IsNullOrEmpty(DB_Layer_SPECIALSOPTIONS))
-                        {
-                            DeserializeSpecialsOptions = System.Text.Json.JsonSerializer.Deserialize<Layers.SpecialsOptions>(DB_Layer_SPECIALSOPTIONS);
-                            doCreateSpecialsOptionsClass = false;
-                        }
-                    }
-                    catch (Exception)
-                    {
-                        Debug.WriteLine("Invalide JSON inside layer :" + DB_Layer_ID + " named : " + DB_Layer_NAME);
-                    }
-                    finally
-                    {
-                        if (doCreateSpecialsOptionsClass)
-                        {
-                            DeserializeSpecialsOptions = new Layers.SpecialsOptions();
-                        }
-                    }
-
-                    if (!string.IsNullOrEmpty(DB_Layer_SCRIPT))
-                    {
-                        DB_Layer_SCRIPT = Collectif.HTMLEntities(DB_Layer_SCRIPT, true);
-                    }
-
-                    Layers calque = new Layers((int)DB_Layer_ID, DB_Layer_FAVORITE, DB_Layer_NAME, DB_Layer_DESCRIPTION, DB_Layer_CATEGORY, DB_Layer_COUNTRY, DB_Layer_IDENTIFIER, DB_Layer_TILE_URL, DB_Layer_SITE, DB_Layer_SITE_URL, DB_Layer_MIN_ZOOM, DB_Layer_MAX_ZOOM, DB_Layer_FORMAT, DB_Layer_STYLE, DB_Layer_TILE_SIZE, DB_Layer_SCRIPT, DB_Layer_VISIBILITY, DeserializeSpecialsOptions, DB_Layer_RECTANGLES, DB_Layer_VERSION, DB_Layer_HAS_SCALE);
-                    if (DB_Layer_FAVORITE && Settings.layerpanel_favorite_at_top)
+                    var calque = Layers.GetLayerFromSQLiteDataReader(sqlite_datareader);
+                    if (calque.IsFavorite && Settings.layerpanel_favorite_at_top)
                     {
                         layersFavorite.Add(calque);
                     }
@@ -182,7 +124,7 @@ namespace MapsInMyFolder
             return layersFavorite.Concat(layersClassicSort).ToList();
         }
 
-        string DB_Layer_Load()
+        string LayersLoad()
         {
             string OriginalLayersGetQuery = $"SELECT *,'LAYERS' AS TYPE FROM LAYERS UNION SELECT *,'CUSTOMSLAYERS' FROM CUSTOMSLAYERS ORDER BY {Settings.layers_Sort} NULLS LAST";
             string EditedLayersGetQuery = $"SELECT * FROM EDITEDLAYERS ORDER BY {Settings.layers_Sort} NULLS LAST";
@@ -194,7 +136,10 @@ namespace MapsInMyFolder
                 }
             }
 
-            string baseHTML = DB_Layer_CreateHTML(DB_Layer_Read(OriginalLayersGetQuery), DB_Layer_Read(EditedLayersGetQuery));
+            List<Layers> legacyLayers = LayerReadInDatabase(OriginalLayersGetQuery);
+            List<Layers> editedLayers = LayerReadInDatabase(EditedLayersGetQuery);
+            Layers.LayersMergeLegacyWithEdited(legacyLayers, editedLayers);
+            string baseHTML = LayersCreateHTML();
 
             if (Settings.show_layer_devtool)
             {
@@ -203,7 +148,7 @@ namespace MapsInMyFolder
 
             StringBuilder PropertyBuilder = new StringBuilder();
             PropertyBuilder.Append("<script>");
-            PropertyBuilder.Append($"document.body.style.setProperty(\"--opacity_preview_background\", {1 - Settings.background_layer_opacity});");
+            PropertyBuilder.Append($"document.body.style.setProperty(\"--opacity_preview_background-image\", {Settings.background_layer_opacity});");
             PropertyBuilder.Append($"document.body.style.setProperty(\"--background_layer_color_R\", {Settings.background_layer_color_R});");
             PropertyBuilder.Append($"document.body.style.setProperty(\"--background_layer_color_G\", {Settings.background_layer_color_G});");
             PropertyBuilder.Append($"document.body.style.setProperty(\"--background_layer_color_B\", {Settings.background_layer_color_B});");
@@ -215,193 +160,142 @@ namespace MapsInMyFolder
 
         }
 
-        static string DB_Layer_CreateHTML(List<Layers> layers, List<Layers> editedlayers)
+
+        static string LayersCreateHTML()
         {
-            Layers.Clear();
+
             StringBuilder generated_layers = new StringBuilder("<ul class=\"");
             generated_layers.Append(Settings.layerpanel_displaystyle.ToString().ToLower());
             generated_layers.AppendLine("\">");
 
-            Dictionary<int, Layers> EditedLayersDictionnary = editedlayers.ToDictionary(l => l.class_id, l => l);
-
-            List<Layers> GenerateHTMLFromLayerList(List<Layers> ListOfLayers, bool DoRejectLayer = true)
+            List<Layers> layersRejectedAtFirstIteration = new List<Layers>();
+            string[] layersSpecificsCountryToKeep = Settings.filter_layers_based_on_country.Split(';', StringSplitOptions.RemoveEmptyEntries);
+            for (int iterationOfLayerTreatments = 0; iterationOfLayerTreatments <= 1; iterationOfLayerTreatments++)
             {
-                List<Layers> layersRejected = new List<Layers>();
+                bool isFirstIterationDoRejectLayer = iterationOfLayerTreatments == 0;
+                IEnumerable<Layers> EnumerableLayers;
 
-                string[] layer_country_to_keep = Settings.filter_layers_based_on_country.Split(';', StringSplitOptions.RemoveEmptyEntries);
-
-                foreach (Layers InitialLayerFromList in ListOfLayers)
+                if (isFirstIterationDoRejectLayer)
                 {
-                    int Initial_ClassVersion = InitialLayerFromList.class_version;
-                    Layers LayerWithReplacement = InitialLayerFromList;
-                    bool layerHasReplacement = EditedLayersDictionnary.TryGetValue(InitialLayerFromList.class_id, out Layers replacementLayer);
-                    BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static;
-                    if (layerHasReplacement)
+                    EnumerableLayers = Layers.GetLayersList();
+                }
+                else
+                {
+                    EnumerableLayers = layersRejectedAtFirstIteration;
+                }
+
+                foreach (Layers layer in EnumerableLayers)
+                {
+                    if (isFirstIterationDoRejectLayer && Settings.layerpanel_put_non_letter_layername_at_the_end)
                     {
-                        foreach (FieldInfo field in typeof(Layers).GetFields(bindingFlags))
+                        if (string.IsNullOrEmpty(layer.Name) || !Char.IsLetter(layer.Name.Trim()[0]))
                         {
-                            object replacementValue = field.GetValue(replacementLayer);
-                            if (replacementValue is null)
-                            {
-                                continue;
-                            }
-                            Type replacementValueType = replacementValue.GetType();
-
-                            if (replacementValueType == typeof(string))
-                            {
-                                string replacementValueTypeToString = replacementValue as string;
-                                if (replacementValueTypeToString != null)
-                                {
-                                    field.SetValue(LayerWithReplacement, replacementValueTypeToString);
-                                }
-                            }
-                            else
-                            {
-                                field.SetValue(LayerWithReplacement, replacementValue);
-                            }
-                        }
-                    }
-
-                    if (LayerWithReplacement?.class_visibility?.Trim() == "DELETED")
-                    {
-                        continue;
-                    }
-
-                    if (string.IsNullOrEmpty(LayerWithReplacement.class_script))
-                    {
-                        LayerWithReplacement.class_script = Settings.tileloader_default_script;
-                    }
-                    if (string.IsNullOrEmpty(LayerWithReplacement.class_visibility))
-                    {
-                        LayerWithReplacement.class_visibility = "Visible";
-                    }
-                    if (LayerWithReplacement.class_category == "/")
-                    {
-                        LayerWithReplacement.class_category = "";
-                    }
-
-                    if (Settings.layerpanel_put_non_letter_layername_at_the_end)
-                    {
-                        if (DoRejectLayer && (string.IsNullOrEmpty(LayerWithReplacement.class_name) || !Char.IsLetter(LayerWithReplacement.class_name.Trim()[0])))
-                        {
-                            layersRejected.Add(InitialLayerFromList);
+                            layersRejectedAtFirstIteration.Add(layer);
                             continue;
                         }
                     }
 
-                    foreach (FieldInfo field in typeof(Layers).GetFields(bindingFlags))
+                    bool LayerShouldBeCountryFiltered = true;
+
+
+                    string[] layerCountrySpecificsAttributes = layer.Country.Split(';', StringSplitOptions.RemoveEmptyEntries);
+                    string[] GlobeSpecificAttributes = new string[] { "Invariant Country", "World", "*" };
+
+                    bool isGlobeSpecificLayer = layerCountrySpecificsAttributes.ContainsOneOrMore(GlobeSpecificAttributes);
+
+                    if (layersSpecificsCountryToKeep.Length == 0 || layerCountrySpecificsAttributes.Length == 0 || string.IsNullOrWhiteSpace(layer.Country))
                     {
-                        object actualValue = field.GetValue(LayerWithReplacement);
-                        if (actualValue is null)
-                        {
-                            if (field.FieldType == typeof(string))
-                            {
-                                field.SetValue(LayerWithReplacement, string.Empty);
-                            }
-                            else if (field.FieldType == typeof(int))
-                            {
-                                field.SetValue(LayerWithReplacement, 0);
-                            }
-                            else
-                            {
-                                field.SetValue(LayerWithReplacement, null);
-                            }
-
-                        }
-                    }
-
-
-                    Layers.Add(Convert.ToInt32(LayerWithReplacement.class_id), LayerWithReplacement);
-
-                    string orangestar = LayerWithReplacement.class_favorite
-                        ? @$"class=""star orange"" title=""{Languages.Current["layerContextMenuRemoveFavorite"]}"""
-                        : @$"class=""star"" title=""{Languages.Current["layerContextMenuAddFavorite"]}""";
-
-                    string orangelayervisibility;
-                    string visibility = "layer";
-
-                    bool CountryFilterThisLayer = true;
-                    if (layer_country_to_keep.Contains("Invariant Country") || layer_country_to_keep.Contains("World") || layer_country_to_keep.Contains("*") || layer_country_to_keep.Length == 0)
-                    {
-                        CountryFilterThisLayer = false;
+                        LayerShouldBeCountryFiltered = false;
                     }
                     else
                     {
-                        if (string.IsNullOrWhiteSpace(LayerWithReplacement.class_country))
+                        if (layersSpecificsCountryToKeep.ContainsOneOrMore(GlobeSpecificAttributes) && isGlobeSpecificLayer)
                         {
-                            CountryFilterThisLayer = false;
+                            LayerShouldBeCountryFiltered = false;
                         }
-                        string[] layer_country = LayerWithReplacement.class_country.Split(';', StringSplitOptions.RemoveEmptyEntries);
-                        if (layer_country.ContainsOneOrMore(layer_country_to_keep) || layer_country.Length == 0 || layer_country.Contains("Invariant Country") || layer_country.Contains("World") || layer_country.Contains("*"))
+                        if (layerCountrySpecificsAttributes.ContainsOneOrMore(layersSpecificsCountryToKeep))
                         {
-                            CountryFilterThisLayer = false;
+                            LayerShouldBeCountryFiltered = false;
                         }
                     }
 
-                    if (CountryFilterThisLayer)
+                    bool ShowCountry = true;
+                    string CountryHTML = string.Empty;
+                    if (ShowCountry)
                     {
-                        visibility += "Filtered";
-                        orangelayervisibility = @"class=""eye hidden""";
+                        CountryHTML = " - " + layer.Country;
+                    }
+
+                    string layerVisibilityHTML;
+                    string layerFiltered = "layer";
+                    if (LayerShouldBeCountryFiltered)
+                    {
+                        layerFiltered += "Filtered";
+                        layerVisibilityHTML = @"class=""eye hidden""";
+                        continue;
                     }
                     else
                     {
-                        if (LayerWithReplacement.class_visibility == "Hidden")
+                        if (layer.Visibility == "Hidden")
                         {
-                            orangelayervisibility = @$"class=""eye"" title=""{Languages.Current["layerContextMenuShowLayer"]}""";
-                            visibility += "Hidden";
+                            layerVisibilityHTML = @$"class=""eye"" title=""{Languages.Current["layerContextMenuShowLayer"]}""";
+                            layerFiltered += "Hidden";
                         }
                         else
                         {
-                            orangelayervisibility = @$"class=""eye orange"" title=""{Languages.Current["layerContextMenuHideLayer"]}""";
-                            visibility += "Visible";
+                            layerVisibilityHTML = @$"class=""eye orange"" title=""{Languages.Current["layerContextMenuHideLayer"]}""";
+                            layerFiltered += "Visible";
                         }
                     }
+                    string layerFavoriteHTML = layer.IsFavorite
+                       ? @$"class=""star orange"" title=""{Languages.Current["layerContextMenuRemoveFavorite"]}"""
+                       : @$"class=""star"" title=""{Languages.Current["layerContextMenuAddFavorite"]}""";
 
-                    const string imgbase64 = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"; //1 pixel gif transparent -> disable base 
+
 
                     string overideBackgroundColor = string.Empty;
-                    if (!string.IsNullOrEmpty(LayerWithReplacement?.class_specialsoptions?.BackgroundColor?.Trim()))
+                    if (!string.IsNullOrEmpty(layer?.SpecialsOptions?.BackgroundColor?.Trim()))
                     {
-                        var Color = Collectif.HexValueToSolidColorBrush(LayerWithReplacement.class_specialsoptions.BackgroundColor);
+                        var Color = Collectif.HexValueToSolidColorBrush(layer.SpecialsOptions.BackgroundColor);
                         overideBackgroundColor = $"background-color:rgba({Color.Color.R},{Color.Color.G},{Color.Color.B},{1 - Settings.background_layer_opacity});";
                     }
-                    string supplement_class = " ";
+                    string supplement_class = string.Empty;
                     if (!Settings.layerpanel_website_IsVisible)
                     {
-                        supplement_class += "displaynone";
+                        supplement_class = string.Concat(" ", "displaynone");
                     }
 
                     string WarningMessageDiv = string.Empty;
-                    if (Initial_ClassVersion > LayerWithReplacement.class_version)
+                    if (layer.DoShowWarningLegacyVersionNewerThanEdited)
                     {
-                        WarningMessageDiv = $"<div class=\"warning\" title=\"{Languages.Current["layerMessageErrorDetectedClickHere"]}\" onclick=\"show_warning(event, '{LayerWithReplacement.class_id}');\"></div>";
+                        WarningMessageDiv = $"<div class=\"warning\" title=\"{Languages.Current["layerMessageErrorDetectedClickHere"]}\" onclick=\"show_warning(event, '{layer.Id}');\"></div>";
                     }
 
                     generated_layers.AppendLine(@$"
-                <li class=""{visibility}"" id=""{LayerWithReplacement.class_id}"">
-                    <div class=""layer_main_div"" style=""background-image:url({imgbase64.Trim()});{overideBackgroundColor}"">
-                        <div class=""layer_main_div_background_image""></div>
-                        <div class=""layer_content"" data-layer=""{LayerWithReplacement.class_identifier}"" title=""{Collectif.HTMLEntities(LayerWithReplacement.class_description)}"">
+                <li class=""{layerFiltered}"" id=""{layer.Id}"">
+                    <div class=""layer_main_div"" style=""{overideBackgroundColor}"">
+                        <div class=""layer_main_div_preview_images"">
+                            <div class=""layer_main_div_background_image""></div>
+                            <div class=""layer_main_div_front_image""></div>
+                        </div>
+                        <div class=""layer_content"" data-layer=""{layer.Identifier}"" title=""{Collectif.HTMLEntities(layer.Description)}"">
                             <div class=""layer_texte"">
-                                <p class=""display_name"">{Collectif.HTMLEntities(LayerWithReplacement.class_name)}</p>
-                                <p class=""zoom"">[{LayerWithReplacement.class_min_zoom}-{LayerWithReplacement.class_max_zoom}] - {LayerWithReplacement.class_site}</p>
-                                <p class=""layer_website{supplement_class}"">{LayerWithReplacement.class_site}</p>
-                                <p class=""layer_category{supplement_class}"">{LayerWithReplacement.class_category}</p>
+                                <p class=""display_name"">{Collectif.HTMLEntities(layer.Name)}</p>
+                                <p class=""zoom"">[{layer.MinZoom}-{layer.MaxZoom}]{CountryHTML} - {layer.SiteName}</p>
+                                <p class=""layer_website{supplement_class}"">{layer.SiteName}</p>
+                                <p class=""layer_category{supplement_class}"">{layer.Category}</p>
                             </div>
-                            <div {orangestar} onclick=""ajouter_aux_favoris(event, this, {LayerWithReplacement.class_id})""></div>
-                            <div {orangelayervisibility} onclick=""change_visibility(event, this, {LayerWithReplacement.class_id})""></div>
+                            <div {layerFavoriteHTML} onclick=""ajouter_aux_favoris(event, this, {layer.Id})""></div>
+                            <div {layerVisibilityHTML} onclick=""change_visibility(event, this, {layer.Id})""></div>
                             {WarningMessageDiv}
                         </div>
                     </div>
                 </li>");
                 }
-                return layersRejected;
             }
 
-            List<Layers> ListOfLayerRejected = GenerateHTMLFromLayerList(layers);
-            GenerateHTMLFromLayerList(ListOfLayerRejected, false);
-
             generated_layers.AppendLine("</ul>");
+            generated_layers.AppendLine($"<script>{LayerGetDefaultSelectByIdScript()}</script>");
             string resource_data = Collectif.ReadResourceString("HTML/layer_panel.html");
             resource_data = Languages.ReplaceInString(resource_data);
             return resource_data.Replace("<!--htmllayerplaceholder-->", generated_layers.ToString());
@@ -409,39 +303,42 @@ namespace MapsInMyFolder
 
         public void RefreshMap()
         {
-            Set_current_layer(Layers.Current.class_id);
+            SetCurrentLayer(Layers.Current.Id);
         }
 
-        public void Set_current_layer(int id)
+
+
+        public void SetCurrentLayer(int id)
         {
-            int layer_startup_id = Settings.layer_startup_id;
-            string last_format = string.Empty;
 
-            if (!string.IsNullOrWhiteSpace(Layers.Current.class_format))
-            {
-                last_format = Layers.Current.class_format;
-            }
-
-            Layers layer = Layers.GetLayerById(id);
-
+            bool lastLayerHasTransparency = Layers.Current.TilesFormatHasTransparency;
             if (Layers.Count() == 0)
             {
                 Layers.Add(0, Layers.Empty(0));
             }
 
-            if (layer is null || layer_startup_id == 0)
+            if (Layers.StartupLayerId == 0)
+            {
+                IEnumerable<Layers> AllLayers = Layers.GetLayersList();
+                Layers SelectedDefaultLayer = AllLayers.FirstOrDefault(layer =>
+                {
+                    bool isJpeg = layer.TilesFormat == "jpeg" || layer.TilesFormat == "jpg";
+                    bool hasUrl = !string.IsNullOrWhiteSpace(layer.TileUrl);
+                    return isJpeg && hasUrl;
+                }, AllLayers.First());
+                Layers.StartupLayerId = SelectedDefaultLayer.Id;
+            }
+            Layers layer = Layers.GetLayerById(id) ?? Layers.GetLayerById(Layers.StartupLayerId);
+
+            if (layer is null)
             {
                 layer = Layers.GetLayersList().First();
-                Settings.layer_startup_id = layer.class_id;
-                if (layer_startup_id == 0)
-                {
-                    layer_startup_id = layer.class_id;
-                }
             }
+
 
             if (layer is not null)
             {
-                MapFigures.DrawFigureOnMapItemsControlFromJsonString(mapviewerRectangles, layer.class_rectangles, mapviewer.ZoomLevel);
+                MapFigures.DrawFigureOnMapItemsControlFromJsonString(mapviewerRectangles, layer.BoundaryRectangles, mapviewer.ZoomLevel);
                 //Clear all layer notifications
                 Notification.ListOfNotificationsOnShow.Where(notification => Regex.IsMatch(notification.NotificationId, @"^LayerId_\d+_")).ToList().ForEach(notification => notification.Remove());
 
@@ -449,35 +346,26 @@ namespace MapsInMyFolder
                 {
                     Layers.Convert.ToCurentLayer(layer);
 
-                    List<string> listoftransparentformat = new List<string> { "png" };
-                    if (listoftransparentformat.Contains(layer.class_format))
+                    if (layer.TilesFormatHasTransparency)
                     {
-                        MapTileLayer_Transparent.TileSource = new TileSource { UriFormat = layer.class_tile_url, LayerID = layer.class_id };
+                        MapTileLayer_Transparent.TileSource = new TileSource { UriFormat = layer.TileUrl, LayerID = layer.Id };
                         MapTileLayer_Transparent.Opacity = 1;
 
-                        if ((!listoftransparentformat.Contains(last_format)) && !string.IsNullOrWhiteSpace(last_format) && layer.class_identifier is not null)
+                        if (layer.Identifier is not null)
                         {
-                            try
+                            Layers StartupLayer = Layers.GetLayerById(Layers.StartupLayerId);
+                            if (StartupLayer != null)
                             {
-                                Layers StartupLayer = Layers.GetLayerById(layer_startup_id);
-                                if (StartupLayer != null)
+                                UIElement basemap = new MapTileLayer
                                 {
-                                    UIElement basemap = new MapTileLayer
-                                    {
-                                        TileSource = new TileSource { UriFormat = StartupLayer?.class_tile_url, LayerID = layer_startup_id },
-                                        SourceName = StartupLayer.class_identifier + new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds(),
-                                        MaxZoomLevel = StartupLayer.class_max_zoom ?? 0,
-                                        MinZoomLevel = StartupLayer.class_min_zoom ?? 0,
-                                        Description = ""
-                                    };
-
-                                    basemap.Opacity = Settings.background_layer_opacity;
-                                    mapviewer.MapLayer = basemap;
-                                }
-                            }
-                            catch (Exception ex)
-                            {
-                                Debug.WriteLine("Erreur changement de calque : " + ex.Message);
+                                    TileSource = new TileSource { UriFormat = StartupLayer?.TileUrl, LayerID = Layers.StartupLayerId },
+                                    SourceName = StartupLayer.Identifier + new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds(),
+                                    MaxZoomLevel = StartupLayer.MaxZoom ?? 0,
+                                    MinZoomLevel = StartupLayer.MinZoom ?? 0,
+                                    Description = "",
+                                    Opacity = Settings.background_layer_opacity
+                                };
+                                mapviewer.MapLayer = basemap;
                             }
                         }
                     }
@@ -485,11 +373,11 @@ namespace MapsInMyFolder
                     {
                         UIElement layer_uielement = new MapTileLayer
                         {
-                            TileSource = new TileSource { UriFormat = layer.class_tile_url, LayerID = layer.class_id },
-                            SourceName = layer.class_identifier + new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds(),
-                            MaxZoomLevel = layer.class_max_zoom ?? 0,
-                            MinZoomLevel = layer.class_min_zoom ?? 0,
-                            Description = layer.class_description
+                            TileSource = new TileSource { UriFormat = layer.TileUrl, LayerID = layer.Id },
+                            SourceName = layer.Identifier + new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds(),
+                            MaxZoomLevel = layer.MaxZoom ?? 0,
+                            MinZoomLevel = layer.MinZoom ?? 0,
+                            Description = layer.Description
                         };
 
                         MapTileLayer_Transparent.TileSource = new TileSource();
@@ -500,8 +388,8 @@ namespace MapsInMyFolder
 
                     if (Settings.zoom_limite_taille_carte)
                     {
-                        mapviewer.MinZoomLevel = layer.class_min_zoom < 3 ? 2 : layer.class_min_zoom ?? 0;
-                        mapviewer.MaxZoomLevel = layer.class_max_zoom ?? 0;
+                        mapviewer.MinZoomLevel = layer.MinZoom < 3 ? 2 : layer.MinZoom ?? 0;
+                        mapviewer.MaxZoomLevel = layer.MaxZoom ?? 0;
                     }
                     else
                     {
@@ -509,15 +397,15 @@ namespace MapsInMyFolder
                         mapviewer.MaxZoomLevel = 24;
                     }
 
-                    if (string.IsNullOrEmpty(layer?.class_specialsoptions?.BackgroundColor?.Trim()))
+                    if (string.IsNullOrEmpty(layer?.SpecialsOptions?.BackgroundColor?.Trim()))
                     {
                         mapviewer.Background = Collectif.RgbValueToSolidColorBrush(Settings.background_layer_color_R, Settings.background_layer_color_G, Settings.background_layer_color_B);
                     }
                     else
                     {
-                        mapviewer.Background = Collectif.HexValueToSolidColorBrush(layer.class_specialsoptions.BackgroundColor);
+                        mapviewer.Background = Collectif.HexValueToSolidColorBrush(layer.SpecialsOptions.BackgroundColor);
                     }
-                    Collectif.SetBackgroundOnUIElement(mapviewer, layer?.class_specialsoptions?.BackgroundColor);
+                    Collectif.SetBackgroundOnUIElement(mapviewer, layer?.SpecialsOptions?.BackgroundColor);
 
                 }
                 catch (Exception ex)
@@ -537,7 +425,7 @@ namespace MapsInMyFolder
             try
             {
                 Javascript.EngineDeleteById(id);
-                string temp_dir = Collectif.GetSaveTempDirectory(layers.class_name, layers.class_identifier);
+                string temp_dir = Collectif.GetSaveTempDirectory(layers.Name, layers.Identifier);
                 if (Directory.Exists(temp_dir))
                 {
                     DirectorySize = Collectif.GetDirectorySize(temp_dir);
@@ -639,8 +527,9 @@ namespace MapsInMyFolder
                 };
                 AskMsg.Children.Add(textBlockAsk);
                 ContentDialogResult result = ContentDialogResult.Secondary;
-                if (HasActionToTake) { 
-                ContentDialog dialog = Message.SetContentDialog(AskMsg, "MapsInMyFolder", MessageDialogButton.YesNoCancel);
+                if (HasActionToTake)
+                {
+                    ContentDialog dialog = Message.SetContentDialog(AskMsg, "MapsInMyFolder", MessageDialogButton.YesNoCancel);
 
                     result = await dialog.ShowAsync();
                 }
@@ -658,7 +547,7 @@ namespace MapsInMyFolder
                 }
 
                 _instance.ReloadPage();
-                _instance.Set_current_layer(Layers.Current.class_id);
+                _instance.SetCurrentLayer(Layers.Current.Id);
             }
         }
 
@@ -671,7 +560,7 @@ namespace MapsInMyFolder
             Database.ExecuteNonQuerySQLCommand($"UPDATE EDITEDLAYERS SET FAVORITE = {fav_state} WHERE ID={id}");
             Database.ExecuteNonQuerySQLCommand($"UPDATE CUSTOMSLAYERS SET FAVORITE = {fav_state} WHERE ID={id}");
 
-            Layers.GetLayerById(id).class_favorite = Convert.ToBoolean(fav_state);
+            Layers.GetLayerById(id).IsFavorite = Convert.ToBoolean(fav_state);
         }
 
         public static void DBLayerVisibility(int id, string visibility_state)
@@ -682,7 +571,7 @@ namespace MapsInMyFolder
             Database.ExecuteNonQuerySQLCommand($"UPDATE EDITEDLAYERS SET VISIBILITY = '{visibility_state}' WHERE ID={id}");
             Database.ExecuteNonQuerySQLCommand($"UPDATE CUSTOMSLAYERS SET VISIBILITY = '{visibility_state}' WHERE ID={id}");
 
-            Layers.GetLayerById(id).class_visibility = visibility_state;
+            Layers.GetLayerById(id).Visibility = visibility_state;
         }
 
         public void LayerTilePreview_RequestUpdate()
@@ -709,18 +598,18 @@ namespace MapsInMyFolder
 
             try
             {
-                int layer_startup_id = Settings.layer_startup_id;
+                int layer_startup_id = Layers.StartupLayerId;
                 Layers backgroundLayer = Layers.GetLayerById(layer_startup_id);
 
-                int min_zoom = layer.class_min_zoom ?? 0;
-                int max_zoom = layer.class_max_zoom ?? 0;
+                int min_zoom = layer.MinZoom ?? 0;
+                int max_zoom = layer.MaxZoom ?? 0;
                 int back_min_zoom = min_zoom;
                 int back_max_zoom = max_zoom;
 
                 if (backgroundLayer is not null)
                 {
-                    back_min_zoom = backgroundLayer.class_min_zoom ?? 0;
-                    back_max_zoom = backgroundLayer.class_max_zoom ?? 0;
+                    back_min_zoom = backgroundLayer.MinZoom ?? 0;
+                    back_max_zoom = backgroundLayer.MaxZoom ?? 0;
                 }
                 int Zoom = Math.Max(Convert.ToInt32(Math.Round(mapviewer.TargetZoomLevel)) - 1, 0);
                 if (Zoom < min_zoom) { Zoom = min_zoom; }
@@ -732,58 +621,84 @@ namespace MapsInMyFolder
                 double Latitude = mapviewer.Center.Latitude;
                 double Longitude = mapviewer.Center.Longitude;
                 var TileNumber = Collectif.CoordonneesToTile(Latitude, Longitude, Zoom);
+
+                bool CheckIfFunctionExist(int layerId, Javascript.InvokeFunction invokeFunction)
+                {
+                    return Javascript.CheckIfFunctionExist(layerId, invokeFunction.ToString(), null);
+                }
+                string GetReplacement(int layerId, string tileUrl, Javascript.InvokeFunction invokeFunction)
+                {
+                    return Collectif.Replacements(tileUrl, TileNumber.X.ToString(), TileNumber.Y.ToString(), Zoom.ToString(), layerId, invokeFunction);
+                }
+
                 string previewLayerFrontImageUrl = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
                 string previewBackgroundImageUrl = string.Empty;
-                if (Javascript.CheckIfFunctionExist(id, Javascript.InvokeFunction.getPreview.ToString(), null))
+                string previewFallbackLayerFrontImageUrl = string.Empty;
+                string previewFallbackBackgroundImageUrl = string.Empty;
+
+                if (CheckIfFunctionExist(id, Javascript.InvokeFunction.getPreview))
                 {
-                    previewLayerFrontImageUrl = Collectif.Replacements(layer.class_tile_url, TileNumber.X.ToString(), TileNumber.Y.ToString(), Zoom.ToString(), id, Javascript.InvokeFunction.getPreview);
-                    previewBackgroundImageUrl = Collectif.Replacements(backgroundLayer?.class_tile_url, TileNumber.X.ToString(), TileNumber.Y.ToString(), Zoom.ToString(), id, Javascript.InvokeFunction.getPreview);
-                    if (backgroundLayer?.class_tile_url == previewBackgroundImageUrl)
-                    {
-                        previewBackgroundImageUrl = "";
-                    }
+                    previewLayerFrontImageUrl = GetReplacement(id, layer.TileUrl, Javascript.InvokeFunction.getPreview);
                 }
                 else
                 {
-                    previewLayerFrontImageUrl = Collectif.Replacements(layer.class_tile_url, TileNumber.X.ToString(), TileNumber.Y.ToString(), Zoom.ToString(), id, Javascript.InvokeFunction.getTile);
-                    previewBackgroundImageUrl = Collectif.Replacements(backgroundLayer?.class_tile_url, TileNumber.X.ToString(), TileNumber.Y.ToString(), Zoom.ToString(), id, Javascript.InvokeFunction.getTile);
+                    previewLayerFrontImageUrl = GetReplacement(id, layer.TileUrl, Javascript.InvokeFunction.getTile);
                 }
 
-                string previewFallbackLayerFrontImageUrl = string.Empty;
-                string previewFallbackBackgroundImageUrl = string.Empty;
-                if (Javascript.CheckIfFunctionExist(id, Javascript.InvokeFunction.getPreviewFallback.ToString(), null))
+                if (CheckIfFunctionExist(id, Javascript.InvokeFunction.getPreviewFallback))
                 {
-                    previewFallbackLayerFrontImageUrl = Collectif.Replacements(layer.class_tile_url, TileNumber.X.ToString(), TileNumber.Y.ToString(), Zoom.ToString(), id, Javascript.InvokeFunction.getPreviewFallback);
-                    previewFallbackBackgroundImageUrl = Collectif.Replacements(backgroundLayer?.class_tile_url, TileNumber.X.ToString(), TileNumber.Y.ToString(), Zoom.ToString(), id, Javascript.InvokeFunction.getPreviewFallback);
-                    if (backgroundLayer?.class_tile_url == previewFallbackBackgroundImageUrl)
+                    previewFallbackLayerFrontImageUrl = GetReplacement(id, layer.TileUrl, Javascript.InvokeFunction.getPreviewFallback);
+                }
+
+                if (layer.TilesFormatHasTransparency)
+                {
+                    if (CheckIfFunctionExist(backgroundLayer.Id, Javascript.InvokeFunction.getPreview))
                     {
-                        previewFallbackBackgroundImageUrl = "";
+                        previewBackgroundImageUrl = GetReplacement(backgroundLayer.Id, backgroundLayer.TileUrl, Javascript.InvokeFunction.getPreview);
+                    }
+                    else
+                    {
+                        previewBackgroundImageUrl = GetReplacement(backgroundLayer.Id, backgroundLayer.TileUrl, Javascript.InvokeFunction.getTile);
+                    }
+                    if (backgroundLayer?.TileUrl == previewBackgroundImageUrl)
+                    {
+                        previewBackgroundImageUrl = "";
+                    }
+
+                    if (CheckIfFunctionExist(backgroundLayer.Id, Javascript.InvokeFunction.getPreviewFallback))
+                    {
+                        previewFallbackBackgroundImageUrl = GetReplacement(backgroundLayer.Id, backgroundLayer?.TileUrl, Javascript.InvokeFunction.getPreviewFallback);
+                        if (backgroundLayer?.TileUrl == previewFallbackBackgroundImageUrl)
+                        {
+                            previewFallbackBackgroundImageUrl = "";
+                        }
                     }
                 }
 
 
 
-                const string base64Before = "[internal]";
-                string encodeURL(string url)
+
+                string EncodeURL(string url)
                 {
-                    return HttpUtility.UrlEncode(url.TrimStart(base64Before));
+                    return HttpUtility.UrlEncode(url);
                 }
 
-                string previewReferrer = Collectif.AddHttpToUrl(layer?.class_site_url);
-                string previewBackgroundReferrer = Collectif.AddHttpToUrl(backgroundLayer?.class_site_url);
+                bool UseReferrerForPreviews = true;
 
-                if (previewLayerFrontImageUrl.StartsWith(base64Before))
+                string previewReferrer = Collectif.AddHttpToUrl(layer?.SiteUrl);
+                string previewBackgroundReferrer = Collectif.AddHttpToUrl(backgroundLayer?.SiteUrl);
+
+                if (UseReferrerForPreviews)
                 {
-                    previewLayerFrontImageUrl = $"mapsinmyfolder://get?referrer={encodeURL(previewReferrer)}&url={encodeURL(previewLayerFrontImageUrl)}";
+                    if (!string.IsNullOrWhiteSpace(previewReferrer))
+                    {
+                        previewLayerFrontImageUrl = $"mapsinmyfolder://get?referrer={EncodeURL(previewReferrer)}&url={EncodeURL(previewLayerFrontImageUrl)}";
+                    }
+                    if (!string.IsNullOrWhiteSpace(previewBackgroundReferrer))
+                    {
+                        previewFallbackLayerFrontImageUrl = $"mapsinmyfolder://get?referrer={EncodeURL(previewBackgroundReferrer)}&url={EncodeURL(previewFallbackLayerFrontImageUrl)}";
+                    }
                 }
-                if (previewFallbackLayerFrontImageUrl.StartsWith(base64Before))
-                {
-                    previewFallbackLayerFrontImageUrl = $"mapsinmyfolder://get?referrer={encodeURL(previewBackgroundReferrer)}&url={encodeURL(previewFallbackLayerFrontImageUrl)}";
-                }
-
-                previewBackgroundImageUrl = previewBackgroundImageUrl.TrimStart(base64Before);
-                previewFallbackBackgroundImageUrl = previewFallbackBackgroundImageUrl.TrimStart(base64Before);
-
                 string previewJSON = "{\"preview\":{\"frontImage\":{\"url\":\"" + previewLayerFrontImageUrl + "\",\"referrer\":\"" + previewReferrer + "\"},\"backgroundImage\":{\"url\":\"" + previewBackgroundImageUrl + "\",\"referrer\":\"" + previewBackgroundReferrer + "\"}},\"previewFallback\":{\"frontImage\":{\"url\":\"" + previewFallbackLayerFrontImageUrl + "\",\"referrer\":\"" + previewReferrer + "\"},\"backgroundImage\":{\"url\":\"" + previewFallbackBackgroundImageUrl + "\",\"referrer\":\"" + previewBackgroundReferrer + "\"}}}";
 
                 return previewJSON;
@@ -793,132 +708,8 @@ namespace MapsInMyFolder
                 Debug.WriteLine("Error getPreview exception :" + ex.Message);
             }
             return String.Empty;
-
         }
     }
 
-    // [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Marquer les membres comme étant static", Justification = "Used by CEFSHARP, static isnt a option here")]
-    public class Layer_Csharp_call_from_js
-    {
-        public void Clear_cache(string listOfId = "0")
-        {
-            long DirectorySize = 0;
-            string[] splittedListOfId = listOfId.Split(',', StringSplitOptions.RemoveEmptyEntries);
-            foreach (string str in splittedListOfId)
-            {
-                int id_int = int.Parse(str.Trim());
-                //Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
-                //{
-                DirectorySize += MainPage.ClearCache(id_int);
 
-                //}, null);
-                Debug.WriteLine("Clear_cache layer " + id_int);
-            }
-            if (DirectorySize >= 0)
-            {
-                string memoryFreed = Collectif.FormatBytes(DirectorySize);
-                string cacheCleanedMessage = "";
-
-                if (splittedListOfId.Length == 1)
-                {
-                    cacheCleanedMessage = Languages.GetWithArguments("layerMessageCacheCleared", Layers.GetLayerById(int.Parse(splittedListOfId[0])).class_name, memoryFreed);
-                }
-                else
-                {
-                    cacheCleanedMessage = Languages.GetWithArguments("layerMessageCachesCleared", Layers.GetLayerById(int.Parse(splittedListOfId[0])).class_name, memoryFreed);
-                }
-                Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
-                {
-                    Message.NoReturnBoxAsync(cacheCleanedMessage, Languages.Current["dialogTitleOperationSuccess"]);
-                }, null);
-            }
-        }
-
-
-        public void Layer_favorite(double id = 0, bool isAdding = true)
-        {
-            int id_int = Convert.ToInt32(id);
-            Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
-            {
-                MainPage.DBLayerFavorite(id_int, isAdding);
-            }, null);
-        }
-
-        public void Layer_visibility(double id = 0, bool isVisible = true)
-        {
-            //Debug.WriteLine($"Layer_visibility : id={id} & isVisible={isVisible}");
-            int id_int = Convert.ToInt32(id);
-            Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
-            {
-                MainPage.DBLayerVisibility(id_int, (isVisible ? "Visible" : "Hidden"));
-            }, null);
-        }
-
-
-        public void Layer_edit(double id = 0, double prefilid = -1)
-        {
-            int id_int = Convert.ToInt32(id);
-            int prefilid_int = Convert.ToInt32(prefilid);
-            Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
-            {
-                MainWindow._instance.FrameLoad_CustomOrEditLayers(id_int, prefilid_int);
-            }, null);
-        }
-
-        public void Layer_set_current(double id = 0)
-        {
-            int id_int = Convert.ToInt32(id);
-            Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
-            {
-                //Debug.WriteLine("Layer_set_current " + id);
-                MainWindow._instance.MainPage.Set_current_layer(id_int);
-            }, null);
-        }
-        public void Layer_show_warning(double id = 0)
-        {
-            int id_int = Convert.ToInt32(id);
-            Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
-            {
-                MainPage.ShowLayerWarning(id_int);
-            }, null);
-        }
-
-        public void Request_search_update()
-        {
-            Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Send, (SendOrPostCallback)delegate
-            {
-                MainWindow._instance.MainPage.SearchLayerStart(true);
-            }, null);
-        }
-
-        public string Request_search_string()
-        {
-            return Application.Current.Dispatcher.Invoke(() => MainWindow._instance.MainPage.SearchGetText(), DispatcherPriority.Send);
-        }
-
-        public void Refresh_panel()
-        {
-            Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
-            {
-                MainWindow._instance.MainPage.ReloadPage();
-                MainWindow._instance.MainPage.SearchLayerStart();
-            }, null);
-        }
-
-        public string Gettilepreviewurlfromid(double id = 0)
-        {
-            if (!Settings.layerpanel_livepreview)
-            {
-                return "";
-            }
-            async Task<string> Gettilepreviewurlfromid_interne(double id)
-            {
-                int id_int = Convert.ToInt32(id);
-                DispatcherOperation op = Application.Current.Dispatcher.BeginInvoke(new Func<string>(() => MainWindow._instance.MainPage.LayerTilePreview_ReturnUrl(id_int)));
-                await op;
-                return op.Result.ToString();
-            }
-            return Gettilepreviewurlfromid_interne(id).Result;
-        }
-    }
 }

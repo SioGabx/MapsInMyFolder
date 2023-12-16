@@ -7,8 +7,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace MapsInMyFolder
 {
@@ -153,12 +155,15 @@ namespace MapsInMyFolder
                 }
             }
 
+
+            layer_startup_id.SelectedIndex = layer_startup_id.Items.Add(new NameHiddenIdValue(0, "_Default"));
+            layer_startup_id.Items.Add(new NameHiddenIdValue(Layers.Current.Id, "_" + Languages.Current["layerCurrent"]));
             foreach (Layers layer in Layers.GetLayersList())
             {
-                if (layer.class_id != -1 && string.Equals(layer.class_format, "JPEG", StringComparison.InvariantCultureIgnoreCase))
+                if (layer.Id != -1 && string.Equals(layer.TilesFormat, "JPEG", StringComparison.InvariantCultureIgnoreCase))
                 {
-                    int index = layer_startup_id.Items.Add(new NameHiddenIdValue(layer.class_id, layer.class_name));
-                    if (layer.class_id == Settings.layer_startup_id)
+                    int index = layer_startup_id.Items.Add(new NameHiddenIdValue(layer.Id, layer.Name + $" [N°{layer.Id}]"));
+                    if (layer.Id == Settings.layer_startup_id)
                     {
                         layer_startup_id.SelectedIndex = index;
                     }
@@ -527,13 +532,14 @@ namespace MapsInMyFolder
             }
         }
 
-        private void DatabaseExport_Click(object sender, RoutedEventArgs e)
+        private async void DatabaseExport_Click(object sender, RoutedEventArgs e)
         {
+            this.Cursor = Cursors.AppStarting;
             SaveFileDialog DatabasesaveFileDialog = new SaveFileDialog
             {
                 Filter = "SQL database |*.db|Text|*.txt",
                 DefaultExt = "db",
-                FileName = "exported_database.db",
+                FileName = "ExportedDatabase.db",
                 CheckPathExists = true,
                 AddExtension = true,
                 RestoreDirectory = true,
@@ -545,7 +551,10 @@ namespace MapsInMyFolder
             {
                 try
                 {
-                    Database.Export(DatabasesaveFileDialog.FileName);
+                    await Task.Run(() =>
+                    {
+                        Database.Export(DatabasesaveFileDialog.FileName);
+                    }); ;
                     Process.Start("explorer.exe", "/select,\"" + DatabasesaveFileDialog.FileName + "\"");
                     return;
                 }
@@ -554,6 +563,7 @@ namespace MapsInMyFolder
                     Message.NoReturnBoxAsync(Languages.Current["settingsMessageErrorDatabaseExport"] + " " + ex.Message, Languages.Current["dialogTitleOperationFailed"]);
                 }
             }
+            this.Cursor = Cursors.Arrow;
         }
     }
 }

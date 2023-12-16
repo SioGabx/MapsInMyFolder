@@ -20,12 +20,11 @@ namespace MapsInMyFolder
     /// </summary>
     public partial class MainWindow : Window
     {
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2211:Les champs non constants ne doivent pas être visibles", Justification = "for access everywhere")]
-        public static MainWindow _instance;
+        public static MainWindow Instance { get; set; }
         private static bool FrameCanGoBack = false;
         public MainWindow()
         {
-            _instance = this;
+            Instance = this;
             InitializeComponent();
             MainContentFrame.Navigate(MainPage);
             Tiles.handler.ServerCertificateCustomValidationCallback += (_, _, _, _) => true;
@@ -51,15 +50,15 @@ namespace MapsInMyFolder
 
         public void FrameLoad_PrepareDownload()
         {
-            if (Layers.Current.class_tile_url is null)
+            if (Layers.Current.TileUrl is null)
             {
-                Message.NoReturnBoxAsync("Une erreur s'est produite lors du chargement du calque.");
+                Message.NoReturnBoxAsync("An error occurred while loading the layer : Tile URL is not defined");
                 return;
             }
             Popup_opening(false);
             PrepareDownloadPage PrepareDownloadPage = new PrepareDownloadPage
             {
-                defaultFilename = Layers.Current.class_name.Trim().Replace(" ", "_").ToLowerInvariant()
+                defaultFilename = Layers.Current.Name.Trim().Replace(" ", "_").ToLowerInvariant()
             };
             PrepareDownloadPage.Init();
             MainContentFrame.Navigate(PrepareDownloadPage);
@@ -126,7 +125,7 @@ namespace MapsInMyFolder
             {
                 case Javascript.JavascriptAction.refreshMap:
                     MainPage.RefreshMap();
-                    break;   
+                    break;
                 case Javascript.JavascriptAction.clearCache:
                     MainPage.ClearCache((int)(sender), false);
                     break;
@@ -138,7 +137,7 @@ namespace MapsInMyFolder
 
         public static void ApplicationUpdateFoundEvent()
         {
-            Notification ApplicationUpdateNotification = new NText($"Une nouvelle version de l'application ({Update.UpdateRelease.Tag_name}) est disponible. Cliquez ici pour mettre à jour.", "MapsInMyFolder", "MainPage", Update.StartUpdating)
+            Notification ApplicationUpdateNotification = new NText(Languages.GetWithArguments("updateMessageNewVersionAvailable", Update.UpdateRelease.Tag_name) + " " + Languages.Current["updateMessageNewVersionClickToUpdate"], "MapsInMyFolder", "MainPage", Update.StartUpdating)
             {
                 NotificationId = "ApplicationUpdateNotification",
                 DisappearAfterAMoment = false,
@@ -158,11 +157,11 @@ namespace MapsInMyFolder
             }
             if (ActualUserVersion == 0)
             {
-                Message = "Une base de données de calques est disponible en ligne. Voullez-vous la télécharger ?";
+                Message = Languages.Current["databaseMessageAvailableOnline"];
             }
             else
             {
-                Message = "Une nouvelle version de la base de donnée est disponible. Cliquez ici pour mettre à jour.";
+                Message = Languages.Current["databaseMessageNewAvailableOnline"];
             }
 
             Notification DatabaseUpdateNotification = new NText(Message, "MapsInMyFolder", "MainPage", Database.StartUpdating)
@@ -217,18 +216,18 @@ namespace MapsInMyFolder
 
         public static void RefreshAllPanels()
         {
-            _instance.LightInit();
-            _instance.MainPage.MapLoad();
-            _instance.MainPage.Init_layer_panel();
-            _instance.MainPage.ReloadPage();
-            _instance.MainPage.SearchLayerStart();
-            _instance.MainPage.Init_download_panel();
-            _instance.MainPage.Set_current_layer(Layers.Current.class_id);
+            Instance.LightInit();
+            Instance.MainPage.MapLoad();
+            Instance.MainPage.InitLayerPanel();
+            Instance.MainPage.ReloadPage();
+            Instance.MainPage.SearchLayerStart();
+            Instance.MainPage.InitDownloadPanel();
+            Instance.MainPage.SetCurrentLayer(Layers.Current.Id);
         }
 
         private void Window_ContentRendered(object sender, EventArgs e)
         {
-            // MainPage.Set_current_layer(Settings.layer_startup_id);
+            MainPage.SetCurrentLayer(Layers.StartupLayerId);
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -244,7 +243,7 @@ namespace MapsInMyFolder
         {
             AppTitleBar.Opacity = 0.5;
             AppTitleBar.IsEnabled = false;
-            MainPage.Download_panel_close();
+            MainPage.DownloadPanelClose();
             if (ReduceOpacity)
             {
                 MainPage.popup_background.Visibility = Visibility.Visible;
@@ -260,13 +259,13 @@ namespace MapsInMyFolder
         {
             if (e.Key == Key.Escape)
             {
-                MainPage.Download_panel_close();
+                MainPage.DownloadPanelClose();
             }
         }
 
         private void Map_panel_open_download_panel_Click(object sender, RoutedEventArgs e)
         {
-            MainPage.Download_panel_open();
+            MainPage.DownloadPanelOpen();
         }
 
         private void Map_panel_open_settings_panel_Click(object sender, RoutedEventArgs e)

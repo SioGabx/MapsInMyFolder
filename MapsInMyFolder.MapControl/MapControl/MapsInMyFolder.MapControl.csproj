@@ -15,18 +15,19 @@
 		<Platforms>AnyCPU;x64</Platforms>
 		<LangVersion>8.0</LangVersion>
 		<ApplicationIcon>icone_v2.ico</ApplicationIcon>
+		<AssemblyName>MapsInMyFolder.MapControl</AssemblyName>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net6.0-windows|AnyCPU'">
-	  <WarningLevel>4</WarningLevel>
+	  <WarningLevel>6</WarningLevel>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net6.0-windows|x64'">
-	  <WarningLevel>4</WarningLevel>
+	  <WarningLevel>6</WarningLevel>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net6.0-windows|AnyCPU'">
-	  <WarningLevel>4</WarningLevel>
+	  <WarningLevel>6</WarningLevel>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net6.0-windows|x64'">
-	  <WarningLevel>4</WarningLevel>
+	  <WarningLevel>6</WarningLevel>
 	</PropertyGroup>
 
 	<ItemGroup>

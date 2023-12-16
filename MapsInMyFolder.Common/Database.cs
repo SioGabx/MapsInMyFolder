@@ -146,22 +146,26 @@ namespace MapsInMyFolder.Commun
 
         static public (SQLiteDataReader Reader, SQLiteConnection conn) ExecuteExecuteReaderSQLCommand(string querry)
         {
+            SQLiteConnection conn = DB_Connection();
+            return (ExecuteExecuteReaderSQLCommand(conn, querry), conn);
+        }
+
+        static public SQLiteDataReader ExecuteExecuteReaderSQLCommand(SQLiteConnection conn, string querry)
+        {
             bool HasError = false;
             do
             {
                 try
                 {
-                    SQLiteConnection conn = DB_Connection();
-
                     if (conn is null)
                     {
                         Debug.WriteLine("La connection à la base de donnée est null");
-                        return (null, null);
+                        return null;
                     }
                     using (SQLiteCommand sqlite_cmd = conn.CreateCommand())
                     {
                         sqlite_cmd.CommandText = querry;
-                        return (sqlite_cmd.ExecuteReader(), conn);
+                        return sqlite_cmd.ExecuteReader();
                     }
                 }
                 catch (Exception ex)
@@ -177,7 +181,7 @@ namespace MapsInMyFolder.Commun
                     }
                 }
             } while (HasError);
-            return (null, null);
+            return null;
         }
 
         static public int ExecuteScalarSQLCommand(string querry)
@@ -298,7 +302,7 @@ namespace MapsInMyFolder.Commun
             }
         }
 
-        //CONNEXION A LA BASE DE DONNEES
+
         public static SQLiteConnection DB_Connection()
         {
             // Create a new database connection:
@@ -325,10 +329,17 @@ namespace MapsInMyFolder.Commun
             return connection;
         }
 
+        public static SQLiteConnection DB_MemoryConnection()
+        {
+            SQLiteConnection connection = DB_OpenConnection(":memory:");
+            DB_CreateTables(connection);
+            return connection;
+        }
+
+
         public static SQLiteConnection DB_OpenConnection(string datasource)
         {
             SQLiteConnection sqlite_conn = new SQLiteConnection("Data Source=" + datasource + "; Version = 3; New = True; Compress = True; ");
-            // Open the connection:
             try
             {
                 sqlite_conn.Open();
@@ -339,6 +350,8 @@ namespace MapsInMyFolder.Commun
             }
             return sqlite_conn;
         }
+
+
 
         public static void DB_CreateTables(SQLiteConnection sqlite_conn)
         {
@@ -492,7 +505,8 @@ namespace MapsInMyFolder.Commun
             if (IsUpdateSuccessful)
             {
                 string ExistingDatabasePath = Path.Combine(Settings.working_folder, Settings.database_pathname);
-                if (File.Exists(ExistingDatabasePath)) {
+                if (File.Exists(ExistingDatabasePath))
+                {
                     string backupFolderPath = Path.Combine(Settings.working_folder, "databaseBackup");
                     Directory.CreateDirectory(backupFolderPath);
                     string dateFormatee = DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss");

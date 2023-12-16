@@ -17,7 +17,8 @@ namespace MapsInMyFolder.Commun
         public static string GetActualVersionFormatedString()
         {
             Version version = AssemblyVersion;
-            return String.Format("{0}.{1}.{2}", version.Major, version.Minor, version.Build);
+            string formatedVersionNumbers = string.Format("{0}.{1}.{2}", version.Major, version.Minor, version.Build);
+            return formatedVersionNumbers;
         }
 
         public static string GetActualProductVersionFormatedString()
@@ -97,7 +98,7 @@ namespace MapsInMyFolder.Commun
 
         public static async void StartUpdating()
         {
-            var dialog = Message.SetContentDialog(Languages.GetWithArguments("updateMessageNewVersionAvailable", UpdateRelease.Tag_name, UpdateRelease.Body), Languages.Current["dialogTitleOperationConfirm"], MessageDialogButton.YesNo);
+            var dialog = Message.SetContentDialog(Languages.GetWithArguments("updateMessageNewVersionAvailable", UpdateRelease.Tag_name) + "\n\n" + Languages.GetWithArguments("updateMessageNewVersionReleaseNote", UpdateRelease.Body), Languages.Current["dialogTitleOperationConfirm"], MessageDialogButton.YesNo);
             ContentDialogResult result = ContentDialogResult.None;
             try
             {
@@ -125,7 +126,7 @@ namespace MapsInMyFolder.Commun
             {
                 Application.Current.Dispatcher.Invoke(() =>
                 {
-                    UpdateNotification.Text(NotificationMsg + $" {progressPercentage}% - {Collectif.FormatBytes(totalBytesDownloaded)}/{Collectif.FormatBytes((long)totalFileSize)}");
+                    UpdateNotification.Text(NotificationMsg + $" {progressPercentage?.ToString("0.00")}% - {Collectif.FormatBytes(totalBytesDownloaded)}/{Collectif.FormatBytes((long)totalFileSize)}");
                     UpdateNotification.SetProgress((double)progressPercentage);
                 });
             };
@@ -147,7 +148,8 @@ namespace MapsInMyFolder.Commun
             {
                 ApplyUpdate();
             }
-            else {
+            else
+            {
                 NText UpdateDownloadedNotification = new NText(Languages.Current["updateNotificationStartUpdateProcess"], "MapsInMyFolder", "MainPage", ApplyUpdate, true);
                 UpdateDownloadedNotification.Register();
             }
@@ -156,7 +158,7 @@ namespace MapsInMyFolder.Commun
         public static void ApplyUpdate()
         {
             NText UpdateNotification = new NText(Languages.Current["updateNotificationStartInstalling"], "MapsInMyFolder", "MainPage", null, true);
-            UpdateNotification.Register(); 
+            UpdateNotification.Register();
 
             string UpdateFilePath = System.IO.Path.Combine(Settings.temp_folder, UpdateFileAsset.Id + UpdateFileAsset.Name);
             Collectif.StartApplication(UpdateFilePath, TimeSpan.FromSeconds(3));

@@ -492,7 +492,7 @@ namespace MapsInMyFolder
         private void ClosePage_button_Click(object sender, RoutedEventArgs e)
         {
             PageDispose();
-            MainWindow._instance.FrameBack();
+            MainWindow.Instance.FrameBack();
         }
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)

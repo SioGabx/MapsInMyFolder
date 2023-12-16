@@ -170,6 +170,9 @@ namespace MapsInMyFolder
         public Enums.Interpretation interpretation;
         public ScaleInfo scaleInfo;
 
+        public int maxDownloadtilesInParralele; //max_download_tiles_in_parralele
+        public int waitingBeforeStartAnotherTile; // waiting_before_start_another_tile_download
+
         public int skippedPanelUpdate;
         public string lastCommand;
         public string lastCommandNotImportant;
@@ -199,7 +202,9 @@ namespace MapsInMyFolder
                                           Status state = Status.waitfordownloading,
                                           int? tileSize = null,
                                           int nbrOfTilesWaitingForDownloading = 0,
-                                          int quality = 100)
+                                          int quality = 100,
+                                          int maxDownloadtilesInParralele = 1,
+                                          int waitingBeforeStartAnotherTile = 0)
         {
             if (id != 0)
             {
@@ -231,9 +236,19 @@ namespace MapsInMyFolder
                 this.scaleInfo = scaleInfo;
                 this.AlloweRequestErrors = AlloweRequestErrors;
                 this.varContext = varContext;
-                skippedPanelUpdate = 0;
-                lastCommand = string.Empty;
-                lastCommandNotImportant = string.Empty;
+                this.skippedPanelUpdate = 0;
+                this.lastCommand = string.Empty;
+                this.lastCommandNotImportant = string.Empty;
+                if (maxDownloadtilesInParralele <= 0)
+                {
+                    this.maxDownloadtilesInParralele = Settings.max_download_tiles_in_parralele;
+                }
+                else
+                {
+                    this.maxDownloadtilesInParralele = Math.Min(Math.Min(Settings.max_download_tiles_in_parralele, maxDownloadtilesInParralele), 1);
+                }
+
+                this.waitingBeforeStartAnotherTile = Math.Max(Settings.waiting_before_start_another_tile_download, waitingBeforeStartAnotherTile);
             }
         }
 
@@ -315,8 +330,8 @@ namespace MapsInMyFolder
         {
             Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
             {
-                _instance.MainPage.RefreshMap();
-                _instance.MainPage.LayerTilePreview_RequestUpdate();
+                Instance.MainPage.RefreshMap();
+                Instance.MainPage.LayerTilePreview_RequestUpdate();
             }, null);
 
             CheckIfReadyToStartDownload();
@@ -337,7 +352,7 @@ namespace MapsInMyFolder
                     if (Network.IsNetworkAvailable())
                     {
                         //start download
-                        _instance.RestartDownload(engine.id);
+                        Instance.RestartDownload(engine.id);
                         numDownloadsStarted++;
                     }
                     else
@@ -369,14 +384,14 @@ namespace MapsInMyFolder
         public void PrepareDownloadBeforeStart(DownloadOptions download_Options)
         {
             CheckifMultipleDownloadInProgress();
-            MainPage.Download_panel_open();
+            MainPage.DownloadPanelOpen();
             MainPage.download_panel_browser?.ExecuteScriptAsync("document.getElementById(\"main\").scrollIntoView({ behavior: \"smooth\", block: \"start\", inline: \"nearest\"})");
             DownloadOptions download_Options_edited = download_Options;
-            download_Options_edited.id_layer = Layers.Current.class_id;
-            download_Options_edited.identifier = Layers.Current.class_identifier;
-            download_Options_edited.name = Layers.Current.class_name;
-            download_Options_edited.tile_size = Layers.Current.class_tiles_size ?? 256;
-            download_Options_edited.urlbase = Layers.Current.class_tile_url;
+            download_Options_edited.id_layer = Layers.Current.Id;
+            download_Options_edited.identifier = Layers.Current.Identifier;
+            download_Options_edited.name = Layers.Current.Name;
+            download_Options_edited.tile_size = Layers.Current.TilesSize ?? 256;
+            download_Options_edited.urlbase = Layers.Current.TileUrl;
             StartDownload(download_Options_edited);
         }
 
@@ -384,7 +399,7 @@ namespace MapsInMyFolder
         void StartDownload(DownloadOptions download_Options)
         {
             int downloadId = DownloadEngine.GetId();
-            string format = Layers.Current.class_format;
+            string format = Layers.Current.TilesFormat;
             string finalSaveFormat = download_Options.format;
             int zoom = download_Options.zoom;
             int quality = download_Options.quality;
@@ -396,6 +411,9 @@ namespace MapsInMyFolder
             int tileSize = download_Options.tile_size;
             string saveTempDirectory = Collectif.GetSaveTempDirectory(layername, identifier, zoom, Settings.temp_folder);
             string urlbase = download_Options.urlbase;
+            int MaxDownloadTilesInParralele = Layers.Current.SpecialsOptions.MaxDownloadTilesInParralele;
+            int WaitingBeforeStartAnotherTile = Layers.Current.SpecialsOptions.WaitingBeforeStartAnotherTile;
+
 
             if (urlbase.Trim() != "" && tileSize != 0)
             {
@@ -418,17 +436,18 @@ namespace MapsInMyFolder
                     { "SE_Latitude", download_Options.SE_PIN_Location.Latitude },
                     { "SE_Longitude", download_Options.SE_PIN_Location.Longitude }
                 };
-                string engineVarContexte = JsonConvert.SerializeObject(Javascript.Functions.DumpVars(Layers.Current.class_id));
-                IEnumerable<TileProperty> urls = Collectif.GetUrl.GetListOfUrlFromLocation(location, zoom, urlbase, Layers.Current.class_id, downloadId, engineVarContexte);
+                string engineVarContexte = JsonConvert.SerializeObject(Javascript.Functions.DumpVars(Layers.Current.Id));
+                IEnumerable<TileProperty> urls = Collectif.GetUrl.GetListOfUrlFromLocation(location, zoom, urlbase, Layers.Current.Id, downloadId, engineVarContexte);
                 CancellationTokenSource tokenSource2 = new CancellationTokenSource();
                 CancellationToken ct = tokenSource2.Token;
                 string timestamp = Convert.ToString(new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds());
-                IEnumerable<HttpStatusCode> ErrorsToIgnore = HttpStatusCodeDisplay.getListFromString(Layers.Current.class_specialsoptions.ErrorsToIgnore);
+                IEnumerable<HttpStatusCode> ErrorsToIgnore = HttpStatusCodeDisplay.getListFromString(Layers.Current.SpecialsOptions.ErrorsToIgnore);
                 string jsonScaleInfo = Newtonsoft.Json.JsonConvert.SerializeObject(download_Options.scaleInfo);
-                
+
                 Debug.WriteLine(engineVarContexte);
                 int dbid = Database.DB_Download_Write(Status.waitfordownloading, filename, nbrOfTiles, zoom, download_Options.NO_PIN_Location.Latitude, download_Options.NO_PIN_Location.Longitude, download_Options.SE_PIN_Location.Latitude, download_Options.SE_PIN_Location.Longitude, download_Options.id_layer, saveTempDirectory, saveDirectory, timestamp, quality, download_Options.resizeWidth, download_Options.resizeHeignt, download_Options.interpretation.ToString(), jsonScaleInfo, engineVarContexte);
-                DownloadEngine engine = new DownloadEngine(downloadId, dbid, Layers.Current.class_id, urls, tokenSource2, ct, format, finalSaveFormat, zoom, saveTempDirectory, saveDirectory, filename, fileTempName, location, download_Options.resizeWidth, download_Options.resizeHeignt, new TileLoader(), download_Options.interpretation, download_Options.scaleInfo, ErrorsToIgnore, engineVarContexte, nbrOfTiles, urlbase, identifier, Status.waitfordownloading, tileSize, nbrOfTiles, quality);
+
+                DownloadEngine engine = new DownloadEngine(downloadId, dbid, Layers.Current.Id, urls, tokenSource2, ct, format, finalSaveFormat, zoom, saveTempDirectory, saveDirectory, filename, fileTempName, location, download_Options.resizeWidth, download_Options.resizeHeignt, new TileLoader(), download_Options.interpretation, download_Options.scaleInfo, ErrorsToIgnore, engineVarContexte, nbrOfTiles, urlbase, identifier, Status.waitfordownloading, tileSize, nbrOfTiles, quality, MaxDownloadTilesInParralele, WaitingBeforeStartAnotherTile);
                 DownloadEngine.Add(engine, downloadId);
 
                 Status status;
@@ -484,7 +503,7 @@ namespace MapsInMyFolder
             AbordAndCancelWithTokenDownload(engineId);
         }
 
-        public void RestartDownloadFromZero(int engineId)
+        public void RestartDownloadFromStart(int engineId)
         {
             DownloadEngine engine = DownloadEngine.GetEngineById(engineId);
             engine.nbrOfTilesWaitingForDownloading = engine.nbrOfTiles;
@@ -546,11 +565,6 @@ namespace MapsInMyFolder
             DownloadEngine.CurrentNumberOfDownload++;
             downloadEngineClassArgs.state = Status.progress;
             CheckIfReadyToStartDownload();
-
-            if (Settings.max_download_tiles_in_parralele == 0)
-            {
-                Settings.max_download_tiles_in_parralele = 1;
-            }
 
             int settingsMaxRetryDownload = Settings.max_retry_download;
             int nbrPass = 0;
@@ -643,7 +657,7 @@ namespace MapsInMyFolder
             {
                 try
                 {
-                    Parallel.ForEach(urls, new ParallelOptions { MaxDegreeOfParallelism = Settings.max_download_tiles_in_parralele, CancellationToken = cancellationToken }, url =>
+                    Parallel.ForEach(urls, new ParallelOptions { MaxDegreeOfParallelism = downloadEngineClass.maxDownloadtilesInParralele, CancellationToken = cancellationToken }, url =>
                         {
                             WaitForInternet(downloadEngineClass);
                             DownloadUrlAsync(url).Wait();
@@ -777,16 +791,16 @@ namespace MapsInMyFolder
             }
 
             engine.skippedPanelUpdate++;
-            int updateRate = (int)Math.Floor(Math.Pow(Settings.max_download_tiles_in_parralele / 10, 1.5));
+            int updateRate = (int)Math.Floor(Math.Pow(engine.maxDownloadtilesInParralele / 10, 1.5));
 
             if (updateRate < 1)
             {
                 updateRate = 1;
             }
 
-            if (Settings.max_download_tiles_in_parralele - updateRate > 100)
+            if (engine.maxDownloadtilesInParralele - updateRate > 100)
             {
-                updateRate = Settings.max_download_tiles_in_parralele;
+                updateRate = engine.maxDownloadtilesInParralele;
             }
 
             if (state == Status.no_data && engine.skippedPanelUpdate != updateRate)
@@ -808,7 +822,7 @@ namespace MapsInMyFolder
                     {
                         engine.lastCommandNotImportant = commandExecuted;
                     }
-                    await _instance?.MainPage?.download_panel_browser?.EvaluateScriptAsync(commandExecuted);
+                    await Instance?.MainPage?.download_panel_browser?.EvaluateScriptAsync(commandExecuted);
 
                     if (isImportant)
                     {
@@ -1028,7 +1042,7 @@ namespace MapsInMyFolder
                         //Image not exist, generating empty tile :
                         try
                         {
-                            string hexColor = layers?.class_specialsoptions?.BackgroundColor;
+                            string hexColor = layers?.SpecialsOptions?.BackgroundColor;
                             if (string.IsNullOrWhiteSpace(hexColor))
                             {
                                 hexColor = "#000000";
@@ -1257,9 +1271,9 @@ namespace MapsInMyFolder
             finally
             {
                 InternalUpdateProgressBar(download_engine);
-                if (Settings.waiting_before_start_another_tile_download > 0 && download_engine.nbrOfTilesWaitingForDownloading > 0)
+                if (download_engine.waitingBeforeStartAnotherTile > 0 && download_engine.nbrOfTilesWaitingForDownloading > 0)
                 {
-                    Thread.Sleep(Settings.waiting_before_start_another_tile_download);
+                    Thread.Sleep(download_engine.waitingBeforeStartAnotherTile);
                 }
             }
 

@@ -23,4 +23,4 @@ The complete documentation for this project is available on our [GitHub Wiki](ht
 
 ## Why am I getting warnings from Windows when installing MapsInMyFolder ?
 The MapsInMyFolder files are not digitally signed which results in these kinds of warnings. Signing code is expensive, requires a bunch of paperwork. 
-If you do not trust the executable on github, you can install the software from the Windows Store. Alternatively, you can always build the code from source.
+If you do not trust the executable on github, you can always build the code from source.

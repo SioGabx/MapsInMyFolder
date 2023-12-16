@@ -487,6 +487,7 @@
                             TextChanged="TextboxLayerTileWidth_TextChanged" />
                     </Grid>
 
+
                     <Grid Margin="0,10,0,0">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="20" />
@@ -510,6 +511,62 @@
                             TextChanged="TextboxSpecialOptionBackgroundColor_TextChanged" />
                     </Grid>
 
+                    <Grid Margin="0,10,0,0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="20" />
+                            <RowDefinition Height="20" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+                        <Label
+                            Grid.Row="0"
+                            Content="{Binding Source={x:Static commun:Languages.Current}, Path=[editorPropertyNameMaxDownloadTilesInParralele]}"
+                            Foreground="#888989" />
+                        <Label
+                            Grid.Row="1"
+                            Content="{Binding Source={x:Static commun:Languages.Current}, Path=[editorPropertyNameLowestIsGonnaBeSelected]}"
+                            Foreground="#888989" />
+                        <TextBox
+                            x:Name="TextboxSpecialOptioneditorPropertyNameMaxDownloadTilesInParralele"
+                            Grid.Row="2"
+                            HorizontalAlignment="Stretch"
+                            Cursor="IBeam"
+                            IsEnabled="True"
+                            MaxLength="7"
+                            MaxLines="1"
+                            Style="{DynamicResource TextBoxCleanStyle_13}" 
+                            TextChanged="TextboxSpecialOptioneditorPropertyNameMaxDownloadTilesInParralele_TextChanged"
+                            LostFocus="TextboxSpecialOptioneditorPropertyNameMaxDownloadTilesInParralele_LostFocus"/>
+                    </Grid>       
+                         <Grid Margin="0,10,0,0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="20" />
+                            <RowDefinition Height="20" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+                        <Label
+                            Grid.Row="0"
+                            Content="{Binding Source={x:Static commun:Languages.Current}, Path=[editorPropertyNameWaitingBeforeStartAnotherTile]}"
+                            Foreground="#888989" />      
+                             <Label
+                            Grid.Row="1"
+                            Content="{Binding Source={x:Static commun:Languages.Current}, Path=[editorPropertyNameHightestIsGonnaBeSelected]}"
+                            Foreground="#888989" />
+                        <TextBox
+                            x:Name="TextboxSpecialOptioneditorPropertyNameWaitingBeforeStartAnotherTile"
+                            Grid.Row="2"
+                            HorizontalAlignment="Stretch"
+                            Cursor="IBeam"
+                            IsEnabled="True"
+                            MaxLength="7"
+                            MaxLines="1"
+                            Style="{DynamicResource TextBoxCleanStyle_13}" 
+                            TextChanged="TextboxSpecialOptioneditorPropertyNameWaitingBeforeStartAnotherTile_TextChanged"
+                            LostFocus="TextboxSpecialOptioneditorPropertyNameWaitingBeforeStartAnotherTile_LostFocus"/>
+                    </Grid>       
+                    
+                    
                     <Grid Margin="0,10,0,0">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="20" />

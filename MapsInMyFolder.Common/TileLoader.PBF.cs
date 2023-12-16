@@ -63,7 +63,7 @@ namespace MapsInMyFolder.Commun
                 settings_max_tiles_cache_days = -1;
             }
 
-            string save_temp_directory_rawBPF = Path.Combine(save_temp_directory,"rawPBF/");
+            string save_temp_directory_rawBPF = Path.Combine(save_temp_directory, "rawPBF/");
             bool cache_tile = false;
             try
             {
