@@ -306,8 +306,17 @@
             quotedStrings.forEach((quotedString) => {
                 searchedText = searchedText.replace(quotedString, encodeURI(quotedString.slice(1, quotedString.length - 1)));
             });
+            let finalFilteredLayers = new Array();
+            searchedText.split("||").forEach(OrSeparatedString => {
+                let FilteredLayers = internalSearch(OrSeparatedString);
+                finalFilteredLayers = finalFilteredLayers.concat(FilteredLayers.filter((item) => finalFilteredLayers.indexOf(item) < 0));
+            });
+           
+            applySearch(finalFilteredLayers);
+        }
 
-            const searchClasses = [
+        function internalSearch(searchedText){
+             const searchClasses = [
                 ["%searchLayerFiltersSite%", "layer_website"],
                 ["%searchLayerFiltersCategory%", "layer_category"],
                 ["%searchLayerFiltersZoom%", "zoom"],
@@ -360,10 +369,10 @@
                 }
             });
 
-            applySearch(filteredLayers);
             return filteredLayers;
         }
-
+        
+        
         function applySearch(filteredLayers) {
             let li = document.getElementsByTagName('li');
             Array.prototype.forEach.call(li, function (liElement) {
