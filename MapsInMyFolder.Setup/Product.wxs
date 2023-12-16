@@ -9,7 +9,7 @@
     <Package InstallerVersion="200" Compressed="yes" InstallPrivileges="elevated" AdminImage="yes" Manufacturer="SioGabx" Description="This program provides the functionality to install MapsInMyFolder." Comments="This program provides the functionality to install MapsInMyFolder. See https://github.com/SioGabx/MapsInMyFolder" /><!--InstallScope="perUser"-->
     <Media Id="1" Cabinet="MyCabFile.cab" EmbedCab="yes"/>
     
-    <MajorUpgrade AllowDowngrades="no" AllowSameVersionUpgrades="yes" IgnoreRemoveFailure="no" Schedule="afterInstallInitialize" DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+    <MajorUpgrade AllowDowngrades="yes" IgnoreRemoveFailure="no" Schedule="afterInstallInitialize" />
 
     <!-- Wix requires that shortcut icons' Id have the same extension as the target file, hence the .exe in the icon Id -->
     <Icon Id="application_icon.exe" SourceFile="$(var.MapsInMyFolder_TargetDir)MapsInMyFolder.exe"/>

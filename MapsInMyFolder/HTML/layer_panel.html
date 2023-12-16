@@ -307,7 +307,10 @@
                 searchedText = searchedText.replace(quotedString, encodeURI(quotedString.slice(1, quotedString.length - 1)));
             });
             let finalFilteredLayers = new Array();
-            searchedText.split("||").forEach(OrSeparatedString => {
+            searchedText.split("||").forEach((OrSeparatedString, index, fullArray) => {
+                if ((fullArray.length > 1) && !(OrSeparatedString.trim())){
+                    return;
+                }
                 let FilteredLayers = internalSearch(OrSeparatedString);
                 finalFilteredLayers = finalFilteredLayers.concat(FilteredLayers.filter((item) => finalFilteredLayers.indexOf(item) < 0));
             });
