@@ -4,6 +4,7 @@ using ModernWpf.Controls;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Data.SQLite;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
@@ -205,43 +206,21 @@ namespace MapsInMyFolder
 
         void Init_LayerEditableTextbox(int prefilLayerId)
         {
-            List<string> Category = new List<string>();
-            List<string> Site = new List<string>();
-            List<string> SiteUrl = new List<string>();
-
-            foreach (Layers layer in Layers.GetLayersList())
+            InitComboboxAvailableValues();
+            Layers LayerInEditMode = Layers.GetLayerById(prefilLayerId); 
+            if (LayerId > 0 && !string.IsNullOrEmpty(LayerInEditMode.Name.Trim()))
             {
-                if (layer.Id < 0)
-                {
-                    continue;
-                }
-                string class_category = layer.Category.Trim();
-                if (!Category.Contains(class_category) && !string.IsNullOrWhiteSpace(class_category))
-                {
-                    Category.Add(class_category);
-                    TextboxLayerCategory.Items.Add(class_category);
-                }
-                string class_site = layer.SiteName.Trim();
-                if (!Site.Contains(class_site) && !string.IsNullOrWhiteSpace(class_site))
-                {
-                    Site.Add(class_site);
-                    TextboxLayerSite.Items.Add(class_site);
-                }
-                string class_site_url = layer.SiteUrl.Trim();
-                if (!SiteUrl.Contains(class_site_url) && !string.IsNullOrWhiteSpace(class_site_url))
-                {
-                    SiteUrl.Add(class_site_url);
-                    TextboxLayerSiteUrl.Items.Add(class_site_url);
-                }
+                CalqueType.Content = string.Concat(Languages.Current["editorTitleLayer"], " - ", LayerInEditMode.Name);
             }
-            Category.Clear();
-            Site.Clear();
-            SiteUrl.Clear();
-            const System.ComponentModel.ListSortDirection listSortDirection = System.ComponentModel.ListSortDirection.Ascending;
-            TextboxLayerCategory.Items.SortDescriptions.Add(new System.ComponentModel.SortDescription("", listSortDirection));
-            TextboxLayerSite.Items.SortDescriptions.Add(new System.ComponentModel.SortDescription("", listSortDirection));
-            TextboxLayerSiteUrl.Items.SortDescriptions.Add(new System.ComponentModel.SortDescription("", listSortDirection));
-            Layers LayerInEditMode = Layers.GetLayerById(prefilLayerId);
+            else if (LayerId != prefilLayerId)
+            {
+                CalqueType.Content = Languages.GetWithArguments("editorTitleNewLayerBasedOn", LayerInEditMode.Id);
+            }
+            SetValuesFromLayers(LayerInEditMode);
+        }
+
+        public void SetValuesFromLayers(Layers LayerInEditMode)
+        {
             TextboxLayerCategory.IsEditable = true;
             TextboxLayerSite.IsEditable = true;
             TextboxLayerSiteUrl.IsEditable = true;
@@ -254,14 +233,7 @@ namespace MapsInMyFolder
                 return;
             }
             TextboxLayerName.Text = LayerInEditMode.Name;
-            if (LayerId > 0 && !string.IsNullOrEmpty(LayerInEditMode.Name.Trim()))
-            {
-                CalqueType.Content = string.Concat(Languages.Current["editorTitleLayer"], " - ", LayerInEditMode.Name);
-            }
-            else if (LayerId != prefilLayerId)
-            {
-                CalqueType.Content = Languages.GetWithArguments("editorTitleNewLayerBasedOn", prefilLayerId);
-            }
+           
             TextboxLayerCategory.Text = LayerInEditMode.Category;
             TextboxLayerSiteUrl.Text = LayerInEditMode.SiteUrl;
             TextboxLayerSite.Text = LayerInEditMode.SiteName;
@@ -289,7 +261,7 @@ namespace MapsInMyFolder
                 tileSize = "256";
             }
 
-            if (LayerId == prefilLayerId)
+            if (LayerId == LayerInEditMode.Id)
             {
                 TextBoxSetValueAndLock(TextboxLayerIdentifier, LayerInEditMode.Identifier);
             }
@@ -360,6 +332,46 @@ namespace MapsInMyFolder
 
             has_scale.IsChecked = LayerInEditMode.IsAtScale;
             Collectif.SetBackgroundOnUIElement(mapviewerappercu, LayerInEditMode?.SpecialsOptions?.BackgroundColor);
+        }
+
+        void InitComboboxAvailableValues()
+        {
+            List<string> Category = new List<string>();
+            List<string> Site = new List<string>();
+            List<string> SiteUrl = new List<string>();
+
+            foreach (Layers layer in Layers.GetLayersList())
+            {
+                if (layer.Id < 0)
+                {
+                    continue;
+                }
+                string class_category = layer.Category.Trim();
+                if (!Category.Contains(class_category) && !string.IsNullOrWhiteSpace(class_category))
+                {
+                    Category.Add(class_category);
+                    TextboxLayerCategory.Items.Add(class_category);
+                }
+                string class_site = layer.SiteName.Trim();
+                if (!Site.Contains(class_site) && !string.IsNullOrWhiteSpace(class_site))
+                {
+                    Site.Add(class_site);
+                    TextboxLayerSite.Items.Add(class_site);
+                }
+                string class_site_url = layer.SiteUrl.Trim();
+                if (!SiteUrl.Contains(class_site_url) && !string.IsNullOrWhiteSpace(class_site_url))
+                {
+                    SiteUrl.Add(class_site_url);
+                    TextboxLayerSiteUrl.Items.Add(class_site_url);
+                }
+            }
+            Category.Clear();
+            Site.Clear();
+            SiteUrl.Clear();
+            const System.ComponentModel.ListSortDirection listSortDirection = System.ComponentModel.ListSortDirection.Ascending;
+            TextboxLayerCategory.Items.SortDescriptions.Add(new System.ComponentModel.SortDescription("", listSortDirection));
+            TextboxLayerSite.Items.SortDescriptions.Add(new System.ComponentModel.SortDescription("", listSortDirection));
+            TextboxLayerSiteUrl.Items.SortDescriptions.Add(new System.ComponentModel.SortDescription("", listSortDirection));
         }
 
 
@@ -624,20 +636,22 @@ namespace MapsInMyFolder
             if (InputBox.textBox.Text.Trim() != UpdateSQLCommand.Trim() && result == ContentDialogResult.Primary)
             {
                 Debug.WriteLine("Executing");
-                LayerId = SaveLayer();
+                //LayerId = SaveLayer();
                 try
                 {
-                    Database.ExecuteNonQuerySQLCommand($"UPDATE 'main'.'EDITEDLAYERS' {InputBox.textBox.Text} WHERE ID = {LayerId}");
+                    using (SQLiteConnection conn = Database.DB_MemoryConnection())
+                    {
+                        Database.ExecuteNonQuerySQLCommand(conn, "INSERT INTO LAYERS DEFAULT VALUES");
+                        Database.ExecuteNonQuerySQLCommand(conn,$"UPDATE LAYERS {InputBox.textBox.Text} WHERE ID = 1");
+                        SQLiteDataReader reader = Database.ExecuteExecuteReaderSQLCommand(conn, "SELECT * FROM LAYERS WHERE ID='1'");
+                        reader.Read();
+                        var calque = Layers.GetLayerFromSQLiteDataReader(reader);
+                        SetValuesFromLayers(calque);
+                    }
                 }
                 catch (Exception ex)
                 {
                     Debug.WriteLine(ex.Message);
-                }
-                finally
-                {
-                    Leave(true);
-                    DisposeElementBeforeLeave();
-                    MainWindow.Instance.FrameLoad_CustomOrEditLayers(LayerId);
                 }
             }
         }

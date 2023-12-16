@@ -47,14 +47,11 @@ namespace MapsInMyFolder
             });
         }
 
-
-
         public void InitLayerPanel()
         {
             if (layer_browser is null) { return; }
             try
             {
-                //layer_browser.JavascriptObjectRepository.UnRegisterAll();
                 layer_browser.JavascriptObjectRepository.Register("LayerCEFSharpLink", new LayerCEFSharpLink());
             }
             catch (Exception ex)

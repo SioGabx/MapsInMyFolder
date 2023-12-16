@@ -10,9 +10,10 @@ using System.Windows.Threading;
 
 namespace MapsInMyFolder
 {
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Marquer les membres comme étant static", Justification = "Used by CEFSHARP")]
     public class DownloadCEFSharpLink
     {
-        public static bool IsFileOk(int id)
+        public bool IsFileOk(int id)
         {
             if (id != 0)
             {
@@ -37,7 +38,7 @@ namespace MapsInMyFolder
             return false;
         }
 
-        public static void DownloadStop(double id)
+        public void DownloadStop(double id)
         {
             int id_int = Convert.ToInt32(id);
             if (id_int != 0)
@@ -56,7 +57,7 @@ namespace MapsInMyFolder
             }
         }
 
-        public static void DownloadCancel(double id)
+        public void DownloadCancel(double id)
         {
             int id_int = Convert.ToInt32(id);
             if (id_int != 0)
@@ -75,7 +76,7 @@ namespace MapsInMyFolder
             }
         }
 
-        public static void DownloadRestart(double id)
+        public void DownloadRestart(double id)
         {
             int id_int = Convert.ToInt32(id);
             if (id_int != 0)
@@ -94,7 +95,7 @@ namespace MapsInMyFolder
             }
         }
 
-        public static void DownloadRestartFromStart(double id)
+        public void DownloadRestartFromStart(double id)
         {
             int id_int = Convert.ToInt32(id);
             if (id_int != 0)
@@ -112,7 +113,7 @@ namespace MapsInMyFolder
                 }, null);
             }
         }
-        public static void DownloadReselectArea(double id)
+        public void DownloadReselectArea(double id)
         {
             int id_int = Convert.ToInt32(id);
             if (id_int != 0)
@@ -133,7 +134,7 @@ namespace MapsInMyFolder
             }
         }
 
-        public static void DownloadOpenFolder(double id)
+        public void DownloadOpenFolder(double id)
         {
             int id_int = Convert.ToInt32(id);
             if (IsFileOk(id_int))
@@ -144,7 +145,7 @@ namespace MapsInMyFolder
             }
         }
 
-        public static void DownloadOpenFile(double id)
+        public void DownloadOpenFile(double id)
         {
             int id_int = Convert.ToInt32(id);
 
@@ -162,7 +163,7 @@ namespace MapsInMyFolder
             }
         }
 
-        public static void DownloadDeleteFile(double id)
+        public void DownloadDeleteFile(double id)
         {
             int id_int = Convert.ToInt32(id);
 
@@ -194,7 +195,7 @@ namespace MapsInMyFolder
                 }
             }
         }
-        public static void DownloadOpenTempFolder(double id)
+        public void DownloadOpenTempFolder(double id)
         {
             int id_int = Convert.ToInt32(id);
             var engine = DownloadEngine.GetEngineById(id_int);
@@ -213,7 +214,7 @@ namespace MapsInMyFolder
             }
         }
 
-        public static void DownloadDeleteInDatabase(double id)
+        public void DownloadDeleteInDatabase(double id)
         {
             int id_int = Convert.ToInt32(id);
             var engine = DownloadEngine.GetEngineById(id_int);
@@ -232,7 +233,7 @@ namespace MapsInMyFolder
             }, null);
         }
 
-        public static void DownloadCopyLocations(double id)
+        public void DownloadCopyLocations(double id)
         {
             int id_int = Convert.ToInt32(id);
             var engine = DownloadEngine.GetEngineById(id_int);
@@ -255,7 +256,7 @@ namespace MapsInMyFolder
                 }
             }, null);
         }
-        public static void DownloadCopyFilePath(double id)
+        public void DownloadCopyFilePath(double id)
         {
             int id_int = Convert.ToInt32(id);
             var engine = DownloadEngine.GetEngineById(id_int);
@@ -273,7 +274,7 @@ namespace MapsInMyFolder
                 }
             }, null);
         }
-        public static void DownloadSetLayerAsCurrent(double id)
+        public void DownloadSetLayerAsCurrent(double id)
         {
             int id_int = Convert.ToInt32(id);
             var engine = DownloadEngine.GetEngineById(id_int);
@@ -291,7 +292,7 @@ namespace MapsInMyFolder
             }, null);
         }
 
-        public static void DownloadCancelAndDeletedInDatabase(double id)
+        public void DownloadCancelAndDeletedInDatabase(double id)
         {
             int id_int = Convert.ToInt32(id);
             var engine = DownloadEngine.GetEngineById(id_int);
