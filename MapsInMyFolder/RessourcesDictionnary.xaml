@@ -8,24 +8,25 @@
     xmlns:editing="clr-namespace:ICSharpCode.AvalonEdit.Editing;assembly=ICSharpCode.AvalonEdit"
     xmlns:local="clr-namespace:MapsInMyFolder"
     xmlns:map="clr-namespace:MapsInMyFolder.MapControl;assembly=MapsInMyFolder.MapControl"
-    xmlns:rendering="clr-namespace:ICSharpCode.AvalonEdit.Rendering;assembly=ICSharpCode.AvalonEdit"
+    xmlns:avaloneditRendering="clr-namespace:ICSharpCode.AvalonEdit.Rendering;assembly=ICSharpCode.AvalonEdit"
+    xmlns:avaloneditEditing="clr-namespace:ICSharpCode.AvalonEdit.Editing;assembly=ICSharpCode.AvalonEdit"
     xmlns:sys="clr-namespace:System;assembly=netstandard"
     xmlns:ui="http://schemas.modernwpf.com/2019">
 
-    <Style TargetType="avalonEdit:TextEditor">
+    <Style TargetType="{x:Type avalonEdit:TextEditor}">
         <Setter Property="Background" Value="#303031" />
         <Setter Property="Foreground" Value="#BCBCBC" />
         <Setter Property="LineNumbersForeground" Value="#626363" />
-
     </Style>
 
-    <Style TargetType="{x:Type rendering:TextView}">
+    <Style TargetType="{x:Type avaloneditRendering:TextView}">
 
         <Setter Property="NonPrintableCharacterBrush" Value="Transparent" />
         <Setter Property="LinkTextForegroundBrush" Value="#FFD69D85" />
         <!--  Style hyperlink displayed within text in text editor  -->
         <Setter Property="LinkTextBackgroundBrush" Value="Transparent" />
     </Style>
+    
 
 
     <Style TargetType="{x:Type editing:TextArea}">
@@ -468,51 +469,6 @@
         </Setter>
     </Style>
 
-    <Style x:Key="PushpinStyleRouge" TargetType="{x:Type map:Pushpin}">
-        <Setter Property="HorizontalAlignment" Value="Center" />
-        <Setter Property="VerticalAlignment" Value="Bottom" />
-        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-        <Setter Property="VerticalContentAlignment" Value="Stretch" />
-        <Setter Property="Padding" Value="3" />
-        <Setter Property="Foreground" Value="Black" />
-        <Setter Property="Background" Value="White" />
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="{x:Type map:Pushpin}">
-                    <Viewbox xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
-                        <Canvas
-                            Name="Calque_1"
-                            Width="30.144814"
-                            Height="45.224998">
-                            <Canvas.RenderTransform>
-                                <TranslateTransform X="0" Y="0" />
-                            </Canvas.RenderTransform>
-                            <Canvas.Resources />
-                            <Path
-                                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                                Name="path3807"
-                                Fill="#FFE64C3C"
-                                StrokeThickness="0.08833007">
-                                <Path.Data>
-                                    <PathGeometry Figures="m 13.661392 3e-5 h 2.826562 c -0.0079 0.0106 -0.01766 0.0203 -0.02473 0.0318 a 0.03621533 0.03621533 0 0 0 0.01413 0.015 1.6102572 1.6102572 0 0 0 0.169594 0.0362 14.51528 14.51528 0 0 1 3.141017 0.67308 c 3.632133 1.23662 6.428663 3.5014 8.354258 6.81643 1.589941 2.73293 2.208252 5.69287 1.943262 8.83301 a 14.791753 14.791753 0 0 1 -1.181856 4.61789 c -0.38512 0.89479 -0.903617 1.71449 -1.387666 2.55451 q -6.171622 10.7215 -12.326461 21.45184 c -0.03357 0.0592 -0.105113 0.10953 -0.07066 0.19521 h -0.08833 c 0.03269 -0.0936 -0.04328 -0.14839 -0.08126 -0.21376 Q 9.0214131 34.6846 3.0900489 24.35881 C 2.4540723 23.25115 1.7403654 22.18766 1.2351174 21.00227 0.00467953 18.1077 -0.31154211 15.12038 0.30941828 12.04119 A 14.740522 14.740522 0 0 1 3.8629369 5.00128 15.030245 15.030245 0 0 1 13.525364 0.076 c 0.04505 0 0.151044 0.0521 0.136028 -0.076 z m 10.825733 15.09208 c 0.04682 -5.17085 -4.187728 -9.37094 -9.269357 -9.44072 -5.2998048 -0.0715 -9.5396481 4.2584 -9.5590807 9.38154 -0.022081 5.06837 4.0773163 9.46191 9.4089187 9.46633 5.316587 0.005 9.450435 -4.35556 9.419519 -9.40715 z" FillRule="NonZero" />
-                                </Path.Data>
-                            </Path>
-                            <Path
-                                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                                Name="path3809"
-                                Fill="#FFBF392B"
-                                StrokeThickness="0.08833007">
-                                <Path.Data>
-                                    <PathGeometry Figures="m 24.487125 15.09211 c 0.03357 5.05071 -4.100281 9.41157 -9.416869 9.40627 -5.3351364 -0.005 -9.4310012 -4.39796 -9.4115687 -9.46545 0.019431 -5.12314 4.2548596 -9.45132 9.5590807 -9.38154 5.078979 0.0707 9.313522 4.27076 9.269357 9.44072 z m -9.415985 5.63015 a 5.6531244 5.6531244 0 0 0 5.653124 -5.6381 c 0.01237 -3.10834 -2.561572 -5.68051 -5.659307 -5.66284 a 5.6531244 5.6531244 0 0 0 0 11.30094 z" FillRule="NonZero" />
-                                </Path.Data>
-                            </Path>
-                        </Canvas>
-                    </Viewbox>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
-
     <Style x:Key="PushpinStyleOrange" TargetType="{x:Type map:Pushpin}">
         <Setter Property="HorizontalAlignment" Value="Center" />
         <Setter Property="VerticalAlignment" Value="Bottom" />
@@ -558,50 +514,6 @@
         </Setter>
     </Style>
 
-    <Style x:Key="PushpinStyleBleu" TargetType="{x:Type map:Pushpin}">
-        <Setter Property="HorizontalAlignment" Value="Center" />
-        <Setter Property="VerticalAlignment" Value="Bottom" />
-        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-        <Setter Property="VerticalContentAlignment" Value="Stretch" />
-        <Setter Property="Padding" Value="3" />
-        <Setter Property="Foreground" Value="Black" />
-        <Setter Property="Background" Value="White" />
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="{x:Type map:Pushpin}">
-                    <Viewbox xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
-                        <Canvas
-                            Name="Calque_1"
-                            Width="30.144814"
-                            Height="45.224998">
-                            <Canvas.RenderTransform>
-                                <TranslateTransform X="0" Y="0" />
-                            </Canvas.RenderTransform>
-                            <Canvas.Resources />
-                            <Path
-                                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                                Name="path3807"
-                                Fill="#FF3C53E6"
-                                StrokeThickness="0.08833007">
-                                <Path.Data>
-                                    <PathGeometry Figures="m 13.661392 3e-5 h 2.826562 c -0.0079 0.0106 -0.01766 0.0203 -0.02473 0.0318 a 0.03621533 0.03621533 0 0 0 0.01413 0.015 1.6102572 1.6102572 0 0 0 0.169594 0.0362 14.51528 14.51528 0 0 1 3.141017 0.67308 c 3.632133 1.23662 6.428663 3.5014 8.354258 6.81643 1.589941 2.73293 2.208252 5.69287 1.943262 8.83301 a 14.791753 14.791753 0 0 1 -1.181856 4.61789 c -0.38512 0.89479 -0.903617 1.71449 -1.387666 2.55451 q -6.171622 10.7215 -12.326461 21.45184 c -0.03357 0.0592 -0.105113 0.10953 -0.07066 0.19521 h -0.08833 c 0.03269 -0.0936 -0.04328 -0.14839 -0.08126 -0.21376 Q 9.0214131 34.6846 3.0900489 24.35881 C 2.4540723 23.25115 1.7403654 22.18766 1.2351174 21.00227 0.00467953 18.1077 -0.31154211 15.12038 0.30941828 12.04119 A 14.740522 14.740522 0 0 1 3.8629369 5.00128 15.030245 15.030245 0 0 1 13.525364 0.076 c 0.04505 0 0.151044 0.0521 0.136028 -0.076 z m 10.825733 15.09208 c 0.04682 -5.17085 -4.187728 -9.37094 -9.269357 -9.44072 -5.2998048 -0.0715 -9.5396481 4.2584 -9.5590807 9.38154 -0.022081 5.06837 4.0773163 9.46191 9.4089187 9.46633 5.316587 0.005 9.450435 -4.35556 9.419519 -9.40715 z" FillRule="NonZero" />
-                                </Path.Data>
-                            </Path>
-                            <Path
-                                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                                Name="path3809"
-                                Fill="#FF3239C8"
-                                StrokeThickness="0.08833007">
-                                <Path.Data>
-                                    <PathGeometry Figures="m 24.487125 15.09211 c 0.03357 5.05071 -4.100281 9.41157 -9.416869 9.40627 -5.3351364 -0.005 -9.4310012 -4.39796 -9.4115687 -9.46545 0.019431 -5.12314 4.2548596 -9.45132 9.5590807 -9.38154 5.078979 0.0707 9.313522 4.27076 9.269357 9.44072 z m -9.415985 5.63015 a 5.6531244 5.6531244 0 0 0 5.653124 -5.6381 c 0.01237 -3.10834 -2.561572 -5.68051 -5.659307 -5.66284 a 5.6531244 5.6531244 0 0 0 0 11.30094 z" FillRule="NonZero" />
-                                </Path.Data>
-                            </Path>
-                        </Canvas>
-                    </Viewbox>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
 
     <Style x:Key="RoundedButton" TargetType="Button">
         <Setter Property="Background" Value="#F18712" />

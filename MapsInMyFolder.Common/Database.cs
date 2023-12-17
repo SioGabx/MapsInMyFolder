@@ -816,5 +816,37 @@ namespace MapsInMyFolder.Commun
                 }
             }
         }
+
+        public static string getSavingStringOptimalValue(string formValue, string layerValue)
+        {
+            formValue = formValue?.Trim();
+            layerValue = layerValue?.Trim();
+            if (formValue == layerValue || formValue == Collectif.HTMLEntities(layerValue))
+            {
+                return null;
+            }
+            else
+            {
+                return formValue;
+            }
+        }
+
+        public static string getSavingOptimalValueWithNULL(string formValue, string layerValue)
+        {
+            string optimalValue = getSavingStringOptimalValue(formValue, layerValue);
+            if (optimalValue == null)
+            {
+                return "NULL";
+            }
+            else
+            {
+                return $"'{optimalValue}'";
+            }
+        }
+
+
+
+
+
     }
 }

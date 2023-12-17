@@ -194,6 +194,32 @@ namespace MapsInMyFolder.Commun
             return GetLayersList().Count();
         }
 
+        public static Dictionary<string, string> GetValuesForSaving(Layers layers)
+        {
+            return new Dictionary<string, string>()
+            {
+                //Key need to be the same as the db
+                {"NAME", Collectif.HTMLEntities(layers.Name)},
+                {"DESCRIPTION", Collectif.HTMLEntities(layers.Description)},
+                {"CATEGORY", Collectif.HTMLEntities(layers.Category)},
+                {"COUNTRY", Collectif.HTMLEntities(layers.Country)},
+                {"IDENTIFIER", Collectif.HTMLEntities(layers.Identifier)},
+                {"TILE_URL", Collectif.HTMLEntities(layers.TileUrl)},
+                {"MIN_ZOOM", layers.MinZoom.ToString()},
+                {"MAX_ZOOM", layers.MaxZoom.ToString()},
+                {"FORMAT", Collectif.HTMLEntities(layers.TilesFormat)},
+                {"SITE", Collectif.HTMLEntities(layers.SiteName)},
+                {"SITE_URL", Collectif.HTMLEntities(layers.SiteUrl)},
+                {"STYLE", Collectif.HTMLEntities(layers.Style)},
+                {"TILE_SIZE", layers.TilesSize.ToString()},
+                {"VISIBILITY", layers.Visibility.ToString()},
+                {"SCRIPT", Collectif.HTMLEntities(layers.Script)},
+                {"RECTANGLES", Collectif.HTMLEntities(layers.BoundaryRectangles)},
+                {"SPECIALSOPTIONS", layers.SpecialsOptions.ToString()},
+                {"HAS_SCALE", (layers.IsAtScale ? 1 : 0).ToString()}
+            };
+        }
+
         public static Layers GetLayerFromSQLiteDataReader(SQLiteDataReader sQLiteDataReader)
         {
             string GetStringFromOrdinal(string name)

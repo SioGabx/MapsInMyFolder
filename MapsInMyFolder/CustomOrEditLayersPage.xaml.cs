@@ -48,7 +48,7 @@ namespace MapsInMyFolder
             Javascript.instance.Logs = String.Empty;
             TextboxLayerScriptConsole.Text = String.Empty;
             Javascript.Functions.ClearVar(-1);
-            Javascript.Functions.ClearVar(-2);
+            Javascript.Functions.ClearVar(InternalEditorId);
             GenerateTempLayerInDicList();
             mapviewerappercu.Background = Collectif.RgbValueToSolidColorBrush(Settings.background_layer_color_R, Settings.background_layer_color_G, Settings.background_layer_color_B);
             mapviewerappercu.Center = MainPage._instance.mapviewer.Center;
@@ -672,27 +672,15 @@ namespace MapsInMyFolder
             {
                 return string.Empty;
             }
-            string NAME = Collectif.HTMLEntities(layers.Name);
-            string DESCRIPTION = Collectif.HTMLEntities(layers.Description);
-            string CATEGORY = Collectif.HTMLEntities(layers.Category);
-            string COUNTRY = Collectif.HTMLEntities(layers.Country);
-            string IDENTIFIER = Collectif.HTMLEntities(layers.Identifier);
-            string TILE_URL = Collectif.HTMLEntities(layers.TileUrl);
-            string MIN_ZOOM = layers.MinZoom.ToString();
-            string MAX_ZOOM = layers.MaxZoom.ToString();
-            string FORMAT = Collectif.HTMLEntities(layers.TilesFormat);
-            string SITE = Collectif.HTMLEntities(layers.SiteName);
-            string SITE_URL = Collectif.HTMLEntities(layers.SiteUrl);
-            string STYLE = Collectif.HTMLEntities(layers.Style);
-            string TILE_SIZE = layers.TilesSize.ToString();
-            string VISIBILITY = layers.Visibility.ToString();
-            string SCRIPT = Collectif.HTMLEntities(layers.Script);
-            string RECTANGLES = Collectif.HTMLEntities(layers.BoundaryRectangles);
-            string SPECIALSOPTIONS = layers.SpecialsOptions.ToString();
-            string HAS_SCALE = (layers.IsAtScale ? 1 : 0).ToString();
-            return ($"SET 'NAME'='{NAME}','DESCRIPTION'='{DESCRIPTION}','CATEGORY'='{CATEGORY}','COUNTRY'='{COUNTRY}','IDENTIFIER'='{IDENTIFIER}','TILE_URL'='{TILE_URL}','MIN_ZOOM'={MIN_ZOOM},'MAX_ZOOM'={MAX_ZOOM},'FORMAT'='{FORMAT}','SITE'='{SITE}','SITE_URL'='{SITE_URL}','STYLE'='{STYLE}','TILE_SIZE'={TILE_SIZE},'SCRIPT'='{SCRIPT}','VISIBILITY'='{VISIBILITY}','SPECIALSOPTIONS'='{SPECIALSOPTIONS}', 'RECTANGLES'='{RECTANGLES}', 'HAS_SCALE'={HAS_SCALE}");
-        }
+            var LayerSaveValues = Layers.GetValuesForSaving(layers);
+            string ShareStringKeyValues = string.Empty;
+            foreach (KeyValuePair<string, string> KeyPair in LayerSaveValues)
+            {
+                ShareStringKeyValues += $"'{KeyPair.Key}'='{KeyPair.Value}',";
+            }
 
+            return ($"SET {ShareStringKeyValues.Trim(',')}");
+        }
 
         private int SaveLayer()
         {
@@ -712,58 +700,37 @@ namespace MapsInMyFolder
                 Message.NoReturnBoxAsync(Languages.Current["editorMessageErrorDatabaseSave"], Languages.Current["dialogTitleOperationFailed"]);
                 return -1;
             }
-            string NAME = Collectif.HTMLEntities(layers.Name);
-            string DESCRIPTION = Collectif.HTMLEntities(layers.Description);
-            string CATEGORY = Collectif.HTMLEntities(layers.Category);
-            string COUNTRY = Collectif.HTMLEntities(layers.Country);
-            string IDENTIFIER = Collectif.HTMLEntities(layers.Identifier);
-            string TILE_URL = Collectif.HTMLEntities(layers.TileUrl);
-            string MIN_ZOOM = layers.MinZoom.ToString();
-            string MAX_ZOOM = layers.MaxZoom.ToString();
-            string FORMAT = Collectif.HTMLEntities(layers.TilesFormat);
-            string SITE = Collectif.HTMLEntities(layers.SiteName);
-            string SITE_URL = Collectif.HTMLEntities(layers.SiteUrl);
-            string STYLE = Collectif.HTMLEntities(layers.Style);
-            string TILE_SIZE = layers.TilesSize.ToString();
-            string SCRIPT = Collectif.HTMLEntities(layers.Script);
-            string RECTANGLES = Collectif.HTMLEntities(layers.BoundaryRectangles);
-            string SPECIALSOPTIONS = layers.SpecialsOptions.ToString();
-            string HAS_SCALE = (layers.IsAtScale ? 1 : 0).ToString();
 
+            var LayerSaveValues = Layers.GetValuesForSaving(layers);
+            string NAME = LayerSaveValues["NAME"];
+            string DESCRIPTION = LayerSaveValues["DESCRIPTION"];
+            string CATEGORY = LayerSaveValues["CATEGORY"];
+            string COUNTRY = LayerSaveValues["COUNTRY"];
+            string IDENTIFIER = LayerSaveValues["IDENTIFIER"];
+            string TILE_URL = LayerSaveValues["TILE_URL"];
+            string MIN_ZOOM = LayerSaveValues["MIN_ZOOM"];
+            string MAX_ZOOM = LayerSaveValues["MAX_ZOOM"];
+            string FORMAT = LayerSaveValues["FORMAT"];
+            string SITE = LayerSaveValues["SITE"];
+            string SITE_URL = LayerSaveValues["SITE_URL"];
+            string STYLE = LayerSaveValues["STYLE"];
+            string TILE_SIZE = LayerSaveValues["TILE_SIZE"];
+            string SCRIPT = LayerSaveValues["SCRIPT"];
+            string RECTANGLES = LayerSaveValues["RECTANGLES"];
+            string SPECIALSOPTIONS = LayerSaveValues["SPECIALSOPTIONS"];
+            string HAS_SCALE = LayerSaveValues["HAS_SCALE"];
 
-
-            string getSavingStringOptimalValue(string formValue, string layerValue)
-            {
-                formValue = formValue?.Trim();
-                layerValue = layerValue?.Trim();
-                if (formValue == layerValue || formValue == Collectif.HTMLEntities(layerValue))
-                {
-                    return null;
-                }
-                else
-                {
-                    return formValue;
-                }
-            }
-
-            string getSavingOptimalValueWithNULL(string formValue, string layerValue)
+            string getSavingOptimalValueWithNULL(string formValue, object layerValue)
             {
                 if (LayerId <= 0)
                 {
                     return $"'{formValue}'";
-                }
-                string optimalValue = getSavingStringOptimalValue(formValue, layerValue);
-                if (optimalValue == null)
-                {
-                    return "NULL";
-                }
-                else
-                {
-                    return $"'{optimalValue}'";
-                }
+                } 
+                return Database.getSavingOptimalValueWithNULL(formValue, layerValue?.ToString());
             }
 
-            try
+
+                try
             {
                 Layers DB_Layer = Layers.Empty();
 
@@ -786,17 +753,17 @@ namespace MapsInMyFolder
                 CATEGORY = getSavingOptimalValueWithNULL(CATEGORY, DB_Layer.Category);
                 COUNTRY = getSavingOptimalValueWithNULL(COUNTRY, DB_Layer.Country);
                 IDENTIFIER = getSavingOptimalValueWithNULL(IDENTIFIER, DB_Layer.Identifier);
-                MIN_ZOOM = getSavingOptimalValueWithNULL(MIN_ZOOM, DB_Layer.MinZoom.ToString());
-                MAX_ZOOM = getSavingOptimalValueWithNULL(MAX_ZOOM, DB_Layer.MaxZoom.ToString());
+                MIN_ZOOM = getSavingOptimalValueWithNULL(MIN_ZOOM, DB_Layer.MinZoom);
+                MAX_ZOOM = getSavingOptimalValueWithNULL(MAX_ZOOM, DB_Layer.MaxZoom);
                 TILE_URL = getSavingOptimalValueWithNULL(TILE_URL, DB_Layer.TileUrl);
                 FORMAT = getSavingOptimalValueWithNULL(FORMAT, DB_Layer.TilesFormat);
                 SITE = getSavingOptimalValueWithNULL(SITE, DB_Layer.SiteName);
                 SITE_URL = getSavingOptimalValueWithNULL(SITE_URL, DB_Layer.SiteUrl);
                 SCRIPT = getSavingOptimalValueWithNULL(SCRIPT, DB_Layer.Script);
                 STYLE = getSavingOptimalValueWithNULL(STYLE, DB_Layer.Style);
-                TILE_SIZE = getSavingOptimalValueWithNULL(TILE_SIZE, DB_Layer.TilesSize.ToString());
+                TILE_SIZE = getSavingOptimalValueWithNULL(TILE_SIZE, DB_Layer.TilesSize);
                 RECTANGLES = getSavingOptimalValueWithNULL(RECTANGLES, DB_Layer.BoundaryRectangles);
-                SPECIALSOPTIONS = getSavingOptimalValueWithNULL(SPECIALSOPTIONS, DB_Layer.SpecialsOptions.ToString());
+                SPECIALSOPTIONS = getSavingOptimalValueWithNULL(SPECIALSOPTIONS, DB_Layer.SpecialsOptions);
                 HAS_SCALE = getSavingOptimalValueWithNULL(HAS_SCALE, null);
             }
             catch (Exception ex)
@@ -830,7 +797,6 @@ namespace MapsInMyFolder
                 Database.ExecuteNonQuerySQLCommand($"UPDATE 'main'.'EDITEDLAYERS' SET 'NAME'={NAME},'DESCRIPTION'={DESCRIPTION},'CATEGORY'={CATEGORY},'COUNTRY'={COUNTRY},'IDENTIFIER'={IDENTIFIER},'TILE_URL'={TILE_URL},'MIN_ZOOM'={MIN_ZOOM},'MAX_ZOOM'={MAX_ZOOM},'FORMAT'={FORMAT},'SITE'={SITE},'SITE_URL'={SITE_URL},'STYLE'={STYLE},'TILE_SIZE'={TILE_SIZE},'SCRIPT'={SCRIPT},'VISIBILITY'='{Visibility.Visible}','SPECIALSOPTIONS'={SPECIALSOPTIONS}, 'RECTANGLES'={RECTANGLES}, 'VERSION'={LastVersion}, 'HAS_SCALE'={HAS_SCALE} WHERE ID = {LayerId}");
             }
             return LayerId;
-            //insert into CUSTOMSLAYERS default values
         }
         private async void ClosePage_button_Click(object sender, RoutedEventArgs e)
         {
@@ -1626,9 +1592,11 @@ namespace MapsInMyFolder
                     };
                 }
 
-                var StackPanel = new StackPanel();
-                StackPanel.Orientation = Orientation.Vertical;
-                StackPanel.Margin = new Thickness(0, 0, 0, 0);
+                var StackPanel = new StackPanel
+                {
+                    Orientation = Orientation.Vertical,
+                    Margin = new Thickness(0, 0, 0, 0)
+                };
                 StackPanel.Children.Add(getLabel());
                 var TextBox = getTextbox();
                 StackPanel.Children.Add(TextBox);

@@ -427,7 +427,6 @@ namespace MapsInMyFolder
 
             if (result == ContentDialogResult.Primary)
             {
-                // Enregistrement
                 SaveSettings();
 
                 // Redémarrer ?
@@ -506,16 +505,15 @@ namespace MapsInMyFolder
             if (!IsInitialized)
                 return;
 
-            List<(StackPanel SettingsPanel, Grid MenuLabel)> ListOfSubMenu = new List<(StackPanel, Grid)>()
-    {
-        (LanguagesSettings, MenuItem_LanguagesSettings),
-        (CalqueSettings, MenuItem_Calque),
-        (TelechargementSettings, MenuItem_Telechargement),
-        (CarteSettings, MenuItem_Carte),
-        (AvanceSettings, MenuItem_Avance),
-        (UpdateSettings, MenuItem_Update),
-        (AProposSettings, MenuItem_APropos)
-    };
+            List<(StackPanel SettingsPanel, Grid MenuLabel)> ListOfSubMenu = new List<(StackPanel, Grid)>() {
+                (LanguagesSettings, MenuItem_LanguagesSettings),
+                (CalqueSettings, MenuItem_Calque),
+                (TelechargementSettings, MenuItem_Telechargement),
+                (CarteSettings, MenuItem_Carte),
+                (AvanceSettings, MenuItem_Avance),
+                (UpdateSettings, MenuItem_Update),
+                (AProposSettings, MenuItem_APropos)
+            };
 
             const int Margin = 50;
             foreach ((StackPanel SettingsPanel, Grid MenuLabel) in ListOfSubMenu)
