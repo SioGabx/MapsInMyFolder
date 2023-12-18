@@ -85,13 +85,13 @@
   <ItemGroup>
     <PackageReference Include="AvalonEdit" Version="6.3.0.90" />
     <PackageReference Include="BlackPearl.Controls.Library" Version="2.0.4" />
-    <PackageReference Include="cef.redist.x64" Version="119.4.3" />
-    <PackageReference Include="CefSharp.Common" Version="119.4.30" />
-    <PackageReference Include="CefSharp.Common.NETCore" Version="119.4.30" />
-    <PackageReference Include="CefSharp.Wpf" Version="119.4.30" />
-    <PackageReference Include="CefSharp.Wpf.NETCore" Version="119.4.30" />
-    <PackageReference Include="Esprima" Version="3.0.1" />
-    <PackageReference Include="Jint" Version="3.0.0-beta-2053" />
+    <PackageReference Include="cef.redist.x64" Version="120.1.8" />
+    <PackageReference Include="CefSharp.Common" Version="120.1.80" />
+    <PackageReference Include="CefSharp.Common.NETCore" Version="120.1.80" />
+    <PackageReference Include="CefSharp.Wpf" Version="120.1.80" />
+    <PackageReference Include="CefSharp.Wpf.NETCore" Version="120.1.80" />
+    <PackageReference Include="Esprima" Version="3.0.2" />
+    <PackageReference Include="Jint" Version="3.0.0-beta-2057" />
     <PackageReference Include="ModernWpfUis" Version="1.4.0" />
     <PackageReference Include="NetVips" Version="2.4.0" />
     <PackageReference Include="NetVips.Native" Version="8.15.0" />
