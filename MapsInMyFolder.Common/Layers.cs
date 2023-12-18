@@ -318,7 +318,7 @@ namespace MapsInMyFolder.Commun
                     }
 
 
-                    if (legacyLayer.Version > replacementLayer.Version)
+                    if (legacyLayerVersion > replacementLayer.Version)
                     {
                         legacyLayerWithReplacements.DoShowWarningLegacyVersionNewerThanEdited = true;
                     }
