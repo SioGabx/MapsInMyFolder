@@ -3,20 +3,9 @@ using ICSharpCode.AvalonEdit.Highlighting;
 using MapsInMyFolder.Commun;
 using ModernWpf.Controls;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics.Eventing.Reader;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace MapsInMyFolder.UserControls
 {
@@ -96,23 +85,23 @@ namespace MapsInMyFolder.UserControls
 
         public new event KeyEventHandler KeyUp;
         public event EventHandler TextChanged;
-       
+
         public string Script
         {
             get { return ScriptTextEditor.Text; }
             set { ScriptTextEditor.Text = value; }
-        }   
+        }
 
         public void SetScriptNoEvent(string text)
         {
-            ScriptTextEditor.TextArea.Document.Text = text; 
-        }   
-        
+            ScriptTextEditor.TextArea.Document.Text = text;
+        }
+
         public new ContextMenu ContextMenu
         {
             get { return ScriptTextEditor.ContextMenu; }
             set { ScriptTextEditor.ContextMenu = value; }
-        } 
+        }
 
         public new double MinHeight
         {

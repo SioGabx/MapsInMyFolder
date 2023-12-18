@@ -963,9 +963,9 @@ namespace MapsInMyFolder.Commun
             uIElement.UndoLimit = undo_limit;
         }
 
-    
 
-   
+
+
 
         public static void TextEditorCursorPositionChanged(ICSharpCode.AvalonEdit.TextEditor textEditor, Grid grid, ScrollViewer scrollViewer, int MarginTop = 25)
         {
@@ -985,7 +985,7 @@ namespace MapsInMyFolder.Commun
 
         public static void IndenterCode(object sender, EventArgs e, ICSharpCode.AvalonEdit.TextEditor textBox)
         {
-            Commun.JSBeautify jSBeautify = new JSBeautify(textBox.Text, new JSBeautifyOptions() { preserve_newlines = false, indent_char = ' ', indent_size = 4});
+            Commun.JSBeautify jSBeautify = new JSBeautify(textBox.Text, new JSBeautifyOptions() { preserve_newlines = false, indent_char = ' ', indent_size = 4 });
             textBox.Text = jSBeautify.GetResult();
         }
 
@@ -1118,7 +1118,7 @@ namespace MapsInMyFolder.Commun
             }
             return null;
         }
-        
+
         public static T FindParent<T>(DependencyObject child) where T : DependencyObject
         {
             DependencyObject parent = VisualTreeHelper.GetParent(child);
@@ -1131,7 +1131,7 @@ namespace MapsInMyFolder.Commun
             return parent as T;
         }
 
-       
+
 
         public static string HTMLEntities(string texte, bool decode = false)
         {

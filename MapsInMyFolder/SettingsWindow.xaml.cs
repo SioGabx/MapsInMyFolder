@@ -1,7 +1,7 @@
-﻿using ICSharpCode.AvalonEdit;
-using MapsInMyFolder.Commun;
+﻿using MapsInMyFolder.Commun;
 using Microsoft.Win32;
 using ModernWpf.Controls;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -11,7 +11,6 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using Newtonsoft.Json;
 
 namespace MapsInMyFolder
 {

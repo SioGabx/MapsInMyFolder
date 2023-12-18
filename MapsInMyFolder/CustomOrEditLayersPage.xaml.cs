@@ -608,11 +608,8 @@ namespace MapsInMyFolder
             }
             return number;
         }
+
         private async void ImportExportInfoLayerClikableLabel_Click(object sender, RoutedEventArgs e)
-        {
-            ImportExportInfoLayerClikableLabel_MouseUp(null, null);
-        }
-        private async void ImportExportInfoLayerClikableLabel_MouseUp(object sender, MouseButtonEventArgs e)
         {
             string UpdateSQLCommand = GetShareSQLPart();
             var InputBox = Message.SetInputBoxDialog("Pour importer ou exporter ce calque, copier ou collez la valeur dans le champs ci-dessous.", UpdateSQLCommand, "MapsInMyFolder", MessageDialogButton.OKCancel);
