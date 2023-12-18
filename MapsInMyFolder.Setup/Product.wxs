@@ -16,8 +16,12 @@
 
     <!-- ARPPRODUCTICON is a special Id which sets the icon in Add/Remove Programs (see https://wixtoolset.org/documentation/manual/v3/howtos/ui_and_localization/configure_arp_appearance.html) -->
     <Property Id="ARPPRODUCTICON" Value="application_icon.exe" />
-    <!--<Property Id="REINSTALLMODE" Value="amus"/>-->
-    <!-- a = replace all -->
+    <Property Id="REINSTALLMODE" Value="dmus"/>
+    <!-- 
+    a = replace all 
+    d = Missing or another version
+    o = Missing or previous
+    -->
     <Property Id="VC_REDIST_X64_EXISTS" Secure="yes">
       <RegistrySearch Id="VC_REDIST_X64_REGSEARCH" Root="HKLM" Key="SOFTWARE\Microsoft\VisualStudio\14.0\VC\Runtimes\x64" Name="Version" Type="raw" />
     </Property>

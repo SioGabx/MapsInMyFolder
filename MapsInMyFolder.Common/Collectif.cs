@@ -302,6 +302,8 @@ namespace MapsInMyFolder.Commun
         public static void RestartApplication()
         {
             string applicationPath = Process.GetCurrentProcess().MainModule.FileName;
+            Debug.WriteLine("Path : " + applicationPath);
+            Debug.WriteLine("Working directory : " + Path.GetDirectoryName(applicationPath));
             Process process = new Process()
             {
                 StartInfo = new ProcessStartInfo(applicationPath)

@@ -305,8 +305,8 @@ namespace MapsInMyFolder
 
                 var infoDialog = Message.SetContentDialog(Languages.Current["settingsMessageRestartRequire"], Languages.Current["dialogTitleOperationInfo"], MessageDialogButton.OK);
                 await infoDialog.ShowAsync();
-
-                Collectif.RestartApplication();
+                    Collectif.RestartApplication();
+                
             }
         }
 
@@ -442,7 +442,7 @@ namespace MapsInMyFolder
 
                 if (result2 == ContentDialogResult.Primary)
                 {
-                    Application.Current.Shutdown();
+                    Collectif.RestartApplication();
                 }
                 else if (result2 == ContentDialogResult.Secondary)
                 {
