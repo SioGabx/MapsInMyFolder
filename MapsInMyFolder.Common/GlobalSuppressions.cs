@@ -5,4 +5,5 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-[assembly: SuppressMessage("Style", "IDE0017:Simplifier l'initialisation des objets", Justification = "<En attente>", Scope = "member", Target = "~M:MapsInMyFolder.Commun.Collectif.GetBytesFromBitmapSource(System.Windows.Media.Imaging.BitmapSource)~System.Byte[]")]
+//[assembly: SuppressMessage("Style", "IDE0017:Simplifier l'initialisation des objets", Justification = "<En attente>", Scope = "member", Target = "~M:MapsInMyFolder.Commun.Collectif.GetBytesFromBitmapSource(System.Windows.Media.Imaging.BitmapSource)~System.Byte[]")]
+[assembly: SuppressMessage("Style", "IDE0063:Utiliser une instruction 'using' simple", Justification = "<En attente>", Scope = "module")]

@@ -5,6 +5,7 @@
     xmlns:avalonEdit="clr-namespace:ICSharpCode.AvalonEdit;assembly=ICSharpCode.AvalonEdit"
     xmlns:cbcontrols="clr-namespace:BlackPearl.Controls.CoreLibrary;assembly=BlackPearl.Controls.CoreLibrary"
     xmlns:commun="clr-namespace:MapsInMyFolder.Commun;assembly=MapsInMyFolder.Commun"
+    xmlns:customCtrl="clr-namespace:MapsInMyFolder.UserControls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:editing="clr-namespace:ICSharpCode.AvalonEdit.Editing;assembly=ICSharpCode.AvalonEdit"
     xmlns:local="clr-namespace:MapsInMyFolder"
@@ -131,7 +132,7 @@
                             FontSize="15">
                             <Run Text="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsSubTitleLanguages]}" />
                         </TextBlock>
-                    </Grid>  
+                    </Grid>
                     <Grid
                         x:Name="MenuItem_Calque"
                         Height="35"
@@ -255,7 +256,7 @@
                         VerticalScrollBarVisibility="Auto"
                         VirtualizingPanel.ScrollUnit="Pixel">
                         <StackPanel>
-                            
+
                             <StackPanel x:Name="LanguagesSettings">
                                 <Label
                                     x:Name="LanguagesSettingsLabel"
@@ -451,26 +452,11 @@
                                         Grid.Row="0"
                                         Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameDefaultScript]}"
                                         Foreground="#888989" />
-                                    <avalonEdit:TextEditor
+                                    <customCtrl:ScriptEditor
                                         x:Name="tileloader_default_script"
                                         Grid.Row="1"
-                                        Height="Auto"
                                         MinHeight="80"
-                                        HorizontalAlignment="Stretch"
-                                        HorizontalScrollBarVisibility="Auto"
-                                        RequestBringIntoView="DisableRequestBringIntoView"
-                                        ShowLineNumbers="True"
-                                        SyntaxHighlighting="MIMF_JavaScript"
-                                        VerticalScrollBarVisibility="Auto">
-                                        <avalonEdit:TextEditor.ContextMenu>
-                                            <ContextMenu Background="#171719" Foreground="#E2E2E1">
-                                                <StaticResource ResourceKey="ContextMenu_Copier" />
-                                                <StaticResource ResourceKey="ContextMenu_Couper" />
-                                                <StaticResource ResourceKey="ContextMenu_Coller" />
-                                            </ContextMenu>
-                                        </avalonEdit:TextEditor.ContextMenu>
-                                    </avalonEdit:TextEditor>
-
+                                        SyntaxHighlighting="MIMF_JavaScript" />
 
                                 </Grid>
 
@@ -483,25 +469,22 @@
                                         Grid.Row="0"
                                         Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameScriptTemplate]}"
                                         Foreground="#888989" />
-                                    <avalonEdit:TextEditor
-                                        x:Name="tileloader_template_script"
+
+                                    <Border
                                         Grid.Row="1"
                                         Height="Auto"
-                                        MinHeight="80"
-                                        HorizontalAlignment="Stretch"
-                                        HorizontalScrollBarVisibility="Auto"
-                                        RequestBringIntoView="DisableRequestBringIntoView"
-                                        ShowLineNumbers="True"
-                                        SyntaxHighlighting="MIMF_JavaScript"
-                                        VerticalScrollBarVisibility="Auto">
-                                        <avalonEdit:TextEditor.ContextMenu>
-                                            <ContextMenu Background="#171719" Foreground="#E2E2E1">
-                                                <StaticResource ResourceKey="ContextMenu_Copier" />
-                                                <StaticResource ResourceKey="ContextMenu_Couper" />
-                                                <StaticResource ResourceKey="ContextMenu_Coller" />
-                                            </ContextMenu>
-                                        </avalonEdit:TextEditor.ContextMenu>
-                                    </avalonEdit:TextEditor>
+                                        BorderBrush="#303031"
+                                        BorderThickness="2,0,0,0">
+                                        <StackPanel Margin="10,0,0,0">
+                                            <StackPanel x:Name="tileloader_template_script" />
+                                            <customCtrl:ClickableLabel
+                                                x:Name="add_template_script"
+                                                Margin="0,5,0,0"
+                                                Click="add_template_script_Click"
+                                                ContentValue="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsPropertyNameScriptTemplateAdd]}"
+                                                ContentValueStringFormat="{}→ {0}" />
+                                        </StackPanel>
+                                    </Border>
                                 </Grid>
                             </StackPanel>
 

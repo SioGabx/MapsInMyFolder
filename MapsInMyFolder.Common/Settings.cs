@@ -50,7 +50,7 @@ namespace MapsInMyFolder.Commun
         public static int map_defaut_zoom_level = 18;
         public static bool zoom_limite_taille_carte = false;
         public static string tileloader_default_script = "//default script\nfunction getTile(args) {\n   return args;\n}";
-        public static string tileloader_template_script = "function getTile(args) {\n   return args;\n}\n\nfunction getPreview(args){\n   return getTile(args);\n}\n\nfunction getPreviewFallback(args){\n   return getTile(args);\n}";
+        public static string tileloader_template_script = "{\"Empty\":\"function getTile(args) {\\r\\n    return args;\\r\\n}\\r\\nfunction getPreview(args) {\\r\\n    return getTile(args);\\r\\n}\\r\\nfunction getPreviewFallback(args) {\\r\\n    return getTile(args);\\r\\n}\"}";
         public static string user_agent = "Mozilla/4.0 (Compatible; Windows NT 5.1; MSIE 6.0) (compatible; MSIE 6.0; Windows NT 5.1; .NET CLR 1.1.4322; .NET CLR 2.0.50727)";
         public static string layers_Sort = "SITE ASC,NAME ASC";
         public static string database_pathname = "MapsInMyFolder_Database.db";

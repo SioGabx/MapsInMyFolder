@@ -2,14 +2,14 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:avalonEdit="clr-namespace:ICSharpCode.AvalonEdit;assembly=ICSharpCode.AvalonEdit"
-    xmlns:avaloneditEditing="clr-namespace:ICSharpCode.AvalonEdit.Editing;assembly=ICSharpCode.AvalonEdit"
-    xmlns:avaloneditRendering="clr-namespace:ICSharpCode.AvalonEdit.Rendering;assembly=ICSharpCode.AvalonEdit"
     xmlns:behavior="clr-namespace:BlackPearl.Controls.CoreLibrary.Behavior;assembly=BlackPearl.Controls.CoreLibrary"
     xmlns:cbcontrols="clr-namespace:BlackPearl.Controls.CoreLibrary;assembly=BlackPearl.Controls.CoreLibrary"
     xmlns:commun="clr-namespace:MapsInMyFolder.Commun;assembly=MapsInMyFolder.Commun"
     xmlns:editing="clr-namespace:ICSharpCode.AvalonEdit.Editing;assembly=ICSharpCode.AvalonEdit"
     xmlns:local="clr-namespace:MapsInMyFolder"
     xmlns:map="clr-namespace:MapsInMyFolder.MapControl;assembly=MapsInMyFolder.MapControl"
+    xmlns:avaloneditRendering="clr-namespace:ICSharpCode.AvalonEdit.Rendering;assembly=ICSharpCode.AvalonEdit"
+    xmlns:avaloneditEditing="clr-namespace:ICSharpCode.AvalonEdit.Editing;assembly=ICSharpCode.AvalonEdit"
     xmlns:sys="clr-namespace:System;assembly=netstandard"
     xmlns:ui="http://schemas.modernwpf.com/2019">
 
@@ -26,7 +26,7 @@
         <!--  Style hyperlink displayed within text in text editor  -->
         <Setter Property="LinkTextBackgroundBrush" Value="Transparent" />
     </Style>
-
+    
 
 
     <Style TargetType="{x:Type editing:TextArea}">
@@ -225,13 +225,13 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
-
+  
     </Style>
 
-
-
-
-
+    
+    
+    
+    
     <Style x:Key="TextBoxCleanStyleDefault" TargetType="{x:Type TextBox}">
         <Setter Property="Foreground" Value="#5A5A5A" />
         <Setter Property="BorderBrush" Value="#5A5A5A" />

@@ -141,22 +141,19 @@ namespace MapsInMyFolder
             SELatitudeTextBox.Text = Commun.Map.CurentSelection.SE_Latitude.ToString();
             SELongitudeTextBox.Text = Commun.Map.CurentSelection.SE_Longitude.ToString();
 
-            Label CopyLabel = new Label()
+            UserControls.ClickableLabel CopyLabel = new UserControls.ClickableLabel()
             {
-                Content = "→ " + Languages.Current["mapSpecifySelectionCoordinatesCopy"],
+                ContentValue = "→ " + Languages.Current["mapSpecifySelectionCoordinatesCopy"],
                 Foreground = Collectif.HexValueToSolidColorBrush("888989"),
                 Margin = new Thickness(0, 20, 0, 0)
             };
-            CopyLabel.MouseLeftButtonUp += CopyLabel_MouseLeftButtonUp;
+            CopyLabel.Click += CopyLabel_Click;
             CopyLabel.Unloaded += CopyLabel_Unloaded;
-            CopyLabel.MouseEnter += Collectif.ClickableLabel_MouseEnter;
-            CopyLabel.MouseLeave += Collectif.ClickableLabel_MouseLeave;
             stackPanel.Children.Add(CopyLabel);
-            void CopyLabel_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+            void CopyLabel_Click(object sender, RoutedEventArgs e)
             {
                 try
                 {
-                    CopyLabel.Cursor = Cursors.Arrow;
                     Clipboard.SetText($"{NOLatitudeTextBox.Text},{NOLongitudeTextBox.Text},{SELatitudeTextBox.Text},{SELongitudeTextBox.Text}");
                 }
                 catch (Exception ex)
@@ -166,27 +163,22 @@ namespace MapsInMyFolder
             }
             void CopyLabel_Unloaded(object sender, RoutedEventArgs e)
             {
-                CopyLabel.MouseRightButtonUp -= CopyLabel_MouseLeftButtonUp;
+                CopyLabel.Click -= CopyLabel_Click;
                 CopyLabel.Unloaded -= CopyLabel_Unloaded;
-                CopyLabel.MouseEnter -= Collectif.ClickableLabel_MouseEnter;
-                CopyLabel.MouseLeave -= Collectif.ClickableLabel_MouseLeave;
             }
 
-            Label PasteLabel = new Label()
+            UserControls.ClickableLabel PasteLabel = new UserControls.ClickableLabel()
             {
-                Content = "→ " + Languages.Current["mapSpecifySelectionCoordinatesPaste"],
+                ContentValue = "→ " + Languages.Current["mapSpecifySelectionCoordinatesPaste"],
                 Foreground = Collectif.HexValueToSolidColorBrush("888989")
             };
-            PasteLabel.MouseLeftButtonUp += PasteLabel_MouseLeftButtonUp;
+            PasteLabel.Click += PasteLabel_Click;
             PasteLabel.Unloaded += PasteLabel_Unloaded;
-            PasteLabel.MouseEnter += Collectif.ClickableLabel_MouseEnter;
-            PasteLabel.MouseLeave += Collectif.ClickableLabel_MouseLeave;
             stackPanel.Children.Add(PasteLabel);
-            void PasteLabel_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+            void PasteLabel_Click(object sender, RoutedEventArgs e)
             {
                 try
                 {
-                    PasteLabel.Cursor = Cursors.Arrow;
                     string locationData = Clipboard.GetText(TextDataFormat.Text);
                     string[] locationDataValues = locationData.Split(',');
 
@@ -213,10 +205,8 @@ namespace MapsInMyFolder
             }
             void PasteLabel_Unloaded(object sender, RoutedEventArgs e)
             {
-                PasteLabel.MouseRightButtonUp -= PasteLabel_MouseLeftButtonUp;
+                PasteLabel.Click -= PasteLabel_Click;
                 PasteLabel.Unloaded -= PasteLabel_Unloaded;
-                PasteLabel.MouseEnter -= Collectif.ClickableLabel_MouseEnter;
-                PasteLabel.MouseLeave -= Collectif.ClickableLabel_MouseLeave;
             }
 
 

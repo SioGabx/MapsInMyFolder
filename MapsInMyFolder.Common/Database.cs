@@ -115,7 +115,7 @@ namespace MapsInMyFolder.Commun
                 if (Network.IsNetworkAvailable())
                 {
                     GitHubFile githubAssets = GetGithubAssets.GetContentAssetsFromGithub(new Uri(Settings.github_repository_url).PathAndQuery, String.Empty, Settings.github_database_name);
-                    if (!(githubAssets is null) && await DB_DownloadFile(githubAssets?.Download_url, database_pathname))
+                    if (githubAssets is not null && await DB_DownloadFile(githubAssets?.Download_url, database_pathname))
                     {
                         int UserVersion = ExecuteScalarSQLCommand("PRAGMA user_version");
                         XMLParser.Cache.Write("dbVersion", UserVersion.ToString());
@@ -426,10 +426,10 @@ namespace MapsInMyFolder.Commun
 
         public static async Task<bool> CheckIfNewerVersionAvailable()
         {
-            (bool IsNewVersionAvailable, int NewVersionNumber) NewVersion = await CompareVersion();
-            if (NewVersion.IsNewVersionAvailable)
+            (bool IsNewVersionAvailable, int NewVersionNumber) = await CompareVersion();
+            if (IsNewVersionAvailable)
             {
-                NewUpdateFoundEvent(null, NewVersion.NewVersionNumber);
+                NewUpdateFoundEvent(null, NewVersionNumber);
                 return true;
             }
             return false;
@@ -817,7 +817,7 @@ namespace MapsInMyFolder.Commun
             }
         }
 
-        public static string getSavingStringOptimalValue(string formValue, string layerValue)
+        public static string GetSavingStringOptimalValue(string formValue, string layerValue)
         {
             formValue = formValue?.Trim();
             layerValue = layerValue?.Trim();
@@ -831,9 +831,9 @@ namespace MapsInMyFolder.Commun
             }
         }
 
-        public static string getSavingOptimalValueWithNULL(string formValue, string layerValue)
+        public static string GetSavingOptimalValueWithNULL(string formValue, string layerValue)
         {
-            string optimalValue = getSavingStringOptimalValue(formValue, layerValue);
+            string optimalValue = GetSavingStringOptimalValue(formValue, layerValue);
             if (optimalValue == null)
             {
                 return "NULL";

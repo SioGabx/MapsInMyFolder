@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using Newtonsoft.Json;
 
 namespace MapsInMyFolder
 {
@@ -25,66 +26,10 @@ namespace MapsInMyFolder
             TitleTextBox.Text = this.Title = "MapsInMyFolder - " + Languages.Current["settingsTitle"];
         }
 
-        private static void SetCaretBrush(TextEditor textEditor)
-        {
-            textEditor.TextArea.Caret.CaretBrush = Collectif.HexValueToSolidColorBrush("#f18712");
-        }
-
-        private void SetTextEditorPositionChangedHandler(TextEditor textEditor, int scrollOffset)
-        {
-            void textEditor_PositionChanged(object sender, EventArgs e)
-            {
-                Collectif.TextEditorCursorPositionChanged(textEditor, SettingsGrid, SettingsScrollViewer, scrollOffset);
-            }
-
-            void textEditor_Unloaded(object sender, EventArgs e)
-            {
-                textEditor.TextArea.Caret.PositionChanged -= textEditor_PositionChanged;
-                textEditor.Unloaded -= textEditor_Unloaded;
-            }
-
-            textEditor.TextArea.Caret.PositionChanged += textEditor_PositionChanged;
-            textEditor.Unloaded += textEditor_Unloaded;
-        }
-
-        private static void SetFixMouseWheelBehavior(TextEditor textEditor)
-        {
-            ScrollViewerHelper.SetScrollViewerMouseWheelFix(Collectif.GetDescendantByType(textEditor, typeof(ScrollViewer)) as ScrollViewer);
-        }
-
-        private void AddContextMenuItems(TextEditor textEditor, string header)
-        {
-            MenuItem indenterMenuItem = new MenuItem
-            {
-                Header = header,
-                Icon = new FontIcon() { Glyph = "\uE12F", Foreground = Collectif.HexValueToSolidColorBrush("#888989") }
-            };
-            void indenterMenuItem_Click(object sender, EventArgs e)
-            {
-                Collectif.IndenterCode(sender, e, textEditor);
-            }
-
-            void indenterMenuItem_Unloaded(object sender, EventArgs e)
-            {
-                indenterMenuItem.Click -= indenterMenuItem_Click;
-                textEditor.Unloaded -= indenterMenuItem_Unloaded;
-            }
-
-            indenterMenuItem.Click += indenterMenuItem_Click;
-            textEditor.Unloaded += indenterMenuItem_Unloaded;
-            textEditor.ContextMenu.Items.Add(indenterMenuItem);
-        }
-
-        private static void SetTextAreaOptions(TextEditor textEditor, bool convertTabsToSpaces, int indentationSize)
-        {
-            textEditor.TextArea.Options.ConvertTabsToSpaces = convertTabsToSpaces;
-            textEditor.TextArea.Options.IndentationSize = indentationSize;
-        }
-
         int DefaultValuesHachCode;
-        void DoIScrollToElement(UIElement element, System.Windows.Input.MouseButtonEventArgs e)
+        void DoIScrollToElement(UIElement element, MouseButtonEventArgs e)
         {
-            if (IsLoaded && e.LeftButton == System.Windows.Input.MouseButtonState.Released)
+            if (IsLoaded && e.LeftButton == MouseButtonState.Released)
             {
                 SettingsScrollViewer.ScrollToElement(element);
             }
@@ -126,19 +71,6 @@ namespace MapsInMyFolder
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            SetCaretBrush(tileloader_default_script);
-            SetCaretBrush(tileloader_template_script);
-            SetTextEditorPositionChangedHandler(tileloader_default_script, 100);
-            SetTextEditorPositionChangedHandler(tileloader_template_script, 100);
-            SetFixMouseWheelBehavior(tileloader_default_script);
-            SetFixMouseWheelBehavior(tileloader_template_script);
-
-            AddContextMenuItems(tileloader_default_script, Languages.Current["editorContextMenuIndent"]);
-            AddContextMenuItems(tileloader_template_script, Languages.Current["editorContextMenuIndent"]);
-
-            SetTextAreaOptions(tileloader_default_script, true, 4);
-            SetTextAreaOptions(tileloader_template_script, true, 4);
-
             InitSettingsWindow();
         }
 
@@ -154,7 +86,6 @@ namespace MapsInMyFolder
                     ApplicationLanguage.SelectedIndex = index;
                 }
             }
-
 
             layer_startup_id.SelectedIndex = layer_startup_id.Items.Add(new NameHiddenIdValue(0, "_Default"));
             layer_startup_id.Items.Add(new NameHiddenIdValue(Layers.Current.Id, "_" + Languages.Current["layerCurrent"]));
@@ -207,8 +138,23 @@ namespace MapsInMyFolder
                 }
             }
 
-            tileloader_default_script.Text = Settings.tileloader_default_script;
-            tileloader_template_script.Text = Settings.tileloader_template_script;
+            tileloader_default_script.Script = Settings.tileloader_default_script;
+            tileloader_default_script.SetTextEditorPositionChangedHandler(SettingsGrid, SettingsScrollViewer, 100);
+            tileloader_default_script.AddToContextMenu(Languages.Current["editorContextMenuIndent"], "\uE12F", (_, _) => tileloader_default_script.Indent());
+            try
+            {
+                Dictionary<string, string> myDictionary = JsonConvert.DeserializeObject<Dictionary<string, string>>(Settings.tileloader_template_script);
+
+                for (int TemplateScriptNumber = 0; TemplateScriptNumber < myDictionary.Count; TemplateScriptNumber++)
+                {
+                    var keyValuePair = myDictionary.ElementAt(TemplateScriptNumber);
+                    AddScriptTemplateEditor(keyValuePair.Key, keyValuePair.Value);
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.ToString());
+            }
             working_folder.Text = Settings.working_folder;
             temp_folder.Text = Settings.temp_folder;
             max_retry_download.Text = Settings.max_retry_download.ToString();
@@ -263,12 +209,59 @@ namespace MapsInMyFolder
             CountryComboBox.ItemSource = Country.GetList();
             CountryComboBox.SelectedItems = Country.GetListFromEnglishName(Settings.filter_layers_based_on_country.Split(';', StringSplitOptions.RemoveEmptyEntries));
 
-            DefaultValuesHachCode = Collectif.CheckIfInputValueHaveChange(SettingsScrollViewer);
+            DefaultValuesHachCode = Generic.CheckIfInputValueHaveChange(SettingsScrollViewer);
             SettingsVersionInformation.Content = Update.GetActualProductVersionFormatedString();
             UpdateLastUpdateSearch();
 
             SettingsScrollViewer.ScrollToTop();
         }
+
+        public void AddScriptTemplateEditor(string ScriptName, string Script)
+        {
+            var TitleScript = new UserControls.TitleScript()
+            {
+                ScriptName = ScriptName,
+                Script = Script,
+                Margin = new Thickness(0, 0, 0, 0)
+            };
+            List<UserControls.TitleScript> ListOfTitleScript = GetScriptTemplateEditor();
+            int TotalNumber = ListOfTitleScript?.Count ?? 0;
+            for (int i = 0; i < TotalNumber; i++)
+            {
+                ListOfTitleScript[i].Margin = new Thickness(0, 0, 0, 10);
+            }
+            TitleScript.SetTextEditorPositionChangedHandler(SettingsGrid, SettingsScrollViewer, 100);
+            TitleScript.AddToContextMenu(Languages.Current["editorContextMenuIndent"], "\uE12F", (_, _) => TitleScript.Indent());
+            tileloader_template_script.Children.Add(TitleScript);
+            RenameEachScript();
+        }
+
+        public void RenameEachScript()
+        {
+            List<UserControls.TitleScript> ListOfTitleScript = GetScriptTemplateEditor();
+            int TotalNumber = ListOfTitleScript?.Count ?? 0;
+            for (int i = 0; i < TotalNumber; i++)
+            {
+                ListOfTitleScript[i].Label.Content = "Script N°" + (i + 1);
+            }
+        }
+
+
+        private void add_template_script_Click(object sender, RoutedEventArgs e)
+        {
+            AddScriptTemplateEditor(Languages.Current["settingsPropertyNameScriptTemplateDefaultName"], string.Empty);
+        }
+
+        public List<UserControls.TitleScript> GetScriptTemplateEditor()
+        {
+            List<System.Type> TypeOfSearchElement = new List<System.Type>
+            {
+                typeof(UserControls.TitleScript)
+            };
+
+            return Collectif.FindVisualChildren(tileloader_template_script, TypeOfSearchElement)?.Cast<UserControls.TitleScript>()?.ToList();
+        }
+
 
         public void UpdateLastUpdateSearch()
         {
@@ -309,7 +302,7 @@ namespace MapsInMyFolder
                     return;
                 }
 
-                DefaultValuesHachCode = Collectif.CheckIfInputValueHaveChange(SettingsScrollViewer);
+                DefaultValuesHachCode = Generic.CheckIfInputValueHaveChange(SettingsScrollViewer);
 
                 var infoDialog = Message.SetContentDialog(Languages.Current["settingsMessageRestartRequire"], Languages.Current["dialogTitleOperationInfo"], MessageDialogButton.OK);
                 await infoDialog.ShowAsync();
@@ -377,8 +370,23 @@ namespace MapsInMyFolder
             string selectedSearchEngine = search_engine.SelectedValue.ToString();
             Settings.search_engine = (SearchEngines)Enum.Parse(typeof(SearchEngines), selectedSearchEngine);
 
-            Settings.tileloader_default_script = tileloader_default_script.Text;
-            Settings.tileloader_template_script = tileloader_template_script.Text;
+            Settings.tileloader_default_script = tileloader_default_script.Script;
+            List<UserControls.TitleScript> ListOfTitleScript = GetScriptTemplateEditor();
+            var DictionnaryNameScript = new Dictionary<string, string>();
+            int index = 0;
+            foreach (UserControls.TitleScript titleScript in ListOfTitleScript)
+            {
+                index++;
+                if (!string.IsNullOrWhiteSpace(titleScript?.Script))
+                {
+                    if (string.IsNullOrWhiteSpace(titleScript?.ScriptName))
+                    {
+                        titleScript.ScriptName = "Script N°" + index;
+                    }
+                    DictionnaryNameScript.Add(titleScript.ScriptName, titleScript.Script);
+                }
+            }
+            Settings.tileloader_template_script = JsonConvert.SerializeObject(DictionnaryNameScript, Formatting.None);
             Settings.user_agent = user_agent.Text;
             Settings.database_pathname = database_pathname.Text;
 
@@ -407,7 +415,7 @@ namespace MapsInMyFolder
 
         private async void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            int valuesHashCode = Collectif.CheckIfInputValueHaveChange(SettingsScrollViewer);
+            int valuesHashCode = Generic.CheckIfInputValueHaveChange(SettingsScrollViewer);
             ContentDialogResult result = ContentDialogResult.None;
 
             if (DefaultValuesHachCode != valuesHashCode)
@@ -475,7 +483,7 @@ namespace MapsInMyFolder
                 // CTRL + S
                 SaveSettings();
                 MainWindow.RefreshAllPanels();
-                DefaultValuesHachCode = Collectif.CheckIfInputValueHaveChange(SettingsScrollViewer);
+                DefaultValuesHachCode = Generic.CheckIfInputValueHaveChange(SettingsScrollViewer);
             }
         }
 

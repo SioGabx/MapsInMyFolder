@@ -5,6 +5,7 @@
     xmlns:avalonEdit="clr-namespace:ICSharpCode.AvalonEdit;assembly=ICSharpCode.AvalonEdit"
     xmlns:cbcontrols="clr-namespace:BlackPearl.Controls.CoreLibrary;assembly=BlackPearl.Controls.CoreLibrary"
     xmlns:commun="clr-namespace:MapsInMyFolder.Commun;assembly=MapsInMyFolder.Commun"
+    xmlns:customCtrl="clr-namespace:MapsInMyFolder.UserControls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:map="clr-namespace:MapsInMyFolder.MapControl;assembly=MapsInMyFolder.MapControl"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -167,7 +168,6 @@
                             Cursor="Arrow"
                             Foreground="#BCBCBC"
                             SelectedIndex="4">
-
                             <ComboBox.Resources>
                                 <Style BasedOn="{StaticResource {x:Type ScrollBar}}" TargetType="ScrollBar">
                                     <Setter Property="Margin" Value="0,0,-5,0" />
@@ -249,26 +249,12 @@
                             Grid.Row="0"
                             Content="{Binding Source={x:Static commun:Languages.Current}, Path=[editorPropertyNameScript]}"
                             Foreground="#888989" />
-                        <avalonEdit:TextEditor
+                        <customCtrl:ScriptEditor
                             x:Name="TextboxLayerScript"
                             Grid.Row="1"
-                            Height="Auto"
                             MinHeight="80"
-                            HorizontalAlignment="Stretch"
-                            HorizontalScrollBarVisibility="Auto"
                             KeyUp="TextboxLayerScript_KeyUp"
-                            RequestBringIntoView="DisableAllRequestBringIntoView"
-                            ShowLineNumbers="True"
-                            SyntaxHighlighting="MIMF_JavaScript"
-                            VerticalScrollBarVisibility="Auto">
-                            <avalonEdit:TextEditor.ContextMenu>
-                                <ContextMenu Background="#171719" Foreground="#E2E2E1">
-                                    <StaticResourceExtension ResourceKey="ContextMenu_Copier" />
-                                    <StaticResourceExtension ResourceKey="ContextMenu_Couper" />
-                                    <StaticResourceExtension ResourceKey="ContextMenu_Coller" />
-                                </ContextMenu>
-                            </avalonEdit:TextEditor.ContextMenu>
-                        </avalonEdit:TextEditor>
+                            SyntaxHighlighting="MIMF_JavaScript" />
                     </Grid>
 
                     <Grid Margin="0,10,0,0">
@@ -281,20 +267,14 @@
                             Grid.Row="0"
                             Content="{Binding Source={x:Static commun:Languages.Current}, Path=[editorPropertyNameArea]}"
                             Foreground="#888989" />
-                        <avalonEdit:TextEditor
+                        <customCtrl:ScriptEditor
                             x:Name="TextboxRectangles"
                             Grid.Row="1"
-                            Height="Auto"
                             MinHeight="20"
-                            HorizontalAlignment="Stretch"
-                            ContextMenu="{StaticResource CopyPasteContextMenu}"
-                            HorizontalScrollBarVisibility="Auto"
                             KeyUp="TextboxRectangles_KeyUp"
-                            RequestBringIntoView="DisableAllRequestBringIntoView"
-                            ShowLineNumbers="False"
                             SyntaxHighlighting="MIMF_Json"
-                            TextChanged="TextboxRectangles_TextChanged"
-                            VerticalScrollBarVisibility="Auto" />
+                            TextChanged="TextboxRectangles_TextChanged" />
+
                         <Label
                             x:Name="LabelOpenVisualRectanglesEditor"
                             Grid.Row="2"
@@ -302,11 +282,9 @@
                             Grid.ColumnSpan="3"
                             VerticalAlignment="Center"
                             Content="{Binding Source={x:Static commun:Languages.Current}, Path=[editorOpenAreaEditor]}"
-                             ContentStringFormat="{}→ {0}"
+                            ContentStringFormat="{}→ {0}"
                             Foreground="#888989"
                             IsTabStop="True"
-                            MouseEnter="ClickableLabel_MouseEnter"
-                            MouseLeave="ClickableLabel_MouseLeave"
                             MouseUp="LabelOpenVisualRectanglesEditor_MouseUp" />
                     </Grid>
 
@@ -348,19 +326,15 @@
                             LostFocus="TextBoxLayerMaxZoom_LostFocus"
                             Style="{DynamicResource TextBoxCleanStyle_13}"
                             TextChanged="TextBoxLayerMaxZoom_TextChanged" />
-                        <Label
+                        <customCtrl:ClickableLabel
                             x:Name="LabelAutoDetectZoom"
                             Grid.Row="2"
                             Grid.Column="0"
                             Grid.ColumnSpan="3"
-                            VerticalAlignment="Center"
-                            Content="{Binding Source={x:Static commun:Languages.Current}, Path=[editorAutoDetectZoom]}"
-                             ContentStringFormat="{}→ {0}"
-                            Foreground="#888989"
+                            ContentValue="{Binding Source={x:Static commun:Languages.Current}, Path=[editorAutoDetectZoom]}"
+                            ContentValueStringFormat="{}→ {0}"
                             IsTabStop="True"
-                            MouseEnter="ClickableLabel_MouseEnter"
-                            MouseLeave="ClickableLabel_MouseLeave"
-                            MouseUp="LabelAutoDetectZoom_MouseUp" />
+                            Click="LabelAutoDetectZoom_Click" />
                     </Grid>
 
                     <Grid Margin="0,10,0,0">
@@ -532,13 +506,13 @@
                             HorizontalAlignment="Stretch"
                             Cursor="IBeam"
                             IsEnabled="True"
+                            LostFocus="TextboxSpecialOptioneditorPropertyNameMaxDownloadTilesInParralele_LostFocus"
                             MaxLength="7"
                             MaxLines="1"
-                            Style="{DynamicResource TextBoxCleanStyle_13}" 
-                            TextChanged="TextboxSpecialOptioneditorPropertyNameMaxDownloadTilesInParralele_TextChanged"
-                            LostFocus="TextboxSpecialOptioneditorPropertyNameMaxDownloadTilesInParralele_LostFocus"/>
-                    </Grid>       
-                         <Grid Margin="0,10,0,0">
+                            Style="{DynamicResource TextBoxCleanStyle_13}"
+                            TextChanged="TextboxSpecialOptioneditorPropertyNameMaxDownloadTilesInParralele_TextChanged" />
+                    </Grid>
+                    <Grid Margin="0,10,0,0">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="20" />
                             <RowDefinition Height="20" />
@@ -548,8 +522,8 @@
                         <Label
                             Grid.Row="0"
                             Content="{Binding Source={x:Static commun:Languages.Current}, Path=[editorPropertyNameWaitingBeforeStartAnotherTile]}"
-                            Foreground="#888989" />      
-                             <Label
+                            Foreground="#888989" />
+                        <Label
                             Grid.Row="1"
                             Content="{Binding Source={x:Static commun:Languages.Current}, Path=[editorPropertyNameHightestIsGonnaBeSelected]}"
                             Foreground="#888989" />
@@ -559,14 +533,14 @@
                             HorizontalAlignment="Stretch"
                             Cursor="IBeam"
                             IsEnabled="True"
+                            LostFocus="TextboxSpecialOptioneditorPropertyNameWaitingBeforeStartAnotherTile_LostFocus"
                             MaxLength="7"
                             MaxLines="1"
-                            Style="{DynamicResource TextBoxCleanStyle_13}" 
-                            TextChanged="TextboxSpecialOptioneditorPropertyNameWaitingBeforeStartAnotherTile_TextChanged"
-                            LostFocus="TextboxSpecialOptioneditorPropertyNameWaitingBeforeStartAnotherTile_LostFocus"/>
-                    </Grid>       
-                    
-                    
+                            Style="{DynamicResource TextBoxCleanStyle_13}"
+                            TextChanged="TextboxSpecialOptioneditorPropertyNameWaitingBeforeStartAnotherTile_TextChanged" />
+                    </Grid>
+
+
                     <Grid Margin="0,10,0,0">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="20" />
@@ -625,7 +599,6 @@
                             </TextBox.Resources>
                         </TextBox>
                     </Grid>
-
                     <Grid Margin="0,30,0,0">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="20" />
@@ -633,35 +606,26 @@
                             <RowDefinition Height="20" />
                             <RowDefinition />
                         </Grid.RowDefinitions>
-                        <Label
+                        <customCtrl:ClickableLabel
                             x:Name="ImportExportInfoLayerClikableLabel"
                             Grid.Row="0"
-                            Content="{Binding Source={x:Static commun:Languages.Current}, Path=[editorImportExportLayerProperty]}"
-                            ContentStringFormat="{}→ {0}"
-                            Foreground="#888989"
-                            MouseEnter="ClickableLabel_MouseEnter"
-                            MouseLeave="ClickableLabel_MouseLeave"
-                            MouseUp="ImportExportInfoLayerClikableLabel_MouseUp" />
+                            ContentValue="{Binding Source={x:Static commun:Languages.Current}, Path=[editorImportExportLayerProperty]}"
+                            ContentValueStringFormat="{}→ {0}"
+                            Click="ImportExportInfoLayerClikableLabel_Click" />
 
-
-                        <Label
+                        <customCtrl:ClickableLabel
                             x:Name="ResetInfoLayerClikableLabel"
                             Grid.Row="1"
-                            Content="{Binding Source={x:Static commun:Languages.Current}, Path=[editorResetLayerProperty]}"
-                            ContentStringFormat="{}→ {0}"
-                            Foreground="#888989"
-                            MouseEnter="ClickableLabel_MouseEnter"
-                            MouseLeave="ClickableLabel_MouseLeave"
-                            MouseUp="ResetInfoLayerClikableLabel_MouseUp" />
-                        <Label
+                            ContentValue="{Binding Source={x:Static commun:Languages.Current}, Path=[editorResetLayerProperty]}"
+                            ContentValueStringFormat="{}→ {0}"
+                            Click="ResetInfoLayerClikableLabel_Click" />
+                        
+                        <customCtrl:ClickableLabel
                             x:Name="DeleteLayerClikableLabel"
                             Grid.Row="2"
-                            Content="{Binding Source={x:Static commun:Languages.Current}, Path=[editorDeleteLayer]}"
-                            ContentStringFormat="{}→ {0}"
-                            Foreground="#888989"
-                            MouseEnter="ClickableLabel_MouseEnter"
-                            MouseLeave="ClickableLabel_MouseLeave"
-                            MouseUp="DeleteLayerClikableLabel_MouseUp" />
+                            ContentValue="{Binding Source={x:Static commun:Languages.Current}, Path=[editorDeleteLayer]}"
+                            ContentValueStringFormat="{}→ {0}"
+                            Click="DeleteLayerClikableLabel_Click" />
                     </Grid>
                     <Rectangle Width="1" Height="20" />
                 </StackPanel>

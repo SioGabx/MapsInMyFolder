@@ -58,8 +58,6 @@ namespace MapsInMyFolder
 
             SetContextMenu();
 
-            TextboxLayerScript.TextArea.Options.ConvertTabsToSpaces = true;
-            TextboxLayerScript.TextArea.Options.IndentationSize = 4;
 
             Init_LayerEditableTextbox(prefilLayerId);
             SetAppercuLayers(forceUpdate: true);
@@ -73,51 +71,43 @@ namespace MapsInMyFolder
             //var keyeventHandler = new KeyEventHandler(TextboxLayerScriptConsoleSender_KeyDown);
             //TextboxLayerScriptConsoleSender.AddHandler(PreviewKeyDownEvent, keyeventHandler, handledEventsToo: true);
             TextboxLayerScriptConsoleSender.PreviewKeyDown += TextboxLayerScriptConsoleSender_KeyDown;
-
-            TextboxLayerScript.TextArea.Caret.CaretBrush = Collectif.HexValueToSolidColorBrush("#f18712");//rgb(241 135 18)
-            TextboxRectangles.TextArea.Caret.CaretBrush = Collectif.HexValueToSolidColorBrush("#f18712");//rgb(241 135 18)
-            TextboxRectangles.TextArea.Caret.PositionChanged += TextboxRectangles_Caret_PositionChanged;
-            TextboxLayerScript.TextArea.Caret.PositionChanged += TextboxLayerScript_Caret_PositionChanged;
-            FixTextEditorScrollIssues();
+            TextboxRectangles.SetTextEditorPositionChangedHandler(EditeurGrid, EditeurScrollBar, 75);
+            TextboxLayerScript.SetTextEditorPositionChangedHandler(EditeurGrid, EditeurScrollBar, 75);
 
             AutoUpdateLayer.IsChecked = Settings.editor_autoupdatelayer;
-            DefaultValuesHachCode = Collectif.CheckIfInputValueHaveChange(EditeurStackPanel);
+            DefaultValuesHachCode = Generic.CheckIfInputValueHaveChange(EditeurStackPanel);
 
             Javascript.LogsChanged += Javascript_LogsChanged;
             Javascript.JavascriptActionEvent += JavascriptActionEvent;
         }
 
-        void FixTextEditorScrollIssues()
-        {
-            ScrollViewerHelper.SetScrollViewerMouseWheelFix(Collectif.GetDescendantByType(TextboxLayerScript, typeof(ScrollViewer)) as ScrollViewer);
-            ScrollViewerHelper.SetScrollViewerMouseWheelFix(Collectif.GetDescendantByType(TextboxRectangles, typeof(ScrollViewer)) as ScrollViewer);
-        }
-
         void SetContextMenu()
         {
-            MenuItem IndentermenuItem = new MenuItem
-            {
-                Header = Languages.Current["editorContextMenuIndent"],
-                Icon = new FontIcon() { Glyph = "\uE12F", Foreground = Collectif.HexValueToSolidColorBrush("#888989") }
-            };
-            IndentermenuItem.Click += IndentermenuItem_Click;
-            TextboxLayerScript.ContextMenu.Items.Add(IndentermenuItem);
-            void IndentermenuItem_Click(object sender, EventArgs e)
-            {
-                IndenterCode(sender, e, TextboxLayerScript);
-            }
+            TextboxLayerScript.AddToContextMenu(Languages.Current["editorContextMenuIndent"], "\uE12F", (_, _) => TextboxLayerScript.Indent());
+
             MenuItem templateMenuItem = new MenuItem
             {
                 Header = Languages.Current["editorContextMenuScriptTemplate"],
                 Icon = new FontIcon() { Glyph = "\uE15C", Foreground = Collectif.HexValueToSolidColorBrush("#888989") }
             };
-            templateMenuItem.Click += templateMenuItem_Click;
-            TextboxLayerScript.ContextMenu.Items.Add(templateMenuItem);
-            void templateMenuItem_Click(object sender, EventArgs e)
+            Dictionary<string, string> myDictionary = JsonConvert.DeserializeObject<Dictionary<string, string>>(Settings.tileloader_template_script);
+            foreach (var keyValue in myDictionary)
             {
-                PutScriptTemplate(TextboxLayerScript);
+                templateMenuItem.Items.Add(new MenuItem
+                {
+                    Header = keyValue.Key
+                });
             }
-
+            templateMenuItem.Click += templateMenuItem_Click;
+            if (myDictionary.Count > 0)
+            {
+                TextboxLayerScript.ContextMenu.Items.Add(templateMenuItem);
+            }
+            void templateMenuItem_Click(object sender, RoutedEventArgs e)
+            {
+                var ClickedMenuItem = e.Source as MenuItem;
+                PutScriptTemplate(TextboxLayerScript, ClickedMenuItem.Header?.ToString());
+            }
             MenuItem clearConsoleMenuItem = new MenuItem
             {
                 Header = Languages.Current["editorContextMenuConsoleErase"],
@@ -150,23 +140,12 @@ namespace MapsInMyFolder
                 helpConsoleMenuItem.Click -= helpConsoleMenuItem_Click;
                 clearConsoleMenuItem.Click -= clearConsoleMenuItem_Click;
                 templateMenuItem.Click -= templateMenuItem_Click;
-                IndentermenuItem.Click -= IndentermenuItem_Click;
                 TextboxLayerScriptConsole.ContextMenu.Items.Remove(helpConsoleMenuItem);
                 TextboxLayerScriptConsole.ContextMenu.Items.Remove(clearConsoleMenuItem);
                 TextboxLayerScript.ContextMenu.Items.Remove(templateMenuItem);
-                TextboxLayerScript.ContextMenu.Items.Remove(IndentermenuItem);
             }
         }
 
-        private void TextboxLayerScript_Caret_PositionChanged(object sender, EventArgs e)
-        {
-            Collectif.TextEditorCursorPositionChanged(TextboxLayerScript, EditeurGrid, EditeurScrollBar, 75);
-        }
-
-        private void TextboxRectangles_Caret_PositionChanged(object sender, EventArgs e)
-        {
-            Collectif.TextEditorCursorPositionChanged(TextboxRectangles, EditeurGrid, EditeurScrollBar, 75);
-        }
 
         private void Javascript_LogsChanged(object sender, Javascript.LogsEventArgs e)
         {
@@ -207,7 +186,7 @@ namespace MapsInMyFolder
         void Init_LayerEditableTextbox(int prefilLayerId)
         {
             InitComboboxAvailableValues();
-            Layers LayerInEditMode = Layers.GetLayerById(prefilLayerId); 
+            Layers LayerInEditMode = Layers.GetLayerById(prefilLayerId);
             if (LayerId > 0 && !string.IsNullOrEmpty(LayerInEditMode.Name.Trim()))
             {
                 CalqueType.Content = string.Concat(Languages.Current["editorTitleLayer"], " - ", LayerInEditMode.Name);
@@ -233,7 +212,7 @@ namespace MapsInMyFolder
                 return;
             }
             TextboxLayerName.Text = LayerInEditMode.Name;
-           
+
             TextboxLayerCategory.Text = LayerInEditMode.Category;
             TextboxLayerSiteUrl.Text = LayerInEditMode.SiteUrl;
             TextboxLayerSite.Text = LayerInEditMode.SiteName;
@@ -375,15 +354,20 @@ namespace MapsInMyFolder
         }
 
 
-        void PutScriptTemplate(ICSharpCode.AvalonEdit.TextEditor textBox)
+        void PutScriptTemplate(UserControls.ScriptEditor textBox, string scriptName)
         {
-            Collectif.InsertTextAtCaretPosition(textBox, Settings.tileloader_template_script);
-            DoWeNeedToUpdateMoinsUnLayer();
+            Dictionary<string, string> myDictionary = JsonConvert.DeserializeObject<Dictionary<string, string>>(Settings.tileloader_template_script);
+            if (myDictionary.TryGetValue(scriptName, out string script))
+            {
+                textBox.InsertTextAtCaretPosition(script);
+                DoWeNeedToUpdateMoinsUnLayer();
+            }
+
         }
 
-        void IndenterCode(object sender, EventArgs e, ICSharpCode.AvalonEdit.TextEditor textBox)
+        void IndenterCode(UserControls.ScriptEditor textBox)
         {
-            Collectif.IndenterCode(sender, e, textBox);
+            textBox.Indent();
             DoWeNeedToUpdateMoinsUnLayer();
         }
 
@@ -394,10 +378,10 @@ namespace MapsInMyFolder
             Collectif.LockPreviousUndo(textBox);
         }
 
-        static void TextBoxSetValueAndLock(ICSharpCode.AvalonEdit.TextEditor textBox, string value)
+        static void TextBoxSetValueAndLock(UserControls.ScriptEditor textBox, string value)
         {
             if (textBox is null) { return; }
-            textBox.Text = value;
+            textBox.Script = value;
         }
 
         void SetAppercuLayers(string url = "", bool forceUpdate = false)
@@ -624,7 +608,10 @@ namespace MapsInMyFolder
             }
             return number;
         }
-
+        private async void ImportExportInfoLayerClikableLabel_Click(object sender, RoutedEventArgs e)
+        {
+            ImportExportInfoLayerClikableLabel_MouseUp(null, null);
+        }
         private async void ImportExportInfoLayerClikableLabel_MouseUp(object sender, MouseButtonEventArgs e)
         {
             string UpdateSQLCommand = GetShareSQLPart();
@@ -642,7 +629,7 @@ namespace MapsInMyFolder
                     using (SQLiteConnection conn = Database.DB_MemoryConnection())
                     {
                         Database.ExecuteNonQuerySQLCommand(conn, "INSERT INTO LAYERS DEFAULT VALUES");
-                        Database.ExecuteNonQuerySQLCommand(conn,$"UPDATE LAYERS {InputBox.textBox.Text} WHERE ID = 1");
+                        Database.ExecuteNonQuerySQLCommand(conn, $"UPDATE LAYERS {InputBox.textBox.Text} WHERE ID = 1");
                         SQLiteDataReader reader = Database.ExecuteExecuteReaderSQLCommand(conn, "SELECT * FROM LAYERS WHERE ID='1'");
                         reader.Read();
                         var calque = Layers.GetLayerFromSQLiteDataReader(reader);
@@ -725,12 +712,12 @@ namespace MapsInMyFolder
                 if (LayerId <= 0)
                 {
                     return $"'{formValue}'";
-                } 
-                return Database.getSavingOptimalValueWithNULL(formValue, layerValue?.ToString());
+                }
+                return Database.GetSavingOptimalValueWithNULL(formValue, layerValue?.ToString());
             }
 
 
-                try
+            try
             {
                 Layers DB_Layer = Layers.Empty();
 
@@ -800,7 +787,7 @@ namespace MapsInMyFolder
         }
         private async void ClosePage_button_Click(object sender, RoutedEventArgs e)
         {
-            int ValuesHachCode = Collectif.CheckIfInputValueHaveChange(EditeurStackPanel);
+            int ValuesHachCode = Generic.CheckIfInputValueHaveChange(EditeurStackPanel);
             ContentDialogResult result = ContentDialogResult.Primary;
             if (DefaultValuesHachCode != ValuesHachCode)
             {
@@ -851,8 +838,8 @@ namespace MapsInMyFolder
             string SITE_URL = TextboxLayerSiteUrl.Text.Trim();
             string STYLE = TextboxLayerStyle.Text.Trim();
             int TILE_SIZE = GetIntValueFromTextBox(TextboxLayerTileWidth);
-            string SCRIPT = TextboxLayerScript.Text.Trim();
-            string RECTANGLES = TextboxRectangles.Text.Trim();
+            string SCRIPT = TextboxLayerScript.Script.Trim();
+            string RECTANGLES = TextboxRectangles.Script.Trim();
             Layers layers = Layers.GetLayerById(-2);
             if (layers is null)
             {
@@ -967,8 +954,6 @@ namespace MapsInMyFolder
             }
             Javascript.LogsChanged -= Javascript_LogsChanged;
             Javascript.JavascriptActionEvent -= JavascriptActionEvent;
-            TextboxRectangles.TextArea.Caret.PositionChanged -= TextboxRectangles_Caret_PositionChanged;
-            TextboxLayerScript.TextArea.Caret.PositionChanged -= TextboxLayerScript_Caret_PositionChanged;
             TextboxLayerScriptConsoleSender.PreviewKeyDown -= TextboxLayerScriptConsoleSender_KeyDown;
             //make sure to reload base layer if curent layer is png
             Layers.Current.TilesFormat = "jpeg";
@@ -1044,23 +1029,15 @@ namespace MapsInMyFolder
 
         }
 
-        private void ClickableLabel_MouseEnter(object sender, MouseEventArgs e)
-        {
-            Collectif.ClickableLabel_MouseEnter(sender, e);
-        }
 
-        private void ClickableLabel_MouseLeave(object sender, MouseEventArgs e)
-        {
-            Collectif.ClickableLabel_MouseLeave(sender, e);
-        }
 
-        private void LabelAutoDetectZoom_MouseUp(object sender, MouseButtonEventArgs e)
+        private void LabelAutoDetectZoom_Click(object sender, RoutedEventArgs e)
         {
             LabelAutoDetectZoom.Foreground = Collectif.HexValueToSolidColorBrush("#888989");
             AutoDetectZoom();
         }
 
-        private async void ResetInfoLayerClikableLabel_MouseUp(object sender, MouseButtonEventArgs e)
+        private async void ResetInfoLayerClikableLabel_Click(object sender, RoutedEventArgs e)
         {
             try
             {
@@ -1080,7 +1057,7 @@ namespace MapsInMyFolder
             }
         }
 
-        private async void DeleteLayerClikableLabel_MouseUp(object sender, MouseButtonEventArgs e)
+        private async void DeleteLayerClikableLabel_Click(object sender, RoutedEventArgs e)
         {
             try
             {
@@ -1217,7 +1194,7 @@ namespace MapsInMyFolder
                     this.Cursor = Cursors.Wait;
                     Mouse.SetCursor(Cursors.Wait);
                     SaveLayer();
-                    DefaultValuesHachCode = Collectif.CheckIfInputValueHaveChange(EditeurStackPanel);
+                    DefaultValuesHachCode = Generic.CheckIfInputValueHaveChange(EditeurStackPanel);
                 }
                 finally
                 {
@@ -1254,7 +1231,7 @@ namespace MapsInMyFolder
             int ListOfRectanglesInTextbox = 1;
             try
             {
-                ListOfRectanglesInTextbox = (JsonConvert.DeserializeObject<List<Dictionary<string, string>>>(TextboxRectangles.Text) ?? new List<Dictionary<string, string>>()).Count;
+                ListOfRectanglesInTextbox = (JsonConvert.DeserializeObject<List<Dictionary<string, string>>>(TextboxRectangles.Script) ?? new List<Dictionary<string, string>>()).Count;
             }
             catch (Exception ex)
             {
@@ -1262,7 +1239,7 @@ namespace MapsInMyFolder
             }
             int NumberOfRectangleSuccessfullyAdded = 0;
 
-            foreach (MapFigures.Figure Figure in MapFigures.GetFiguresFromJsonString(TextboxRectangles.Text))
+            foreach (MapFigures.Figure Figure in MapFigures.GetFiguresFromJsonString(TextboxRectangles.Script))
             {
                 FullscreenRectanglesMap.AddNewSelection(FullscreenRectanglesMap.mapSelectable.AddRectangle(Figure.NO, Figure.SE), Figure.Name, Figure.MinZoom.ToString(), Figure.MaxZoom.ToString(), Figure.Color, Figure.StrokeThickness.ToString());
                 NumberOfRectangleSuccessfullyAdded++;
@@ -1289,7 +1266,6 @@ namespace MapsInMyFolder
                 FullscreenRectanglesMap.SaveButton.Click -= FullscreenMap_SaveButton_Click;
                 FullscreenRectanglesMap.Unloaded -= FullscreenRectanglesMap_Unloaded;
                 SelectionRectangle.Rectangles.Clear();
-                FixTextEditorScrollIssues();
                 SetContextMenu();
             }
         }
@@ -1354,7 +1330,7 @@ namespace MapsInMyFolder
             {
                 SerializedProperties = JsonConvert.SerializeObject(ListOfRectangleProperties, Formatting.Indented);
             }
-            TextboxRectangles.TextArea.Document.Text = SerializedProperties;
+            TextboxRectangles.SetScriptNoEvent(SerializedProperties);
             DoWeNeedToUpdateMoinsUnLayer();
             MainWindow.Instance.FrameBack();
         }
@@ -1396,21 +1372,21 @@ namespace MapsInMyFolder
         private void SetPreviewUrl_Click(object sender, RoutedEventArgs e)
         {
             const Javascript.InvokeFunction invokeFunction = Javascript.InvokeFunction.getPreview;
-            TextboxLayerScript.Text = Javascript.AddOrReplaceFunction(TextboxLayerScript.Text, invokeFunction.ToString(), GetPreviewFunction(invokeFunction));
-            IndenterCode(sender, e, TextboxLayerScript);
+            TextboxLayerScript.Script = Javascript.AddOrReplaceFunction(TextboxLayerScript.Script, invokeFunction.ToString(), GetPreviewFunction(invokeFunction));
+            IndenterCode(TextboxLayerScript);
         }
 
         private void SetPreviewFallbackUrl_Click(object sender, RoutedEventArgs e)
         {
             const Javascript.InvokeFunction invokeFunction = Javascript.InvokeFunction.getPreviewFallback;
-            TextboxLayerScript.Text = Javascript.AddOrReplaceFunction(TextboxLayerScript.Text, invokeFunction.ToString(), GetPreviewFunction(invokeFunction));
-            IndenterCode(sender, e, TextboxLayerScript);
+            TextboxLayerScript.Script = Javascript.AddOrReplaceFunction(TextboxLayerScript.Script, invokeFunction.ToString(), GetPreviewFunction(invokeFunction));
+            IndenterCode(TextboxLayerScript);
         }
 
         private string GetPreviewFunction(Javascript.InvokeFunction invokeFunction)
         {
             string TileUrl = TextboxLayerTileUrl.Text;
-            string Script = TextboxLayerScript.Text;
+            string Script = TextboxLayerScript.Script;
             int ZoomLevel = Convert.ToInt32(Math.Floor(mapviewerappercu.ZoomLevel));
             (int X, int Y) = Collectif.CoordonneesToTile(mapviewerappercu.Center.Latitude, mapviewerappercu.Center.Longitude, ZoomLevel);
             var (DefaultCallValue, ResultCallValue) = Collectif.GetUrl.CallFunctionAndGetResult(TileUrl, Script, X, Y, ZoomLevel, -2, Javascript.InvokeFunction.getTile);
@@ -1445,17 +1421,17 @@ namespace MapsInMyFolder
 
         private void TextboxRectangles_TextChanged(object sender, EventArgs e)
         {
-            string FiguresJsonString = TextboxRectangles.Text;
+            string FiguresJsonString = TextboxRectangles.Script;
             MapFigures.DrawFigureOnMapItemsControlFromJsonString(mapviewerRectangles, FiguresJsonString, mapviewerappercu.ZoomLevel);
         }
 
         private void TextboxRectangles_KeyUp(object sender, KeyEventArgs e)
         {
-            if (TextboxRectangles.Text.IsJson())
+            if (TextboxRectangles.Script.IsJson())
             {
                 try
                 {
-                    JsonConvert.DeserializeObject<List<Dictionary<string, string>>>(TextboxRectangles.Text);
+                    JsonConvert.DeserializeObject<List<Dictionary<string, string>>>(TextboxRectangles.Script);
                 }
                 catch (Exception)
                 {
@@ -1658,5 +1634,6 @@ namespace MapsInMyFolder
                 TextboxSpecialOptioneditorPropertyNameWaitingBeforeStartAnotherTile.Text = string.Empty;
             }
         }
+
     }
 }

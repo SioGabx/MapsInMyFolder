@@ -963,42 +963,9 @@ namespace MapsInMyFolder.Commun
             uIElement.UndoLimit = undo_limit;
         }
 
-        public static void ClickableLabel_MouseEnter(object sender, MouseEventArgs e)
-        {
-            Label label_element = sender as Label;
-            if (label_element.IsEnabled)
-            {
-                label_element.Cursor = Cursors.Hand;
-                label_element.Foreground = Collectif.HexValueToSolidColorBrush("#b4b4b4");
-            }
-            else
-            {
-                label_element.Cursor = Cursors.Arrow;
-            }
-        }
+    
 
-        public static void ClickableLabel_MouseLeave(object sender, MouseEventArgs e)
-        {
-            Label label_element = sender as Label;
-            label_element.Foreground = Collectif.HexValueToSolidColorBrush("#888989");
-        }
-
-
-        public static void InsertTextAtCaretPosition(ICSharpCode.AvalonEdit.TextEditor TextBox, string text)
-        {
-            int CaretIndex = TextBox.CaretOffset;
-            if (TextBox.SelectionLength == 0)
-            {
-                TextBox.TextArea.Document.Insert(CaretIndex, text);
-            }
-            else
-            {
-                TextBox.SelectedText = text;
-                TextBox.SelectionLength = 0;
-            }
-
-            TextBox.CaretOffset = Math.Min(TextBox.Text.Length, CaretIndex + text.Length);
-        }
+   
 
         public static void TextEditorCursorPositionChanged(ICSharpCode.AvalonEdit.TextEditor textEditor, Grid grid, ScrollViewer scrollViewer, int MarginTop = 25)
         {
@@ -1018,7 +985,7 @@ namespace MapsInMyFolder.Commun
 
         public static void IndenterCode(object sender, EventArgs e, ICSharpCode.AvalonEdit.TextEditor textBox)
         {
-            Commun.JSBeautify jSBeautify = new JSBeautify(textBox.Text, new JSBeautifyOptions() { preserve_newlines = false, indent_char = ' ', indent_size = 4 });
+            Commun.JSBeautify jSBeautify = new JSBeautify(textBox.Text, new JSBeautifyOptions() { preserve_newlines = false, indent_char = ' ', indent_size = 4});
             textBox.Text = jSBeautify.GetResult();
         }
 
@@ -1151,93 +1118,20 @@ namespace MapsInMyFolder.Commun
             }
             return null;
         }
-
-        public static int CheckIfInputValueHaveChange(UIElement SourcePanel)
+        
+        public static T FindParent<T>(DependencyObject child) where T : DependencyObject
         {
-            List<System.Type> TypeOfSearchElement = new List<System.Type>
+            DependencyObject parent = VisualTreeHelper.GetParent(child);
+
+            while (parent != null && !(parent is T))
             {
-                typeof(TextBox),
-                typeof(ComboBox),
-                typeof(CheckBox),
-                typeof(RadioButton),
-                typeof(ICSharpCode.AvalonEdit.TextEditor),
-                typeof(BlackPearl.Controls.CoreLibrary.MultiSelectCombobox)
-            };
+                parent = VisualTreeHelper.GetParent(parent);
+            }
 
-            List<UIElement> ListOfisualChildren = FindVisualChildren(SourcePanel, TypeOfSearchElement);
-
-            string strHachCode = string.Empty;
-            ListOfisualChildren.ForEach(element =>
-            {
-                if (TypeOfSearchElement.Contains(element.GetType()))
-                {
-                    string elementXName = element.GetName();
-                    if (!string.IsNullOrEmpty(elementXName))
-                    {
-                        int hachCode = 0;
-                        Type type = element.GetType();
-                        if (type == typeof(TextBox))
-                        {
-                            TextBox TextBox = (TextBox)element;
-                            string value = TextBox.Text;
-                            if (!string.IsNullOrEmpty(value))
-                            {
-                                hachCode = value.GetHashCode();
-                            }
-                        }
-                        else if (type == typeof(ICSharpCode.AvalonEdit.TextEditor))
-                        {
-                            ICSharpCode.AvalonEdit.TextEditor TextEditor = (ICSharpCode.AvalonEdit.TextEditor)element;
-                            string value = TextEditor.Text;
-                            if (!string.IsNullOrEmpty(value))
-                            {
-                                hachCode = value.GetHashCode();
-                            }
-                        }
-                        else if (type == typeof(ComboBox))
-                        {
-                            ComboBox ComboBox = (ComboBox)element;
-                            string value = ComboBox.Text;
-                            if (!string.IsNullOrEmpty(value))
-                            {
-                                hachCode = value.GetHashCode();
-                            }
-                        }
-                        else if (type == typeof(CheckBox))
-                        {
-                            CheckBox CheckBox = (CheckBox)element;
-                            hachCode = CheckBox.IsChecked.GetHashCode();
-
-                        }
-                        else if (type == typeof(RadioButton))
-                        {
-                            RadioButton RadioButton = (RadioButton)element;
-                            hachCode = RadioButton.IsChecked.GetHashCode();
-                        }
-                        else if (type == typeof(BlackPearl.Controls.CoreLibrary.MultiSelectCombobox))
-                        {
-                            BlackPearl.Controls.CoreLibrary.MultiSelectCombobox MultiSelectCombobox = (BlackPearl.Controls.CoreLibrary.MultiSelectCombobox)element;
-                            if (MultiSelectCombobox.SelectedItems != null && MultiSelectCombobox.SelectedItems.Count > 0)
-                            {
-
-                                hachCode = string.Join(";", MultiSelectCombobox.SelectedValuesAsString("EnglishName")).GetHashCode();
-                            }
-                            else
-                            {
-                                hachCode = 0;
-                            }
-                        }
-                        else
-                        {
-                            throw new NotSupportedException("The type " + type.Name + " is not supported by the function");
-                        }
-                        strHachCode += hachCode.ToString();
-                    }
-                }
-            });
-            ListOfisualChildren.Clear();
-            return strHachCode.GetHashCode();
+            return parent as T;
         }
+
+       
 
         public static string HTMLEntities(string texte, bool decode = false)
         {
