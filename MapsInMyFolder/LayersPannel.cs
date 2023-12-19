@@ -650,7 +650,7 @@ namespace MapsInMyFolder
                     previewFallbackLayerFrontImageUrl = GetReplacement(id, layer.TileUrl, Javascript.InvokeFunction.getPreviewFallback);
                 }
 
-                if (layer.TilesFormatHasTransparency)
+                if (layer.TilesFormatHasTransparency && backgroundLayer is not null)
                 {
                     if (CheckIfFunctionExist(backgroundLayer.Id, Javascript.InvokeFunction.getPreview))
                     {
