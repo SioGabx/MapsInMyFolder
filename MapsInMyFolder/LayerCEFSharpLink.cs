@@ -32,7 +32,7 @@ namespace MapsInMyFolder
                 }
                 else
                 {
-                    cacheCleanedMessage = Languages.GetWithArguments("layerMessageCachesCleared", Layers.GetLayerById(int.Parse(splittedListOfId[0])).Name, memoryFreed);
+                    cacheCleanedMessage = Languages.GetWithArguments("layerMessageCachesCleared", memoryFreed);
                 }
                 Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
                 {

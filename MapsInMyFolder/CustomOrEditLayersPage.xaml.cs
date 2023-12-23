@@ -881,7 +881,7 @@ namespace MapsInMyFolder
 
         async void AutoDetectZoom()
         {
-            string label_base_content = LabelAutoDetectZoom.Content.ToString();
+            string label_base_content = LabelAutoDetectZoom.ContentValue.ToString();
             if (string.IsNullOrEmpty(TextboxLayerTileUrl.Text))
             {
                 Message.NoReturnBoxAsync(Languages.Current["editorMessageErrorAutoDetectZoomURLNotDefined"], Languages.Current["dialogTitleOperationFailed"]);
@@ -899,7 +899,7 @@ namespace MapsInMyFolder
             for (int Z = 0; Z < 30; Z++)
             {
                 string infotext = Languages.GetWithArguments("editorMessageAutoDetectReport", Z);
-                LabelAutoDetectZoom.Content = infotext;
+                LabelAutoDetectZoom.ContentValue = infotext;
                 Javascript.Functions.Print(infotext, -2);
 
                 var (X, Y) = Collectif.CoordonneesToTile(location.Latitude, location.Longitude, Z);
@@ -924,7 +924,7 @@ namespace MapsInMyFolder
                         ZoomMaximum = Z - 1;
                         Javascript.Functions.Print(Languages.GetWithArguments("editorMessageAutoDetectReportMaxZoomDetected", ZoomMaximum), -2);
                         TextBoxLayerMaxZoom.Text = ZoomMaximum.ToString();
-                        LabelAutoDetectZoom.Content = label_base_content;
+                        LabelAutoDetectZoom.ContentValue = label_base_content;
                         LabelAutoDetectZoom.IsEnabled = true;
                         break;
                     }
@@ -934,7 +934,7 @@ namespace MapsInMyFolder
 
             if (ZoomMaximum == -1)
             {
-                LabelAutoDetectZoom.Content = Languages.Current["editorMessageAutoDetectReportMaxZoomNotFound"];
+                LabelAutoDetectZoom.ContentValue = Languages.Current["editorMessageAutoDetectReportMaxZoomNotFound"];
                 LabelAutoDetectZoom.IsEnabled = true;
             }
         }

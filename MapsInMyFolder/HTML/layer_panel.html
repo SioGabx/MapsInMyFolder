@@ -11,6 +11,7 @@
     <meta name="language" content="fr-FR">
     <script>
         CefSharp.BindObjectAsync("LayerCEFSharpLink");
+
     </script>
     <script>
         //https://codepen.io/SioGabx/pen/wvxNaxg
@@ -96,7 +97,7 @@
                     if (!event.ctrlKey || eventTarget.parentElement.querySelectorAll("." + selectedItemClass).length == 0)
                         //Add select class to the click if it is simple (no CTRL + no SHIFT key press)
                         try {
-                            document.querySelectorAll('.select').forEach(function (layer) {
+                            document.querySelectorAll('.select').forEach(function(layer) {
                                 layer.classList.remove("select");
                                 lastelement = layer;
                             });
@@ -131,7 +132,7 @@
             if (eventTarget.parentElement.querySelectorAll("." + selectedItemClass).length <= 1) {
                 return;
             } else {
-                eventTarget.parentElement.querySelectorAll("." + selectedItemClass).forEach(function (element) {
+                eventTarget.parentElement.querySelectorAll("." + selectedItemClass).forEach(function(element) {
                     element.classList.add(selectedHighlightItemClass);
                 });
             }
@@ -140,7 +141,7 @@
 
         function getSelectedElements() {
             let listOfSelectedElements = [];
-            document.querySelectorAll('.' + selectedItemClass).forEach(function (element) {
+            document.querySelectorAll('.' + selectedItemClass).forEach(function(element) {
                 if (element.clientHeight > 0) {
                     listOfSelectedElements.push(element);
                 }
@@ -166,7 +167,7 @@
             }
 
             if (getSelectedElements().length > 1 && eye.closest("li").classList.contains(selectedItemClass)) {
-                getSelectedElements().forEach(function (element) {
+                getSelectedElements().forEach(function(element) {
                     internal_change_visibility(element.querySelector(".eye"), element.id, isAddingAction);
                 });
             } else {
@@ -206,7 +207,7 @@
                 eye.title = "%layerContextMenuShowLayer%";
 
                 if (liElement.classList.contains("layerHiddenStateProgress")) {
-                    setTimeout(function () {
+                    setTimeout(function() {
                         liElement.classList.add("layerHidden");
                         liElement.classList.remove("layerHiddenStateProgress");
                     }, 150);
@@ -235,7 +236,7 @@
             }
 
             if (getSelectedElements().length > 1) {
-                getSelectedElements().forEach(function (element) {
+                getSelectedElements().forEach(function(element) {
                     internal_ajouter_aux_favoris(element.querySelector(".star"), element.id, isAddingAction);
                 });
             } else {
@@ -264,10 +265,10 @@
         function selectionner_calque_by_id(id, scroll = true) {
             console.log("selectionner_calque_by_id" + id);
             //debugger;
-            document.querySelectorAll('.select').forEach(function (layer) {
+            document.querySelectorAll('.select').forEach(function(layer) {
                 layer.classList.remove("select");
             });
-            document.querySelectorAll('.inSelection').forEach(function (layer) {
+            document.querySelectorAll('.inSelection').forEach(function(layer) {
                 layer.classList.remove(selectedItemClass);
                 layer.classList.remove(referenceItemClass);
                 layer.classList.remove(selectedHighlightItemClass);
@@ -308,18 +309,18 @@
             });
             let finalFilteredLayers = new Array();
             searchedText.split("||").forEach((OrSeparatedString, index, fullArray) => {
-                if ((fullArray.length > 1) && !(OrSeparatedString.trim())){
+                if ((fullArray.length > 1) && !(OrSeparatedString.trim())) {
                     return;
                 }
                 let FilteredLayers = internalSearch(OrSeparatedString);
                 finalFilteredLayers = finalFilteredLayers.concat(FilteredLayers.filter((item) => finalFilteredLayers.indexOf(item) < 0));
             });
-           
+
             applySearch(finalFilteredLayers);
         }
 
-        function internalSearch(searchedText){
-             const searchClasses = [
+        function internalSearch(searchedText) {
+            const searchClasses = [
                 ["%searchLayerFiltersSite%", "layer_website"],
                 ["%searchLayerFiltersCategory%", "layer_category"],
                 ["%searchLayerFiltersZoom%", "zoom"],
@@ -331,8 +332,8 @@
             let filteredLayers = searchWithSpecifier(searchClasses, searchArguments);
 
             //delete non query terms
-            searchArguments.slice().forEach(function (argument) {
-                searchClasses.forEach(function (item) {
+            searchArguments.slice().forEach(function(argument) {
+                searchClasses.forEach(function(item) {
                     let specifier = item[0];
                     let SpecifierIdentifier = specifier + ":";
                     if (argument.startsWith(SpecifierIdentifier)) {
@@ -348,14 +349,14 @@
 
             //regular search
             let li = document.getElementsByTagName('li');
-            Array.prototype.forEach.call(li, function (liElement) {
+            Array.prototype.forEach.call(li, function(liElement) {
                 let isVisible = true;
                 if (filteredLayers.includes(liElement.id)) {
                     paragraphe = liElement.getElementsByTagName("p");
-                    Array.prototype.forEach.call(searchArguments, function (searchArgument) {
+                    Array.prototype.forEach.call(searchArguments, function(searchArgument) {
                         let decodedSearchArgument = decodeURI(searchArgument);
                         let isFound = false;
-                        Array.prototype.forEach.call(paragraphe, function (pElement) {
+                        Array.prototype.forEach.call(paragraphe, function(pElement) {
                             if (contains(pElement.innerText, removeStartAndEndQuotes(decodedSearchArgument))) {
                                 isFound = true;
                             }
@@ -374,11 +375,11 @@
 
             return filteredLayers;
         }
-        
-        
+
+
         function applySearch(filteredLayers) {
             let li = document.getElementsByTagName('li');
-            Array.prototype.forEach.call(li, function (liElement) {
+            Array.prototype.forEach.call(li, function(liElement) {
                 let ID = liElement.id;
                 if (filteredLayers.includes(ID)) {
                     showLi(liElement);
@@ -391,12 +392,12 @@
         function searchWithSpecifier(searchClasses, searchArguments) {
             let filteredLi = [];
             let li = document.getElementsByTagName('li');
-            Array.prototype.forEach.call(li, function (liElement) {
+            Array.prototype.forEach.call(li, function(liElement) {
                 // code pour manipuler chaque élément li ici
 
                 let HasFoundSomething = true;
-                Array.prototype.forEach.call(searchArguments, function (searchArgument) {
-                    searchClasses.forEach(function (item) {
+                Array.prototype.forEach.call(searchArguments, function(searchArgument) {
+                    searchClasses.forEach(function(item) {
                         let specifier = item[0];
                         let classToSearch = item[1];
 
@@ -408,7 +409,7 @@
                             let specifierSelector = liElement.getElementsByClassName(classToSearch);
 
                             // Bouclez à travers tous les éléments sélectionnés
-                            Array.prototype.forEach.call(specifierSelector, function (specifierElement) {
+                            Array.prototype.forEach.call(specifierSelector, function(specifierElement) {
                                 // Faites quelque chose avec chaque élément ici
                                 let decodedSearchArgument = decodeURI(searchArgument);
                                 if (!contains(specifierElement.innerHTML, removeStartAndEndQuotes(decodedSearchArgument))) {
@@ -565,7 +566,7 @@
             }
         }
 
-        window.addEventListener("scroll", function () {
+        window.addEventListener("scroll", function() {
             measureScrollSpeed();
         });
 
@@ -582,7 +583,7 @@
                 let mainDiv = element_fiup.querySelector(".layer_main_div");
                 let id = parseInt(element_fiup.id);
 
-                LayerCEFSharpLink.layerGetTilePreviewUrlFromId(id).then(function (urlResultString) {
+                LayerCEFSharpLink.layerGetTilePreviewUrlFromId(id).then(function(urlResultString) {
                     //console.log("urlResult : " + urlResultString);
                     if (element_fiup.classList.contains("hidden") || element_fiup.classList.contains("displaynone")) {
                         return;
@@ -598,7 +599,7 @@
                         let fallbackbbackgroundurl = urlResult.previewFallback.backgroundImage.url;
                         const img = new Image(); // width, height
                         img.src = urlResult.preview.frontImage.url;
-                        img.addEventListener('load', function () {
+                        img.addEventListener('load', function() {
                             //console.log("Preview : " + id + "loaded");
                             mainDivFrontImage.style.backgroundImage = "url(" + img.src + ")";
                             if (element_fiup.classList.contains("inview")) {
@@ -606,13 +607,13 @@
                                 mainDiv.style.setProperty("--opacity_preview_background-image", "");
                             }
                         });
-                        img.addEventListener('error', function () {
+                        img.addEventListener('error', function() {
                             if (fallbackurl === undefined) {
                                 emptyPreview();
                             } else {
                                 const fallbackimg = new Image();
                                 fallbackimg.src = fallbackurl;
-                                fallbackimg.addEventListener('load', function () {
+                                fallbackimg.addEventListener('load', function() {
                                     //console.log("Preview : " + id + "loaded");
                                     mainDivFrontImage.style.backgroundImage = "url(" + fallbackimg.src + ")";
                                     if (element_fiup.classList.contains("inview")) {
@@ -626,7 +627,7 @@
                                     }
                                 });
 
-                                fallbackimg.addEventListener('error', function () {
+                                fallbackimg.addEventListener('error', function() {
                                     console.log("Failed to load fallback image : " + fallbackurl);
                                     emptyPreview();
                                 });
@@ -651,7 +652,7 @@
 
         function checkVisibility() {
             let items = document.querySelectorAll("li");
-            items.forEach(function (item) {
+            items.forEach(function(item) {
                 let isVisible = isElementInViewport(item);
                 if (isVisible) {
                     item.classList.add('inview');
@@ -685,7 +686,7 @@
             try {
                 console.log("UpdatePreview");
                 let inviewelements = document.querySelectorAll(".inview");
-                inviewelements.forEach(function (element_up) {
+                inviewelements.forEach(function(element_up) {
                     InternalUpdatePreview(element_up);
                 });
             } catch (error) {
@@ -724,7 +725,8 @@
             content-visibility: hidden;
         }
 
-        .showHiddenLayer .layerHidden, .select.layerHidden {
+        .showHiddenLayer .layerHidden,
+        .select.layerHidden {
             display: inherit;
             content-visibility: inherit;
             opacity: 0.8;
@@ -748,19 +750,18 @@
         }
 
         .inSelectionHighlight .layer_main_div {
-            border-top: 1px solid #794915;
-            border-right: 1px solid #794915;
-            border-bottom: 1px solid #794915;
+            box-shadow: 0px 0px 5px 0px #794915;
         }
 
-            .inSelectionHighlight .layer_main_div::before {
-                position: absolute;
-                content: "";
-                width: 100%;
-                height: 100%;
-                background-color: rgb(160, 100, 30);
-                mix-blend-mode: color;
-            }
+        .inSelectionHighlight .layer_main_div::before {
+            position: absolute;
+            content: "";
+            width: 100%;
+            height: 100%;
+            background-color: rgb(160, 100, 30, 0.7);
+            mix-blend-mode: color;
+            z-index: 99;
+        }
 
         .layerHidden.inSelectionHighlight .layer_main_div::before {
             background-color: rgb(212 162 103);
@@ -856,9 +857,9 @@
             border-radius: 10px;
         }
 
-            ::-webkit-scrollbar-thumb:hover {
-                background: #62626B;
-            }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #62626B;
+        }
 
         ul,
         li,
@@ -873,10 +874,10 @@
             font-size: 16.5px;
         }
 
-            p + p {
-                margin-top: 0px;
-                font-size: 12px;
-            }
+        p+p {
+            margin-top: 0px;
+            font-size: 12px;
+        }
 
         .layer_texte {
             color: #E2E2E1;
@@ -911,11 +912,11 @@
             right: 0;
         }
 
-            .star.orange {
-                opacity: 0.8;
-                background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNDEuNzMiIGhlaWdodD0iMTQxLjczIiB2aWV3Qm94PSIwIDAgMTQxLjczIDE0MS43MyI+PHRpdGxlPnBpY3RvZ3JhbW1lczwvdGl0bGU+PHBhdGggZD0iTTcwLjg3LDU5Ljk0QTEwLjkzLDEwLjkzLDAsMSwwLDgxLjc5LDcwLjg3LDEwLjk0LDEwLjk0LDAsMCwwLDcwLjg3LDU5Ljk0WiIgc3R5bGU9ImZpbGw6IzAxMDEwMSIvPjxwYXRoIGQ9Ik03MC44Nyw5LjM3bDE1LDQ3aDUwbC00MCwyOSwxNSw0Ny00MC0yOS00MCwyOSwxNS00Ny00MC0yOWg1MFoiIHN0eWxlPSJmaWxsOiNmMTg3MTM7c3Ryb2tlOiMwMDA7c3Ryb2tlLXdpZHRoOjJweCIvPjwvc3ZnPg==");
-                background-size: contain;
-            }
+        .star.orange {
+            opacity: 0.8;
+            background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNDEuNzMiIGhlaWdodD0iMTQxLjczIiB2aWV3Qm94PSIwIDAgMTQxLjczIDE0MS43MyI+PHRpdGxlPnBpY3RvZ3JhbW1lczwvdGl0bGU+PHBhdGggZD0iTTcwLjg3LDU5Ljk0QTEwLjkzLDEwLjkzLDAsMSwwLDgxLjc5LDcwLjg3LDEwLjk0LDEwLjk0LDAsMCwwLDcwLjg3LDU5Ljk0WiIgc3R5bGU9ImZpbGw6IzAxMDEwMSIvPjxwYXRoIGQ9Ik03MC44Nyw5LjM3bDE1LDQ3aDUwbC00MCwyOSwxNSw0Ny00MC0yOS00MCwyOSwxNS00Ny00MC0yOWg1MFoiIHN0eWxlPSJmaWxsOiNmMTg3MTM7c3Ryb2tlOiMwMDA7c3Ryb2tlLXdpZHRoOjJweCIvPjwvc3ZnPg==");
+            background-size: contain;
+        }
 
         .star {
             opacity: 0.6;
@@ -923,14 +924,14 @@
             background-size: contain;
         }
 
-            .star:not(.orange):hover {
-                opacity: 0.7;
-            }
+        .star:not(.orange):hover {
+            opacity: 0.7;
+        }
 
-            .star:hover {
-                opacity: 1;
-                filter: brightness(1.1)
-            }
+        .star:hover {
+            opacity: 1;
+            filter: brightness(1.1)
+        }
 
 
 
@@ -944,11 +945,11 @@
             transition: opacity 150ms;
         }
 
-            .eye.orange {
-                opacity: 0;
-                background-image: url("data:image/svg+xml;base64,PHN2ZyBpZD0iQ2FscXVlXzIiIGRhdGEtbmFtZT0iQ2FscXVlIDIiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjE0MS43MyIgaGVpZ2h0PSIxNDEuNzMiIHZpZXdCb3g9IjAgMCAxNDEuNzMgMTQxLjczIj48ZGVmcz48c3R5bGU+LmNscy0xe2ZpbGw6IzAxMDEwMTtzdHJva2U6Izc1NzU3ODtzdHJva2Utd2lkdGg6MnB4O308L3N0eWxlPjwvZGVmcz48dGl0bGU+cGljdG9ncmFtbWVzPC90aXRsZT48cGF0aCBjbGFzcz0iY2xzLTEiIGQ9Ik03MC44Nyw1OS45NEExMC45MywxMC45MywwLDEsMCw4MS43OSw3MC44NywxMC45NCwxMC45NCwwLDAsMCw3MC44Nyw1OS45NFoiLz48cGF0aCBjbGFzcz0iY2xzLTEiIGQ9Ik0xMzcuNiw2Ny44YTEyMS4yLDEyMS4yLDAsMCwwLTE5LjM0LTE3LjY5Yy0xNS43Ny0xMS42NC0zMi4xNS0xNy44LTQ3LjM5LTE3LjhzLTMxLjYzLDYuMTYtNDcuNCwxNy44QTEyMS43NCwxMjEuNzQsMCwwLDAsNC4xMyw2Ny44YTQuODEsNC44MSwwLDAsMCwwLDYuMTNBMTIxLjIsMTIxLjIsMCwwLDAsMjMuNDcsOTEuNjJjMTUuNzcsMTEuNjUsMzIuMTYsMTcuOCw0Ny40LDE3LjhzMzEuNjItNi4xNSw0Ny4zOS0xNy44QTEyMC42NywxMjAuNjcsMCwwLDAsMTM3LjYsNzMuOTMsNC44MSw0LjgxLDAsMCwwLDEzNy42LDY3LjhaTTcwLjg3LDk1Ljg3YTI1LDI1LDAsMSwxLDI1LTI1QTI1LDI1LDAsMCwxLDcwLjg3LDk1Ljg3WiIvPjwvc3ZnPg==");
-                background-size: contain;
-            }
+        .eye.orange {
+            opacity: 0;
+            background-image: url("data:image/svg+xml;base64,PHN2ZyBpZD0iQ2FscXVlXzIiIGRhdGEtbmFtZT0iQ2FscXVlIDIiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjE0MS43MyIgaGVpZ2h0PSIxNDEuNzMiIHZpZXdCb3g9IjAgMCAxNDEuNzMgMTQxLjczIj48ZGVmcz48c3R5bGU+LmNscy0xe2ZpbGw6IzAxMDEwMTtzdHJva2U6Izc1NzU3ODtzdHJva2Utd2lkdGg6MnB4O308L3N0eWxlPjwvZGVmcz48dGl0bGU+cGljdG9ncmFtbWVzPC90aXRsZT48cGF0aCBjbGFzcz0iY2xzLTEiIGQ9Ik03MC44Nyw1OS45NEExMC45MywxMC45MywwLDEsMCw4MS43OSw3MC44NywxMC45NCwxMC45NCwwLDAsMCw3MC44Nyw1OS45NFoiLz48cGF0aCBjbGFzcz0iY2xzLTEiIGQ9Ik0xMzcuNiw2Ny44YTEyMS4yLDEyMS4yLDAsMCwwLTE5LjM0LTE3LjY5Yy0xNS43Ny0xMS42NC0zMi4xNS0xNy44LTQ3LjM5LTE3LjhzLTMxLjYzLDYuMTYtNDcuNCwxNy44QTEyMS43NCwxMjEuNzQsMCwwLDAsNC4xMyw2Ny44YTQuODEsNC44MSwwLDAsMCwwLDYuMTNBMTIxLjIsMTIxLjIsMCwwLDAsMjMuNDcsOTEuNjJjMTUuNzcsMTEuNjUsMzIuMTYsMTcuOCw0Ny40LDE3LjhzMzEuNjItNi4xNSw0Ny4zOS0xNy44QTEyMC42NywxMjAuNjcsMCwwLDAsMTM3LjYsNzMuOTMsNC44MSw0LjgxLDAsMCwwLDEzNy42LDY3LjhaTTcwLjg3LDk1Ljg3YTI1LDI1LDAsMSwxLDI1LTI1QTI1LDI1LDAsMCwxLDcwLjg3LDk1Ljg3WiIvPjwvc3ZnPg==");
+            background-size: contain;
+        }
 
         .eye {
             background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNDEuNzMiIGhlaWdodD0iMTQxLjczIiB2aWV3Qm94PSIwIDAgMTQxLjczIDE0MS43MyI+PGRlZnM+PHN0eWxlPi5he2ZpbGw6IzAxMDEwMTt9LmJ7ZmlsbDpub25lO3N0cm9rZTojMDEwMTAxO3N0cm9rZS1taXRlcmxpbWl0OjEwO3N0cm9rZS13aWR0aDoxNnB4O308L3N0eWxlPjwvZGVmcz48dGl0bGU+cGljdG9ncmFtbWVzPC90aXRsZT48cGF0aCBjbGFzcz0iYSIgZD0iTTcwLjg3LDU5Ljk0QTEwLjkzLDEwLjkzLDAsMSwwLDgxLjc5LDcwLjg3LDEwLjk0LDEwLjk0LDAsMCwwLDcwLjg3LDU5Ljk0WiIvPjxwYXRoIGQ9Ik0xMzcuNiw2Ny44YTEyMS4yLDEyMS4yLDAsMCwwLTE5LjM0LTE3LjY5Yy0xNS43Ny0xMS42NC0zMi4xNS0xNy44LTQ3LjM5LTE3LjhzLTMxLjYzLDYuMTYtNDcuNCwxNy44QTEyMS43NCwxMjEuNzQsMCwwLDAsNC4xMyw2Ny44YTQuODEsNC44MSwwLDAsMCwwLDYuMTNBMTIxLjIsMTIxLjIsMCwwLDAsMjMuNDcsOTEuNjJjMTUuNzcsMTEuNjUsMzIuMTYsMTcuOCw0Ny40LDE3LjhzMzEuNjItNi4xNSw0Ny4zOS0xNy44QTEyMC42NywxMjAuNjcsMCwwLDAsMTM3LjYsNzMuOTMsNC44MSw0LjgxLDAsMCwwLDEzNy42LDY3LjhaTTcwLjg3LDk1Ljg3YTI1LDI1LDAsMSwxLDI1LTI1QTI1LDI1LDAsMCwxLDcwLjg3LDk1Ljg3WiIvPjxwYXRoIGNsYXNzPSJiIiBkPSJNMTYsMTIzLjE0LDEyNS43MSwxOC41OSIvPjwvc3ZnPg==");
@@ -1045,13 +1046,13 @@
             z-index: 9999;
         }
 
-            .context_menu .context_menu {
-                transform: scale(1);
-                position: absolute;
-                left: 100%;
-                top: -6px;
-                box-shadow: rgb(0 0 0 / 8%) 5px 2px 20px 0, rgb(0 0 0 / 10%) 0px 5px 11px;
-            }
+        .context_menu .context_menu {
+            transform: scale(1);
+            position: absolute;
+            left: 100%;
+            top: -6px;
+            box-shadow: rgb(0 0 0 / 8%) 5px 2px 20px 0, rgb(0 0 0 / 10%) 0px 5px 11px;
+        }
 
         .item {
             padding: 7px 48px;
@@ -1060,24 +1061,24 @@
             transition: background-color ease 125ms;
         }
 
-            /*  [data-navtype="keyboard"] [data-navtype="mouse"] */
-            .context_menu[data-navtype="mouse"] .item:hover,
-            .item:focus-within,
-            .context_menu[data-navtype="keyboard"] .item.selected {
-                background-color: #303031;
-                --background-menu-color: #303031;
-            }
+        /*  [data-navtype="keyboard"] [data-navtype="mouse"] */
+        .context_menu[data-navtype="mouse"] .item:hover,
+        .item:focus-within,
+        .context_menu[data-navtype="keyboard"] .item.selected {
+            background-color: #303031;
+            --background-menu-color: #303031;
+        }
 
-            .item .sous-menu {
-                display: none;
-                width: 100%;
-            }
+        .item .sous-menu {
+            display: none;
+            width: 100%;
+        }
 
-            .context_menu[data-navtype="mouse"] .item:hover .sous-menu,
-            .item:focus-within .sous-menu,
-            .context_menu[data-navtype="keyboard"] .item.selected .sous-menu {
-                display: block;
-            }
+        .context_menu[data-navtype="mouse"] .item:hover .sous-menu,
+        .item:focus-within .sous-menu,
+        .context_menu[data-navtype="keyboard"] .item.selected .sous-menu {
+            display: block;
+        }
 
         .item-content {
             align-items: center;
@@ -1192,11 +1193,11 @@
             display: none;
         }
 
-            .nolayermessage p {
-                font-size: 14px;
-                font-family: "Segoe UI";
-                color: #888989;
-            }
+        .nolayermessage p {
+            font-size: 14px;
+            font-family: "Segoe UI";
+            color: #888989;
+        }
 
         body:not(:has(li)) .nolayermessage {
             display: block;
@@ -1249,9 +1250,9 @@
             margin-left: 15px;
         }
 
-            ul.list_alternat li:nth-child(even) {
-                background-color: #313131;
-            }
+        ul.list_alternat li:nth-child(even) {
+            background-color: #313131;
+        }
 
         ul.list .zoom,
         ul.list_alternat .zoom {
@@ -1270,6 +1271,7 @@
         .context_menu.shiftkeydown:not([data-layer_binding="0"]) .menu.item.shiftkeydownrequired {
             display: block;
         }
+
     </style>
 
 </head>
@@ -1410,8 +1412,8 @@
             <div class="item-content">
                 <div class="icon">
                     <svg version="1.2" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 141.7 141.7" overflow="visible" xml:space="preserve">
-                    <g id="Calque_2">
-                    <path d="
+                        <g id="Calque_2">
+                            <path d="
 		M135.5,61.9c5.2,36.9-20.5,71-57.4,76.2c-0.4,0-0.7,0.1-1.1,0.1C39.9,140.5,7.9,112.2,5.7,75c-0.1-1.8-0.1-3.5-0.1-5.3
 		C6.9,33.8,35.5,5,71.3,3.4c21.2,0.6,41,10.8,53.8,27.8l2.9,4.4H95.9" />
                         </g>
@@ -1438,7 +1440,7 @@
 
 
         LayerCEFSharpLink.layerRequestGetSearchString()
-            .then(function (initSearchValue) {
+            .then(function(initSearchValue) {
                 console.log("search " + initSearchValue);
                 if (initSearchValue != null && initSearchValue != undefined) {
                     searchAndUpdatePreview(initSearchValue);
@@ -1461,7 +1463,7 @@
         var all_item_element = document.querySelectorAll(".context_menu .item .item-content:not(.have-sous-menu) a");
         //init fonction
         //si la souris bouge sur l'un des item du context menu, alors on passe en mode souris et on enregistre sa position
-        document.querySelectorAll(".context_menu .item").forEach(element_qsaci => element_qsaci.addEventListener("mousemove", function (event) {
+        document.querySelectorAll(".context_menu .item").forEach(element_qsaci => element_qsaci.addEventListener("mousemove", function(event) {
             get_context_menu_element().setAttribute("data-navtype", "mouse");
 
             var temp_tab_index = parseInt(event.target.closest(".item").getAttribute("data-selectable-id"));
@@ -1481,10 +1483,10 @@
         }));
 
         //on enregistre l'event de click sur chaque items et on leur ajoute un index
-        all_item_element.forEach(function (item, index) {
+        all_item_element.forEach(function(item, index) {
             var parent_item = item.parentElement.parentElement;
 
-            parent_item.addEventListener("click", function (event) {
+            parent_item.addEventListener("click", function(event) {
                 event.preventDefault();
                 item_context_menu_clicked(event.target);
             });
@@ -1505,7 +1507,7 @@
         }
 
         function unclicked() {
-            document.querySelectorAll(".clickfocus").forEach(function (selected_items) {
+            document.querySelectorAll(".clickfocus").forEach(function(selected_items) {
                 selected_items.classList.remove("clickfocus");
             });
         }
@@ -1587,7 +1589,7 @@
 
         function unselect_all() {
             //on retire à tout les items le tag séléctionné
-            document.querySelectorAll(".selected").forEach(function (selected_items) {
+            document.querySelectorAll(".selected").forEach(function(selected_items) {
                 selected_items.classList.remove("selected");
             });
         }
@@ -1641,7 +1643,7 @@
             if (get_context_menu_element().classList.contains("shiftkeydown")) {
                 get_context_menu_element().classList.remove("shiftkeydown");
             }
-            document.querySelectorAll(".hover").forEach(function (selected_items) {
+            document.querySelectorAll(".hover").forEach(function(selected_items) {
                 selected_items.classList.remove("hover");
             });
             unclicked();
@@ -1650,7 +1652,7 @@
 
         function update_lock_state(id, lock) {
             if (id == "*") {
-                all_item_element.forEach(function (item, index) {
+                all_item_element.forEach(function(item, index) {
                     var parent_item = item.parentElement.parentElement;
                     if (lock) {
                         parent_item.classList.add("lock");
@@ -1840,7 +1842,7 @@
                         break;
                     case "ajouter_favori":
                         if (getSelectedElements().length > 1) {
-                            getSelectedElements().forEach(function (element) {
+                            getSelectedElements().forEach(function(element) {
                                 internal_ajouter_aux_favoris(element.querySelector(".star"), element.id, true);
                             });
                         } else {
@@ -1850,7 +1852,7 @@
                         break;
                     case "retirer_favori":
                         if (getSelectedElements().length > 1) {
-                            getSelectedElements().forEach(function (element) {
+                            getSelectedElements().forEach(function(element) {
                                 internal_ajouter_aux_favoris(element.querySelector(".star"), element.id, false);
                             });
                         } else {
@@ -1860,7 +1862,7 @@
 
                     case "afficher_calque":
                         if (getSelectedElements().length > 1) {
-                            getSelectedElements().forEach(function (element) {
+                            getSelectedElements().forEach(function(element) {
                                 internal_change_visibility(element.querySelector(".eye"), element.id, true);
                             });
                         } else {
@@ -1870,7 +1872,7 @@
                         break;
                     case "masquer_calque":
                         if (getSelectedElements().length > 1) {
-                            getSelectedElements().forEach(function (element) {
+                            getSelectedElements().forEach(function(element) {
                                 internal_change_visibility(element.querySelector(".eye"), element.id, false);
                             });
                         } else {
@@ -1884,7 +1886,7 @@
 
                         if (getSelectedElements().length > 1) {
                             let listOfId = "";
-                            getSelectedElements().forEach(function (element) {
+                            getSelectedElements().forEach(function(element) {
                                 listOfId += element.id + ",";
                             });
                             LayerCEFSharpLink.clearCache(listOfId);
@@ -1915,9 +1917,10 @@
                 hide_context_menu(null);
             }
         }
-            // ------------------ CONTEXT MENU ------------------
+        // ------------------ CONTEXT MENU ------------------
 
     </script>
 
 </body>
+
 </html>
