@@ -3,6 +3,7 @@ using ICSharpCode.AvalonEdit.Highlighting;
 using MapsInMyFolder.Commun;
 using ModernWpf.Controls;
 using System;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -86,10 +87,29 @@ namespace MapsInMyFolder.UserControls
         public new event KeyEventHandler KeyUp;
         public event EventHandler TextChanged;
 
+        public static readonly DependencyProperty ScriptProperty = DependencyProperty.Register(
+            nameof(Script), typeof(object),
+            typeof(ScriptEditor),
+     new PropertyMetadata(OnScriptChanged));
+
+        private static void OnScriptChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var CodeEditor = (ScriptEditor)d;
+            CodeEditor.Script = e.NewValue?.ToString();
+        }
+
         public string Script
         {
-            get { return ScriptTextEditor.Text; }
-            set { ScriptTextEditor.Text = value; }
+            get { 
+                return (string)GetValue(ScriptProperty); 
+            }
+            set { 
+                SetValue(ScriptProperty, value);
+                if (ScriptTextEditor.Text != value)
+                {
+                    ScriptTextEditor.Text = value;
+                }
+            }
         }
 
         public void SetScriptNoEvent(string text)
@@ -142,6 +162,12 @@ namespace MapsInMyFolder.UserControls
 
         private void ScriptTextEditor_TextChanged(object sender, EventArgs e)
         {
+            if (Script != ScriptTextEditor.Text)
+            {
+                Script = ScriptTextEditor.Text;
+            }
+            Debug.WriteLine(ScriptTextEditor.Text);
+            Debug.WriteLine(Script);
             TextChanged?.Invoke(this, e);
         }
     }

@@ -13,7 +13,7 @@ namespace MapsInMyFolder.Commun
         public bool IsFavorite { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
-        public string Category { get; set; }
+        public string Tag { get; set; }
         public string Country { get; set; }
         public string Identifier { get; set; }
         public string TileUrl { get; set; }
@@ -34,13 +34,13 @@ namespace MapsInMyFolder.Commun
         public bool IsAtScale { get; set; }
 
 
-        public Layers(int Id, bool IsFavorite, string Name, string Description, string Category, string Country, string Identifier, string TileUrl, string SiteName, string SiteUrl, int? MinZoom, int? MaxZoom, string TilesFormat, string Style, int? TilesSize, string Script, string Visibility, LayersSpecialsOptions SpecialsOptions, string BoundaryRectangles, int Version, bool IsAtScale)
+        public Layers(int Id, bool IsFavorite, string Name, string Description, string Tag, string Country, string Identifier, string TileUrl, string SiteName, string SiteUrl, int? MinZoom, int? MaxZoom, string TilesFormat, string Style, int? TilesSize, string Script, string Visibility, LayersSpecialsOptions SpecialsOptions, string BoundaryRectangles, int Version, bool IsAtScale)
         {
             this.Id = Id;
             this.IsFavorite = IsFavorite;
             this.Name = Name;
             this.Description = Description;
-            this.Category = Category;
+            this.Tag = Tag;
             this.Country = Country;
             this.Identifier = Identifier;
             this.TileUrl = TileUrl;
@@ -201,7 +201,7 @@ namespace MapsInMyFolder.Commun
                 //Key need to be the same as the db
                 {"NAME", Collectif.HTMLEntities(layers.Name)},
                 {"DESCRIPTION", Collectif.HTMLEntities(layers.Description)},
-                {"CATEGORY", Collectif.HTMLEntities(layers.Category)},
+                {"CATEGORY", Collectif.HTMLEntities(layers.Tag)},
                 {"COUNTRY", Collectif.HTMLEntities(layers.Country)},
                 {"IDENTIFIER", Collectif.HTMLEntities(layers.Identifier)},
                 {"TILE_URL", Collectif.HTMLEntities(layers.TileUrl)},
@@ -337,9 +337,9 @@ namespace MapsInMyFolder.Commun
                 {
                     legacyLayerWithReplacements.Visibility = "Visible";
                 }
-                if (legacyLayerWithReplacements.Category == "/")
+                if (legacyLayerWithReplacements.Tag == "/")
                 {
-                    legacyLayerWithReplacements.Category = "";
+                    legacyLayerWithReplacements.Tag = "";
                 }
                 legacyLayerWithReplacements.Country = legacyLayerWithReplacements.Country?.Replace("*", "World");
                 List<string> listOfAllFormatsAcceptedWithTransparency = new List<string> { "png" };

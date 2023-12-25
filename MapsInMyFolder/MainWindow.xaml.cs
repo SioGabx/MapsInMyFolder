@@ -178,6 +178,10 @@ namespace MapsInMyFolder
             Init();
             LoadAvalonEditThemes();
 
+
+            GridLayerEditor editor = new GridLayerEditor();
+            MainContentFrame.Navigate(editor);
+
             if (Settings.search_application_update_on_startup && await Update.CheckIfNewerVersionAvailableOnGithub())
             {
                 Debug.WriteLine("Une nouvelle mise à jour est disponible : Version " + Update.UpdateRelease.Tag_name);
@@ -187,6 +191,8 @@ namespace MapsInMyFolder
             {
                 await Database.CheckIfNewerVersionAvailable();
             }
+
+
         }
 
         public static void LoadAvalonEditThemes()

@@ -213,7 +213,7 @@ namespace MapsInMyFolder
             }
             TextboxLayerName.Text = LayerInEditMode.Name;
 
-            TextboxLayerCategory.Text = LayerInEditMode.Category;
+            TextboxLayerCategory.Text = LayerInEditMode.Tag;
             TextboxLayerSiteUrl.Text = LayerInEditMode.SiteUrl;
             TextboxLayerSite.Text = LayerInEditMode.SiteName;
             TextboxLayerFormat.Text = LayerInEditMode.TilesFormat.ToUpperInvariant();
@@ -325,7 +325,7 @@ namespace MapsInMyFolder
                 {
                     continue;
                 }
-                string class_category = layer.Category.Trim();
+                string class_category = layer.Tag.Trim();
                 if (!Category.Contains(class_category) && !string.IsNullOrWhiteSpace(class_category))
                 {
                     Category.Add(class_category);
@@ -734,7 +734,7 @@ namespace MapsInMyFolder
 
                 NAME = getSavingOptimalValueWithNULL(NAME, DB_Layer.Name);
                 DESCRIPTION = getSavingOptimalValueWithNULL(DESCRIPTION, DB_Layer.Description);
-                CATEGORY = getSavingOptimalValueWithNULL(CATEGORY, DB_Layer.Category);
+                CATEGORY = getSavingOptimalValueWithNULL(CATEGORY, DB_Layer.Tag);
                 COUNTRY = getSavingOptimalValueWithNULL(COUNTRY, DB_Layer.Country);
                 IDENTIFIER = getSavingOptimalValueWithNULL(IDENTIFIER, DB_Layer.Identifier);
                 MIN_ZOOM = getSavingOptimalValueWithNULL(MIN_ZOOM, DB_Layer.MinZoom);
@@ -845,7 +845,7 @@ namespace MapsInMyFolder
             }
             layers.Name = NAME;
             layers.Description = DESCRIPTION;
-            layers.Category = CATEGORY;
+            layers.Tag = CATEGORY;
             layers.Country = COUNTRY;
             layers.Identifier = IDENTIFIER;
             layers.TileUrl = TILE_URL;

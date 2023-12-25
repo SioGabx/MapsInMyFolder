@@ -11,6 +11,17 @@ namespace MapsInMyFolder.Commun
 {
     public static class Extensions
     {
+
+        public static string GetCellValue(this DataGridCellInfo cell)
+        {
+            string RawValue = cell.Item?.GetType()?.GetProperty(cell.Column?.SortMemberPath)?.GetValue(cell.Item, null)?.ToString();
+            return RawValue;
+        }
+        public static object GetPropertyValue(this object T, string PropName)
+        {
+            return T.GetType().GetProperty(PropName)?.GetValue(T, null);
+        }
+
         public static bool Contains(this string str, string substring, StringComparison comp)
         {
             if (substring == null)

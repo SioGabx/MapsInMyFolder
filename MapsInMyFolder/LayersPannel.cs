@@ -283,7 +283,7 @@ namespace MapsInMyFolder
                                 <p class=""display_name"">{Collectif.HTMLEntities(layer.Name)}</p>
                                 <p class=""zoom"">[{layer.MinZoom}-{layer.MaxZoom}]{CountryHTML} - {layer.SiteName}</p>
                                 <p class=""layer_website{supplement_class}"">{layer.SiteName}</p>
-                                <p class=""layer_category{supplement_class}"">{layer.Category}</p>
+                                <p class=""layer_category{supplement_class}"">{layer.Tag}</p>
                             </div>
                             <div {layerFavoriteHTML} onclick=""ajouter_aux_favoris(event, this, {layer.Id})""></div>
                             <div {layerVisibilityHTML} onclick=""change_visibility(event, this, {layer.Id})""></div>
