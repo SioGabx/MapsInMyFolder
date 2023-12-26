@@ -29,7 +29,9 @@
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net6.0-windows|x64'">
 	  <WarningLevel>6</WarningLevel>
 	</PropertyGroup>
-
+  <PropertyGroup>
+    <NoWarn>NU1701</NoWarn>
+  </PropertyGroup>
 	<ItemGroup Condition="'$(TargetFramework)'=='net6.0-windows'">
 		<PackageReference Include="System.Runtime.Caching" Version="8.0.0" />
 	</ItemGroup>

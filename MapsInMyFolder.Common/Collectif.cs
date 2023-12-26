@@ -2,6 +2,7 @@
 using MapsInMyFolder.Commun;
 using NetVips;
 using Newtonsoft.Json;
+using NReco.Csv;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -985,11 +986,6 @@ namespace MapsInMyFolder.Commun
             }
         }
 
-        public static void IndenterCode(object sender, EventArgs e, ICSharpCode.AvalonEdit.TextEditor textBox)
-        {
-            Commun.JSBeautify jSBeautify = new JSBeautify(textBox.Text, new JSBeautifyOptions() { preserve_newlines = false, indent_char = ' ', indent_size = 4 });
-            textBox.Text = jSBeautify.GetResult();
-        }
 
         public static Visual GetDescendantByType(Visual element, Type type)
         {
@@ -1083,9 +1079,8 @@ namespace MapsInMyFolder.Commun
                 }
                 else if (!string.IsNullOrEmpty(childName))
                 {
-                    FrameworkElement frameworkElement = child as FrameworkElement;
                     // If the child's name is set for search
-                    if (frameworkElement != null && frameworkElement.Name == childName)
+                    if (child is FrameworkElement frameworkElement && frameworkElement.Name == childName)
                     {
                         // if the child's name is of the request name
                         foundChild = (T)child;
@@ -1125,7 +1120,7 @@ namespace MapsInMyFolder.Commun
         {
             DependencyObject parent = VisualTreeHelper.GetParent(child);
 
-            while (parent != null && !(parent is T))
+            while (parent != null && parent is not T)
             {
                 parent = VisualTreeHelper.GetParent(parent);
             }
@@ -1306,15 +1301,12 @@ namespace MapsInMyFolder.Commun
                 return HttpStatusCode.SeeOther;
             }
 
-            switch (await InternalCheckIfDownloadSuccess(url))
+            return await InternalCheckIfDownloadSuccess(url) switch
             {
-                case HttpStatusCode.NotFound:
-                    return 404;
-                case HttpStatusCode.OK:
-                    return 200;
-                default:
-                    return -1;
-            }
+                HttpStatusCode.NotFound => 404,
+                HttpStatusCode.OK => 200,
+                _ => -1,
+            };
         }
 
         public static (double Latitude, double Longitude) GetCenterBetweenTwoPoints((double Latitude, double Longitude) PointA, (double Latitude, double Longitude) PointB)
@@ -1464,6 +1456,36 @@ namespace MapsInMyFolder.Commun
             }
             return sb.ToString();
         }
+
+        public static string[][] ParseCSV(string input, string delimiter = "\t")
+        {
+            var csvStream = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(input));
+            var csvReader = new CsvReader(new StreamReader(csvStream), delimiter);
+            var Lines = new List<string[]>();
+            while (csvReader.Read())
+            {
+                var Field = new List<string>();
+                for (int i = 0; i < csvReader.FieldsCount; i++)
+                {
+                    Field.Add(csvReader[i]);
+                }
+                Lines.Add(Field.ToArray());
+            }
+            return Lines.ToArray();
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
     }
 
     public static class ScrollViewerHelper

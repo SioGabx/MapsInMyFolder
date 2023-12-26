@@ -6,18 +6,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
 using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using System.Windows.Threading;
 
 namespace MapsInMyFolder.UserControls
 {
@@ -46,15 +38,18 @@ namespace MapsInMyFolder.UserControls
         }
 
         private string currentSavedCellValue = string.Empty;
-        private void dataGrid_CurrentCellChanged(object sender, EventArgs e)
+        private void DataGrid_CurrentCellChanged(object sender, EventArgs e)
         {
             UpdateCellEditor();
         }
 
         private void UpdateCellEditor()
         {
-            Layers SelectedLayer = dataGrid?.CurrentItem as Layers;
-            if (SelectedLayer is null)
+            if (dataGrid.SelectedCells.Count > 1)
+            {
+                return;
+            }
+            if (dataGrid?.CurrentItem is not Layers SelectedLayer)
             {
                 return;
             }
@@ -150,12 +145,12 @@ namespace MapsInMyFolder.UserControls
             {
                 RoutedEvent = UIElement.KeyDownEvent
             };
-            SwitchNextCell(newEventArgs, TextBoxEditor);
+            SwitchNextCell(newEventArgs);
             //TextBoxEditor.CaretIndex = TextBoxEditor.Text.Length;
         }
 
 
-        private void SwitchNextCell(KeyEventArgs newEventArgs, UIElement element)
+        private void SwitchNextCell(KeyEventArgs newEventArgs)
         {
             FocusCurrentSelectedCell();
             dataGrid.RaiseEvent(newEventArgs);
@@ -164,26 +159,33 @@ namespace MapsInMyFolder.UserControls
 
 
 
-        private void dataGrid_PreviewKeyDown(object sender, KeyEventArgs e)
+        private void DataGrid_PreviewKeyDown(object sender, KeyEventArgs e)
         {
             if (!isCellBeingEdited)
             {
-                if (e.Key == Key.C && (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl)))
+                if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
                 {
-                    CopySelectedCells();
-                    e.Handled = true;
+                    if (e.Key == Key.C)
+                    {
+                        CopySelectedCells();
+                        e.Handled = true;
+                    }
+                    if (e.Key == Key.V)
+                    {
+                        PasteIntoCells();
+                        e.Handled = true;
+                    }
                 }
-
             }
         }
 
 
-        private void dataGrid_BeginningEdit(object sender, DataGridBeginningEditEventArgs e)
+        private void DataGrid_BeginningEdit(object sender, DataGridBeginningEditEventArgs e)
         {
             isCellBeingEdited = true;
         }
 
-        private void dataGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
+        private void DataGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
         {
             isCellBeingEdited = false;
         }
@@ -198,6 +200,81 @@ namespace MapsInMyFolder.UserControls
             dataGrid.BeginEdit();
         }
 
+
+
+        private void PasteIntoCells()
+        {
+            string data = Clipboard.GetText();
+            string[][] clipboardData = Collectif.ParseCSV(data);
+            List<DataGridCellInfo> SelectedCells = dataGrid.SelectedCells.ToList();
+            DataGridCellInfo currentCell = SelectedCells.FirstOrDefault(dataGrid.CurrentCell);
+
+
+            int NumberOfColumnsSelected = SelectedCells.Select(s => s.Column).Distinct().Count();
+            int NumberOfRowSelected = SelectedCells.Select(s => s.Item).Distinct().Count();
+
+            // The index of the first DataGridRow
+            int startRow = dataGrid.ItemContainerGenerator.IndexFromContainer(
+                (DataGridRow)dataGrid.ItemContainerGenerator.ContainerFromItem(currentCell.Item));
+
+            // The destination rows 
+            // (from startRow to either end or length of clipboard rows)
+            DataGridRow[] rows =
+                Enumerable.Range(
+                    startRow, Math.Min(dataGrid.Items.Count, clipboardData.Length))
+                .Select(rowIndex =>
+                    dataGrid.ItemContainerGenerator.ContainerFromIndex(rowIndex) as DataGridRow)
+                .Where(a => a != null).ToArray();
+
+            // The destination columns 
+            // (from selected row to either end or max. length of clipboard columns)
+            DataGridColumn[] columns =
+                dataGrid.Columns.OrderBy(column => column.DisplayIndex)
+                .SkipWhile(column => column != currentCell.Column)
+                .Take(clipboardData.Max(row => row.Length)).ToArray();
+            
+            DataGridColumn[] SelectedColumns =
+                dataGrid.Columns.OrderBy(column => column.DisplayIndex)
+                .SkipWhile(column => column != currentCell.Column)
+                .Take(clipboardData.Max(row => NumberOfColumnsSelected)).ToArray();
+
+            // Clear the current selection
+            dataGrid.SelectedCells.Clear();
+
+            // Adjust the selection to accommodate the clipboard content
+            int rowCountToSelect = Math.Max(rows.Length, NumberOfRowSelected);
+            int colCountToSelect = Math.Max(columns.Length, NumberOfColumnsSelected);
+
+            for (int selectedRowIndex = 0; selectedRowIndex < rowCountToSelect; selectedRowIndex++)
+            {
+                DataGridRow row = dataGrid.ItemContainerGenerator.ContainerFromIndex(startRow + selectedRowIndex) as DataGridRow;
+                string[] rowContent = clipboardData[selectedRowIndex % clipboardData.Length];
+
+                for (int colIndex = 0; colIndex < colCountToSelect; colIndex++)
+                {
+                    string cellContent = rowContent[colIndex % columns.Length];
+                    DataGridColumn column = null;
+                    if ((SelectedColumns.Count()) > colIndex)
+                    {
+                        //Selected Columns is greater than selection
+                        column = SelectedColumns[colIndex] as DataGridColumn;
+                    }
+                    else
+                    {
+                        column = columns[colIndex % columns.Length];
+                    }
+                    
+                    column.OnPastingCellClipboardContent(row.Item, cellContent);
+
+                    // Select the pasted cell
+                    DataGridCellInfo newCell = new DataGridCellInfo(row.Item, columns[colIndex % columns.Length]);
+                    if (!dataGrid.SelectedCells.Contains(newCell))
+                    {
+                        dataGrid.SelectedCells.Add(newCell);
+                    }
+                }
+            }
+        }
 
         private void CopySelectedCells()
         {

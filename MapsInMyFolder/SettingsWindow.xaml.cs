@@ -305,8 +305,8 @@ namespace MapsInMyFolder
 
                 var infoDialog = Message.SetContentDialog(Languages.Current["settingsMessageRestartRequire"], Languages.Current["dialogTitleOperationInfo"], MessageDialogButton.OK);
                 await infoDialog.ShowAsync();
-                    Collectif.RestartApplication();
-                
+                Collectif.RestartApplication();
+
             }
         }
 

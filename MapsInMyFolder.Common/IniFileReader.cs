@@ -9,7 +9,7 @@ namespace MapsInMyFolder.Commun
         {
             Dictionary<string, string> keyValuePairs = new Dictionary<string, string>();
 
-            string[] lines = iniString.Split(new string[] {"\n", Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+            string[] lines = iniString.Split(new string[] { "\n", Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
 
             foreach (string line in lines)
             {

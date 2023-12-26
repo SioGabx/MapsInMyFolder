@@ -100,10 +100,12 @@ namespace MapsInMyFolder.UserControls
 
         public string Script
         {
-            get { 
-                return (string)GetValue(ScriptProperty); 
+            get
+            {
+                return (string)GetValue(ScriptProperty);
             }
-            set { 
+            set
+            {
                 SetValue(ScriptProperty, value);
                 if (ScriptTextEditor.Text != value)
                 {
