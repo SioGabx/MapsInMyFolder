@@ -172,7 +172,9 @@ namespace MapsInMyFolder.UserControls
                     }
                     if (e.Key == Key.V)
                     {
+                        this.Cursor = Cursors.Wait;
                         PasteIntoCells();
+                        this.Cursor = Cursors.Arrow;
                         e.Handled = true;
                     }
                 }
@@ -200,10 +202,71 @@ namespace MapsInMyFolder.UserControls
             dataGrid.BeginEdit();
         }
 
-
-
-        private void PasteIntoCells()
+        private bool IsContiguousSelection(DataGrid dataGrid)
         {
+            List<DataGridCellInfo> SelectedCells = dataGrid.SelectedCells.ToList();
+            DataGridCellInfo currentCell = SelectedCells.FirstOrDefault(dataGrid.CurrentCell);
+            dataGrid.CurrentCell = currentCell;
+            dataGrid.BeginEdit();
+            // The index of the first DataGridRow
+            if (dataGrid?.ItemContainerGenerator?.ContainerFromItem(currentCell.Item) is not DataGridRow Container)
+            {
+                return true;
+            }
+            int? startRow = dataGrid?.ItemContainerGenerator?.IndexFromContainer(Container);
+            if (startRow == null) { return true; } 
+            int NumberOfColumnsSelected = SelectedCells.Select(s => s.Column).Distinct().Count();
+            int NumberOfRowSelected = SelectedCells.Select(s => s.Item).Distinct().Count();
+
+            // The destination rows 
+            // (from startRow to either end or length of clipboard rows)
+            DataGridRow[] rows =
+                Enumerable.Range(
+                    (int)startRow, Math.Min(dataGrid.Items.Count, NumberOfRowSelected))
+                .Select(rowIndex =>
+                    dataGrid.ItemContainerGenerator.ContainerFromIndex(rowIndex) as DataGridRow)
+                .Where(a => a != null).ToArray();
+
+            // The destination columns 
+            // (from selected row to either end or max. length of clipboard columns)
+            DataGridColumn[] columns =
+                dataGrid.Columns.OrderBy(column => column.DisplayIndex)
+                .SkipWhile(column => column != currentCell.Column)
+                .Take(NumberOfColumnsSelected).ToArray();
+
+            for (int selectedRowIndex = 0; selectedRowIndex < NumberOfRowSelected; selectedRowIndex++)
+            {
+                DataGridRow row = dataGrid.ItemContainerGenerator.ContainerFromIndex((int)startRow + selectedRowIndex) as DataGridRow;
+                if (row is null)
+                {
+                    continue;
+                }
+                for (int colIndex = 0; colIndex < NumberOfColumnsSelected; colIndex++)
+                {
+                    DataGridCellInfo newCell = new DataGridCellInfo(row.Item, columns[colIndex]);
+                    if (!dataGrid.SelectedCells.Contains(newCell))
+                    {
+                        return false;
+                    }
+
+                }
+            }
+            return true;
+        }
+
+        private async void PasteIntoCells()
+        {
+            if (!IsContiguousSelection(dataGrid))
+            {
+                try { 
+                await Message.SetContentDialog(Languages.Current["EditableDataGridImpossibleActionOnMultiplePlage"], Languages.Current["dialogTitleOperationFailed"], MessageDialogButton.OK).ShowAsync();
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex.ToString());
+                }
+                return;
+            }
             string data = Clipboard.GetText();
             string[][] clipboardData = Collectif.ParseCSV(data);
             List<DataGridCellInfo> SelectedCells = dataGrid.SelectedCells.ToList();
@@ -214,14 +277,18 @@ namespace MapsInMyFolder.UserControls
             int NumberOfRowSelected = SelectedCells.Select(s => s.Item).Distinct().Count();
 
             // The index of the first DataGridRow
-            int startRow = dataGrid.ItemContainerGenerator.IndexFromContainer(
-                (DataGridRow)dataGrid.ItemContainerGenerator.ContainerFromItem(currentCell.Item));
+            if (dataGrid?.ItemContainerGenerator?.ContainerFromItem(currentCell.Item) is not DataGridRow Container)
+            {
+                return;
+            }
+            int? startRow = dataGrid?.ItemContainerGenerator?.IndexFromContainer(Container);
+            if (startRow == null) { return; }
 
             // The destination rows 
             // (from startRow to either end or length of clipboard rows)
             DataGridRow[] rows =
                 Enumerable.Range(
-                    startRow, Math.Min(dataGrid.Items.Count, clipboardData.Length))
+                    (int)startRow, Math.Min(dataGrid.Items.Count, clipboardData.Length))
                 .Select(rowIndex =>
                     dataGrid.ItemContainerGenerator.ContainerFromIndex(rowIndex) as DataGridRow)
                 .Where(a => a != null).ToArray();
@@ -232,22 +299,24 @@ namespace MapsInMyFolder.UserControls
                 dataGrid.Columns.OrderBy(column => column.DisplayIndex)
                 .SkipWhile(column => column != currentCell.Column)
                 .Take(clipboardData.Max(row => row.Length)).ToArray();
-            
+
             DataGridColumn[] SelectedColumns =
                 dataGrid.Columns.OrderBy(column => column.DisplayIndex)
                 .SkipWhile(column => column != currentCell.Column)
                 .Take(clipboardData.Max(row => NumberOfColumnsSelected)).ToArray();
 
-            // Clear the current selection
-            dataGrid.SelectedCells.Clear();
-
+            //if (rows.Count() > NumberOfRowSelected && columns.Count() > NumberOfColumnsSelected)
+            //{
+                // Clear the current selection
+                dataGrid.SelectedCells.Clear();
+            //}
             // Adjust the selection to accommodate the clipboard content
             int rowCountToSelect = Math.Max(rows.Length, NumberOfRowSelected);
             int colCountToSelect = Math.Max(columns.Length, NumberOfColumnsSelected);
 
             for (int selectedRowIndex = 0; selectedRowIndex < rowCountToSelect; selectedRowIndex++)
             {
-                DataGridRow row = dataGrid.ItemContainerGenerator.ContainerFromIndex(startRow + selectedRowIndex) as DataGridRow;
+                DataGridRow row = dataGrid.ItemContainerGenerator.ContainerFromIndex((int)startRow + selectedRowIndex) as DataGridRow;
                 string[] rowContent = clipboardData[selectedRowIndex % clipboardData.Length];
 
                 for (int colIndex = 0; colIndex < colCountToSelect; colIndex++)
@@ -263,15 +332,16 @@ namespace MapsInMyFolder.UserControls
                     {
                         column = columns[colIndex % columns.Length];
                     }
-                    
+
                     column.OnPastingCellClipboardContent(row.Item, cellContent);
 
                     // Select the pasted cell
-                    DataGridCellInfo newCell = new DataGridCellInfo(row.Item, columns[colIndex % columns.Length]);
+                    DataGridCellInfo newCell = new DataGridCellInfo(row.Item, column);
                     if (!dataGrid.SelectedCells.Contains(newCell))
                     {
                         dataGrid.SelectedCells.Add(newCell);
                     }
+
                 }
             }
         }

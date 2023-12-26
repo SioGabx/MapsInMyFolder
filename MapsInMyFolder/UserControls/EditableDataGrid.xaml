@@ -94,12 +94,7 @@
             SelectedCellsChanged="DataGrid_SelectedCellsChanged"
             SelectionMode="Extended"
             SelectionUnit="CellOrRowHeader"
-            VerticalScrollBarVisibility="Auto"
-            VirtualizingPanel.CacheLengthUnit="Page"
-            VirtualizingPanel.IsVirtualizing="True"
-            VirtualizingPanel.IsVirtualizingWhenGrouping="True"
-            VirtualizingPanel.ScrollUnit="Pixel"
-            VirtualizingPanel.VirtualizationMode="Recycling">
+            VerticalScrollBarVisibility="Auto">
 
             <DataGrid.Columns>
                 <DataGridTextColumn
