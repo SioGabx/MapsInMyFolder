@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Data.SQLite;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Web;
 
 namespace MapsInMyFolder.Commun
 {
@@ -153,6 +155,86 @@ namespace MapsInMyFolder.Commun
             }
         }
 
+
+
+        public static void SetCurrentLayer(int id)
+        {
+            if (Layers.Count() == 0)
+            {
+                Layers.Add(0, Layers.Empty(0));
+            }
+
+            if (Layers.StartupLayerId == 0)
+            {
+                IEnumerable<Layers> AllLayers = Layers.GetLayersList();
+                Layers SelectedDefaultLayer = AllLayers.FirstOrDefault(layer =>
+                {
+                    bool isJpeg = layer.TilesFormat == "jpeg" || layer.TilesFormat == "jpg";
+                    bool hasUrl = !string.IsNullOrWhiteSpace(layer.TileUrl);
+                    return isJpeg && hasUrl;
+                }) ?? AllLayers.First();
+
+                Layers.StartupLayerId = SelectedDefaultLayer.Id;
+            }
+            Layers layer = GetLayerById(id) ?? GetLayerById(StartupLayerId) ?? GetLayersList().First();
+            if (layer is not null)
+            {
+                Convert.ToCurentLayer(layer);
+            }
+        }
+
+        public static long ClearCache(int id, bool showErrors = true)
+        {
+            if (id == 0) { return 0; }
+
+            Layers layers = Layers.GetLayerById(id);
+            if (layers is null) { return 0; }
+            long DirectorySize = 0;
+            try
+            {
+                Javascript.EngineDeleteById(id);
+                string temp_dir = Collectif.GetSaveTempDirectory(layers.Name, layers.Identifier);
+                if (Directory.Exists(temp_dir))
+                {
+                    DirectorySize = Collectif.GetDirectorySize(temp_dir);
+                    Directory.Delete(temp_dir, true);
+                }
+            }
+            catch (Exception ex)
+            {
+                if (!showErrors)
+                {
+                    Message.NoReturnBoxAsync(Languages.GetWithArguments("layerMessageErrorCachesNorClear", ex.Message), Languages.Current["dialogTitleOperationFailed"]);
+
+                }
+                Debug.WriteLine("Erreur lors du nettoyage du cache : " + ex.Message);
+            }
+            return DirectorySize;
+        }
+
+        public static void SetAsFavorite(int id, bool favBooleanState)
+        {
+            if (id == 0) { return; }
+            int fav_state = favBooleanState ? 1 : 0;
+
+            Database.ExecuteNonQuerySQLCommand($"UPDATE LAYERS SET FAVORITE = {fav_state} WHERE ID={id}");
+            Database.ExecuteNonQuerySQLCommand($"UPDATE EDITEDLAYERS SET FAVORITE = {fav_state} WHERE ID={id}");
+            Database.ExecuteNonQuerySQLCommand($"UPDATE CUSTOMSLAYERS SET FAVORITE = {fav_state} WHERE ID={id}");
+
+            Layers.GetLayerById(id).IsFavorite = System.Convert.ToBoolean(fav_state);
+        }
+
+        public static void SetVisibility(int id, string visibility_state)
+        {
+            if (id == 0) { return; }
+
+            Database.ExecuteNonQuerySQLCommand($"UPDATE LAYERS SET VISIBILITY = '{visibility_state}' WHERE ID={id}");
+            Database.ExecuteNonQuerySQLCommand($"UPDATE EDITEDLAYERS SET VISIBILITY = '{visibility_state}' WHERE ID={id}");
+            Database.ExecuteNonQuerySQLCommand($"UPDATE CUSTOMSLAYERS SET VISIBILITY = '{visibility_state}' WHERE ID={id}");
+
+            Layers.GetLayerById(id).Visibility = visibility_state;
+        }
+
         private static Dictionary<int, Layers> LayersDictionary { get; set; } = new Dictionary<int, Layers>();
 
         public static Layers GetLayerById(int id)
@@ -219,6 +301,50 @@ namespace MapsInMyFolder.Commun
                 {"HAS_SCALE", (layers.IsAtScale ? 1 : 0).ToString()}
             };
         }
+
+        public static bool Load()
+        {
+            string OriginalLayersGetQuery = $"SELECT *,'LAYERS' AS TYPE FROM LAYERS UNION SELECT *,'CUSTOMSLAYERS' FROM CUSTOMSLAYERS ORDER BY {Settings.layers_Sort} NULLS LAST";
+            string EditedLayersGetQuery = $"SELECT * FROM EDITEDLAYERS ORDER BY {Settings.layers_Sort} NULLS LAST";
+            if (Database.DB_IsConnectionNull())
+            {
+                return false;
+            }
+
+            List<Layers> legacyLayers = LayerReadInDatabase(OriginalLayersGetQuery);
+            List<Layers> editedLayers = LayerReadInDatabase(EditedLayersGetQuery);
+            Layers.LayersMergeLegacyWithEdited(legacyLayers, editedLayers);
+            return true;
+        }
+
+        public static List<Layers> LayerReadInDatabase(string query_command)
+        {
+            List<Layers> layersFavorite = new List<Layers>();
+            List<Layers> layersClassicSort = new List<Layers>();
+            using SQLiteDataReader sqlite_datareader = Database.ExecuteExecuteReaderSQLCommand(query_command).Reader;
+
+            while (sqlite_datareader.Read())
+            {
+                try
+                {
+                    var calque = Layers.GetLayerFromSQLiteDataReader(sqlite_datareader);
+                    if (calque.IsFavorite && Settings.layerpanel_favorite_at_top)
+                    {
+                        layersFavorite.Add(calque);
+                    }
+                    else
+                    {
+                        layersClassicSort.Add(calque);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine("fonction DB_Layer_Read : " + ex.Message);
+                }
+            }
+            return layersFavorite.Concat(layersClassicSort).ToList();
+        }
+
 
         public static Layers GetLayerFromSQLiteDataReader(SQLiteDataReader sQLiteDataReader)
         {
@@ -372,6 +498,126 @@ namespace MapsInMyFolder.Commun
                 Layers.Add(System.Convert.ToInt32(legacyLayerWithReplacements.Id), legacyLayerWithReplacements);
             }
         }
+        
+        public static string PreviewGetUrl(int id, double TargetZoomLevel, double Latitude, double Longitude)
+        {
+            Layers layer = Layers.GetLayerById(id);
 
+            if (layer is null)
+            {
+                return "";
+            }
+
+            try
+            {
+                int layer_startup_id = Layers.StartupLayerId;
+                Layers backgroundLayer = Layers.GetLayerById(layer_startup_id);
+
+                int min_zoom = layer.MinZoom ?? 0;
+                int max_zoom = layer.MaxZoom ?? 0;
+                int back_min_zoom = min_zoom;
+                int back_max_zoom = max_zoom;
+
+                if (backgroundLayer is not null)
+                {
+                    back_min_zoom = backgroundLayer.MinZoom ?? 0;
+                    back_max_zoom = backgroundLayer.MaxZoom ?? 0;
+                }
+                int Zoom = Math.Max(System.Convert.ToInt32(Math.Round(TargetZoomLevel)) - 1, 0);
+                if (Zoom < min_zoom) { Zoom = min_zoom; }
+                if (Zoom > max_zoom) { Zoom = max_zoom; }
+
+                if (Zoom < back_min_zoom) { Zoom = Math.Max(back_min_zoom, Zoom); }
+                if (Zoom > back_max_zoom) { Zoom = Math.Min(back_max_zoom, Zoom); }
+
+                var TileNumber = Collectif.CoordonneesToTile(Latitude, Longitude, Zoom);
+
+                bool CheckIfFunctionExist(int layerId, Javascript.InvokeFunction invokeFunction)
+                {
+                    return Javascript.CheckIfFunctionExist(layerId, invokeFunction.ToString(), null);
+                }
+                string GetReplacement(int layerId, string tileUrl, Javascript.InvokeFunction invokeFunction)
+                {
+                    return Collectif.Replacements(tileUrl, TileNumber.X.ToString(), TileNumber.Y.ToString(), Zoom.ToString(), layerId, invokeFunction);
+                }
+
+                string previewLayerFrontImageUrl = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
+                string previewBackgroundImageUrl = string.Empty;
+                string previewFallbackLayerFrontImageUrl = string.Empty;
+                string previewFallbackBackgroundImageUrl = string.Empty;
+
+                if (CheckIfFunctionExist(id, Javascript.InvokeFunction.getPreview))
+                {
+                    previewLayerFrontImageUrl = GetReplacement(id, layer.TileUrl, Javascript.InvokeFunction.getPreview);
+                }
+                else
+                {
+                    previewLayerFrontImageUrl = GetReplacement(id, layer.TileUrl, Javascript.InvokeFunction.getTile);
+                }
+
+                if (CheckIfFunctionExist(id, Javascript.InvokeFunction.getPreviewFallback))
+                {
+                    previewFallbackLayerFrontImageUrl = GetReplacement(id, layer.TileUrl, Javascript.InvokeFunction.getPreviewFallback);
+                }
+
+                if (layer.TilesFormatHasTransparency && backgroundLayer is not null)
+                {
+                    if (CheckIfFunctionExist(backgroundLayer.Id, Javascript.InvokeFunction.getPreview))
+                    {
+                        previewBackgroundImageUrl = GetReplacement(backgroundLayer.Id, backgroundLayer.TileUrl, Javascript.InvokeFunction.getPreview);
+                    }
+                    else
+                    {
+                        previewBackgroundImageUrl = GetReplacement(backgroundLayer.Id, backgroundLayer.TileUrl, Javascript.InvokeFunction.getTile);
+                    }
+                    if (backgroundLayer?.TileUrl == previewBackgroundImageUrl)
+                    {
+                        previewBackgroundImageUrl = "";
+                    }
+
+                    if (CheckIfFunctionExist(backgroundLayer.Id, Javascript.InvokeFunction.getPreviewFallback))
+                    {
+                        previewFallbackBackgroundImageUrl = GetReplacement(backgroundLayer.Id, backgroundLayer?.TileUrl, Javascript.InvokeFunction.getPreviewFallback);
+                        if (backgroundLayer?.TileUrl == previewFallbackBackgroundImageUrl)
+                        {
+                            previewFallbackBackgroundImageUrl = "";
+                        }
+                    }
+                }
+
+
+
+
+                string EncodeURL(string url)
+                {
+                    return HttpUtility.UrlEncode(url);
+                }
+
+                bool UseReferrerForPreviews = true;
+
+                string previewReferrer = Collectif.AddHttpToUrl(layer?.SiteUrl);
+                string previewBackgroundReferrer = Collectif.AddHttpToUrl(backgroundLayer?.SiteUrl);
+
+                if (UseReferrerForPreviews)
+                {
+                    if (!string.IsNullOrWhiteSpace(previewReferrer))
+                    {
+                        previewLayerFrontImageUrl = $"mapsinmyfolder://get?referrer={EncodeURL(previewReferrer)}&url={EncodeURL(previewLayerFrontImageUrl)}";
+                    }
+                    if (!string.IsNullOrWhiteSpace(previewBackgroundReferrer))
+                    {
+                        previewFallbackLayerFrontImageUrl = $"mapsinmyfolder://get?referrer={EncodeURL(previewBackgroundReferrer)}&url={EncodeURL(previewFallbackLayerFrontImageUrl)}";
+                    }
+                }
+                string previewJSON = "{\"preview\":{\"frontImage\":{\"url\":\"" + previewLayerFrontImageUrl + "\",\"referrer\":\"" + previewReferrer + "\"},\"backgroundImage\":{\"url\":\"" + previewBackgroundImageUrl + "\",\"referrer\":\"" + previewBackgroundReferrer + "\"}},\"previewFallback\":{\"frontImage\":{\"url\":\"" + previewFallbackLayerFrontImageUrl + "\",\"referrer\":\"" + previewReferrer + "\"},\"backgroundImage\":{\"url\":\"" + previewFallbackBackgroundImageUrl + "\",\"referrer\":\"" + previewBackgroundReferrer + "\"}}}";
+
+                return previewJSON;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("Error getPreview exception :" + ex.Message);
+            }
+            return String.Empty;
+        }
     }
 }

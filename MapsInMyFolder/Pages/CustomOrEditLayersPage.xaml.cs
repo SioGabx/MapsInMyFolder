@@ -292,11 +292,11 @@ namespace MapsInMyFolder
             CountryComboBox.SelectedItems = SelectedCountries;
 
             string[] class_httpstatuscode = LayerInEditMode.SpecialsOptions?.ErrorsToIgnore?.Split(';', StringSplitOptions.RemoveEmptyEntries);
-            var SelectedHttpStatusCode = new List<HttpStatusCodeDisplay>();
-            var listOfHttpStatusCode = new List<HttpStatusCodeDisplay>();
-            foreach (HttpStatusCode status in HttpStatusCodeDisplay.getList())
+            var SelectedHttpStatusCode = new List<StatusCode>();
+            var listOfHttpStatusCode = new List<StatusCode>();
+            foreach (HttpStatusCode status in StatusCode.getList())
             {
-                var item = new HttpStatusCodeDisplay(status, $"{(int)status} - {status}");
+                var item = new StatusCode(status, $"{(int)status} - {status}");
                 if (!listOfHttpStatusCode.Contains(item))
                 {
                     listOfHttpStatusCode.Add(item);
@@ -718,14 +718,14 @@ namespace MapsInMyFolder
             {
                 Layers DB_Layer = Layers.Empty();
 
-                List<Layers> LayersRead = MainPage.LayerReadInDatabase($"SELECT * FROM LAYERS WHERE ID='{LayerId}'");
+                List<Layers> LayersRead = Layers.LayerReadInDatabase($"SELECT * FROM LAYERS WHERE ID='{LayerId}'");
                 if (LayersRead.Count > 0)
                 {
                     DB_Layer = LayersRead[0];
                 }
                 else
                 {
-                    List<Layers> CustomLayersRead = MainPage.LayerReadInDatabase($"SELECT * FROM CUSTOMSLAYERS WHERE ID='{LayerId}'");
+                    List<Layers> CustomLayersRead = Layers.LayerReadInDatabase($"SELECT * FROM CUSTOMSLAYERS WHERE ID='{LayerId}'");
                     if (CustomLayersRead.Count > 0)
                     {
                         DB_Layer = CustomLayersRead[0];
@@ -810,13 +810,13 @@ namespace MapsInMyFolder
 
         public void Leave(bool NoTransition = false)
         {
-            MainPage.ClearCache(LayerId, false);
+            Layers.ClearCache(LayerId, false);
             Javascript.EngineStopAll();
             Settings.map_show_tile_border = ShowTileBorderArchive;
             Settings.is_in_debug_mode = IsInDebugModeArchive;
             MainWindow.Instance.FrameBack(NoTransition);
             Javascript.EngineClearList();
-            MainPage._instance.ReloadPage();
+            MainPage._instance.RequestReloadPage();
         }
 
         public void UpdateMoinsUnLayer()

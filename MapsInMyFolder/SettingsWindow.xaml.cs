@@ -406,6 +406,10 @@ namespace MapsInMyFolder
             if (actualSettingsPath != newSettingsPath && System.IO.File.Exists(actualSettingsPath))
             {
                 System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(newSettingsPath));
+                if (System.IO.File.Exists(newSettingsPath))
+                {
+                    System.IO.File.Delete(newSettingsPath);
+                }
                 System.IO.File.Copy(actualSettingsPath, newSettingsPath);
             }
 

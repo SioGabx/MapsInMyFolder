@@ -76,7 +76,7 @@ namespace MapsInMyFolder
         }
         private void SetTextBoxRedimDimension()
         {
-            RognageInfo rognageInfo = GetOriginalImageSize();
+            Rognage rognageInfo = GetOriginalImageSize();
             if (rognageInfo != null)
             {
                 Label_ImgSize.Content = $"{rognageInfo.width} x {rognageInfo.height}";
@@ -424,7 +424,7 @@ namespace MapsInMyFolder
                 return;
             }
 
-            RognageInfo rognage_info = GetOriginalImageSize();
+            Rognage rognage_info = GetOriginalImageSize();
 
             var SelectionLocation = MainPage.MapSelectable.GetRectangleLocation();
             double NO_PIN_Latitude = SelectionLocation.NO.Latitude;
@@ -659,7 +659,7 @@ namespace MapsInMyFolder
         }
 
 
-        RognageInfo GetOriginalImageSize()
+        Rognage GetOriginalImageSize()
         {
             if (!IsInitialized) { return null; }
 
@@ -669,13 +669,13 @@ namespace MapsInMyFolder
             double SE_PIN_Latitude = SelectionLocation.SE.Latitude;
             double SE_PIN_Longitude = SelectionLocation.SE.Longitude;
             int Zoom = Convert.ToInt16(Math.Floor(ZoomSlider.Value));
-            return RognageInfo.GetRognageValue(NO_PIN_Latitude, NO_PIN_Longitude, SE_PIN_Latitude, SE_PIN_Longitude, Zoom, Layers.Current.TilesSize);
+            return Rognage.GetRognageValue(NO_PIN_Latitude, NO_PIN_Longitude, SE_PIN_Latitude, SE_PIN_Longitude, Zoom, Layers.Current.TilesSize);
         }
         (int width, int height) GetResizedImageSize()
         {
             int ResizeWidth = -1;
             int ResizeHeight = -1;
-            RognageInfo rognage_info = GetOriginalImageSize();
+            Rognage rognage_info = GetOriginalImageSize();
 
             if (TextBox_Redim_HUnit.SelectedIndex == 0)
             {
@@ -780,7 +780,7 @@ namespace MapsInMyFolder
                 OpositeTextbox.Text = "";
                 return;
             }
-            RognageInfo rognage_info = GetOriginalImageSize();
+            Rognage rognage_info = GetOriginalImageSize();
             double SourcePropertyAttachedRognageDimension;
             double SourcePropertyOpositeRognageDimension;
             if (SourcePropertyName == "width")
@@ -858,7 +858,7 @@ namespace MapsInMyFolder
 
         void SetDefaultRedimTextBoxValue(TextBox AttachedTextbox, ComboBox AttachedComboBoxUnit, string SourcePropertyName)
         {
-            RognageInfo rognage_info = GetOriginalImageSize();
+            Rognage rognage_info = GetOriginalImageSize();
             double SourcePropertyRognageDimension;
             if (SourcePropertyName == "width")
             {
@@ -889,7 +889,7 @@ namespace MapsInMyFolder
         void TextBoxRedimUnitChanged(TextBox AttachedTextbox, ComboBox AttachedComboBoxUnit, ComboBox OpositeComboBoxUnit, string SourcePropertyName)
         {
             if (!IsInitialized) { return; }
-            RognageInfo rognage_info = GetOriginalImageSize();
+            Rognage rognage_info = GetOriginalImageSize();
 
             double SourcePropertyRognageDimension;
             if (SourcePropertyName == "width")
@@ -959,7 +959,7 @@ namespace MapsInMyFolder
 
         void SetTextBoxRedimDimensionTextBasedOnPourcentage(TextBox AttachedTextbox, ComboBox AttachedComboBoxUnit, string SourcePropertyName, double PourcentageValue)
         {
-            RognageInfo rognage_info = GetOriginalImageSize();
+            Rognage rognage_info = GetOriginalImageSize();
             double SourcePropertyRognageDimension;
             if (SourcePropertyName == "width")
             {
@@ -1145,7 +1145,7 @@ namespace MapsInMyFolder
             var selectionLocation = MainPage.MapSelectable.GetRectangleLocation();
             DownloadOptions downloadOptions = new DownloadOptions(0, saveDirectory, format, filename, "", "", 0, zoom, quality, "", selectionLocation.NO, selectionLocation.SE, resizeWidth, resizeHeight, interpretation, scaleInfo);
 
-            MainWindow.Instance.PrepareDownloadBeforeStart(downloadOptions);
+            Downloader.PrepareDownloadBeforeStart(downloadOptions);
             ClosePage();
             TextBoxScaleIsLock(false);
 

@@ -127,7 +127,7 @@ namespace MapsInMyFolder
                     MainPage.RefreshMap();
                     break;
                 case Javascript.JavascriptAction.clearCache:
-                    MainPage.ClearCache((int)(sender), false);
+                    Layers.ClearCache((int)(sender), false);
                     break;
                 default:
                     Debug.WriteLine("Cette JSEvent action n'existe pas");
@@ -177,11 +177,6 @@ namespace MapsInMyFolder
         {
             Init();
             LoadAvalonEditThemes();
-
-
-            GridLayerEditor editor = new GridLayerEditor();
-            MainContentFrame.Navigate(editor);
-
             if (Settings.search_application_update_on_startup && await Update.CheckIfNewerVersionAvailableOnGithub())
             {
                 Debug.WriteLine("Une nouvelle mise à jour est disponible : Version " + Update.UpdateRelease.Tag_name);
@@ -191,8 +186,13 @@ namespace MapsInMyFolder
             {
                 await Database.CheckIfNewerVersionAvailable();
             }
+        }
 
-
+        public void NetworkIsBack()
+        {
+            MainPage.RefreshMap();
+            MainPage.SetBBOXPreviewRequestUpdate();
+            Downloader.CheckIfReadyToStartDownload();
         }
 
         public static void LoadAvalonEditThemes()
@@ -224,9 +224,7 @@ namespace MapsInMyFolder
         {
             Instance.LightInit();
             Instance.MainPage.MapLoad();
-            Instance.MainPage.InitLayerPanel();
-            Instance.MainPage.ReloadPage();
-            Instance.MainPage.SearchLayerStart();
+            Instance.MainPage.LayerPanel.Refresh();
             Instance.MainPage.InitDownloadPanel();
             Instance.MainPage.SetCurrentLayer(Layers.Current.Id);
         }
@@ -239,8 +237,6 @@ namespace MapsInMyFolder
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             this.Visibility = Visibility.Hidden;
-            MainPage.layer_browser.Dispose();
-            MainPage.download_panel_browser.Dispose();
             Javascript.EngineStopAll();
             Cef.Shutdown();
         }
@@ -266,6 +262,11 @@ namespace MapsInMyFolder
             if (e.Key == Key.Escape)
             {
                 MainPage.DownloadPanelClose();
+            }
+            if (e.Key == Key.Down)
+            {
+                GridLayerEditor editor = new GridLayerEditor();
+                MainContentFrame.Navigate(editor);
             }
         }
 

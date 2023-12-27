@@ -3,6 +3,9 @@ using MapsInMyFolder.MapControl;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -25,8 +28,6 @@ namespace MapsInMyFolder
         {
             _instance = this;
             InitializeComponent();
-            var requestHandler = new CustomRequestHandler();
-            layer_browser.RequestHandler = requestHandler;
         }
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
@@ -49,17 +50,16 @@ namespace MapsInMyFolder
 
         public void Preload()
         {
-            ReloadPage();
+            LayerPanel.ReloadPage();
             MapLoad();
         }
 
         void Init()
         {
             InitDownloadPanel();
-            InitLayerPanel();
+            LayerPanel.InitLayerPanel();
             isInitialised = true;
             Notification.UpdateNotification += UpdateNotification;
-            layer_browser.ToolTipOpening += (o, e) => e.Handled = true;
         }
 
         private async void Map_panel_open_location_panel_Click(object sender, RoutedEventArgs e)
@@ -227,53 +227,8 @@ namespace MapsInMyFolder
 
         private void Download_panel_close_button_Click(object sender, RoutedEventArgs e)
         {
-            Debug.WriteLine(Languages.Current["searchLayerPlaceholder"]);
-            //Download_panel_close();
-        }
-
-        private void Layer_searchbar_GotFocus(object sender, RoutedEventArgs e)
-        {
-            if (layer_searchbar.Text == Languages.Current["searchLayerPlaceholder"])
-            {
-                layer_searchbar.Text = "";
-                layer_searchbar.Foreground = (System.Windows.Media.SolidColorBrush)new System.Windows.Media.BrushConverter().ConvertFromString("#BCBCBC");
-            }
-        }
-
-        private void Layer_searchbar_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
-        {
-            if (e.Key == Key.Enter)
-            {
-                try
-                {
-                    lastSearch = "";
-                    SearchLayerStart();
-                    layer_browser.Focus();
-                }
-                catch { }
-            }
-            if (e.Key == Key.Escape)
-            {
-                layer_browser.Focus();
-            }
-        }
-
-        private void Layer_searchbar_LostFocus(object sender, RoutedEventArgs e)
-        {
-            if (string.IsNullOrWhiteSpace(layer_searchbar.Text))
-            {
-                layer_searchbar.Text = Languages.Current["searchLayerPlaceholder"];
-                layer_searchbar.Foreground = (System.Windows.Media.SolidColorBrush)new System.Windows.Media.BrushConverter().ConvertFromString("#5A5A5A");
-            }
-            else
-            {
-                layer_searchbar.Foreground = (System.Windows.Media.SolidColorBrush)new System.Windows.Media.BrushConverter().ConvertFromString("#BCBCBC");
-            }
-        }
-
-        private void Layer_searchbar_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            SearchLayerStart();
+            //Debug.WriteLine(Languages.Current["searchLayerPlaceholder"]);
+            DownloadPanelClose();
         }
 
         public void UpdateNotification(object sender, (string NotificationId, string Destinateur) NotificationInternalArgs)
@@ -333,7 +288,7 @@ namespace MapsInMyFolder
                 mapviewer.Center = new Location((Settings.NO_PIN_starting_location_latitude + Settings.SE_PIN_starting_location_latitude) / 2, (Settings.NO_PIN_starting_location_longitude + Settings.SE_PIN_starting_location_longitude) / 2);
                 mapviewer.ZoomLevel = Settings.map_defaut_zoom_level;
                 MapSelectable.OnLocationUpdated += OnLocationUpdated;
-                MapSelectable.RequestedPreviewUpdate += (o, e) => LayerTilePreview_RequestUpdate();
+                MapSelectable.RequestedPreviewUpdate += (o, e) => SetBBOXPreviewRequestUpdate();
 
             }
             mapviewer.Background = new System.Windows.Media.SolidColorBrush(
@@ -482,5 +437,109 @@ namespace MapsInMyFolder
             MapSelectable.CleanRectangleLocations();
             MainWindow.Instance.FrameLoad_PrepareDownload();
         }
+
+
+        private async void mapLocationSearchBar_SearchResultEvent(object sender, UserControls.SearchLocation.SearchResultEventArgs e)
+        {
+            MapPanel.SetLocation(searchResult, e.SearchResultLocation);
+            if (e.MapViewerBoundingBox != null)
+            {
+                mapviewer.ZoomToBounds(e.MapViewerBoundingBox);
+            }
+            await Task.Delay((int)Settings.animations_duration_millisecond);
+            SetBBOXPreviewRequestUpdate();
+        }
+
+        private void mapLocationSearchBar_SearchLostFocusRequest(object sender, EventArgs e)
+        {
+            LayerPanel.LayerBrowser.Focus();
+        }
+
+        private void LayerPanel_SetCurrentLayerEvent(object sender, UserControls.LayersPanel.LayerIdEventArgs e)
+        {
+            SetCurrentLayer(e.LayerId);
+        }
+
+        public void SetCurrentLayer(int id)
+        {
+            Layers.SetCurrentLayer(id);
+            Layers layer = Layers.Current;
+            if (layer is not null)
+            {
+                MapFigures.DrawFigureOnMapItemsControlFromJsonString(mapviewerRectangles, layer.BoundaryRectangles, mapviewer.ZoomLevel);
+                //Clear all layer notifications
+                Notification.ListOfNotificationsOnShow.Where(notification => Regex.IsMatch(notification.NotificationId, @"^LayerId_\d+_")).ToList().ForEach(notification => notification.Remove());
+
+                try
+                {
+                    if (layer.TilesFormatHasTransparency)
+                    {
+                        MapTileLayer_Transparent.TileSource = new TileSource { UriFormat = layer.TileUrl, LayerID = layer.Id };
+                        MapTileLayer_Transparent.Opacity = 1;
+
+                        if (layer.Identifier is not null)
+                        {
+                            Layers StartupLayer = Layers.GetLayerById(Layers.StartupLayerId);
+                            if (StartupLayer != null)
+                            {
+                                UIElement basemap = new MapTileLayer
+                                {
+                                    TileSource = new TileSource { UriFormat = StartupLayer?.TileUrl, LayerID = Layers.StartupLayerId },
+                                    SourceName = StartupLayer.Identifier + new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds(),
+                                    MaxZoomLevel = StartupLayer.MaxZoom ?? 0,
+                                    MinZoomLevel = StartupLayer.MinZoom ?? 0,
+                                    Description = "",
+                                    Opacity = Settings.background_layer_opacity
+                                };
+                                mapviewer.MapLayer = basemap;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        UIElement layer_uielement = new MapTileLayer
+                        {
+                            TileSource = new TileSource { UriFormat = layer.TileUrl, LayerID = layer.Id },
+                            SourceName = layer.Identifier + new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds(),
+                            MaxZoomLevel = layer.MaxZoom ?? 0,
+                            MinZoomLevel = layer.MinZoom ?? 0,
+                            Description = layer.Description
+                        };
+
+                        MapTileLayer_Transparent.TileSource = new TileSource();
+                        MapTileLayer_Transparent.Opacity = 0;
+                        mapviewer.MapLayer.Opacity = 1;
+                        mapviewer.MapLayer = layer_uielement;
+                    }
+
+                    if (Settings.zoom_limite_taille_carte)
+                    {
+                        mapviewer.MinZoomLevel = layer.MinZoom < 3 ? 2 : layer.MinZoom ?? 0;
+                        mapviewer.MaxZoomLevel = layer.MaxZoom ?? 0;
+                    }
+                    else
+                    {
+                        mapviewer.MinZoomLevel = 2;
+                        mapviewer.MaxZoomLevel = 24;
+                    }
+
+                    if (string.IsNullOrEmpty(layer?.SpecialsOptions?.BackgroundColor?.Trim()))
+                    {
+                        mapviewer.Background = Collectif.RgbValueToSolidColorBrush(Settings.background_layer_color_R, Settings.background_layer_color_G, Settings.background_layer_color_B);
+                    }
+                    else
+                    {
+                        mapviewer.Background = Collectif.HexValueToSolidColorBrush(layer.SpecialsOptions.BackgroundColor);
+                    }
+                    Collectif.SetBackgroundOnUIElement(mapviewer, layer?.SpecialsOptions?.BackgroundColor);
+
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine("Erreur changement de calque" + ex.Message);
+                }
+            }
+        }
+
     }
 }

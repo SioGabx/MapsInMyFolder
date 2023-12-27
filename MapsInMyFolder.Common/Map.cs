@@ -15,6 +15,7 @@
             public static double NO_Longitude;
             public static double SE_Latitude;
             public static double SE_Longitude;
+
         }
     }
 }

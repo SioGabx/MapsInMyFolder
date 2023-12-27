@@ -6,12 +6,13 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Threading;
 
-namespace MapsInMyFolder
+namespace MapsInMyFolder.CEFSharpLinks
 {
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Marquer les membres comme étant static", Justification = "Used by CEFSHARP")]
-    public class DownloadCEFSharpLink
+    public class DownloadLink
     {
         public bool IsFileOk(int id)
         {
@@ -27,7 +28,7 @@ namespace MapsInMyFolder
                     }
                     else if (engine.state == Status.success)
                     {
-                        MainWindow.UpdateDownloadPanel(id, Languages.Current["downloadStateNotFound"], isImportant: true, state: Status.deleted);
+                        Downloader.UpdateDownloadPanel(id, Languages.Current["downloadStateNotFound"], isImportant: true, state: Status.deleted);
                     }
                 }
                 else
@@ -47,7 +48,7 @@ namespace MapsInMyFolder
                 {
                     try
                     {
-                        MainWindow.StopingDownload(id_int);
+                        Downloader.StopingDownload(id_int);
                     }
                     catch (Exception ex)
                     {
@@ -66,7 +67,7 @@ namespace MapsInMyFolder
                 {
                     try
                     {
-                        MainWindow.CancelDownload(id_int);
+                        Downloader.CancelDownload(id_int);
                     }
                     catch (Exception ex)
                     {
@@ -85,7 +86,7 @@ namespace MapsInMyFolder
                 {
                     try
                     {
-                        MainWindow.Instance.RestartDownload(id_int);
+                        Downloader.RestartDownload(id_int);
                     }
                     catch (Exception ex)
                     {
@@ -104,7 +105,7 @@ namespace MapsInMyFolder
                 {
                     try
                     {
-                        MainWindow.Instance.RestartDownloadFromStart(id_int);
+                        Downloader.RestartDownloadFromStart(id_int);
                     }
                     catch (Exception ex)
                     {
@@ -177,7 +178,7 @@ namespace MapsInMyFolder
                 {
                     try
                     {
-                        MainWindow.UpdateDownloadPanel(id_int, Languages.Current["downloadStateDeleted"], "0", true, Status.deleted);
+                        Downloader.UpdateDownloadPanel(id_int, Languages.Current["downloadStateDeleted"], "0", true, Status.deleted);
                         Database.DB_Download_Update(id_int, "STATE", nameof(Status.deleted));
                     }
                     catch (Exception ex)
@@ -283,7 +284,7 @@ namespace MapsInMyFolder
             {
                 try
                 {
-                    MainPage._instance.layer_browser.GetMainFrame().EvaluateScriptAsync("selectionner_calque_by_id(" + engine.layerid + ")");
+                    MainPage._instance.LayerPanel.LayerBrowser.GetMainFrame().EvaluateScriptAsync("selectionner_calque_by_id(" + engine.layerid + ")");
                 }
                 catch (Exception ex)
                 {
@@ -339,3 +340,4 @@ namespace MapsInMyFolder
         }
     }
 }
+

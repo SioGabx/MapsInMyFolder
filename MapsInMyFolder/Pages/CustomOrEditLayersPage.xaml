@@ -19,7 +19,7 @@
     <Page.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="RessourcesDictionnary.xaml" />
+                <ResourceDictionary Source="../RessourcesDictionnary.xaml" />
                 <ResourceDictionary>
                     <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="#454546" />
                     <SolidColorBrush x:Key="ButtonBackgroundPressed" Color="#454546" />

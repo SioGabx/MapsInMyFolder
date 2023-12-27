@@ -1,4 +1,5 @@
-﻿using MapsInMyFolder.Commun;
+﻿using CefSharp.Wpf;
+using MapsInMyFolder.Commun;
 using System;
 using System.Diagnostics;
 using System.Threading;
@@ -6,11 +7,20 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
 
-namespace MapsInMyFolder
+namespace MapsInMyFolder.CEFSharpLinks
 {
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1822:Marquer les membres comme étant static", Justification = "Used by CEFSHARP")]
-    public class LayerCEFSharpLink
+    public class LayerLink
     {
+        private UserControls.LayersPanel LayersPanel { get; }
+        private MapControl.Map MapViewer { get; }
+
+        public LayerLink(UserControls.LayersPanel LayersPanel, MapControl.Map MapViewer)
+        {
+            this.LayersPanel = LayersPanel;
+            this.MapViewer = MapViewer;
+        }
+
         public void ClearCache(string listOfId = "0")
         {
             long DirectorySize = 0;
@@ -18,7 +28,7 @@ namespace MapsInMyFolder
             foreach (string str in splittedListOfId)
             {
                 int id_int = int.Parse(str.Trim());
-                DirectorySize += MainPage.ClearCache(id_int);
+                DirectorySize += Layers.ClearCache(id_int);
                 Debug.WriteLine("Clear_cache layer " + id_int);
             }
             if (DirectorySize >= 0)
@@ -47,7 +57,7 @@ namespace MapsInMyFolder
             int id_int = Convert.ToInt32(id);
             Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
             {
-                MainPage.DBLayerFavorite(id_int, isAdding);
+                Layers.SetAsFavorite(id_int, isAdding);
             }, null);
         }
 
@@ -57,7 +67,7 @@ namespace MapsInMyFolder
             int id_int = Convert.ToInt32(id);
             Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
             {
-                MainPage.DBLayerVisibility(id_int, (isVisible ? "Visible" : "Hidden"));
+                Layers.SetVisibility(id_int, isVisible ? "Visible" : "Hidden");
             }, null);
         }
 
@@ -77,8 +87,7 @@ namespace MapsInMyFolder
             int id_int = Convert.ToInt32(id);
             Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
             {
-                //Debug.WriteLine("Layer_set_current " + id);
-                MainWindow.Instance.MainPage.SetCurrentLayer(id_int);
+                LayersPanel.OnSetCurrentLayerEvent(id_int);
             }, null);
         }
         public void LayerShowWarningLegacyVersionNewerThanEdited(double id = 0)
@@ -86,7 +95,7 @@ namespace MapsInMyFolder
             int id_int = Convert.ToInt32(id);
             Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
             {
-                MainPage.ShowLayerWarning(id_int);
+                MainPage._instance.ShowLayerWarning(id_int);
             }, null);
         }
 
@@ -94,21 +103,22 @@ namespace MapsInMyFolder
         {
             Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Send, (SendOrPostCallback)delegate
             {
-                MainWindow.Instance.MainPage.SearchLayerStart(true);
+                LayersPanel.LayersSearchBar.SearchLayerStart(true);
+
             }, null);
         }
 
         public string LayerRequestGetSearchString()
         {
-            return Application.Current.Dispatcher.Invoke(() => MainWindow.Instance.MainPage.SearchGetText(), DispatcherPriority.Send);
+            return Application.Current.Dispatcher.Invoke(() => LayersPanel.LayersSearchBar.SearchGetText(), DispatcherPriority.Send);
         }
 
         public void LayerRequestRefreshPanel()
         {
             Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
             {
-                MainWindow.Instance.MainPage.ReloadPage();
-                MainWindow.Instance.MainPage.SearchLayerStart();
+                LayersPanel.ReloadPage();
+                LayersPanel.LayersSearchBar.SearchLayerStart();
             }, null);
         }
 
@@ -118,14 +128,23 @@ namespace MapsInMyFolder
             {
                 return "";
             }
-            async Task<string> LayerGetTilePreviewUrlFromId_Task(double id)
+            string LayerGetTilePreviewUrlFromId_Task(double id)
             {
                 int id_int = Convert.ToInt32(id);
-                DispatcherOperation op = Application.Current.Dispatcher.BeginInvoke(new Func<string>(() => MainWindow.Instance.MainPage.LayerTilePreview_ReturnUrl(id_int)));
-                await op;
-                return op.Result.ToString();
+
+                if (MapViewer is null)
+                {
+                    return string.Empty;
+                }
+                return Application.Current.Dispatcher.Invoke(() =>
+                {
+                    double TargetZoomLevel = MapViewer.TargetZoomLevel;
+                    double Latitude = MapViewer.Center.Latitude;
+                    double Longitude = MapViewer.Center.Longitude;
+                    return Layers.PreviewGetUrl(id_int, TargetZoomLevel, Latitude, Longitude);
+                }, DispatcherPriority.Normal);
             }
-            return LayerGetTilePreviewUrlFromId_Task(id).Result;
+            return LayerGetTilePreviewUrlFromId_Task(id);
         }
     }
 }

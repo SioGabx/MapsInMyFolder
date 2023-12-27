@@ -16,7 +16,7 @@
     <Page.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="RessourcesDictionnary.xaml" />
+                <ResourceDictionary Source="../RessourcesDictionnary.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Page.Resources>
@@ -364,7 +364,7 @@
                                 FontSize="11.8"
                                 Foreground="#888989" />
                             <StackPanel
-                                Width="{Binding ElementName=WrapPanel_Largeur, Path=ActualWidth, Converter={StaticResource MathConverter}}"
+                                Width="{Binding ElementName=WrapPanel_Largeur, Path=ActualWidth}"
                                 MinWidth="330"
                                 Margin="0,0,0,0"
                                 HorizontalAlignment="Left"
@@ -424,7 +424,7 @@
                                 FontSize="11.8"
                                 Foreground="#888989" />
                             <StackPanel
-                                Width="{Binding ElementName=WrapPanel_Hauteur, Path=ActualWidth, Converter={StaticResource MathConverter}}"
+                                Width="{Binding ElementName=WrapPanel_Hauteur, Path=ActualWidth}"
                                 MinWidth="330"
                                 Margin="0,0,0,0"
                                 HorizontalAlignment="Left"
@@ -507,7 +507,7 @@
                                 FontSize="11.8"
                                 Foreground="#888989" />
                             <StackPanel
-                                Width="{Binding ElementName=WrapPanel_Hauteur, Path=ActualWidth, Converter={StaticResource MathConverter}}"
+                                Width="{Binding ElementName=WrapPanel_Hauteur, Path=ActualWidth}"
                                 MinWidth="330"
                                 Margin="0,0,0,0"
                                 HorizontalAlignment="Left"

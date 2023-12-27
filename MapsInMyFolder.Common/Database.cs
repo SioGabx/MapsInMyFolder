@@ -329,6 +329,18 @@ namespace MapsInMyFolder.Commun
             return connection;
         }
 
+        public static bool DB_IsConnectionNull()
+        {
+            using (SQLiteConnection conn = Database.DB_Connection())
+            {
+                if (conn is null)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         public static SQLiteConnection DB_MemoryConnection()
         {
             SQLiteConnection connection = DB_OpenConnection(":memory:");

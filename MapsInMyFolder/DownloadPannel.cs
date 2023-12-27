@@ -118,7 +118,7 @@ namespace MapsInMyFolder
                             Download_INFOS = Languages.Current["downloadStateNotFound"];
                         }
                     }
-                    IEnumerable<HttpStatusCode> ErrorsToIgnore = HttpStatusCodeDisplay.getListFromString(layers.SpecialsOptions.ErrorsToIgnore);
+                    IEnumerable<HttpStatusCode> ErrorsToIgnore = StatusCode.GetListFromString(layers.SpecialsOptions.ErrorsToIgnore);
 
                     DownloadEngine engine = new DownloadEngine(downloadid, DB_Download_ID, DB_Download_LAYER_ID, urls, tokenSource2, ct, format, final_saveformat, DB_Download_ZOOM, DB_Download_TEMP_DIRECTORY, DB_Download_SAVE_DIRECTORY, DB_Download_FILE_NAME, filetempname, location, RESIZEWIDTH, RESIZEHEIGHT, new TileLoader(), COLORINTERPRETATION, SCALEINFO, ErrorsToIgnore, DB_Download_VARCONTEXTE, DB_Download_NBR_TILES, layers.TileUrl, layers.Identifier, engine_status, layers.TilesSize, quality: DB_Download_QUALITY);
                     DownloadEngine.Add(engine, downloadid);
@@ -145,7 +145,7 @@ namespace MapsInMyFolder
             if (download_panel_browser is null) { return; }
             try
             {
-                download_panel_browser.JavascriptObjectRepository.Register("DownloadCEFSharpLink", new DownloadCEFSharpLink());
+                download_panel_browser.JavascriptObjectRepository.Register("DownloadCEFSharpLink", new CEFSharpLinks.DownloadLink());
             }
             catch (Exception ex)
             {

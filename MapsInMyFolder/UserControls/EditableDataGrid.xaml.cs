@@ -202,7 +202,7 @@ namespace MapsInMyFolder.UserControls
             dataGrid.BeginEdit();
         }
 
-        private bool IsContiguousSelection(DataGrid dataGrid)
+        private static bool IsContiguousSelection(DataGrid dataGrid)
         {
             List<DataGridCellInfo> SelectedCells = dataGrid.SelectedCells.ToList();
             DataGridCellInfo currentCell = SelectedCells.FirstOrDefault(dataGrid.CurrentCell);
@@ -323,7 +323,7 @@ namespace MapsInMyFolder.UserControls
                 {
                     string cellContent = rowContent[colIndex % columns.Length];
                     DataGridColumn column = null;
-                    if ((SelectedColumns.Count()) > colIndex)
+                    if ((SelectedColumns.Length) > colIndex)
                     {
                         //Selected Columns is greater than selection
                         column = SelectedColumns[colIndex] as DataGridColumn;

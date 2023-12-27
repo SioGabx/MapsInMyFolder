@@ -14,7 +14,7 @@
     <Page.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="RessourcesDictionnary.xaml" />
+                <ResourceDictionary Source="../RessourcesDictionnary.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Page.Resources>

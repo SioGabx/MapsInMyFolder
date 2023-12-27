@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:cefsharp="clr-namespace:CefSharp.Wpf;assembly=CefSharp.Wpf"
     xmlns:commun="clr-namespace:MapsInMyFolder.Commun;assembly=MapsInMyFolder.Commun"
+    xmlns:customCtrl="clr-namespace:MapsInMyFolder.UserControls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:MapsInMyFolder"
     xmlns:map="clr-namespace:MapsInMyFolder.MapControl;assembly=MapsInMyFolder.MapControl"
@@ -16,7 +17,7 @@
     <Page.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="RessourcesDictionnary.xaml" />
+                <ResourceDictionary Source="../RessourcesDictionnary.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
 
@@ -31,7 +32,6 @@
         <Grid Grid.Column="0" Background="#FF171719">
             <Grid.RowDefinitions>
                 <RowDefinition Height="65" />
-                <RowDefinition Height="50" />
                 <RowDefinition />
             </Grid.RowDefinitions>
             <Label
@@ -45,19 +45,11 @@
                 FontFamily="Segoe UI Light"
                 FontSize="30"
                 Foreground="#FFE2E2E1" />
-            <TextBox
-                x:Name="layer_searchbar"
+            <!--<customCtrl:SearchLayer
+                x:Name="LayersSearchBar"
                 Grid.Row="1"
                 Margin="10,0,5,0"
-                HorizontalAlignment="Stretch"
-                Cursor="IBeam"
-                GotFocus="Layer_searchbar_GotFocus"
-                KeyDown="Layer_searchbar_KeyDown"
-                LostFocus="Layer_searchbar_LostFocus"
-                Style="{DynamicResource TextBoxCleanStyle_16}"
-                Text="{Binding Source={x:Static commun:Languages.Current}, Mode=OneWay, Path=[searchLayerPlaceholder]}"
-                TextChanged="Layer_searchbar_TextChanged" />
-
+                LinkedLayerBrowser="{Binding ElementName=layer_browser}" />
             <Border
                 Grid.Row="2"
                 Width="Auto"
@@ -69,7 +61,12 @@
                     x:Name="layer_browser"
                     LoadingStateChanged="Layer_browser_LoadingStateChanged"
                     WebBrowser="{Binding WebBrowser, Mode=OneWayToSource}" />
-            </Border>
+            </Border>-->
+            <customCtrl:LayersPanel
+                x:Name="LayerPanel"
+                Grid.Row="1"
+                LinkedMapViewer="{Binding ElementName=mapviewer}" SetCurrentLayerEvent="LayerPanel_SetCurrentLayerEvent" />
+
         </Grid>
 
         <Grid Grid.Column="1">
@@ -93,51 +90,21 @@
             <Grid
                 x:Name="MapGrid"
                 Grid.Row="1"
-                Margin="0,0,0,0">
+                Grid.RowSpan="2"
+                Margin="0,0,0,0"
+                Panel.ZIndex="1">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="45" />
                     <ColumnDefinition Width="5" />
                 </Grid.ColumnDefinitions>
 
-                <TextBox
-                    x:Name="mapSearchbar"
-                    Grid.Column="0"
+                <customCtrl:SearchLocation
+                    x:Name="mapLocationSearchBar"
                     Margin="10,0,0,0"
-                    HorizontalAlignment="Stretch"
-                    Cursor="IBeam"
-                    GotFocus="MapSearchbar_GotFocus"
-                    KeyDown="MapSearchbar_KeyDown"
-                    LostFocus="MapSearchbar_LostFocus"
-                    Style="{DynamicResource TextBoxCleanStyle_16}"
-                    Text="{Binding Source={x:Static commun:Languages.Current}, Mode=OneWay, Path=[searchMapPlaceholder]}"
-                    TextChanged="MapSearchbar_TextChanged" />
-
-                <Rectangle
-                    x:Name="mapSearchbarOverflow"
-                    Grid.Column="0"
-                    Width="55"
-                    Height="34"
-                    Margin="0,0,0,0"
-                    HorizontalAlignment="Right"
-                    VerticalAlignment="Top"
-                    IsHitTestVisible="False">
-                    <Rectangle.Fill>
-                        <LinearGradientBrush SpreadMethod="Pad" StartPoint="0.5,0" EndPoint="0.5,1">
-                            <LinearGradientBrush.RelativeTransform>
-                                <TransformGroup>
-                                    <ScaleTransform CenterX="0.5" CenterY="0.5" />
-                                    <SkewTransform CenterX="0.5" CenterY="0.5" />
-                                    <RotateTransform Angle="-90" CenterX="0.5" CenterY="0.5" />
-                                    <TranslateTransform />
-                                </TransformGroup>
-                            </LinearGradientBrush.RelativeTransform>
-                            <GradientStop Offset="1" Color="#E52D2D2D" />
-                            <GradientStop Offset="0" Color="#002D2D2D" />
-                        </LinearGradientBrush>
-                    </Rectangle.Fill>
-                </Rectangle>
-
+                    CurrentMapViewerCenter="{Binding ElementName=mapviewer, Path=Center}"
+                    SearchLostFocusRequest="mapLocationSearchBar_SearchLostFocusRequest"
+                    SearchResultEvent="mapLocationSearchBar_SearchResultEvent" />
                 <Button
                     x:Name="map_panel_open_location_panel"
                     Grid.Column="1"
@@ -165,22 +132,7 @@
                 </Button>
             </Grid>
 
-            <ListBox
-                x:Name="mapSearchbarSuggestion"
-                Grid.Row="1"
-                Grid.RowSpan="2"
-                Grid.Column="1"
-                Height="100"
-                MaxHeight="175"
-                Margin="10,35,50,0"
-                HorizontalAlignment="Stretch"
-                VerticalAlignment="Top"
-                Panel.ZIndex="999"
-                Background="#2B2B2B"
-                SelectionChanged="MapSearchbarSuggestion_SelectionChanged"
-                Visibility="Hidden" />
-
-            <Grid Grid.Row="2">
+            <Grid Grid.Row="2" Visibility="Visible">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
@@ -226,12 +178,10 @@
                         x:Name="searchResult"
                         Panel.ZIndex="999"
                         map:MapPanel.Location="48.16,6.5"
-                        MouseDoubleClick="SearchResult_MouseDoubleClick"
                         Style="{DynamicResource PushpinStyleOrange}"
-                        Visibility="Hidden" />
+                        Visibility="{Binding ElementName=mapLocationSearchBar, Path=SearchResultPushpinVisibility}" />
 
                     <map:MapTileLayer x:Name="MapTileLayer_Transparent" />
-                    <!--<map:MapPolygon Panel.ZIndex="999" x:Name="Selection_Rectangle" Stroke="#F18712" Locations="53.447,65 -18,8.1114" StrokeThickness="3" Fill="#4CF18712" StrokeDashCap="Square" />-->
                     <map:MapItemsControl x:Name="mapviewerRectangles" />
                 </map:Map>
                 <StackPanel

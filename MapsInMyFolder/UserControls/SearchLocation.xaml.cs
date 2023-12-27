@@ -2,17 +2,80 @@
 using MapsInMyFolder.MapControl;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
 using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
+using System.Windows.Shapes;
 using System.Windows.Threading;
 
-namespace MapsInMyFolder
+namespace MapsInMyFolder.UserControls
 {
-    public partial class MainPage : Page
+    /// <summary>
+    /// Logique d'interaction pour SearchLocation.xaml
+    /// </summary>
+    public partial class SearchLocation : UserControl
     {
+        public SearchLocation()
+        {
+            InitializeComponent();
+        }
+
+        // Dependency property to control the visibility of the button
+        public static readonly DependencyProperty SearchResultPushpinVisibilityProperty =
+            DependencyProperty.Register(
+                "SearchResultPushpinVisibility",
+                typeof(Visibility),
+                typeof(SearchLocation),
+                new PropertyMetadata(Visibility.Hidden));
+
+        public Visibility SearchResultPushpinVisibility
+        {
+            get { return (Visibility)GetValue(SearchResultPushpinVisibilityProperty); }
+            set { SetValue(SearchResultPushpinVisibilityProperty, value); }
+        }
+
+        public static readonly DependencyProperty CurrentMapViewerCenterProperty =
+          DependencyProperty.Register(
+              "CurrentMapViewerCenter",
+              typeof(Location),
+              typeof(SearchLocation),
+              new PropertyMetadata(new Location(0,0)));
+
+        public Location CurrentMapViewerCenter
+        {
+            get { return (Location)GetValue(CurrentMapViewerCenterProperty); }
+            set { SetValue(CurrentMapViewerCenterProperty, value); }
+        }
+
+        public class SearchResultEventArgs : EventArgs
+        {
+            public Location SearchResultLocation { get; }
+            public BoundingBox MapViewerBoundingBox { get; }
+
+            public SearchResultEventArgs(Location searchResultLocation, BoundingBox mapViewerBoundingBox)
+            {
+                SearchResultLocation = searchResultLocation;
+                MapViewerBoundingBox = mapViewerBoundingBox;
+            }
+        }
+        public delegate void SearchResultEventHandler(object sender, SearchResultEventArgs e);
+
+        public event SearchResultEventHandler SearchResultEvent;
+        public event EventHandler SearchLostFocusRequest;
+        protected virtual void OnSearchResultEvent(Location searchResultLocation, BoundingBox mapViewerBoundingBox)
+        {
+            SearchResultEvent?.Invoke(this, new SearchResultEventArgs(searchResultLocation, mapViewerBoundingBox));
+        }
+
         private void MapSearchbar_GotFocus(object sender, RoutedEventArgs e)
         {
             if (mapSearchbar.Text == Languages.Current["searchMapPlaceholder"])
@@ -32,7 +95,7 @@ namespace MapsInMyFolder
 
             if (string.IsNullOrWhiteSpace(mapSearchbar.Text))
             {
-                searchResult.Visibility = Visibility.Hidden;
+                SearchResultPushpinVisibility = Visibility.Hidden;
                 mapSearchbar.Text = Languages.Current["searchMapPlaceholder"];
                 mapSearchbar.Foreground = (System.Windows.Media.SolidColorBrush)new System.Windows.Media.BrushConverter().ConvertFromString("#5A5A5A");
             }
@@ -44,7 +107,7 @@ namespace MapsInMyFolder
         {
             if (mapSearchbar.Text != Languages.Current["searchMapPlaceholder"])
             {
-                searchResult.Visibility = Visibility.Hidden;
+                SearchResultPushpinVisibility = Visibility.Hidden;
                 mapSearchbar.Foreground = (System.Windows.Media.SolidColorBrush)new System.Windows.Media.BrushConverter().ConvertFromString("#BCBCBC");
             }
 
@@ -78,7 +141,7 @@ namespace MapsInMyFolder
                 {
                     lastSearch = text;
                     (List<string> ListOfAddresses, Dictionary<int, SearchEngineResult> SearchEngineResult) searchResults = (null, null);
-                    var userMapLocation = mapviewer.Center;
+                    var userMapLocation = CurrentMapViewerCenter;
                     await Task.Run(() => searchResults = SearchEngine.Search(text, userMapLocation.Latitude, userMapLocation.Longitude));
                     if (lastSearch != text)
                     {
@@ -118,7 +181,7 @@ namespace MapsInMyFolder
             SetSelection(index);
         }
 
-        private async void SetSelection(int index)
+        private void SetSelection(int index)
         {
             if (index >= 0)
             {
@@ -127,24 +190,27 @@ namespace MapsInMyFolder
                 if (selectedSearchResult != null)
                 {
                     mapSearchbar.Text = selectedSearchResult.DisplayName;
-                    searchResult.Visibility = Visibility.Visible;
-                    MapPanel.SetLocation(searchResult, new Location(Convert.ToDouble(selectedSearchResult.Latitude), Convert.ToDouble(selectedSearchResult.Longitude)));
-
+                    SearchResultPushpinVisibility = Visibility.Visible;
+                    
+                    Location searchResultLocation = new Location(Convert.ToDouble(selectedSearchResult.Latitude), Convert.ToDouble(selectedSearchResult.Longitude));
+                    BoundingBox mapviewerBoundingBox = null;
                     if (!string.IsNullOrEmpty(selectedSearchResult.BoundingBox))
                     {
                         string[] boundingBox = selectedSearchResult.BoundingBox.Split(',');
-                        mapviewer.ZoomToBounds(new BoundingBox(Convert.ToDouble(boundingBox[0]),
+                        //mapviewer.ZoomToBounds();
+                        mapviewerBoundingBox = new BoundingBox(Convert.ToDouble(boundingBox[0]),
                                                                Convert.ToDouble(boundingBox[2]),
                                                                Convert.ToDouble(boundingBox[1]),
-                                                               Convert.ToDouble(boundingBox[3])));
+                                                               Convert.ToDouble(boundingBox[3]));
 
-                        LayerTilePreview_RequestUpdate();
-                        mapviewer.Cursor = Cursors.Arrow;
-                        await Task.Delay((int)Math.Round(Settings.animations_duration_millisecond * 0.7));
-                        LayerTilePreview_RequestUpdate();
-                        await Task.Delay((int)Math.Round(Settings.animations_duration_millisecond * 0.3));
-                        LayerTilePreview_RequestUpdate();
+                        //LayerTilePreview_RequestUpdate();
+                        //await Task.Delay((int)Math.Round(Settings.animations_duration_millisecond * 0.7));
+                        //LayerTilePreview_RequestUpdate();
+                        //await Task.Delay((int)Math.Round(Settings.animations_duration_millisecond * 0.3));
+                        //LayerTilePreview_RequestUpdate();
                     }
+
+                    OnSearchResultEvent(searchResultLocation, mapviewerBoundingBox);
                 }
             }
         }
@@ -157,21 +223,18 @@ namespace MapsInMyFolder
                 {
                     lastSearch = "";
                     SearchStart(true);
-                    layer_browser.Focus();
+                    SearchLostFocusRequest.Invoke(this, EventArgs.Empty);
                 }
                 catch { }
             }
 
             if (e.Key == Key.Escape)
             {
-                layer_browser.Focus();
+                SearchLostFocusRequest.Invoke(this, EventArgs.Empty);
             }
         }
 
-        private void SearchResult_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-        {
-            lastSearch = "";
-            SearchStart(true);
-        }
+       
+
     }
 }

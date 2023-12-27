@@ -607,9 +607,6 @@
         </Style.Triggers>
     </Style>
 
-    <local:PixelsToGridLengthConverter x:Key="PixelsToGridLength" />
-    <local:MathConverter x:Key="MathConverter" />
-
     <Style x:Key="AppTitleBarStyle" TargetType="ui:TitleBarControl">
         <Setter Property="ui:ThemeManager.RequestedTheme" Value="Dark" />
     </Style>
