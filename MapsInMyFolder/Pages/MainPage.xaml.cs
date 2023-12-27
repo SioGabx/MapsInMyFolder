@@ -1,7 +1,9 @@
 ﻿using MapsInMyFolder.Commun;
 using MapsInMyFolder.MapControl;
+using ModernWpf.Controls;
 using System;
 using System.Collections.Generic;
+using System.Data.SQLite;
 using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -20,7 +22,7 @@ namespace MapsInMyFolder
     public partial class MainPage : System.Windows.Controls.Page
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2211:Les champs non constants ne doivent pas être visibles", Justification = "for access everywhere")]
-        public static MainPage _instance;
+        public static MainPage _instance { get; set; }
         bool isInitialised = false;
         public static MapSelectable MapSelectable { get; set; }
         private static MapFigures MapFigures;
@@ -375,61 +377,7 @@ namespace MapsInMyFolder
         private void Mapviewer_MouseWheel(object sender, MouseWheelEventArgs e)
         {
             MapFigures.UpdateFiguresFromZoomLevel(mapviewer.TargetZoomLevel);
-            AnimateLabel(ZoomLevelIndicator);
-        }
-
-        private bool isAnimating = false; // Indique si l'animation est en cours d'exécution
-
-        private void AnimateLabel(Label label)
-        {
-            label.Visibility = Visibility.Visible;
-            // Si l'animation est déjà en cours d'exécution, annule l'animation de disparition en cours et recommence l'animation d'apparition à la valeur d'opacité actuelle
-            DoubleAnimation fadeInAnimation = new DoubleAnimation();
-
-            if (isAnimating)
-            {
-                label.BeginAnimation(OpacityProperty, null);
-                fadeInAnimation.From = label.Opacity;
-                fadeInAnimation.To = 1.0;
-            }
-            else
-            {
-                fadeInAnimation.From = 0.0;
-                fadeInAnimation.To = 1.0;
-            }
-
-            TimeSpan fadeInDuration = TimeSpan.FromSeconds(0.2);
-            TimeSpan fadeOutDuration = TimeSpan.FromSeconds(0.5);
-
-            fadeInAnimation.Duration = fadeInDuration;
-            Storyboard storyboard = new Storyboard();
-            DoubleAnimation fadeOutAnimation = new DoubleAnimation
-            {
-                From = 1.0,
-                To = 0.0,
-                Duration = fadeOutDuration,
-
-                // Démarre après l'animation d'apparition + 1 seconde
-                BeginTime = fadeInDuration + TimeSpan.FromSeconds(0.5)
-            };
-
-            storyboard.Children.Add(fadeInAnimation);
-            storyboard.Children.Add(fadeOutAnimation);
-            Storyboard.SetTarget(fadeInAnimation, label);
-            Storyboard.SetTargetProperty(fadeInAnimation, new PropertyPath(OpacityProperty));
-            Storyboard.SetTarget(fadeOutAnimation, label);
-            Storyboard.SetTargetProperty(fadeOutAnimation, new PropertyPath(OpacityProperty));
-
-            void AnimationCompleted(object sender, EventArgs e)
-            {
-                isAnimating = false;
-                fadeOutAnimation.Completed -= AnimationCompleted;
-            }
-
-            fadeOutAnimation.Completed += AnimationCompleted;
-
-            storyboard.Begin();
-            isAnimating = true;
+            Collectif.AnimateLabel(ZoomLevelIndicator);
         }
 
         private void Start_Download_Click(object sender, RoutedEventArgs e)
@@ -437,7 +385,6 @@ namespace MapsInMyFolder
             MapSelectable.CleanRectangleLocations();
             MainWindow.Instance.FrameLoad_PrepareDownload();
         }
-
 
         private async void mapLocationSearchBar_SearchResultEvent(object sender, UserControls.SearchLocation.SearchResultEventArgs e)
         {
@@ -541,5 +488,132 @@ namespace MapsInMyFolder
             }
         }
 
+        public void RefreshMap()
+        {
+            SetCurrentLayer(Layers.Current.Id);
+        }
+        public void RequestReloadPage()
+        {
+            LayerPanel.ReloadPage();
+        }
+
+        public async void ShowLayerWarning(int id)
+        {
+            int EditedDB_VERSION;
+            string EditedDB_SCRIPT;
+            string EditedDB_TILE_URL;
+
+            int LastDB_VERSION;
+            string LastDB_SCRIPT;
+            string LastDB_TILE_URL;
+
+
+            var DatabaseEditedLayerExecutable = Database.ExecuteExecuteReaderSQLCommand($"SELECT * FROM 'EDITEDLAYERS' WHERE ID = {id}");
+            using (DatabaseEditedLayerExecutable.conn)
+            {
+                using (SQLiteDataReader editedlayers_sqlite_datareader = DatabaseEditedLayerExecutable.Reader)
+                {
+                    if (!editedlayers_sqlite_datareader.Read())
+                    {
+                        return;
+                    }
+
+                    EditedDB_VERSION = editedlayers_sqlite_datareader.GetIntFromOrdinal("VERSION") ?? 0;
+                    EditedDB_SCRIPT = editedlayers_sqlite_datareader.GetStringFromOrdinal("SCRIPT");
+                    EditedDB_TILE_URL = editedlayers_sqlite_datareader.GetStringFromOrdinal("TILE_URL");
+                }
+            }
+
+            var DatabaseLayerExecutable = Database.ExecuteExecuteReaderSQLCommand($"SELECT * FROM 'LAYERS' WHERE ID = {id}");
+            using (DatabaseLayerExecutable.conn)
+            {
+                using (SQLiteDataReader layers_sqlite_datareader = DatabaseLayerExecutable.Reader)
+                {
+                    layers_sqlite_datareader.Read();
+                    LastDB_VERSION = layers_sqlite_datareader.GetIntFromOrdinal("VERSION") ?? 0;
+                    LastDB_SCRIPT = layers_sqlite_datareader.GetStringFromOrdinal("SCRIPT");
+                    if (string.IsNullOrEmpty(LastDB_SCRIPT))
+                    {
+                        LastDB_SCRIPT = "";
+                    }
+                    LastDB_TILE_URL = layers_sqlite_datareader.GetStringFromOrdinal("TILE_URL");
+                }
+            }
+
+            if (EditedDB_VERSION != LastDB_VERSION)
+            {
+                bool HasActionToTake = false;
+                StackPanel AskMsg = new StackPanel();
+                string RemoveSQL = "";
+
+                if (EditedDB_SCRIPT != LastDB_SCRIPT && !string.IsNullOrWhiteSpace(EditedDB_SCRIPT))
+                {
+                    HasActionToTake = true;
+                    TextBlock textBlock = new TextBlock
+                    {
+                        Text = Languages.Current["layerMessageErrorUpdateScriptChanged"],
+                        TextWrapping = TextWrapping.Wrap
+                    };
+                    AskMsg.Children.Add(textBlock);
+                    AskMsg.Children.Add(Collectif.FormatDiffGetScrollViewer(EditedDB_SCRIPT, LastDB_SCRIPT));
+                    RemoveSQL += $"'SCRIPT'=NULL";
+                }
+
+                if (EditedDB_TILE_URL != LastDB_TILE_URL && !string.IsNullOrWhiteSpace(EditedDB_TILE_URL))
+                {
+                    HasActionToTake = true;
+                    TextBlock textBlock = new TextBlock
+                    {
+                        Text = Languages.Current["layerMessageErrorUpdateTileURLChanged"],
+                        TextWrapping = TextWrapping.Wrap
+                    };
+                    AskMsg.Children.Add(textBlock);
+                    AskMsg.Children.Add(Collectif.FormatDiffGetScrollViewer(EditedDB_TILE_URL, LastDB_TILE_URL));
+                    RemoveSQL += $"'TILE_URL'=NULL";
+                }
+
+                TextBlock textBlockAsk = new TextBlock
+                {
+                    Text = Languages.Current["layerMessageErrorUpdateAskFix"],
+                    TextWrapping = TextWrapping.Wrap,
+                    FontWeight = FontWeight.FromOpenTypeWeight(600)
+                };
+                AskMsg.Children.Add(textBlockAsk);
+                ContentDialogResult result = ContentDialogResult.Secondary;
+                if (HasActionToTake)
+                {
+                    ContentDialog dialog = Message.SetContentDialog(AskMsg, "MapsInMyFolder", MessageDialogButton.YesNoCancel);
+
+                    result = await dialog.ShowAsync();
+                }
+                if (result == ContentDialogResult.Primary)
+                {
+                    Database.ExecuteNonQuerySQLCommand($"UPDATE 'main'.'EDITEDLAYERS' SET 'VERSION'='{LastDB_VERSION}',{RemoveSQL} WHERE ID = {id};");
+                }
+                else if (result == ContentDialogResult.Secondary)
+                {
+                    Database.ExecuteNonQuerySQLCommand($"UPDATE 'main'.'EDITEDLAYERS' SET 'VERSION'='{LastDB_VERSION}' WHERE ID = {id};");
+                }
+                else
+                {
+                    return;
+                }
+
+                RequestReloadPage();
+                SetCurrentLayer(Layers.Current.Id);
+            }
+        }
+
+        public void SetBBOXPreviewRequestUpdate()
+        {
+            var bbox = mapviewer.ViewRectToBoundingBox(new Rect(0, 0, mapviewer.ActualWidth, mapviewer.ActualHeight));
+            Commun.Map.CurentView.NO_Latitude = bbox.North;
+            Commun.Map.CurentView.NO_Longitude = bbox.West;
+            Commun.Map.CurentView.SE_Latitude = bbox.South;
+            Commun.Map.CurentView.SE_Longitude = bbox.East;
+
+            LayerPanel.PreviewRequestUpdate();
+            return;
+        }
     }
 }

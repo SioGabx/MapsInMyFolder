@@ -260,6 +260,60 @@ namespace MapsInMyFolder.Commun
             };
         }
 
+
+        private static bool isAnimating = false; // Indique si l'animation est en cours d'exécution
+        public static void AnimateLabel(Label label)
+        {
+            label.Visibility = Visibility.Visible;
+            // Si l'animation est déjà en cours d'exécution, annule l'animation de disparition en cours et recommence l'animation d'apparition à la valeur d'opacité actuelle
+            DoubleAnimation fadeInAnimation = new DoubleAnimation();
+
+            if (isAnimating)
+            {
+                label.BeginAnimation(UIElement.OpacityProperty, null);
+                fadeInAnimation.From = label.Opacity;
+                fadeInAnimation.To = 1.0;
+            }
+            else
+            {
+                fadeInAnimation.From = 0.0;
+                fadeInAnimation.To = 1.0;
+            }
+
+            TimeSpan fadeInDuration = TimeSpan.FromSeconds(0.2);
+            TimeSpan fadeOutDuration = TimeSpan.FromSeconds(0.5);
+
+            fadeInAnimation.Duration = fadeInDuration;
+            Storyboard storyboard = new Storyboard();
+            DoubleAnimation fadeOutAnimation = new DoubleAnimation
+            {
+                From = 1.0,
+                To = 0.0,
+                Duration = fadeOutDuration,
+
+                // Démarre après l'animation d'apparition + 1 seconde
+                BeginTime = fadeInDuration + TimeSpan.FromSeconds(0.5)
+            };
+
+            storyboard.Children.Add(fadeInAnimation);
+            storyboard.Children.Add(fadeOutAnimation);
+            Storyboard.SetTarget(fadeInAnimation, label);
+            Storyboard.SetTargetProperty(fadeInAnimation, new PropertyPath(UIElement.OpacityProperty));
+            Storyboard.SetTarget(fadeOutAnimation, label);
+            Storyboard.SetTargetProperty(fadeOutAnimation, new PropertyPath(UIElement.OpacityProperty));
+
+            void AnimationCompleted(object sender, EventArgs e)
+            {
+                isAnimating = false;
+                fadeOutAnimation.Completed -= AnimationCompleted;
+            }
+
+            fadeOutAnimation.Completed += AnimationCompleted;
+
+            storyboard.Begin();
+            isAnimating = true;
+        }
+
         public static void GetAllManifestResourceNames()
         {
             //get assembly ManifestResourceNames

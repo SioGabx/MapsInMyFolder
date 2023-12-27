@@ -22,6 +22,7 @@ namespace MapsInMyFolder
     {
         public static MainWindow Instance { get; set; }
         private static bool FrameCanGoBack = false;
+
         public MainWindow()
         {
             Instance = this;
