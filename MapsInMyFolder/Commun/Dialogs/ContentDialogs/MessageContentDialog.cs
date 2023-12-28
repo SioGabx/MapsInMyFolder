@@ -53,9 +53,9 @@ namespace MapsInMyFolder.Commun
             }
             catch (Exception ex)
             {
-                Debug.WriteLine(ex.ToString());
+                Debug.WriteLine("ShowContentDialog : " + ex.ToString());
+                return ContentDialogResult.None;
             }
-            return ContentDialogResult.None;
         }
 
         public static async Task<ContentDialogResult> ShowContentDialog(object text, object caption = null, MessageDialogButton messageBoxButton = MessageDialogButton.OK)

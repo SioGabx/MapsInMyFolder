@@ -60,10 +60,7 @@ namespace MapsInMyFolder
                 }
                 SetTextBoxRedimDimensionTextBasedOnPourcentage(TextBox_Redim_Width, TextBox_Redim_WUnit, "width", GetScale().Scale / CurrentTextBoxTargetScale * 100);
             }
-            else
-            {
-                SetTextBoxRedimDimension();
-            }
+            SetTextBoxRedimDimension();
             Update_Labels();
         }
         private void Page_Loaded(object sender, RoutedEventArgs e)
@@ -74,12 +71,17 @@ namespace MapsInMyFolder
             StackPanel_ImageTilePreview_2.Background = brush;
             SetTextBoxRedimDimension();
         }
+
         private void SetTextBoxRedimDimension()
         {
             Trimer rognageInfo = GetOriginalImageSize();
             if (rognageInfo != null)
             {
                 Label_ImgSize.Content = $"{rognageInfo.width} x {rognageInfo.height}";
+                if (TextBoxScaleIsLock())
+                {
+                    return;
+                }
                 if (TextBox_Redim_HUnit.SelectedIndex == 0 && TextBox_Redim_HUnit.SelectedIndex == 0)
                 {
                     TextBox_Redim_Width.SetText(rognageInfo.width.ToString(), TextBox_Redim_Width_TextChanged);
@@ -89,6 +91,7 @@ namespace MapsInMyFolder
         }
         public void Init()
         {
+            SetTextBoxRedimDimension();
             Update_Labels();
             lastRequestZoom = -1;
             UpdateMigniatureParralele();
@@ -499,24 +502,26 @@ namespace MapsInMyFolder
                     return;
                 }
 
-                double SizeInPixel;
+                double SizeInPixelAfterRedim;
                 if (TextBox_Redim_WUnit.SelectedIndex == 0)
                 {
-                    SizeInPixel = ScaleConvertedAttachedTextBoxText;
+                    SizeInPixelAfterRedim = ScaleConvertedAttachedTextBoxText;
                 }
                 else
                 {
-                    SizeInPixel = Math.Max(10, Math.Round(rognage_info.width * ((double)ScaleConvertedAttachedTextBoxText / 100)));
+                    SizeInPixelAfterRedim = Math.Max(10, Math.Round(rognage_info.width * ((double)ScaleConvertedAttachedTextBoxText / 100)));
                 }
 
-                double ScaleShrink = ((double)SizeInPixel / rognage_info.width);
+                
 
-                if (ScaleShrink < 1)
+                if (SizeInPixelAfterRedim < rognage_info.width)
                 {
-                    final_size += $" | {Languages.GetWithArguments("preparePropertyResizedImageSizeIndicatorSmaller", Math.Round(1 - ScaleShrink, 2))}";
+                    double ScaleShrink = ((double)SizeInPixelAfterRedim / rognage_info.width);
+                    final_size += $" | {Languages.GetWithArguments("preparePropertyResizedImageSizeIndicatorSmaller", Math.Abs(Math.Round(ScaleShrink, 2)))}";
                 }
-                else if (ScaleShrink > 1)
+                else if (SizeInPixelAfterRedim > rognage_info.width)
                 {
+                    double ScaleShrink = (rognage_info.width / (double)SizeInPixelAfterRedim);
                     final_size += $" | {Languages.GetWithArguments("preparePropertyResizedImageSizeIndicatorBigger", Math.Abs(Math.Round(ScaleShrink, 2)))}";
                 }
 
