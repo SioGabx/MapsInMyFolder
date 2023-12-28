@@ -32,6 +32,15 @@ namespace MapsInMyFolder.UserControls
             set { SetValue(LinkedMapViewerProperty, value); }
         }
 
+        public static readonly DependencyProperty GetLayersMethodProperty =
+     DependencyProperty.Register("GetLayersMethod", typeof(Func<IEnumerable<Layers>>), typeof(LayersPanel));
+
+        public Func<IEnumerable<Layers>> GetLayersMethod
+        {
+            get { return (Func<IEnumerable<Layers>>)GetValue(GetLayersMethodProperty); }
+            set { SetValue(GetLayersMethodProperty, value); }
+        }
+
         public class LayerIdEventArgs : EventArgs
         {
             public int LayerId { get; }
@@ -100,7 +109,6 @@ namespace MapsInMyFolder.UserControls
             }
         }
 
-
         public static string LayerGetDefaultSelectByIdScript()
         {
             int LayerId = Layers.Current.Id;
@@ -119,12 +127,18 @@ namespace MapsInMyFolder.UserControls
             return;
         }
 
-        static string LayersLoad()
+        private static string GetErrorHtml(string Message)
+        {
+            return "<style>p{font-family: \"Segoe UI\";color:#888989;font-size:14px;}</style><p>" + Message + "</p>";
+
+        }
+
+        private string LayersLoad()
         {
             Layers.Load();
             if (Database.DB_IsConnectionNull())
             {
-                return "<style>p{font-family: \"Segoe UI\";color:#888989;font-size:14px;}</style><p>" + Languages.Current["layerMessageNoDatabase"] + "</p>";
+                return GetErrorHtml(Languages.Current["layerMessageNoDatabase"]);
             }
             StringBuilder PropertyBuilder = new StringBuilder();
             string baseHTML = LayersCreateHTML();
@@ -139,13 +153,10 @@ namespace MapsInMyFolder.UserControls
         }
 
 
-        static string LayersCreateHTML()
+        private string LayersCreateHTML()
         {
-
-            StringBuilder generated_layers = new StringBuilder("<ul class=\"");
-            generated_layers.Append(Settings.layerpanel_displaystyle.ToString().ToLower());
-            generated_layers.AppendLine("\">");
-
+            StringBuilder generated_layers = new StringBuilder();
+            generated_layers.Append($"<ul class=\"{Settings.layerpanel_displaystyle}\">");
             List<Layers> layersRejectedAtFirstIteration = new List<Layers>();
             string[] layersSpecificsCountryToKeep = Settings.filter_layers_based_on_country.Split(';', StringSplitOptions.RemoveEmptyEntries);
             for (int iterationOfLayerTreatments = 0; iterationOfLayerTreatments <= 1; iterationOfLayerTreatments++)
@@ -155,11 +166,19 @@ namespace MapsInMyFolder.UserControls
 
                 if (isFirstIterationDoRejectLayer)
                 {
-                    EnumerableLayers = Layers.GetLayersList();
+                    if (GetLayersMethod is null)
+                    {
+                        return GetErrorHtml("GetLayersMethod is not defined in XAML");
+                    }
+                    EnumerableLayers = GetLayersMethod();
                 }
                 else
                 {
                     EnumerableLayers = layersRejectedAtFirstIteration;
+                }
+                if (EnumerableLayers is null)
+                {
+                    return GetErrorHtml("Error, layers was null");
                 }
 
                 foreach (Layers layer in EnumerableLayers)
@@ -249,7 +268,7 @@ namespace MapsInMyFolder.UserControls
                         WarningMessageDiv = $"<div class=\"warning\" title=\"{Languages.Current["layerMessageErrorDetectedClickHere"]}\" onclick=\"show_warning(event, '{layer.Id}');\"></div>";
                     }
 
-                    generated_layers.AppendLine(@$"
+                    generated_layers.Append(@$"
                 <li class=""{layerFiltered}"" id=""{layer.Id}"">
                     <div class=""layer_main_div"" style=""{overideBackgroundColor}"">
                         <div class=""layer_main_div_preview_images"">

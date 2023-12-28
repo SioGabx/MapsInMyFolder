@@ -51,8 +51,8 @@ namespace MapsInMyFolder
             Javascript.Functions.ClearVar(InternalEditorId);
             GenerateTempLayerInDicList();
             mapviewerappercu.Background = Collectif.RgbValueToSolidColorBrush(Settings.background_layer_color_R, Settings.background_layer_color_G, Settings.background_layer_color_B);
-            mapviewerappercu.Center = MainPage._instance.mapviewer.Center;
-            mapviewerappercu.ZoomLevel = MainPage._instance.mapviewer.ZoomLevel;
+            mapviewerappercu.Center = MainPage.Instance.mapviewer.Center;
+            mapviewerappercu.ZoomLevel = MainPage.Instance.mapviewer.ZoomLevel;
             TextBoxSetValueAndLock(TextboxLayerScript, Settings.tileloader_default_script);
             CountryComboBox.ItemSource = Country.GetList();
 
@@ -803,7 +803,7 @@ namespace MapsInMyFolder
             Leave();
             if (Layers.Current.Id == LayerId)
             {
-                MainPage._instance.SetCurrentLayer(Layers.Current.Id);
+                MainPage.Instance.SetCurrentLayer(Layers.Current.Id);
             }
         }
 
@@ -815,7 +815,7 @@ namespace MapsInMyFolder
             Settings.is_in_debug_mode = IsInDebugModeArchive;
             MainWindow.Instance.FrameBack(NoTransition);
             Javascript.EngineClearList();
-            MainPage._instance.RequestReloadPage();
+            MainPage.Instance.RequestReloadPage();
         }
 
         public void UpdateMoinsUnLayer()

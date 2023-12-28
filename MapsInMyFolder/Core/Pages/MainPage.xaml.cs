@@ -21,14 +21,24 @@ namespace MapsInMyFolder
     /// </summary>
     public partial class MainPage : System.Windows.Controls.Page
     {
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", "CA2211:Les champs non constants ne doivent pas être visibles", Justification = "for access everywhere")]
-        public static MainPage _instance { get; set; }
+        public static MainPage Instance { get; set; }
         bool isInitialised = false;
         public static MapSelectable MapSelectable { get; set; }
         private static MapFigures MapFigures;
+        public string SomeOtherThing { get; set; }
+        //public static readonly DependencyProperty LayersListProperty = DependencyProperty.Register("LayersList", typeof(IEnumerable<Layers>), typeof(MainPage));
+
+        public static Func<IEnumerable<Layers>> GetLayersListMethod
+        {
+            get
+            {
+                return Layers.GetLayersList;
+            }
+        }
+
         public MainPage()
         {
-            _instance = this;
+            Instance = this;
             InitializeComponent();
         }
 
@@ -613,5 +623,7 @@ namespace MapsInMyFolder
             LayerPanel.PreviewRequestUpdate();
             return;
         }
+
+
     }
 }

@@ -124,7 +124,7 @@ namespace MapsInMyFolder
                 {
                     try
                     {
-                        MainPage._instance.MapViewerSetSelection(engine.location, true);
+                        MainPage.Instance.MapViewerSetSelection(engine.location, true);
                     }
                     catch (Exception ex)
                     {
@@ -283,7 +283,7 @@ namespace MapsInMyFolder
             {
                 try
                 {
-                    MainPage._instance.LayerPanel.LayerBrowser.GetMainFrame().EvaluateScriptAsync("selectionner_calque_by_id(" + engine.layerid + ")");
+                    MainPage.Instance.LayerPanel.LayerBrowser.GetMainFrame().EvaluateScriptAsync("selectionner_calque_by_id(" + engine.layerid + ")");
                 }
                 catch (Exception ex)
                 {

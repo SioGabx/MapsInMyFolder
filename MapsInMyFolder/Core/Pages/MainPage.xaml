@@ -3,10 +3,12 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:cefsharp="clr-namespace:CefSharp.Wpf;assembly=CefSharp.Wpf"
+    xmlns:collections="clr-namespace:System.Collections;assembly=netstandard"
     xmlns:commun="clr-namespace:MapsInMyFolder.Commun"
     xmlns:customCtrl="clr-namespace:MapsInMyFolder.UserControls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:map="clr-namespace:MapsInMyFolder.MapControl"
+    xmlns:mapsinmyfolder="clr-namespace:MapsInMyFolder"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     Title="MainPage"
     d:DesignHeight="450"
@@ -16,7 +18,7 @@
     <Page.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="\Commun\Styles\RessourcesDictionnary.xaml"/>
+                <ResourceDictionary Source="\Commun\Styles\RessourcesDictionnary.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Page.Resources>
@@ -45,7 +47,10 @@
             <customCtrl:LayersPanel
                 x:Name="LayerPanel"
                 Grid.Row="1"
-                LinkedMapViewer="{Binding ElementName=mapviewer}" SetCurrentLayerEvent="LayerPanel_SetCurrentLayerEvent" />
+                DataContext="{Binding RelativeSource={RelativeSource AncestorType={x:Type mapsinmyfolder:MainPage}}}"
+                GetLayersMethod="{Binding GetLayersListMethod}"
+                LinkedMapViewer="{Binding ElementName=mapviewer}"
+                SetCurrentLayerEvent="LayerPanel_SetCurrentLayerEvent" />
 
         </Grid>
 

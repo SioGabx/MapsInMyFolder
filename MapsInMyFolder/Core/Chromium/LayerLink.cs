@@ -93,7 +93,7 @@ namespace MapsInMyFolder
             int id_int = Convert.ToInt32(id);
             Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
             {
-                MainPage._instance.ShowLayerWarning(id_int);
+                MainPage.Instance.ShowLayerWarning(id_int);
             }, null);
         }
 
