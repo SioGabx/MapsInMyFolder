@@ -200,7 +200,7 @@ namespace MapsInMyFolder
         {
             static void LoadHighlighting(string Name, string FileName, string StyleExtension)
             {
-                using (Stream s = Collectif.ReadResourceStream(@"EditorTheme\" + FileName))
+                using (Stream s = Collectif.ReadResourceStream(@"Commun\Styles\EditorTheme\" + FileName))
                 {
                     if (s == null)
                     {

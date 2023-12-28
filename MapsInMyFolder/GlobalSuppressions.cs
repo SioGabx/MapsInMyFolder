@@ -8,3 +8,4 @@ using System.Diagnostics.CodeAnalysis;
 [assembly: SuppressMessage("Style", "IDE0090:Utiliser 'new(...)'", Justification = "More readable to use old version", Scope = "module")]
 [assembly: SuppressMessage("Style", "IDE0063:Utiliser une instruction 'using' simple", Justification = "More readable ", Scope = "module")]
 [assembly: SuppressMessage("Style", "IDE0042:Déconstruire la déclaration de variable", Justification = "<En attente>", Scope = "module")]
+[assembly: SuppressMessage("Style", "IDE0057:Utiliser l'opérateur de plage", Justification = "<En attente>", Scope = "module")]

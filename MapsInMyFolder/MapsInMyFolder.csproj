@@ -27,7 +27,7 @@
 
   <PropertyGroup>
     <NoWarn>NU1701</NoWarn>
-    <ApplicationIcon>Media\icone.ico</ApplicationIcon>
+    <ApplicationIcon>Media\Icon\icone.ico</ApplicationIcon>
     <RepositoryUrl>https://github.com/SioGabx/MapsInMyFolder</RepositoryUrl>
     <Copyright>SioGabx</Copyright>
     <Version>1.1.0</Version>
@@ -57,29 +57,29 @@
   <ItemGroup>
     <None Remove="closedhand.cur" />
     <None Remove="download_panel.html" />
-    <None Remove="EditorTheme\Json.xshd" />
-    <None Remove="Languages\English.ini" />
-    <None Remove="Languages\French.ini" />
+    <None Remove="Commun\Styles\EditorTheme\Json.xshd" />
+    <None Remove="Commun\Languages\English.ini" />
+    <None Remove="Commun\Languages\French.ini" />
     <None Remove="layer_panel.html" />
     <None Remove="ScriptEditorTheme.xshd" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="Media\icone.ico" />
+    <Content Include="Media\Icon\icone.ico" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="EditorTheme\Javascript.xshd" />
-    <EmbeddedResource Include="EditorTheme\Json.xshd" />
+    <EmbeddedResource Include="Commun\Styles\EditorTheme\Javascript.xshd" />
+    <EmbeddedResource Include="Commun\Styles\EditorTheme\Json.xshd" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Cursors\closedhand.cur" />
-    <EmbeddedResource Include="HTML\download_panel.html" />
-    <EmbeddedResource Include="HTML\layer_panel.html" />
+    <EmbeddedResource Include="Media\Cursors\closedhand.cur" />
+    <EmbeddedResource Include="Core\Chromium\HTML\download_panel.html" />
+    <EmbeddedResource Include="Core\Chromium\HTML\layer_panel.html" />
 
-    <EmbeddedResource Include="Languages\English.ini" />
-    <EmbeddedResource Include="Languages\French.ini" />
+    <EmbeddedResource Include="Commun\Languages\Ressources\English.ini" />
+    <EmbeddedResource Include="Commun\Languages\Ressources\French.ini" />
   </ItemGroup>
 
   <ItemGroup>
@@ -97,8 +97,10 @@
     <PackageReference Include="NetVips.Native" Version="8.15.0" />
     <PackageReference Include="NetVips.Native.win-x64" Version="8.15.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="NReco.Csv" Version="1.0.2" />
     <PackageReference Include="ProjNet" Version="2.0.0" />
     <PackageReference Include="System.Data.SQLite" Version="1.0.118" />
+    <PackageReference Include="System.Runtime.Caching" Version="8.0.0" />
     <PackageReference Include="wix" Version="3.11.2" />
   </ItemGroup>
 
@@ -107,8 +109,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MapsInMyFolder.Common\MapsInMyFolder.Commun.csproj" />
-    <ProjectReference Include="..\MapsInMyFolder.MapControl\MapControl\MapsInMyFolder.MapControl.csproj" />
     <ProjectReference Include="..\MapsInMyFolder.VectorTileRenderer\MapsInMyFolder.VectorTileRenderer.csproj" />
   </ItemGroup>
 

@@ -1,0 +1,553 @@
+﻿using MapsInMyFolder.Commun;
+using Microsoft.Win32;
+using ModernWpf.Controls;
+using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Globalization;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
+
+namespace MapsInMyFolder
+{
+    /// <summary>
+    /// Logique d'interaction pour SettingsWindow.xaml
+    /// </summary>
+    public partial class SettingsWindow : Window
+    {
+        public SettingsWindow()
+        {
+            InitializeComponent();
+            TitleTextBox.Text = this.Title = "MapsInMyFolder - " + Languages.Current["settingsTitle"];
+        }
+
+        int DefaultValuesHachCode;
+        void DoIScrollToElement(UIElement element, MouseButtonEventArgs e)
+        {
+            if (IsLoaded && e.LeftButton == MouseButtonState.Released)
+            {
+                SettingsScrollViewer.ScrollToElement(element);
+            }
+        }
+
+        private void ScrollMenuItem_Telechargement(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            DoIScrollToElement(TelechargementSettingsLabel, e);
+        }
+
+        private void ScrollMenuItem_Calque(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            DoIScrollToElement(CalqueSettingsLabel, e);
+        }
+
+        private void ScrollMenuItem_Carte(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            DoIScrollToElement(CarteSettingsLabel, e);
+        }
+        private void ScrollMenuItem_Languages(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            DoIScrollToElement(LanguagesSettings, e);
+        }
+
+        private void ScrollMenuItem_Avance(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            DoIScrollToElement(AvanceSettingsLabel, e);
+        }
+
+        private void ScrollMenuItem_Update(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            DoIScrollToElement(UpdateSettingsLabel, e);
+        }
+
+        private void ScrollMenuItem_APropos(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            DoIScrollToElement(AProposSettingsLabel, e);
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            InitSettingsWindow();
+        }
+
+        void InitSettingsWindow()
+        {
+            //Language
+            foreach (Languages.Language language in Enum.GetValues(typeof(Languages.Language)))
+            {
+                string userFriendlyString = Languages.ReplaceInString(language.GetUserFriendlyString());
+                int index = ApplicationLanguage.Items.Add(new NameHiddenIdValue(language, userFriendlyString));
+                if (language == Settings.application_languages)
+                {
+                    ApplicationLanguage.SelectedIndex = index;
+                }
+            }
+
+            layer_startup_id.SelectedIndex = layer_startup_id.Items.Add(new NameHiddenIdValue(0, "_Default"));
+            layer_startup_id.Items.Add(new NameHiddenIdValue(Layers.Current.Id, "_" + Languages.Current["layerCurrent"]));
+            foreach (Layers layer in Layers.GetLayersList())
+            {
+                if (layer.Id != -1 && string.Equals(layer.TilesFormat, "JPEG", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    int index = layer_startup_id.Items.Add(new NameHiddenIdValue(layer.Id, layer.Name + $" [N°{layer.Id}]"));
+                    if (layer.Id == Settings.layer_startup_id)
+                    {
+                        layer_startup_id.SelectedIndex = index;
+                    }
+                }
+            }
+
+            //layersSort
+            layersSort.ItemSource = new List<string>()
+            {
+                "ID ASC",
+                "ID DESC",
+                "NAME ASC",
+                "NAME DESC",
+                "DESCRIPTION ASC",
+                "DESCRIPTION DESC",
+                "CATEGORY ASC",
+                "CATEGORY DESC",
+                "FORMAT ASC",
+                "FORMAT DESC",
+                "SITE ASC",
+                "SITE DESC",
+                "COUNTRY ASC",
+                "COUNTRY DESC"
+            };
+            layersSort.SelectedItems = Settings.layers_Sort.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList();
+
+            //layerpanel_put_non_letter_layername_at_the_end
+            layerpanel_put_non_letter_layername_at_the_end.IsChecked = Settings.layerpanel_put_non_letter_layername_at_the_end;
+
+            //layerpanel_favorite_at_top
+            layerpanel_favorite_at_top.IsChecked = Settings.layerpanel_favorite_at_top;
+
+            //layerpanel_displaystyle
+            var listDisplayTypes = (ListDisplayType[])Enum.GetValues(typeof(ListDisplayType));
+            foreach (var displayType in listDisplayTypes)
+            {
+                layerpanel_displaystyle.Items.Add(displayType.ToString().ToLowerInvariant().UcFirst());
+                if (displayType.ToString() == Settings.layerpanel_displaystyle.ToString())
+                {
+                    layerpanel_displaystyle.SelectedIndex = Array.IndexOf(listDisplayTypes, displayType);
+                }
+            }
+
+            tileloader_default_script.Script = Settings.tileloader_default_script;
+            tileloader_default_script.SetTextEditorPositionChangedHandler(SettingsGrid, SettingsScrollViewer, 100);
+            tileloader_default_script.AddToContextMenu(Languages.Current["editorContextMenuIndent"], "\uE12F", (_, _) => tileloader_default_script.Indent());
+            try
+            {
+                Dictionary<string, string> myDictionary = JsonConvert.DeserializeObject<Dictionary<string, string>>(Settings.tileloader_template_script);
+
+                for (int TemplateScriptNumber = 0; TemplateScriptNumber < myDictionary.Count; TemplateScriptNumber++)
+                {
+                    var keyValuePair = myDictionary.ElementAt(TemplateScriptNumber);
+                    AddScriptTemplateEditor(keyValuePair.Key, keyValuePair.Value);
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.ToString());
+            }
+            working_folder.Text = Settings.working_folder;
+            temp_folder.Text = Settings.temp_folder;
+            max_retry_download.Text = Settings.max_retry_download.ToString();
+            max_redirection_download_tile.Text = Settings.max_redirection_download_tile.ToString();
+            tiles_cache_expire_after_x_days.Text = Settings.tiles_cache_expire_after_x_days.ToString();
+            http_client_timeout_in_seconds.Text = Settings.http_client_timeout_in_seconds.ToString();
+            max_download_project_in_parralele.Text = Settings.max_download_project_in_parralele.ToString();
+            max_download_tiles_in_parralele.Text = Settings.max_download_tiles_in_parralele.ToString();
+            waiting_before_start_another_tile_download.Text = Settings.waiting_before_start_another_tile_download.ToString();
+            user_agent.Text = Settings.user_agent;
+            generate_transparent_tiles_on_error.IsChecked = Settings.generate_transparent_tiles_on_error;
+            generate_transparent_tiles_on_404.IsChecked = Settings.generate_transparent_tiles_on_404;
+            generate_transparent_tiles_never.IsChecked = (!Settings.generate_transparent_tiles_on_error && !Settings.generate_transparent_tiles_on_404);
+            int R = Settings.background_layer_color_R;
+            int G = Settings.background_layer_color_G;
+            int B = Settings.background_layer_color_B;
+            string hex = (((byte)R << 16) | ((byte)G << 8) | ((byte)B << 0)).ToString("X");
+            background_layer_color.Text = "#" + hex;
+            background_layer_opacity.Text = (Settings.background_layer_opacity * 100).ToString() + "%";
+            NO_PIN_starting_location_latitude.Text = Settings.NO_PIN_starting_location_latitude.ToString();
+            NO_PIN_starting_location_longitude.Text = Settings.NO_PIN_starting_location_longitude.ToString();
+            SE_PIN_starting_location_latitude.Text = Settings.SE_PIN_starting_location_latitude.ToString();
+            SE_PIN_starting_location_longitude.Text = Settings.SE_PIN_starting_location_longitude.ToString();
+            visibility_pins.IsChecked = Settings.visibility_pins == Visibility.Visible;
+            map_defaut_zoom_level.Text = Settings.map_defaut_zoom_level.ToString();
+            zoom_limite_taille_carte.IsChecked = Settings.zoom_limite_taille_carte;
+            map_show_tile_border.IsChecked = Settings.map_show_tile_border;
+
+            //search_engine
+            SearchEngines[] SearchEngines = (SearchEngines[])Enum.GetValues(typeof(SearchEngines));
+            foreach (var searchEngine in SearchEngines)
+            {
+                search_engine.Items.Add(searchEngine.ToString());
+                if (searchEngine.ToString() == Settings.search_engine.ToString())
+                {
+                    search_engine.SelectedIndex = Array.IndexOf(SearchEngines, searchEngine);
+                }
+            }
+
+            database_pathname.Text = Settings.database_pathname;
+            selection_rectangle_resize_tblr_gap.Text = Settings.selection_rectangle_resize_tblr_gap.ToString();
+            selection_rectangle_resize_angle_gap.Text = Settings.selection_rectangle_resize_angle_gap.ToString();
+            github_repository_url.Text = Settings.github_repository_url;
+            github_database_name.Text = Settings.github_database_name;
+            is_in_debug_mode.IsChecked = Settings.is_in_debug_mode;
+            show_layer_devtool.IsChecked = Settings.show_layer_devtool;
+            show_download_devtool.IsChecked = Settings.show_download_devtool;
+            nettoyer_cache_browser_au_demarrage.IsChecked = Settings.nettoyer_cache_browser_au_demarrage;
+            nettoyer_cache_layers_au_demarrage.IsChecked = Settings.nettoyer_cache_layers_au_demarrage;
+            search_application_update_on_startup.IsChecked = Settings.search_application_update_on_startup;
+            search_database_update_on_startup.IsChecked = Settings.search_database_update_on_startup;
+            CountryComboBox.ItemSource = Country.GetList();
+            CountryComboBox.SelectedItems = Country.GetListFromEnglishName(Settings.filter_layers_based_on_country.Split(';', StringSplitOptions.RemoveEmptyEntries));
+
+            DefaultValuesHachCode = Collectif.CheckIfInputValueHaveChange(SettingsScrollViewer);
+            SettingsVersionInformation.Content = Update.GetActualProductVersionFormatedString();
+            UpdateLastUpdateSearch();
+
+            SettingsScrollViewer.ScrollToTop();
+        }
+
+        public void AddScriptTemplateEditor(string ScriptName, string Script)
+        {
+            var TitleScript = new UserControls.TitleScript()
+            {
+                ScriptName = ScriptName,
+                Script = Script,
+                Margin = new Thickness(0, 0, 0, 0)
+            };
+            List<UserControls.TitleScript> ListOfTitleScript = GetScriptTemplateEditor();
+            int TotalNumber = ListOfTitleScript?.Count ?? 0;
+            for (int i = 0; i < TotalNumber; i++)
+            {
+                ListOfTitleScript[i].Margin = new Thickness(0, 0, 0, 10);
+            }
+            TitleScript.SetTextEditorPositionChangedHandler(SettingsGrid, SettingsScrollViewer, 100);
+            TitleScript.AddToContextMenu(Languages.Current["editorContextMenuIndent"], "\uE12F", (_, _) => TitleScript.Indent());
+            tileloader_template_script.Children.Add(TitleScript);
+            RenameEachScript();
+        }
+
+        public void RenameEachScript()
+        {
+            List<UserControls.TitleScript> ListOfTitleScript = GetScriptTemplateEditor();
+            int TotalNumber = ListOfTitleScript?.Count ?? 0;
+            for (int i = 0; i < TotalNumber; i++)
+            {
+                ListOfTitleScript[i].Label.Content = "Script N°" + (i + 1);
+            }
+        }
+
+
+        private void add_template_script_Click(object sender, RoutedEventArgs e)
+        {
+            AddScriptTemplateEditor(Languages.Current["settingsPropertyNameScriptTemplateDefaultName"], string.Empty);
+        }
+
+        public List<UserControls.TitleScript> GetScriptTemplateEditor()
+        {
+            List<System.Type> TypeOfSearchElement = new List<System.Type>
+            {
+                typeof(UserControls.TitleScript)
+            };
+
+            return Collectif.FindVisualChildren(tileloader_template_script, TypeOfSearchElement)?.Cast<UserControls.TitleScript>()?.ToList();
+        }
+
+
+        public void UpdateLastUpdateSearch()
+        {
+            string lastUpdateCheckDateTimeTick = Collectif.FilterDigitOnly(XMLParser.Cache.Read("LastUpdateCheck"), null, false, false);
+            string lastUpdateCheckDate = "/";
+
+            if (!string.IsNullOrEmpty(lastUpdateCheckDateTimeTick))
+            {
+                long tick = Convert.ToInt64(lastUpdateCheckDateTimeTick);
+                DateTime lastUpdateCheckDateTime = new DateTime(tick);
+                lastUpdateCheckDate = lastUpdateCheckDateTime.ToString("dd MMMM yyyy - H:mm:ss", CultureInfo.InstalledUICulture);
+            }
+
+            Debug.WriteLine(lastUpdateCheckDateTimeTick);
+            searchForUpdatesLastUpdateCheck.Content = lastUpdateCheckDate;
+        }
+
+        private async void ResetSettings_Click(object sender, RoutedEventArgs e)
+        {
+            ContentDialogResult dialogConfirmResetApplicationSettings = await Message.ShowContentDialog(Languages.Current["settingsMessageResetApplicationSettings"], Languages.Current["dialogTitleOperationConfirm"], MessageDialogButton.YesCancel);
+            
+            if (dialogConfirmResetApplicationSettings == ContentDialogResult.Primary)
+            {
+                try
+                {
+                    string settingsPath = Settings.SettingsPath();
+
+                    if (System.IO.File.Exists(settingsPath))
+                    {
+                        System.IO.File.Delete(settingsPath);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    await Message.ShowContentDialog(Languages.GetWithArguments("settingsMessageErrorResetApplicationSettings", ex.Message), Languages.Current["dialogTitleOperationFailed"], MessageDialogButton.OK);
+                    return;
+                }
+
+                DefaultValuesHachCode = Collectif.CheckIfInputValueHaveChange(SettingsScrollViewer);
+
+                await Message.ShowContentDialog(Languages.Current["settingsMessageRestartRequire"], Languages.Current["dialogTitleOperationInfo"], MessageDialogButton.OK);
+                Collectif.RestartApplication();
+            }
+        }
+
+        public void SaveSettings()
+        {
+            NameHiddenIdValue LanguageEnumSelectedItem = (NameHiddenIdValue)ApplicationLanguage.SelectedItem;
+            if (LanguageEnumSelectedItem != null)
+            {
+                Settings.application_languages = (Languages.Language)LanguageEnumSelectedItem.Id;
+            }
+
+            NameHiddenIdValue layerStartupIdSelectedItem = (NameHiddenIdValue)layer_startup_id.SelectedItem;
+            if (layerStartupIdSelectedItem != null)
+            {
+                Settings.layer_startup_id = (int)layerStartupIdSelectedItem.Id;
+            }
+
+            Settings.background_layer_opacity = Convert.ToDouble(background_layer_opacity.Text.Replace("%", "").Trim()) / 100;
+
+            string hexValue = background_layer_color.Text;
+            hexValue = hexValue.Replace("#", "");
+            int rgbInt = Convert.ToInt32(hexValue, 16);
+            byte red = (byte)((rgbInt >> 16) & 255);
+            byte green = (byte)((rgbInt >> 8) & 255);
+            byte blue = (byte)(rgbInt & 255);
+
+            Settings.background_layer_color_R = red;
+            Settings.background_layer_color_G = green;
+            Settings.background_layer_color_B = blue;
+
+            Settings.working_folder = working_folder.Text;
+            Settings.temp_folder = temp_folder.Text;
+            Settings.max_retry_download = Convert.ToInt32(max_retry_download.Text);
+            Settings.max_redirection_download_tile = Convert.ToInt32(max_redirection_download_tile.Text);
+            Settings.tiles_cache_expire_after_x_days = Convert.ToInt32(tiles_cache_expire_after_x_days.Text);
+            Settings.http_client_timeout_in_seconds = Convert.ToInt32(http_client_timeout_in_seconds.Text);
+            Settings.max_download_project_in_parralele = Convert.ToInt32(max_download_project_in_parralele.Text);
+            Settings.max_download_tiles_in_parralele = Convert.ToInt32(max_download_tiles_in_parralele.Text);
+            Settings.waiting_before_start_another_tile_download = Convert.ToInt32(waiting_before_start_another_tile_download.Text);
+            Settings.generate_transparent_tiles_on_404 = generate_transparent_tiles_on_404.IsChecked ?? false;
+            Settings.generate_transparent_tiles_on_error = generate_transparent_tiles_on_error.IsChecked ?? false;
+            Settings.is_in_debug_mode = is_in_debug_mode.IsChecked ?? false;
+            Settings.show_layer_devtool = show_layer_devtool.IsChecked ?? false;
+            Settings.show_download_devtool = show_download_devtool.IsChecked ?? false;
+            Settings.nettoyer_cache_browser_au_demarrage = nettoyer_cache_browser_au_demarrage.IsChecked ?? false;
+            Settings.nettoyer_cache_layers_au_demarrage = nettoyer_cache_layers_au_demarrage.IsChecked ?? false;
+            Settings.layerpanel_put_non_letter_layername_at_the_end = layerpanel_put_non_letter_layername_at_the_end.IsChecked ?? false;
+            Settings.layerpanel_favorite_at_top = layerpanel_favorite_at_top.IsChecked ?? false;
+            Settings.filter_layers_based_on_country = string.Join(';', CountryComboBox.SelectedValuesAsString("EnglishName"));
+
+            string layerpanelDisplayStyleValue = layerpanel_displaystyle.SelectedValue.ToString().ToUpperInvariant();
+            Settings.layerpanel_displaystyle = (ListDisplayType)Enum.Parse(typeof(ListDisplayType), layerpanelDisplayStyleValue);
+            Settings.NO_PIN_starting_location_latitude = Convert.ToDouble(NO_PIN_starting_location_latitude.Text);
+            Settings.NO_PIN_starting_location_longitude = Convert.ToDouble(NO_PIN_starting_location_longitude.Text);
+            Settings.SE_PIN_starting_location_latitude = Convert.ToDouble(SE_PIN_starting_location_latitude.Text);
+            Settings.SE_PIN_starting_location_longitude = Convert.ToDouble(SE_PIN_starting_location_longitude.Text);
+            Settings.map_defaut_zoom_level = Convert.ToInt32(map_defaut_zoom_level.Text);
+            Settings.zoom_limite_taille_carte = zoom_limite_taille_carte.IsChecked ?? false;
+
+            string selectedSearchEngine = search_engine.SelectedValue.ToString();
+            Settings.search_engine = (SearchEngines)Enum.Parse(typeof(SearchEngines), selectedSearchEngine);
+
+            Settings.tileloader_default_script = tileloader_default_script.Script;
+            List<UserControls.TitleScript> ListOfTitleScript = GetScriptTemplateEditor();
+            var DictionnaryNameScript = new Dictionary<string, string>();
+            int index = 0;
+            foreach (UserControls.TitleScript titleScript in ListOfTitleScript)
+            {
+                index++;
+                if (!string.IsNullOrWhiteSpace(titleScript?.Script))
+                {
+                    if (string.IsNullOrWhiteSpace(titleScript?.ScriptName))
+                    {
+                        titleScript.ScriptName = "Script N°" + index;
+                    }
+                    DictionnaryNameScript.Add(titleScript.ScriptName, titleScript.Script);
+                }
+            }
+            Settings.tileloader_template_script = JsonConvert.SerializeObject(DictionnaryNameScript, Formatting.None);
+            Settings.user_agent = user_agent.Text;
+            Settings.database_pathname = database_pathname.Text;
+
+            Settings.search_application_update_on_startup = search_application_update_on_startup.IsChecked ?? false;
+            Settings.search_database_update_on_startup = search_database_update_on_startup.IsChecked ?? false;
+            Settings.layers_Sort = string.Join(',', layersSort.SelectedValuesAsString());
+
+            Settings.visibility_pins = (visibility_pins.IsChecked ?? false) ? Visibility.Visible : Visibility.Hidden;
+
+            Settings.selection_rectangle_resize_tblr_gap = Convert.ToInt32(selection_rectangle_resize_tblr_gap.Text);
+            Settings.selection_rectangle_resize_angle_gap = Convert.ToInt32(selection_rectangle_resize_angle_gap.Text);
+            Settings.map_show_tile_border = map_show_tile_border.IsChecked ?? false;
+            Settings.github_repository_url = github_repository_url.Text;
+            Settings.github_database_name = github_database_name.Text;
+
+            string actualSettingsPath = Settings.SettingsPath();
+            string newSettingsPath = Settings.SettingsPath(true);
+            if (actualSettingsPath != newSettingsPath && System.IO.File.Exists(actualSettingsPath))
+            {
+                System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(newSettingsPath));
+                if (System.IO.File.Exists(newSettingsPath))
+                {
+                    System.IO.File.Delete(newSettingsPath);
+                }
+                System.IO.File.Copy(actualSettingsPath, newSettingsPath);
+            }
+
+            Settings.SaveSettings();
+        }
+
+        private async void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            int valuesHashCode = Collectif.CheckIfInputValueHaveChange(SettingsScrollViewer);
+            if (DefaultValuesHachCode == valuesHashCode)
+            {
+                return;
+            }
+            e.Cancel = true;
+
+            ContentDialogResult dialogAskLeaveWithoutSavingResult = await Message.ShowContentDialog(Languages.Current["settingsMessageLeaveWithoutSaving"], Languages.Current["dialogTitleOperationConfirm"], MessageDialogButton.YesNo);
+            if (dialogAskLeaveWithoutSavingResult == ContentDialogResult.Primary)
+            {
+                SaveSettings();
+
+                // Redémarrer ?
+                ContentDialogResult dialogAskForRestartResult = await Message.ShowContentDialog(Languages.Current["settingsMessageAskForRestart"], Languages.Current["dialogTitleOperationConfirm"], MessageDialogButton.YesNo);
+
+                if (dialogAskForRestartResult == ContentDialogResult.Primary)
+                {
+                    Collectif.RestartApplication();
+                }
+                else if (dialogAskForRestartResult == ContentDialogResult.Secondary)
+                {
+                    // Si l'utilisateur ne souhaite pas redémarrer
+                    DefaultValuesHachCode = valuesHashCode;
+                    MainWindow.RefreshAllPanels();
+                    this.Close();
+                    return;
+                }
+            }
+            else if (dialogAskLeaveWithoutSavingResult == ContentDialogResult.Secondary)
+            {
+                DefaultValuesHachCode = valuesHashCode;
+                this.Close();
+            }
+        }
+
+        private void FilterDigitTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            Collectif.FilterDigitOnlyWhileWritingInTextBoxWithMaxValue((TextBox)sender, -1);
+        }
+
+        private void Window_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (e.Key == Key.S && Keyboard.Modifiers == ModifierKeys.Control)
+            {
+                // CTRL + S
+                SaveSettings();
+                MainWindow.RefreshAllPanels();
+                DefaultValuesHachCode = Collectif.CheckIfInputValueHaveChange(SettingsScrollViewer);
+            }
+        }
+
+        private async void SearchForUpdates_Click(object sender, RoutedEventArgs e)
+        {
+            searchForUpdates.IsEnabled = false;
+            searchForUpdatesLastUpdateCheck.Content = Languages.Current["settingsPropertyNameLastApplicationUpdatesCheckInProgress"];
+            bool isNewerDatabaseVersionAvailableOnGithub = await Database.CheckIfNewerVersionAvailable();
+            bool isNewerApplicationVersionAvailableOnGithub = await Update.CheckIfNewerVersionAvailableOnGithub();
+            searchForUpdates.IsEnabled = true;
+            UpdateLastUpdateSearch();
+
+            if (isNewerApplicationVersionAvailableOnGithub)
+            {
+                Notification.ListOfNotificationsOnShow.ToList().ForEach(notification => notification.Remove());
+                Update.StartUpdating();
+            }
+        }
+
+        private void DisableRequestBringIntoView(object sender, RequestBringIntoViewEventArgs e)
+        {
+            e.Handled = true;
+        }
+
+        private void SettingsScrollViewer_ScrollChanged(object sender, ScrollChangedEventArgs e)
+        {
+            if (!IsInitialized)
+                return;
+
+            List<(StackPanel SettingsPanel, Grid MenuLabel)> ListOfSubMenu = new List<(StackPanel, Grid)>() {
+                (LanguagesSettings, MenuItem_LanguagesSettings),
+                (CalqueSettings, MenuItem_Calque),
+                (TelechargementSettings, MenuItem_Telechargement),
+                (CarteSettings, MenuItem_Carte),
+                (AvanceSettings, MenuItem_Avance),
+                (UpdateSettings, MenuItem_Update),
+                (AProposSettings, MenuItem_APropos)
+            };
+
+            const int Margin = 50;
+            foreach ((StackPanel SettingsPanel, Grid MenuLabel) in ListOfSubMenu)
+            {
+                var UIElementPosition = SettingsPanel.TranslatePoint(new Point(0, 0), SettingsScrollViewer).Y;
+                if (UIElementPosition - Margin <= 0 && UIElementPosition > -(SettingsPanel.ActualHeight - Margin))
+                {
+                    MenuLabel.Style = (Style)this.Resources["GridInViewNormalStyle"];
+                }
+                else
+                {
+                    MenuLabel.Style = (Style)this.Resources["GridSelectNormalStyle"];
+                }
+            }
+        }
+
+        private async void DatabaseExport_Click(object sender, RoutedEventArgs e)
+        {
+            this.Cursor = Cursors.AppStarting;
+            SaveFileDialog DatabasesaveFileDialog = new SaveFileDialog
+            {
+                Filter = "SQL database |*.db|Text|*.txt",
+                DefaultExt = "db",
+                FileName = "ExportedDatabase.db",
+                CheckPathExists = true,
+                AddExtension = true,
+                RestoreDirectory = true,
+                ValidateNames = true,
+                Title = Languages.Current["saveFileDialogSelectSaveLocation"]
+            };
+
+            if (DatabasesaveFileDialog.ShowDialog() == true)
+            {
+                try
+                {
+                    await Task.Run(() =>
+                    {
+                        Database.Export(DatabasesaveFileDialog.FileName);
+                    }); ;
+                    Process.Start("explorer.exe", "/select,\"" + DatabasesaveFileDialog.FileName + "\"");
+                    return;
+                }
+                catch (Exception ex)
+                {
+                    Message.NoReturnBoxAsync(Languages.Current["settingsMessageErrorDatabaseExport"] + " " + ex.Message, Languages.Current["dialogTitleOperationFailed"]);
+                }
+            }
+            this.Cursor = Cursors.Arrow;
+        }
+    }
+}

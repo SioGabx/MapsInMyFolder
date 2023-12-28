@@ -120,7 +120,7 @@ namespace MapsInMyFolder
                     }
                     IEnumerable<HttpStatusCode> ErrorsToIgnore = StatusCode.GetListFromString(layers.SpecialsOptions.ErrorsToIgnore);
 
-                    DownloadEngine engine = new DownloadEngine(downloadid, DB_Download_ID, DB_Download_LAYER_ID, urls, tokenSource2, ct, format, final_saveformat, DB_Download_ZOOM, DB_Download_TEMP_DIRECTORY, DB_Download_SAVE_DIRECTORY, DB_Download_FILE_NAME, filetempname, location, RESIZEWIDTH, RESIZEHEIGHT, new TileLoader(), COLORINTERPRETATION, SCALEINFO, ErrorsToIgnore, DB_Download_VARCONTEXTE, DB_Download_NBR_TILES, layers.TileUrl, layers.Identifier, engine_status, layers.TilesSize, quality: DB_Download_QUALITY);
+                    DownloadEngine engine = new DownloadEngine(downloadid, DB_Download_ID, DB_Download_LAYER_ID, urls, tokenSource2, ct, format, final_saveformat, DB_Download_ZOOM, DB_Download_TEMP_DIRECTORY, DB_Download_SAVE_DIRECTORY, DB_Download_FILE_NAME, filetempname, location, RESIZEWIDTH, RESIZEHEIGHT, COLORINTERPRETATION, SCALEINFO, ErrorsToIgnore, DB_Download_VARCONTEXTE, DB_Download_NBR_TILES, layers.TileUrl, layers.Identifier, engine_status, layers.TilesSize, quality: DB_Download_QUALITY);
                     DownloadEngine.Add(engine, downloadid);
                     string commande_add = "add_download(" + downloadid + @",""" + engine_status.ToString() + @""",""" + DB_Download_FILE_NAME + @""",0," + DB_Download_NBR_TILES + @",""" + Download_INFOS + @""",""" + DB_Download_TIMESTAMP + @""");";
                     if (engine_status == Status.error)
@@ -139,13 +139,13 @@ namespace MapsInMyFolder
 
         public void InitDownloadPanel()
         {
-            string resource_data = Collectif.ReadResourceString("HTML/download_panel.html");
+            string resource_data = Collectif.ReadResourceString("Core/Chromium/HTML/download_panel.html");
             resource_data = Languages.ReplaceInString(resource_data);
             download_panel_browser.LoadHtml(resource_data);
             if (download_panel_browser is null) { return; }
             try
             {
-                download_panel_browser.JavascriptObjectRepository.Register("DownloadCEFSharpLink", new CEFSharpLinks.DownloadLink());
+                download_panel_browser.JavascriptObjectRepository.Register("DownloadCEFSharpLink", new DownloadLink());
             }
             catch (Exception ex)
             {
