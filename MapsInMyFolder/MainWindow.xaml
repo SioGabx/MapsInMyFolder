@@ -24,7 +24,13 @@
     Loaded="Window_Loaded"
     ResizeMode="CanResize"
     mc:Ignorable="d">
-
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="\Commun\Styles\RessourcesDictionnary.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
     <Window.TaskbarItemInfo>
         <TaskbarItemInfo />
     </Window.TaskbarItemInfo>

@@ -859,7 +859,12 @@ namespace MapsInMyFolder
 
         private void SetHandCursor()
         {
-            map.Cursor = new Cursor(Collectif.ReadResourceStream("Media/Cursors/closedhand.cur"));
+            map.Cursor = GetHandCursor();
+        }
+
+        public static Cursor GetHandCursor()
+        {
+            return new Cursor(Collectif.ReadResourceStream("Media/Cursors/closedhand.cur"));
         }
 
         private void SaveCurrentMousePosition(MouseEventArgs e)
@@ -1213,7 +1218,6 @@ namespace MapsInMyFolder
             }
             UpdateVisualCursor(e);
         }
-
 
         public static BoundingBox GetTileBounding(Location location, int zoom)
         {

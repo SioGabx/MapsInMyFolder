@@ -7,6 +7,7 @@
     xmlns:customCtrl="clr-namespace:MapsInMyFolder.UserControls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:map="clr-namespace:MapsInMyFolder.MapControl"
+    xmlns:mapsinmyfolder="clr-namespace:MapsInMyFolder"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     Title="GridLayerEditor"
     d:DesignHeight="450"
@@ -15,7 +16,7 @@
     <Page.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="\Commun\Styles\RessourcesDictionnary.xaml"/>
+                <ResourceDictionary Source="\Commun\Styles\RessourcesDictionnary.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Page.Resources>
@@ -28,7 +29,6 @@
         <Grid Grid.Column="0" Background="#FF171719">
             <Grid.RowDefinitions>
                 <RowDefinition Height="65" />
-                <RowDefinition Height="50" />
                 <RowDefinition />
             </Grid.RowDefinitions>
             <Label
@@ -42,26 +42,37 @@
                 FontFamily="Segoe UI Light"
                 FontSize="30"
                 Foreground="#FFE2E2E1" />
-            <customCtrl:SearchLayer
-                x:Name="LayersSearchBar"
+            <customCtrl:LayersPanel
+                x:Name="LayerPanel"
                 Grid.Row="1"
-                Margin="10,0,5,0"
-                LinkedLayerBrowser="{Binding ElementName=layer_browser}" />
-            <Border
-                Grid.Row="2"
-                Width="Auto"
-                Height="Auto"
-                Margin="0,0,5,0"
-                BorderBrush="Transparent"
-                BorderThickness="1">
-                <cefsharp:ChromiumWebBrowser
-                    x:Name="layer_browser"
-                    LoadingStateChanged="Layer_browser_LoadingStateChanged"
-                    WebBrowser="{Binding WebBrowser, Mode=OneWayToSource}" />
-            </Border>
+                DataContext="{Binding RelativeSource={RelativeSource AncestorType={x:Type mapsinmyfolder:GridLayerEditor}}}"
+                GetLayersMethod="{Binding GetLayersListMethod}"
+                LinkedMapViewer="{Binding ElementName=mapviewer}" />
         </Grid>
 
-        <Grid Grid.Column="1">
+        <Grid Grid.Column="1" Visibility="Visible">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="65" />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <Label
+                Grid.Row="0"
+                Height="50"
+                Margin="28,10,0,0"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"
+                Content="{Binding Source={x:Static commun:Languages.Current}, Path=[mapTitle]}"
+                FontFamily="Segoe UI Light"
+                FontSize="30"
+                Foreground="#FFE2E2E1" />
+            <customCtrl:EditableDataGrid
+                Margin="10,0,15,0"
+                x:Name="LayerGrid"
+                Grid.Row="1"
+                Loaded="LayerGrid_Loaded" />
+        </Grid>
+
+        <Grid Grid.Column="1" Visibility="Collapsed">
 
             <Grid.RowDefinitions>
                 <RowDefinition Height="65" />
@@ -94,16 +105,13 @@
                 <customCtrl:SearchLocation
                     x:Name="mapLocationSearchBar"
                     Margin="10,0,0,0"
-                    CurrentMapViewerCenter="{Binding ElementName=mapviewer, Path=Center}"
+                    SearchResultMap="{Binding ElementName=mapviewer}"
+                    SearchResultPushpin="{Binding ElementName=searchResult}"
                     SearchLostFocusRequest="mapLocationSearchBar_SearchLostFocusRequest"
                     SearchResultEvent="mapLocationSearchBar_SearchResultEvent" />
             </Grid>
 
-            <Grid Grid.Row="2" Visibility="Hidden">
-                <customCtrl:EditableDataGrid x:Name="LayerGrid" Loaded="LayerGrid_Loaded" />
-            </Grid>
-
-            <Grid Grid.Row="2" Visibility="Visible">
+            <Grid Grid.Row="2">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
@@ -134,23 +142,18 @@
                     <map:Pushpin
                         x:Name="SE_PIN"
                         Panel.ZIndex="999"
-                        map:MapPanel.Location="48.198846,6.4"
                         Background="#303031"
-                        Content="Coin_Superieur"
                         Foreground="#FFE2E2E1" />
                     <map:Pushpin
                         x:Name="NO_PIN"
                         Panel.ZIndex="999"
-                        map:MapPanel.Location="48.16,6.5"
                         Background="#303031"
-                        Content="Coin_Inferieur"
                         Foreground="#FFE2E2E1" />
                     <map:Pushpin
                         x:Name="searchResult"
                         Panel.ZIndex="999"
-                        map:MapPanel.Location="48.16,6.5"
                         Style="{DynamicResource PushpinStyleOrange}"
-                        Visibility="{Binding ElementName=mapLocationSearchBar, Path=SearchResultPushpinVisibility}" />
+                        Visibility="Collapsed" />
 
                     <map:MapTileLayer x:Name="MapTileLayer_Transparent" />
                     <map:MapItemsControl x:Name="mapviewerRectangles" />

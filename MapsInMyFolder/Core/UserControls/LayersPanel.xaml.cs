@@ -61,7 +61,7 @@ namespace MapsInMyFolder.UserControls
 
 
 
-        public void InitLayerPanel()
+        private void InitLayerPanel()
         {
             if (LayerBrowser is null) { return; }
 
@@ -86,15 +86,17 @@ namespace MapsInMyFolder.UserControls
             }
         }
 
-        public void Refresh()
+        public void Init()
         {
             InitLayerPanel();
-            ReloadPage();
-            LayersSearchBar.SearchLayerStart();
+            Reload();
         }
-        public void ReloadPage()
+
+
+        public void Reload()
         {
             LayerBrowser.LoadHtml(LayersLoad(), "http://siogabx.fr");
+            LayersSearchBar.SearchLayerStart();
         }
 
         private void LayerBrowser_LoadingStateChanged(object sender, CefSharp.LoadingStateChangedEventArgs e)
@@ -109,7 +111,7 @@ namespace MapsInMyFolder.UserControls
             }
         }
 
-        public static string LayerGetDefaultSelectByIdScript()
+        private static string LayerGetDefaultSelectByIdScript()
         {
             int LayerId = Layers.Current.Id;
             string scroll = ", true";
@@ -302,8 +304,5 @@ namespace MapsInMyFolder.UserControls
         {
             e.Handled = true;
         }
-
-
-
     }
 }

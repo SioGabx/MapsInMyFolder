@@ -699,10 +699,17 @@
                     MinHeight="30"
                     Background="White"
                     MouseWheel="Mapviewerappercu_MouseWheel"
+                    Cursor="Hand"
                     ZoomLevel="18">
                     <map:Map.Center>
                         <map:Location Latitude="48.198846" Longitude="6.429381" />
                     </map:Map.Center>
+                    <map:Pushpin
+                        x:Name="searchResult"
+                        Panel.ZIndex="999"
+                        Style="{DynamicResource PushpinStyleOrange}"
+                        Visibility="Collapsed" />
+
                     <map:MapTileLayer x:Name="MapTileLayer_Transparent" />
                     <map:MapItemsControl x:Name="mapviewerRectangles" />
                     <map:Map.ContextMenu>
@@ -796,6 +803,15 @@
                         </TextBlock>
                     </Label.Content>
                 </Label>
+                <customCtrl:SearchLocation
+                    Grid.Row="1"
+                    Grid.Column="0"
+                    Margin="5,5,110,0"
+                    VerticalAlignment="Top"
+                    IsFloatingSearchBar="True"
+                    FontSize="13"
+                    SearchResultMap="{Binding ElementName=mapviewerappercu}"
+                    SearchResultPushpin="{Binding ElementName=searchResult}" />
                 <StackPanel
                     Grid.Row="1"
                     Grid.Column="0"

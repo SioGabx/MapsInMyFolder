@@ -3,7 +3,6 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:cefsharp="clr-namespace:CefSharp.Wpf;assembly=CefSharp.Wpf"
-    xmlns:collections="clr-namespace:System.Collections;assembly=netstandard"
     xmlns:commun="clr-namespace:MapsInMyFolder.Commun"
     xmlns:customCtrl="clr-namespace:MapsInMyFolder.UserControls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -87,7 +86,9 @@
                 <customCtrl:SearchLocation
                     x:Name="mapLocationSearchBar"
                     Margin="10,0,0,0"
-                    CurrentMapViewerCenter="{Binding ElementName=mapviewer, Path=Center}"
+                    FontSize="16"
+                    SearchResultMap="{Binding ElementName=mapviewer}"
+                    SearchResultPushpin="{Binding ElementName=searchResult}"
                     SearchLostFocusRequest="mapLocationSearchBar_SearchLostFocusRequest"
                     SearchResultEvent="mapLocationSearchBar_SearchResultEvent" />
                 <Button
@@ -148,23 +149,17 @@
                     <map:Pushpin
                         x:Name="SE_PIN"
                         Panel.ZIndex="999"
-                        map:MapPanel.Location="48.198846,6.4"
                         Background="#303031"
-                        Content="Coin_Superieur"
                         Foreground="#FFE2E2E1" />
                     <map:Pushpin
                         x:Name="NO_PIN"
                         Panel.ZIndex="999"
-                        map:MapPanel.Location="48.16,6.5"
                         Background="#303031"
-                        Content="Coin_Inferieur"
                         Foreground="#FFE2E2E1" />
                     <map:Pushpin
                         x:Name="searchResult"
                         Panel.ZIndex="999"
-                        map:MapPanel.Location="48.16,6.5"
-                        Style="{DynamicResource PushpinStyleOrange}"
-                        Visibility="{Binding ElementName=mapLocationSearchBar, Path=SearchResultPushpinVisibility}" />
+                        Style="{DynamicResource PushpinStyleOrange}"  Visibility="Collapsed" />
 
                     <map:MapTileLayer x:Name="MapTileLayer_Transparent" />
                     <map:MapItemsControl x:Name="mapviewerRectangles" />

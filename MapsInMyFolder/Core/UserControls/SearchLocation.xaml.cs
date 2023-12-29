@@ -20,33 +20,80 @@ namespace MapsInMyFolder.UserControls
         {
             InitializeComponent();
         }
+        private void UserControl_Loaded(object sender, RoutedEventArgs e)
+        {
+            ToggleBarOnChange();
+        }
 
-        // Dependency property to control the visibility of the button
-        public static readonly DependencyProperty SearchResultPushpinVisibilityProperty =
+        public static DependencyProperty SearchResultPushpinProperty =
             DependencyProperty.Register(
-                "SearchResultPushpinVisibility",
-                typeof(Visibility),
+                "SearchResultPushpin",
+                typeof(Pushpin),
                 typeof(SearchLocation),
-                new PropertyMetadata(Visibility.Hidden));
+                new PropertyMetadata(null));
 
-        public Visibility SearchResultPushpinVisibility
+        public Pushpin SearchResultPushpin
         {
-            get { return (Visibility)GetValue(SearchResultPushpinVisibilityProperty); }
-            set { SetValue(SearchResultPushpinVisibilityProperty, value); }
+            get { return (Pushpin)GetValue(SearchResultPushpinProperty); }
+            set { SetValue(SearchResultPushpinProperty, value); }
+        }    
+        
+        public static DependencyProperty SearchResultMapProperty =
+            DependencyProperty.Register(
+                "SearchResultMap",
+                typeof(MapControl.Map),
+                typeof(SearchLocation),
+                new PropertyMetadata(null));
+
+        public MapControl.Map SearchResultMap
+        {
+            get { return (MapControl.Map)GetValue(SearchResultMapProperty); }
+            set { SetValue(SearchResultMapProperty, value); }
         }
 
-        public static readonly DependencyProperty CurrentMapViewerCenterProperty =
-          DependencyProperty.Register(
-              "CurrentMapViewerCenter",
-              typeof(Location),
-              typeof(SearchLocation),
-              new PropertyMetadata(new Location(0, 0)));
+       
+        public static readonly DependencyProperty IsFloatingSearchBarProperty =
+            DependencyProperty.Register(
+                "IsFloatingSearchBar",
+                typeof(bool),
+                typeof(SearchLocation),
+                new PropertyMetadata(false));
 
-        public Location CurrentMapViewerCenter
+        public bool IsFloatingSearchBar
         {
-            get { return (Location)GetValue(CurrentMapViewerCenterProperty); }
-            set { SetValue(CurrentMapViewerCenterProperty, value); }
+            get { return (bool)GetValue(IsFloatingSearchBarProperty); }
+            set { SetValue(IsFloatingSearchBarProperty, value); }
         }
+
+
+        private static readonly DependencyProperty IsFloatingSearchBarVisibleProperty =
+           DependencyProperty.Register(
+               "IsFloatingSearchBarVisible",
+               typeof(bool),
+               typeof(SearchLocation),
+               new PropertyMetadata(false));
+        private bool IsFloatingSearchBarVisible
+        {
+            get { return (bool)GetValue(IsFloatingSearchBarVisibleProperty); }
+            set { SetValue(IsFloatingSearchBarVisibleProperty, value); ToggleBarOnChange(); }
+        }
+
+        public void ToggleBarOnChange()
+        {
+            if (!IsFloatingSearchBar || IsFloatingSearchBarVisible)
+            {
+                mapSearchbarGrid.Visibility = Visibility.Visible;
+                mapSearchbarToggle.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                mapSearchbarGrid.Visibility = Visibility.Collapsed;
+                mapSearchbarToggle.Visibility = Visibility.Visible;
+            }
+        }
+
+        
+
 
         public class SearchResultEventArgs : EventArgs
         {
@@ -87,11 +134,22 @@ namespace MapsInMyFolder.UserControls
 
             if (string.IsNullOrWhiteSpace(mapSearchbar.Text))
             {
-                SearchResultPushpinVisibility = Visibility.Hidden;
+                SetPushpinVisibility(Visibility.Hidden);
                 mapSearchbar.Text = Languages.Current["searchMapPlaceholder"];
                 mapSearchbar.Foreground = (System.Windows.Media.SolidColorBrush)new System.Windows.Media.BrushConverter().ConvertFromString("#5A5A5A");
+                IsFloatingSearchBarVisible = false;
             }
         }
+
+        public void SetPushpinVisibility(Visibility visibility)
+        {
+            if (SearchResultPushpin != null)
+            {
+                SearchResultPushpin.Visibility = visibility;
+            }
+
+        }
+
 
         private readonly System.Timers.Timer mapSearchbarTimer = new System.Timers.Timer(500);
 
@@ -99,7 +157,7 @@ namespace MapsInMyFolder.UserControls
         {
             if (mapSearchbar.Text != Languages.Current["searchMapPlaceholder"])
             {
-                SearchResultPushpinVisibility = Visibility.Hidden;
+                SetPushpinVisibility(Visibility.Hidden);
                 mapSearchbar.Foreground = (System.Windows.Media.SolidColorBrush)new System.Windows.Media.BrushConverter().ConvertFromString("#BCBCBC");
             }
 
@@ -122,6 +180,11 @@ namespace MapsInMyFolder.UserControls
 
         private string lastSearch = Languages.Current["searchMapPlaceholder"];
 
+        public Location GetMapLocation()
+        {
+            return SearchResultMap?.Center ?? new Location(0,0);
+        }
+
         private async void SearchStart(bool selectFirst = false)
         {
             string text = "";
@@ -133,7 +196,7 @@ namespace MapsInMyFolder.UserControls
                 {
                     lastSearch = text;
                     (List<string> ListOfAddresses, Dictionary<int, MapLocationSearchEngineResult> SearchEngineResult) searchResults = (null, null);
-                    var userMapLocation = CurrentMapViewerCenter;
+                    var userMapLocation = GetMapLocation();
                     await Task.Run(() => searchResults = MapLocationSearchEngine.Search(text, userMapLocation.Latitude, userMapLocation.Longitude));
                     if (lastSearch != text)
                     {
@@ -182,7 +245,7 @@ namespace MapsInMyFolder.UserControls
                 if (selectedSearchResult != null)
                 {
                     mapSearchbar.Text = selectedSearchResult.DisplayName;
-                    SearchResultPushpinVisibility = Visibility.Visible;
+                    SetPushpinVisibility(Visibility.Visible);
 
                     Location searchResultLocation = new Location(Convert.ToDouble(selectedSearchResult.Latitude), Convert.ToDouble(selectedSearchResult.Longitude));
                     BoundingBox mapviewerBoundingBox = null;
@@ -201,11 +264,27 @@ namespace MapsInMyFolder.UserControls
                         //await Task.Delay((int)Math.Round(Settings.animations_duration_millisecond * 0.3));
                         //LayerTilePreview_RequestUpdate();
                     }
-
+                    SetMapView(searchResultLocation, mapviewerBoundingBox);
                     OnSearchResultEvent(searchResultLocation, mapviewerBoundingBox);
+                    IsFloatingSearchBarVisible = false;
                 }
             }
         }
+
+        public async void SetMapView(Location searchResultLocation, BoundingBox mapViewerBoundingBox)
+        {
+            if (SearchResultPushpin != null)
+            {
+                MapPanel.SetLocation(SearchResultPushpin, searchResultLocation);
+            }
+           
+            if (SearchResultMap != null && mapViewerBoundingBox != null)
+            {
+                SearchResultMap.ZoomToBounds(mapViewerBoundingBox);
+            }
+            await Task.Delay((int)Settings.animations_duration_millisecond);
+        }
+
 
         private void MapSearchbar_KeyDown(object sender, KeyEventArgs e)
         {
@@ -215,18 +294,23 @@ namespace MapsInMyFolder.UserControls
                 {
                     lastSearch = "";
                     SearchStart(true);
-                    SearchLostFocusRequest.Invoke(this, EventArgs.Empty);
+                    SearchLostFocusRequest?.Invoke(this, EventArgs.Empty);
                 }
                 catch { }
             }
 
             if (e.Key == Key.Escape)
             {
-                SearchLostFocusRequest.Invoke(this, EventArgs.Empty);
+                SearchLostFocusRequest?.Invoke(this, EventArgs.Empty);
+                IsFloatingSearchBarVisible = false;
             }
         }
 
-
+        private void mapSearchbarToggle_Click(object sender, RoutedEventArgs e)
+        {
+            IsFloatingSearchBarVisible = true;
+            mapSearchbar.Focus();
+        }
 
     }
 }

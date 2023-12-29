@@ -348,13 +348,6 @@
         <Setter Property="ContextMenu" Value="{StaticResource CopyPasteContextMenu}" />
     </Style>
 
-
-    <Style
-        x:Key="TextBoxCleanStyle_16"
-        BasedOn="{StaticResource TextBoxCleanStyleDefault}"
-        TargetType="{x:Type TextBox}">
-        <Setter Property="FontSize" Value="16" />
-    </Style>
     <Style
         x:Key="TextBoxCleanStyle_13"
         BasedOn="{StaticResource TextBoxCleanStyleDefault}"
@@ -534,7 +527,7 @@
                         BorderThickness="1"
                         CornerRadius="20">
                         <ContentPresenter
-                            Margin="30,0,30,0"
+                            Margin="25,0,25,0"
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center" />
                     </Border>
@@ -551,7 +544,7 @@
                                 Storyboard.TargetProperty="(Button.Background).(SolidColorBrush.Color)"
                                 From="#F18712"
                                 To="#e17710"
-                                Duration="0:0:0.1" />
+                                Duration="0:0:0.2" />
                         </Storyboard>
                     </BeginStoryboard>
                 </EventTrigger.Actions>
@@ -566,7 +559,7 @@
                                 Storyboard.TargetProperty="(Button.Background).(SolidColorBrush.Color)"
                                 From="#e17710"
                                 To="#F18712"
-                                Duration="0:0:0.1" />
+                                Duration="0:0:0.2" />
                         </Storyboard>
                     </BeginStoryboard>
                 </EventTrigger.Actions>

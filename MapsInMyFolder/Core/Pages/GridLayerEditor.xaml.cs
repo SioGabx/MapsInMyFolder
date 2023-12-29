@@ -2,7 +2,9 @@
 using MapsInMyFolder.Commun;
 using MapsInMyFolder.MapControl;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -22,12 +24,25 @@ namespace MapsInMyFolder
 
         private static ObservableCollection<Layers> _items;
 
+        public static Func<IEnumerable<Layers>> GetLayersListMethod
+        {
+            get
+            {
+                Func<IEnumerable<Layers>> func = () =>
+                {
+                    return _items;
+                };
+                return func;
+            }
+        }
+
         private void GetData()
         {
             _items = new ObservableCollection<Layers>();
 
             foreach (Layers layers in Layers.GetLayersList())
             {
+                if (layers.SiteName.StartsWith("G"))
                 _items.Add(layers);
             }
             LayerGrid.ItemsSource = _items;
@@ -36,6 +51,7 @@ namespace MapsInMyFolder
         private void LayerGrid_Loaded(object sender, RoutedEventArgs e)
         {
             GetData();
+            LayerPanel.Init();
             MapFigures = new MapFigures();
         }
 
@@ -61,13 +77,13 @@ namespace MapsInMyFolder
             Map.CurentView.SE_Latitude = bbox.South;
             Map.CurentView.SE_Longitude = bbox.East;
 
-            layer_browser.ExecuteScriptAsyncWhenPageLoaded("UpdatePreview();");
+            LayerPanel.LayerBrowser.ExecuteScriptAsyncWhenPageLoaded("UpdatePreview();");
             return;
         }
 
         private void mapLocationSearchBar_SearchLostFocusRequest(object sender, EventArgs e)
         {
-            layer_browser.Focus();
+            LayerPanel.LayerBrowser.Focus();
         }
 
         private async void mapLocationSearchBar_SearchResultEvent(object sender, UserControls.SearchLocation.SearchResultEventArgs e)

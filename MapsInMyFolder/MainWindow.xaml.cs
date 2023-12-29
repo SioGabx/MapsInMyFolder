@@ -225,7 +225,7 @@ namespace MapsInMyFolder
         {
             Instance.LightInit();
             Instance.MainPage.MapLoad();
-            Instance.MainPage.LayerPanel.Refresh();
+            Instance.MainPage.LayerPanel.Init();
             Instance.MainPage.InitDownloadPanel();
             Instance.MainPage.SetCurrentLayer(Layers.Current.Id);
         }

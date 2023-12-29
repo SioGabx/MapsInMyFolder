@@ -115,7 +115,7 @@ namespace MapsInMyFolder
         {
             Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
             {
-                LayersPanel.ReloadPage();
+                LayersPanel.Reload();
                 LayersPanel.LayersSearchBar.SearchLayerStart();
             }, null);
         }

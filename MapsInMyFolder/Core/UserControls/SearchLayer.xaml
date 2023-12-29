@@ -16,7 +16,7 @@
             GotFocus="Layer_searchbar_GotFocus"
             KeyDown="Layer_searchbar_KeyDown"
             LostFocus="Layer_searchbar_LostFocus"
-            Style="{DynamicResource TextBoxCleanStyle_16}"
+            Style="{DynamicResource TextBoxCleanStyleDefault}"
             Text="{Binding Source={x:Static commun:Languages.Current}, Mode=OneWay, Path=[searchLayerPlaceholder]}"
             TextChanged="Layer_searchbar_TextChanged" />
     </Grid>

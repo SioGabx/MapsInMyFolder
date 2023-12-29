@@ -17,6 +17,7 @@
         <customCtrl:SearchLayer
             x:Name="LayersSearchBar"
             Grid.Row="0"
+            FontSize="16"
             Margin="10,0,5,0"
             LinkedLayerBrowser="{Binding ElementName=LayerBrowser}" />
         <Border
@@ -29,7 +30,7 @@
             <cefsharp:ChromiumWebBrowser
                 x:Name="LayerBrowser"
                 LoadingStateChanged="LayerBrowser_LoadingStateChanged"
-                WebBrowser="{Binding WebBrowser, Mode=OneWayToSource}" ToolTipOpening="LayerBrowser_ToolTipOpening" />
+                ToolTipOpening="LayerBrowser_ToolTipOpening" />
         </Border>
     </Grid>
 </UserControl>

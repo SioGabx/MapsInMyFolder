@@ -25,8 +25,6 @@ namespace MapsInMyFolder
         bool isInitialised = false;
         public static MapSelectable MapSelectable { get; set; }
         private static MapFigures MapFigures;
-        public string SomeOtherThing { get; set; }
-        //public static readonly DependencyProperty LayersListProperty = DependencyProperty.Register("LayersList", typeof(IEnumerable<Layers>), typeof(MainPage));
 
         public static Func<IEnumerable<Layers>> GetLayersListMethod
         {
@@ -62,14 +60,13 @@ namespace MapsInMyFolder
 
         public void Preload()
         {
-            LayerPanel.ReloadPage();
             MapLoad();
         }
 
         void Init()
         {
             InitDownloadPanel();
-            LayerPanel.InitLayerPanel();
+            LayerPanel.Init();
             isInitialised = true;
             Notification.UpdateNotification += UpdateNotification;
         }
@@ -398,12 +395,6 @@ namespace MapsInMyFolder
 
         private async void mapLocationSearchBar_SearchResultEvent(object sender, UserControls.SearchLocation.SearchResultEventArgs e)
         {
-            MapPanel.SetLocation(searchResult, e.SearchResultLocation);
-            if (e.MapViewerBoundingBox != null)
-            {
-                mapviewer.ZoomToBounds(e.MapViewerBoundingBox);
-            }
-            await Task.Delay((int)Settings.animations_duration_millisecond);
             SetBBOXPreviewRequestUpdate();
         }
 
@@ -504,7 +495,7 @@ namespace MapsInMyFolder
         }
         public void RequestReloadPage()
         {
-            LayerPanel.ReloadPage();
+            LayerPanel.Reload();
         }
 
         public async void ShowLayerWarning(int id)
