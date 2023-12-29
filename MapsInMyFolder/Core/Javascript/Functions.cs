@@ -269,7 +269,7 @@ namespace MapsInMyFolder
                 string printString = ConvertJSObjectToString(print);
                 if (!string.IsNullOrEmpty(printString))
                 {
-                    if (LayerId == -2 && Tiles.AcceptJavascriptPrint)
+                    if (LayerId == (int)Layers.ReservedId.EditorTempLayer && Tiles.AcceptJavascriptPrint)
                     {
                         instance.Logs = string.Concat(instance.Logs, "\n", printString);
                     }

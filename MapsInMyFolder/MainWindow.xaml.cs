@@ -64,14 +64,16 @@ namespace MapsInMyFolder
             PrepareDownloadPage.Init();
             MainContentFrame.Navigate(PrepareDownloadPage);
         }
-        public void FrameLoad_CustomOrEditLayers(int Layerid, int prefilLayerId = -1)
+
+        public void FrameLoad_CustomOrEditLayers(int Layerid, CustomOrEditLayersPage.EditingMode EditMode)
         {
             Popup_opening(false);
             CustomOrEditLayersPage CustomOrEditLayersPage = new CustomOrEditLayersPage
             {
-                LayerId = Layerid
+                LayerId = Layerid,
+                EditMode = EditMode
             };
-            CustomOrEditLayersPage.Init_CustomOrEditLayersWindow(prefilLayerId);
+            CustomOrEditLayersPage.Init_CustomOrEditLayersWindow();
 
             MainContentFrame.Navigate(CustomOrEditLayersPage);
             Tiles.AcceptJavascriptPrint = true;

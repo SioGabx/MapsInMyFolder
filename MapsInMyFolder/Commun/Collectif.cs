@@ -918,7 +918,7 @@ namespace MapsInMyFolder.Commun
                         else if (type == typeof(UserControls.ScriptEditor))
                         {
                             UserControls.ScriptEditor TitleScript = (UserControls.ScriptEditor)element;
-                            hachCode = TitleScript.Script.GetHashCode();
+                            hachCode = TitleScript?.Script?.GetHashCode() ?? 0;
                         }
                         else if (type == typeof(BlackPearl.Controls.CoreLibrary.MultiSelectCombobox))
                         {

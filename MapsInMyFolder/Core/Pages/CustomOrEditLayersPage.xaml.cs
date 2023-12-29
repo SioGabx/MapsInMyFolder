@@ -37,19 +37,37 @@ namespace MapsInMyFolder
 
         private static MapFigures MapFigures { get; set; }
         public int LayerId { get; set; }
-        private static int InternalEditorId { get; set; } = -2;
+        public EditingMode EditMode { get; set; } = EditingMode.New;
         private int DefaultValuesHachCode = 0;
-        public void Init_CustomOrEditLayersWindow(int prefilLayerId)
+
+        public enum EditingMode
         {
-            if (prefilLayerId == -1)
+            New, NewFromTemplate, Edit
+        }
+
+
+        public void Init_CustomOrEditLayersWindow()
+        {
+            int EditorLayerIdToLoad = -1;
+            if (EditMode == EditingMode.New)
             {
-                prefilLayerId = LayerId;
+                EditorLayerIdToLoad = -1;
+                LayerId = -1;
+            }else if(EditMode == EditingMode.NewFromTemplate)
+            {
+                EditorLayerIdToLoad = LayerId;
+                LayerId = -1;
             }
+            else if (EditMode == EditingMode.Edit)
+            {
+                EditorLayerIdToLoad = LayerId;
+            }
+
             Javascript.instance.Logs = String.Empty;
             TextboxLayerScriptConsole.Text = String.Empty;
-            Javascript.Functions.ClearVar(-1);
-            Javascript.Functions.ClearVar(InternalEditorId);
-            GenerateTempLayerInDicList();
+            Javascript.Functions.ClearVar((int)Layers.ReservedId.GenericTempLayer);
+            Javascript.Functions.ClearVar((int)Layers.ReservedId.EditorTempLayer);
+            GenerateEditorTempLayerInDicList();
             mapviewerappercu.Background = Collectif.RgbValueToSolidColorBrush(Settings.background_layer_color_R, Settings.background_layer_color_G, Settings.background_layer_color_B);
             mapviewerappercu.Center = MainPage.Instance.mapviewer.Center;
             mapviewerappercu.ZoomLevel = MainPage.Instance.mapviewer.ZoomLevel;
@@ -59,7 +77,7 @@ namespace MapsInMyFolder
             SetContextMenu();
 
 
-            Init_LayerEditableTextbox(prefilLayerId);
+            Init_LayerEditableTextbox(EditorLayerIdToLoad);
             SetAppercuLayers(forceUpdate: true);
             DoExpandStyleTextBox();
 
@@ -129,7 +147,7 @@ namespace MapsInMyFolder
             TextboxLayerScriptConsole.ContextMenu.Items.Add(helpConsoleMenuItem);
             void helpConsoleMenuItem_Click(object sender, EventArgs e)
             {
-                Javascript.Functions.Help(-2);
+                Javascript.Functions.Help((int)Layers.ReservedId.EditorTempLayer);
                 TextboxLayerScriptConsole.ScrollToEnd();
             }
 
@@ -176,14 +194,14 @@ namespace MapsInMyFolder
             }), DispatcherPriority.SystemIdle);
         }
 
-        static void GenerateTempLayerInDicList()
+        static void GenerateEditorTempLayerInDicList()
         {
             Layers MoinsUnEditLayer = Layers.Empty();
-            MoinsUnEditLayer.Id = InternalEditorId;
-            Layers.Add(-2, MoinsUnEditLayer);
+            MoinsUnEditLayer.Id = (int)Layers.ReservedId.EditorTempLayer;
+            Layers.Add(MoinsUnEditLayer.Id, MoinsUnEditLayer);
         }
 
-        void Init_LayerEditableTextbox(int prefilLayerId)
+        private void Init_LayerEditableTextbox(int prefilLayerId)
         {
             InitComboboxAvailableValues();
             Layers LayerInEditMode = Layers.GetLayerById(prefilLayerId);
@@ -437,8 +455,8 @@ namespace MapsInMyFolder
                 }
                 if (!string.IsNullOrEmpty(url))
                 {
-                    UpdateMoinsUnLayer();
-                    MapTileLayer_Transparent.TileSource = new TileSource { UriFormat = url, LayerID = InternalEditorId };
+                    UpdateEditorTempLayerToValues();
+                    MapTileLayer_Transparent.TileSource = new TileSource { UriFormat = url, LayerID = (int)Layers.ReservedId.EditorTempLayer };
 
                 }
                 SetBackgroundMap(mapviewerappercu);
@@ -644,14 +662,14 @@ namespace MapsInMyFolder
         {
             try
             {
-                UpdateMoinsUnLayer();
+                UpdateEditorTempLayerToValues();
             }
             catch (Exception ex)
             {
                 Debug.WriteLine(ex.Message);
                 return string.Empty;
             }
-            Layers layers = Layers.GetLayerById(-2);
+            Layers layers = Layers.GetLayerById((int)Layers.ReservedId.EditorTempLayer);
             if (layers is null)
             {
                 return string.Empty;
@@ -666,23 +684,23 @@ namespace MapsInMyFolder
             return ($"SET {ShareStringKeyValues.Trim(',')}");
         }
 
-        private int SaveLayer()
+        private void SaveLayer()
         {
             try
             {
-                UpdateMoinsUnLayer();
+                UpdateEditorTempLayerToValues();
             }
             catch (Exception ex)
             {
                 Debug.WriteLine(ex.Message);
                 Message.NoReturnBoxAsync(ex.Message, Languages.Current["dialogTitleOperationFailed"]);
-                return -1;
+                return;
             }
-            Layers layers = Layers.GetLayerById(-2);
+            Layers layers = Layers.GetLayerById((int)Layers.ReservedId.EditorTempLayer);
             if (layers is null)
             {
                 Message.NoReturnBoxAsync(Languages.Current["editorMessageErrorDatabaseSave"], Languages.Current["dialogTitleOperationFailed"]);
-                return -1;
+                return;
             }
 
             var LayerSaveValues = Layers.GetValuesForSaving(layers);
@@ -755,14 +773,14 @@ namespace MapsInMyFolder
                 Debug.WriteLine($"Error comparaison des layers à partir du N°{LayerId} : {ex.Message}");
 
             }
-            if (LayerId == -1)
+            if (LayerId == (int)Layers.ReservedId.GenericTempLayer)
             {
                 int CustomLayersMaxID = Database.ExecuteScalarSQLCommand("SELECT MAX(ID) FROM 'main'.'CUSTOMSLAYERS'");
                 int EditedLayersMaxID = Database.ExecuteScalarSQLCommand("SELECT MAX(ID) FROM 'main'.'EDITEDLAYERS'");
                 int ID = Math.Max(1000000, Math.Max(CustomLayersMaxID, EditedLayersMaxID)) + 1;
                 Database.ExecuteNonQuerySQLCommand("INSERT INTO 'main'.'CUSTOMSLAYERS'('ID','NAME', 'DESCRIPTION', 'CATEGORY', 'COUNTRY', 'IDENTIFIER', 'TILE_URL', 'MIN_ZOOM', 'MAX_ZOOM', 'FORMAT', 'SITE', 'SITE_URL', 'STYLE', 'TILE_SIZE', 'FAVORITE', 'SCRIPT', 'VISIBILITY', 'SPECIALSOPTIONS', 'RECTANGLES', 'VERSION', 'HAS_SCALE') " +
                 $"VALUES({ID}, {NAME}, {DESCRIPTION}, {CATEGORY},{COUNTRY}, {IDENTIFIER}, {TILE_URL}, {MIN_ZOOM}, {MAX_ZOOM}, {FORMAT}, {SITE}, {SITE_URL}, {STYLE},{TILE_SIZE}, {0} , {SCRIPT},  '{Visibility.Visible}',  {SPECIALSOPTIONS}, {RECTANGLES}, {1}, {HAS_SCALE})");
-                return ID;
+                return;
             }
             else if (Database.ExecuteScalarSQLCommand("SELECT COUNT(*) FROM 'main'.'EDITEDLAYERS' WHERE ID = " + LayerId) == 0)
             {
@@ -780,7 +798,7 @@ namespace MapsInMyFolder
                 }
                 Database.ExecuteNonQuerySQLCommand($"UPDATE 'main'.'EDITEDLAYERS' SET 'NAME'={NAME},'DESCRIPTION'={DESCRIPTION},'CATEGORY'={CATEGORY},'COUNTRY'={COUNTRY},'IDENTIFIER'={IDENTIFIER},'TILE_URL'={TILE_URL},'MIN_ZOOM'={MIN_ZOOM},'MAX_ZOOM'={MAX_ZOOM},'FORMAT'={FORMAT},'SITE'={SITE},'SITE_URL'={SITE_URL},'STYLE'={STYLE},'TILE_SIZE'={TILE_SIZE},'SCRIPT'={SCRIPT},'VISIBILITY'='{Visibility.Visible}','SPECIALSOPTIONS'={SPECIALSOPTIONS}, 'RECTANGLES'={RECTANGLES}, 'VERSION'={LastVersion}, 'HAS_SCALE'={HAS_SCALE} WHERE ID = {LayerId}");
             }
-            return LayerId;
+            return;
         }
         private async void ClosePage_button_Click(object sender, RoutedEventArgs e)
         {
@@ -818,7 +836,7 @@ namespace MapsInMyFolder
             MainPage.Instance.RequestReloadPage();
         }
 
-        public void UpdateMoinsUnLayer()
+        public void UpdateEditorTempLayerToValues()
         {
             Javascript.EngineClearList();
             string NAME = TextboxLayerName.Text.Trim();
@@ -836,11 +854,11 @@ namespace MapsInMyFolder
             int TILE_SIZE = GetIntValueFromTextBox(TextboxLayerTileWidth);
             string SCRIPT = TextboxLayerScript.Script.Trim();
             string RECTANGLES = TextboxRectangles.Script.Trim();
-            Layers layers = Layers.GetLayerById(-2);
+            Layers layers = Layers.GetLayerById((int)Layers.ReservedId.EditorTempLayer);
             if (layers is null)
             {
-                GenerateTempLayerInDicList();
-                layers = Layers.GetLayerById(-2);
+                GenerateEditorTempLayerInDicList();
+                layers = Layers.GetLayerById((int)Layers.ReservedId.EditorTempLayer);
             }
             layers.Name = NAME;
             layers.Description = DESCRIPTION;
@@ -875,7 +893,7 @@ namespace MapsInMyFolder
             layers.Style = STYLE;
             layers.BoundaryRectangles = RECTANGLES;
             layers.IsAtScale = has_scale.IsChecked ?? false;
-            Layers.Add(-2, layers);
+            Layers.Add((int)Layers.ReservedId.EditorTempLayer, layers);
         }
 
         async void AutoDetectZoom()
@@ -893,16 +911,16 @@ namespace MapsInMyFolder
             int ZoomMinimum = -1;
             int ZoomMaximum = -1;
 
-            UpdateMoinsUnLayer();
+            UpdateEditorTempLayerToValues();
 
             for (int Z = 0; Z < 30; Z++)
             {
                 string infotext = Languages.GetWithArguments("editorMessageAutoDetectReport", Z);
                 LabelAutoDetectZoom.ContentValue = infotext;
-                Javascript.Functions.Print(infotext, -2);
+                Javascript.Functions.Print(infotext, (int)Layers.ReservedId.EditorTempLayer);
 
                 var (X, Y) = Collectif.CoordonneesToTile(location.Latitude, location.Longitude, Z);
-                string url = Collectif.Replacements(TextboxLayerTileUrl.Text, X.ToString(), Y.ToString(), Z.ToString(), InternalEditorId, Javascript.InvokeFunction.getTile);
+                string url = Collectif.Replacements(TextboxLayerTileUrl.Text, X.ToString(), Y.ToString(), Z.ToString(), (int)Layers.ReservedId.EditorTempLayer, Javascript.InvokeFunction.getTile);
 
                 int result = await Collectif.CheckIfDownloadSuccess(url);
                 Debug.WriteLine("-->" + result);
@@ -975,8 +993,8 @@ namespace MapsInMyFolder
             {
                 Dispatcher.Invoke(new Action(() =>
                 {
-                    Javascript.EngineStopById(-2);
-                    UpdateMoinsUnLayer();
+                    Javascript.EngineStopById((int)Layers.ReservedId.EditorTempLayer);
+                    UpdateEditorTempLayerToValues();
                     SetAppercuLayers(TextboxLayerTileUrl.Text);
                 }), DispatcherPriority.ContextIdle);
             }
@@ -1043,7 +1061,7 @@ namespace MapsInMyFolder
                     Database.ExecuteNonQuerySQLCommand("DELETE FROM EDITEDLAYERS WHERE ID=" + LayerId);
                     Leave(true);
                     DisposeElementBeforeLeave();
-                    MainWindow.Instance.FrameLoad_CustomOrEditLayers(LayerId);
+                    MainWindow.Instance.FrameLoad_CustomOrEditLayers(LayerId, EditMode);
                 }
                 catch (Exception ex)
                 {
@@ -1353,8 +1371,8 @@ namespace MapsInMyFolder
             int ZoomLevel = Convert.ToInt32(Math.Floor(mapviewerappercu.ZoomLevel));
             (int X, int Y) = Collectif.CoordonneesToTile(mapviewerappercu.Center.Latitude, mapviewerappercu.Center.Longitude, ZoomLevel);
 
-            string Url = GetUrl.FromTileXYZ(TextboxLayerTileUrl.Text, X, Y, ZoomLevel, -2, invokeFunction);
-            Javascript.Functions.Print(invokeFunction.ToString() + " : " + Url, -2);
+            string Url = GetUrl.FromTileXYZ(TextboxLayerTileUrl.Text, X, Y, ZoomLevel, (int)Layers.ReservedId.EditorTempLayer, invokeFunction);
+            Javascript.Functions.Print(invokeFunction.ToString() + " : " + Url, (int)Layers.ReservedId.EditorTempLayer);
             Clipboard.SetText(Url);
         }
 

@@ -63,7 +63,17 @@ namespace MapsInMyFolder
         }
 
         public static Layers Current { get; set; } = Empty();
+
         public static int StartupLayerId { get; set; } = Settings.layer_startup_id;
+
+        //(int)Layers.ReservedId.EditorTempLayer
+        public enum ReservedId
+        {
+            GenericTempLayer = -1,
+            EditorTempLayer = -2
+        }
+
+
 
         public class LayersSpecialsOptions
         {
@@ -409,7 +419,8 @@ namespace MapsInMyFolder
 
             return new Layers((int)DB_Layer_ID, DB_Layer_FAVORITE, DB_Layer_NAME, DB_Layer_DESCRIPTION, DB_Layer_CATEGORY, DB_Layer_COUNTRY, DB_Layer_IDENTIFIER, DB_Layer_TILE_URL, DB_Layer_SITE, DB_Layer_SITE_URL, DB_Layer_MIN_ZOOM, DB_Layer_MAX_ZOOM, DB_Layer_FORMAT, DB_Layer_STYLE, DB_Layer_TILE_SIZE, DB_Layer_SCRIPT, DB_Layer_VISIBILITY, DeserializeSpecialsOptions, DB_Layer_RECTANGLES, DB_Layer_VERSION, DB_Layer_HAS_SCALE);
         }
-        public static void LayersMergeLegacyWithEdited(List<Layers> legacyLayers, List<Layers> editedLayers)
+
+        private static void LayersMergeLegacyWithEdited(List<Layers> legacyLayers, List<Layers> editedLayers)
         {
             Layers.Clear();
             Dictionary<int, Layers> editedLayersDictionnary = editedLayers.ToDictionary(l => l.Id, l => l);
@@ -618,7 +629,7 @@ namespace MapsInMyFolder
             {
                 Debug.WriteLine("Error getPreview exception :" + ex.Message);
             }
-            return String.Empty;
+            return string.Empty;
         }
     }
 }

@@ -1880,7 +1880,7 @@
                         }
                         break;
                     case "modifier_calque":
-                        LayerCEFSharpLink.layerMakeEdits(parseInt(id));
+                        LayerCEFSharpLink.layerMakeEdits(parseInt(id), "Edit");
                         break;
                     case "supprimer_cache_calque":
 
@@ -1895,10 +1895,10 @@
                         }
                         break;
                     case "ajouter_calque":
-                        LayerCEFSharpLink.layerMakeEdits(-1);
+                        LayerCEFSharpLink.layerMakeEdits(-1, "New");
                         break;
                     case "ajouter_calque_template":
-                        LayerCEFSharpLink.layerMakeEdits(-1, parseInt(id));
+                        LayerCEFSharpLink.layerMakeEdits(parseInt(id), "NewFromTemplate");
                         break;
                     case "basculer_affichage_showmasque":
                         document.querySelector("ul").classList.add("showHiddenLayer"); //showHiddenLayer

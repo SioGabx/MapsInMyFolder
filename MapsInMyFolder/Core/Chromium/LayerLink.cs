@@ -61,7 +61,6 @@ namespace MapsInMyFolder
 
         public void LayerVisibility(double id = 0, bool isVisible = true)
         {
-            //Debug.WriteLine($"Layer_visibility : id={id} & isVisible={isVisible}");
             int id_int = Convert.ToInt32(id);
             Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
             {
@@ -70,13 +69,16 @@ namespace MapsInMyFolder
         }
 
 
-        public void LayerMakeEdits(double id = 0, double prefilid = -1)
+        public void LayerMakeEdits(double id, string EditMode)
         {
             int id_int = Convert.ToInt32(id);
-            int prefilid_int = Convert.ToInt32(prefilid);
+            if (!Enum.TryParse(EditMode, out CustomOrEditLayersPage.EditingMode EditingMode))
+            {
+                EditingMode = CustomOrEditLayersPage.EditingMode.New;
+            }
             Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
             {
-                MainWindow.Instance.FrameLoad_CustomOrEditLayers(id_int, prefilid_int);
+                MainWindow.Instance.FrameLoad_CustomOrEditLayers(id_int, EditingMode);
             }, null);
         }
 
