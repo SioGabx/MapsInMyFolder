@@ -7,11 +7,13 @@ using System.Data.SQLite;
 using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media.Animation;
+using System.Windows.Threading;
 using TextBox = System.Windows.Controls.TextBox;
 
 namespace MapsInMyFolder
@@ -393,12 +395,12 @@ namespace MapsInMyFolder
             MainWindow.Instance.FrameLoad_PrepareDownload();
         }
 
-        private async void mapLocationSearchBar_SearchResultEvent(object sender, UserControls.SearchLocation.SearchResultEventArgs e)
+        private void MapLocationSearchBar_SearchResultEvent(object sender, UserControls.SearchLocation.SearchResultEventArgs e)
         {
             SetBBOXPreviewRequestUpdate();
         }
 
-        private void mapLocationSearchBar_SearchLostFocusRequest(object sender, EventArgs e)
+        private void MapLocationSearchBar_SearchLostFocusRequest(object sender, EventArgs e)
         {
             LayerPanel.LayerBrowser.Focus();
         }
@@ -615,6 +617,19 @@ namespace MapsInMyFolder
             return;
         }
 
+        private void LayerPanel_OpenEditLayerPageEvent(object sender, UserControls.LayersPanel.LayerIdEventArgs e)
+        {
+            if (e.Args is not CustomOrEditLayersPage.EditingMode EditMode)
+            {
+                EditMode = CustomOrEditLayersPage.EditingMode.New;
+            }
+            Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
+            {
+                CustomOrEditLayersPage EditPage = MainWindow.Instance.FrameLoad_CustomOrEditLayers(e.LayerId, EditMode);
+                EditPage.Init();
+
+            }, null);
+        }
 
     }
 }

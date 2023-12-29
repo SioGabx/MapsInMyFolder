@@ -44,6 +44,7 @@ namespace MapsInMyFolder.UserControls
         public class LayerIdEventArgs : EventArgs
         {
             public int LayerId { get; }
+            public object Args { get; set; }
 
             public LayerIdEventArgs(int LayerId)
             {
@@ -59,6 +60,15 @@ namespace MapsInMyFolder.UserControls
             SetCurrentLayerEvent?.Invoke(this, new LayerIdEventArgs(LayerId));
         }
 
+        public event LayerIdEventHandler OpenEditLayerPageEvent;
+        public virtual void OnOpenEditLayerPageEventEvent(int LayerId, CustomOrEditLayersPage.EditingMode EditMode)
+        {
+            LayerIdEventArgs EventArgs = new LayerIdEventArgs(LayerId)
+            {
+                Args = EditMode
+            };
+            OpenEditLayerPageEvent?.Invoke(this, EventArgs);
+        }
 
 
         private void InitLayerPanel()

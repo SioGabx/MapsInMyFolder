@@ -25,7 +25,7 @@ namespace MapsInMyFolder.UserControls
             ToggleBarOnChange();
         }
 
-        public static DependencyProperty SearchResultPushpinProperty =
+        public static readonly DependencyProperty SearchResultPushpinProperty =
             DependencyProperty.Register(
                 "SearchResultPushpin",
                 typeof(Pushpin),
@@ -36,9 +36,9 @@ namespace MapsInMyFolder.UserControls
         {
             get { return (Pushpin)GetValue(SearchResultPushpinProperty); }
             set { SetValue(SearchResultPushpinProperty, value); }
-        }    
-        
-        public static DependencyProperty SearchResultMapProperty =
+        }
+
+        public static readonly DependencyProperty SearchResultMapProperty =
             DependencyProperty.Register(
                 "SearchResultMap",
                 typeof(MapControl.Map),
@@ -257,12 +257,6 @@ namespace MapsInMyFolder.UserControls
                                                                Convert.ToDouble(boundingBox[2]),
                                                                Convert.ToDouble(boundingBox[1]),
                                                                Convert.ToDouble(boundingBox[3]));
-
-                        //LayerTilePreview_RequestUpdate();
-                        //await Task.Delay((int)Math.Round(Settings.animations_duration_millisecond * 0.7));
-                        //LayerTilePreview_RequestUpdate();
-                        //await Task.Delay((int)Math.Round(Settings.animations_duration_millisecond * 0.3));
-                        //LayerTilePreview_RequestUpdate();
                     }
                     SetMapView(searchResultLocation, mapviewerBoundingBox);
                     OnSearchResultEvent(searchResultLocation, mapviewerBoundingBox);
@@ -306,10 +300,11 @@ namespace MapsInMyFolder.UserControls
             }
         }
 
-        private void mapSearchbarToggle_Click(object sender, RoutedEventArgs e)
+        private void MapSearchbarToggle_Click(object sender, RoutedEventArgs e)
         {
             IsFloatingSearchBarVisible = true;
             mapSearchbar.Focus();
+            mapSearchbar.CaretIndex = mapSearchbar.Text.Length;
         }
 
     }

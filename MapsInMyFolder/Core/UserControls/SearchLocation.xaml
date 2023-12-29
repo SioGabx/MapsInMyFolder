@@ -64,7 +64,7 @@
             HorizontalAlignment="Left"
             VerticalAlignment="Top"
             Background="#303031"
-            Click="mapSearchbarToggle_Click"
+            Click="MapSearchbarToggle_Click"
             Foreground="#888989"
             ToolTip="{Binding Source={x:Static commun:Languages.Current}, Path=[searchMapPlaceholder]}">
             <ui:FontIcon Glyph="&#xE11A;" RenderTransformOrigin="0.5,0.5">

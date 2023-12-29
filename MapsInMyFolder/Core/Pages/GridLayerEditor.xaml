@@ -12,7 +12,7 @@
     Title="GridLayerEditor"
     d:DesignHeight="450"
     d:DesignWidth="800"
-    mc:Ignorable="d">
+    mc:Ignorable="d" Loaded="Page_Loaded">
     <Page.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -47,7 +47,8 @@
                 Grid.Row="1"
                 DataContext="{Binding RelativeSource={RelativeSource AncestorType={x:Type mapsinmyfolder:GridLayerEditor}}}"
                 GetLayersMethod="{Binding GetLayersListMethod}"
-                LinkedMapViewer="{Binding ElementName=mapviewer}" />
+                LinkedMapViewer="{Binding ElementName=mapviewer}"
+                OpenEditLayerPageEvent="LayerPanel_OpenEditLayerPageEvent" />
         </Grid>
 
         <Grid Grid.Column="1" Visibility="Visible">
@@ -66,10 +67,9 @@
                 FontSize="30"
                 Foreground="#FFE2E2E1" />
             <customCtrl:EditableDataGrid
-                Margin="10,0,15,0"
                 x:Name="LayerGrid"
                 Grid.Row="1"
-                Loaded="LayerGrid_Loaded" />
+                Margin="10,0,15,0" />
         </Grid>
 
         <Grid Grid.Column="1" Visibility="Collapsed">
@@ -105,10 +105,10 @@
                 <customCtrl:SearchLocation
                     x:Name="mapLocationSearchBar"
                     Margin="10,0,0,0"
+                    SearchLostFocusRequest="MapLocationSearchBar_SearchLostFocusRequest"
+                    SearchResultEvent="MapLocationSearchBar_SearchResultEvent"
                     SearchResultMap="{Binding ElementName=mapviewer}"
-                    SearchResultPushpin="{Binding ElementName=searchResult}"
-                    SearchLostFocusRequest="mapLocationSearchBar_SearchLostFocusRequest"
-                    SearchResultEvent="mapLocationSearchBar_SearchResultEvent" />
+                    SearchResultPushpin="{Binding ElementName=searchResult}" />
             </Grid>
 
             <Grid Grid.Row="2">

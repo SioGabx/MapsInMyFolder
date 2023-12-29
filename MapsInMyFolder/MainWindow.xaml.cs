@@ -65,7 +65,7 @@ namespace MapsInMyFolder
             MainContentFrame.Navigate(PrepareDownloadPage);
         }
 
-        public void FrameLoad_CustomOrEditLayers(int Layerid, CustomOrEditLayersPage.EditingMode EditMode)
+        public CustomOrEditLayersPage FrameLoad_CustomOrEditLayers(int Layerid, CustomOrEditLayersPage.EditingMode EditMode)
         {
             Popup_opening(false);
             CustomOrEditLayersPage CustomOrEditLayersPage = new CustomOrEditLayersPage
@@ -73,10 +73,9 @@ namespace MapsInMyFolder
                 LayerId = Layerid,
                 EditMode = EditMode
             };
-            CustomOrEditLayersPage.Init_CustomOrEditLayersWindow();
-
             MainContentFrame.Navigate(CustomOrEditLayersPage);
             Tiles.AcceptJavascriptPrint = true;
+            return CustomOrEditLayersPage;
         }
 
         public void Init()

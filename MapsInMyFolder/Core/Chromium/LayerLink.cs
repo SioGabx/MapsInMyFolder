@@ -76,10 +76,7 @@ namespace MapsInMyFolder
             {
                 EditingMode = CustomOrEditLayersPage.EditingMode.New;
             }
-            Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
-            {
-                MainWindow.Instance.FrameLoad_CustomOrEditLayers(id_int, EditingMode);
-            }, null);
+            LayersPanel?.OnOpenEditLayerPageEventEvent(id_int, EditingMode);
         }
 
         public void LayerSetAsCurrent(double id = 0)
@@ -87,7 +84,7 @@ namespace MapsInMyFolder
             int id_int = Convert.ToInt32(id);
             Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
             {
-                LayersPanel.OnSetCurrentLayerEvent(id_int);
+                LayersPanel?.OnSetCurrentLayerEvent(id_int);
             }, null);
         }
         public void LayerShowWarningLegacyVersionNewerThanEdited(double id = 0)

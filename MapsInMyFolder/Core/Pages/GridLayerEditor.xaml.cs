@@ -5,10 +5,12 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Threading;
 
 namespace MapsInMyFolder
 {
@@ -22,16 +24,18 @@ namespace MapsInMyFolder
             InitializeComponent();
         }
 
+        public new bool IsInitialized { get; private set; }
+      
         private static ObservableCollection<Layers> _items;
 
         public static Func<IEnumerable<Layers>> GetLayersListMethod
         {
             get
             {
-                Func<IEnumerable<Layers>> func = () =>
+                static IEnumerable<Layers> func()
                 {
                     return _items;
-                };
+                }
                 return func;
             }
         }
@@ -43,16 +47,24 @@ namespace MapsInMyFolder
             foreach (Layers layers in Layers.GetLayersList())
             {
                 if (layers.SiteName.StartsWith("G"))
-                _items.Add(layers);
+                    _items.Add(layers);
             }
             LayerGrid.ItemsSource = _items;
         }
-
-        private void LayerGrid_Loaded(object sender, RoutedEventArgs e)
+        public void Init()
         {
-            GetData();
-            LayerPanel.Init();
-            MapFigures = new MapFigures();
+            if (!IsInitialized)
+            {
+                IsInitialized = true;
+                GetData();
+                LayerPanel.Init();
+                MapFigures = new MapFigures();
+            }
+        }
+
+        private void Page_Loaded(object sender, RoutedEventArgs e)
+        {
+            Init();
         }
 
         private void Layer_browser_LoadingStateChanged(object sender, CefSharp.LoadingStateChangedEventArgs e)
@@ -81,12 +93,12 @@ namespace MapsInMyFolder
             return;
         }
 
-        private void mapLocationSearchBar_SearchLostFocusRequest(object sender, EventArgs e)
+        private void MapLocationSearchBar_SearchLostFocusRequest(object sender, EventArgs e)
         {
             LayerPanel.LayerBrowser.Focus();
         }
 
-        private async void mapLocationSearchBar_SearchResultEvent(object sender, UserControls.SearchLocation.SearchResultEventArgs e)
+        private async void MapLocationSearchBar_SearchResultEvent(object sender, UserControls.SearchLocation.SearchResultEventArgs e)
         {
             MapPanel.SetLocation(searchResult, e.SearchResultLocation);
             if (e.MapViewerBoundingBox != null)
@@ -96,5 +108,44 @@ namespace MapsInMyFolder
             await Task.Delay((int)Settings.animations_duration_millisecond);
             LayerTilePreview_RequestUpdate();
         }
+
+        private void LayerPanel_OpenEditLayerPageEvent(object sender, UserControls.LayersPanel.LayerIdEventArgs e)
+        {
+            if (e.Args is not CustomOrEditLayersPage.EditingMode EditMode)
+            {
+                EditMode = CustomOrEditLayersPage.EditingMode.New;
+            }
+            Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)delegate
+            {
+                CustomOrEditLayersPage EditPage = MainWindow.Instance.FrameLoad_CustomOrEditLayers(e.LayerId, EditMode);
+                EditPage.OnSaveLayerEvent += EditPage_SaveLayerEvent;
+                EditPage.OnInitEvent += EditPage_OnInitEvent;
+                EditPage.OnLeaveEvent += EditPage_OnLeaveEvent;
+                EditPage.Init();
+                void EditPage_OnLeaveEvent(object sender, EventArgs e)
+                {
+                    EditPage.OnSaveLayerEvent -= EditPage_SaveLayerEvent;
+                    EditPage.OnInitEvent -= EditPage_OnInitEvent;
+                    EditPage.OnLeaveEvent -= EditPage_OnLeaveEvent;
+                }
+
+            }, null);
+        }
+        private void EditPage_OnInitEvent(object sender, Layers.LayersEventArgs e)
+        {
+            CustomOrEditLayersPage EditPage = sender as CustomOrEditLayersPage;
+            e.Layer = _items.Where(l => l.Id == EditPage.LayerId).FirstOrDefault();
+        }
+
+        private void EditPage_SaveLayerEvent(object sender, Layers.LayersEventArgs e)
+        {
+            var OriginalLayer = _items.Where(l => l.Id == e.Layer.Id).FirstOrDefault();
+            var Index = _items.IndexOf(OriginalLayer);
+            _items.Remove(OriginalLayer);
+            _items.Insert(Index, e.Layer);
+            e.Cancel = true;
+        }
+
+       
     }
 }

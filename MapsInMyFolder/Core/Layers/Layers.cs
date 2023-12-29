@@ -69,10 +69,21 @@ namespace MapsInMyFolder
         //(int)Layers.ReservedId.EditorTempLayer
         public enum ReservedId
         {
-            GenericTempLayer = -1,
-            EditorTempLayer = -2
+            TempLayerGeneric = -1,
+            TempLayerDatabaseEditor = -2,
+            TempLayerMemoryEditor = -3,
         }
+        public class LayersEventArgs : EventArgs
+        {
+            public Layers Layer { get; set; }
+            public bool Cancel { get; set; }
 
+            public LayersEventArgs(Layers Layer)
+            {
+                this.Layer = Layer;
+            }
+        }
+        public delegate void LayerEventHandler(object sender, LayersEventArgs e);
 
 
         public class LayersSpecialsOptions

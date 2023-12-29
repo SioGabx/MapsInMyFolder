@@ -49,7 +49,8 @@
                 DataContext="{Binding RelativeSource={RelativeSource AncestorType={x:Type mapsinmyfolder:MainPage}}}"
                 GetLayersMethod="{Binding GetLayersListMethod}"
                 LinkedMapViewer="{Binding ElementName=mapviewer}"
-                SetCurrentLayerEvent="LayerPanel_SetCurrentLayerEvent" />
+                SetCurrentLayerEvent="LayerPanel_SetCurrentLayerEvent" 
+                OpenEditLayerPageEvent="LayerPanel_OpenEditLayerPageEvent"/>
 
         </Grid>
 
@@ -89,8 +90,8 @@
                     FontSize="16"
                     SearchResultMap="{Binding ElementName=mapviewer}"
                     SearchResultPushpin="{Binding ElementName=searchResult}"
-                    SearchLostFocusRequest="mapLocationSearchBar_SearchLostFocusRequest"
-                    SearchResultEvent="mapLocationSearchBar_SearchResultEvent" />
+                    SearchLostFocusRequest="MapLocationSearchBar_SearchLostFocusRequest"
+                    SearchResultEvent="MapLocationSearchBar_SearchResultEvent" />
                 <Button
                     x:Name="map_panel_open_location_panel"
                     Grid.Column="1"

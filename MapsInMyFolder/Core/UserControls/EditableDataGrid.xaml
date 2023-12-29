@@ -46,32 +46,28 @@
             <RowDefinition Height="100" />
             <RowDefinition />
         </Grid.RowDefinitions>
-        <Grid
-            x:Name="CellEditor"
-            Grid.Row="0">
+        <Grid x:Name="CellEditor" Height="90" Cursor="">
             <TextBox
                 x:Name="TextBoxEditor"
-                Grid.Row="0"
-                Height="Auto"
-                MinHeight="90"
+                Height="92"
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Top"
                 VerticalContentAlignment="Top"
-                Cursor="IBeam"
                 AutoWordSelection="False"
+                Cursor="IBeam"
                 PreviewKeyDown="TextBoxEditor_PreviewKeyDown"
                 Style="{DynamicResource TextBoxCleanStyleNoBorderSmall}" />
             <customCtrl:ScriptEditor
                 x:Name="CodeEditor"
-                Grid.Row="0"
-                Height="Auto"
-                MinHeight="90"
+                Height="90"
+                VerticalAlignment="Top"
+                VerticalContentAlignment="Top"
                 SyntaxHighlighting="MIMF_JavaScript" />
         </Grid>
         <DataGrid
-            Margin="0,10,0,0"
             x:Name="dataGrid"
             Grid.Row="1"
+            Margin="0,10,0,0"
             AutoGenerateColumns="False"
             BeginningEdit="DataGrid_BeginningEdit"
             CellEditEnding="DataGrid_CellEditEnding"
