@@ -32,7 +32,7 @@
                 Height="21"
                 HorizontalAlignment="Stretch"
                 Cursor="IBeam"
-                Style="{DynamicResource TextBoxCleanStyle_13}" />
+                Style="{DynamicResource TextBoxCleanStyleSmall}" />
             <customCtrl:ScriptEditor
                 x:Name="ScriptTextEditor"
                 MinHeight="80"

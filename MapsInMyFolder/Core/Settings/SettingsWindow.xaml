@@ -508,7 +508,7 @@
                                         Height="21"
                                         HorizontalAlignment="Stretch"
                                         Cursor="IBeam"
-                                        Style="{DynamicResource TextBoxCleanStyle_13}" />
+                                        Style="{DynamicResource TextBoxCleanStyleSmall}" />
                                 </Grid>
 
                                 <Grid Margin="0,10,0,0">
@@ -527,7 +527,7 @@
                                         Height="21"
                                         HorizontalAlignment="Stretch"
                                         Cursor="IBeam"
-                                        Style="{DynamicResource TextBoxCleanStyle_13}" />
+                                        Style="{DynamicResource TextBoxCleanStyleSmall}" />
                                 </Grid>
 
                                 <Grid Margin="0,10,0,0">
@@ -546,7 +546,7 @@
                                         Height="21"
                                         HorizontalAlignment="Stretch"
                                         Cursor="IBeam"
-                                        Style="{DynamicResource TextBoxCleanStyle_13}"
+                                        Style="{DynamicResource TextBoxCleanStyleSmall}"
                                         TextChanged="FilterDigitTextBox_TextChanged" />
                                 </Grid>
 
@@ -566,7 +566,7 @@
                                         Height="21"
                                         HorizontalAlignment="Stretch"
                                         Cursor="IBeam"
-                                        Style="{DynamicResource TextBoxCleanStyle_13}"
+                                        Style="{DynamicResource TextBoxCleanStyleSmall}"
                                         TextChanged="FilterDigitTextBox_TextChanged" />
                                 </Grid>
 
@@ -586,7 +586,7 @@
                                         Height="21"
                                         HorizontalAlignment="Stretch"
                                         Cursor="IBeam"
-                                        Style="{DynamicResource TextBoxCleanStyle_13}"
+                                        Style="{DynamicResource TextBoxCleanStyleSmall}"
                                         TextChanged="FilterDigitTextBox_TextChanged" />
                                 </Grid>
 
@@ -606,7 +606,7 @@
                                         Height="21"
                                         HorizontalAlignment="Stretch"
                                         Cursor="IBeam"
-                                        Style="{DynamicResource TextBoxCleanStyle_13}"
+                                        Style="{DynamicResource TextBoxCleanStyleSmall}"
                                         TextChanged="FilterDigitTextBox_TextChanged" />
                                 </Grid>
 
@@ -626,7 +626,7 @@
                                         Height="21"
                                         HorizontalAlignment="Stretch"
                                         Cursor="IBeam"
-                                        Style="{DynamicResource TextBoxCleanStyle_13}"
+                                        Style="{DynamicResource TextBoxCleanStyleSmall}"
                                         TextChanged="FilterDigitTextBox_TextChanged" />
                                 </Grid>
 
@@ -646,7 +646,7 @@
                                         Height="21"
                                         HorizontalAlignment="Stretch"
                                         Cursor="IBeam"
-                                        Style="{DynamicResource TextBoxCleanStyle_13}"
+                                        Style="{DynamicResource TextBoxCleanStyleSmall}"
                                         TextChanged="FilterDigitTextBox_TextChanged" />
                                 </Grid>
 
@@ -666,7 +666,7 @@
                                         Height="21"
                                         HorizontalAlignment="Stretch"
                                         Cursor="IBeam"
-                                        Style="{DynamicResource TextBoxCleanStyle_13}"
+                                        Style="{DynamicResource TextBoxCleanStyleSmall}"
                                         TextChanged="FilterDigitTextBox_TextChanged" />
                                 </Grid>
 
@@ -686,7 +686,7 @@
                                         Height="21"
                                         HorizontalAlignment="Stretch"
                                         Cursor="IBeam"
-                                        Style="{DynamicResource TextBoxCleanStyle_13}" />
+                                        Style="{DynamicResource TextBoxCleanStyleSmall}" />
                                 </Grid>
 
                                 <Grid Margin="0,15,0,0">
@@ -768,7 +768,7 @@
                                         Height="21"
                                         HorizontalAlignment="Stretch"
                                         Cursor="IBeam"
-                                        Style="{DynamicResource TextBoxCleanStyle_13}" />
+                                        Style="{DynamicResource TextBoxCleanStyleSmall}" />
                                 </Grid>
 
                                 <Grid Margin="0,10,0,0">
@@ -787,7 +787,7 @@
                                         Height="21"
                                         HorizontalAlignment="Stretch"
                                         Cursor="IBeam"
-                                        Style="{DynamicResource TextBoxCleanStyle_13}" />
+                                        Style="{DynamicResource TextBoxCleanStyleSmall}" />
                                 </Grid>
 
                                 <Grid Margin="0,10,0,0">
@@ -814,7 +814,7 @@
                                         Height="21"
                                         HorizontalAlignment="Stretch"
                                         Cursor="IBeam"
-                                        Style="{DynamicResource TextBoxCleanStyle_13}" />
+                                        Style="{DynamicResource TextBoxCleanStyleSmall}" />
                                     <TextBox
                                         x:Name="NO_PIN_starting_location_longitude"
                                         Grid.Row="1"
@@ -822,7 +822,7 @@
                                         Height="21"
                                         HorizontalAlignment="Stretch"
                                         Cursor="IBeam"
-                                        Style="{DynamicResource TextBoxCleanStyle_13}" />
+                                        Style="{DynamicResource TextBoxCleanStyleSmall}" />
                                 </Grid>
 
                                 <Grid Margin="0,10,0,0">
@@ -849,7 +849,7 @@
                                         Height="21"
                                         HorizontalAlignment="Stretch"
                                         Cursor="IBeam"
-                                        Style="{DynamicResource TextBoxCleanStyle_13}" />
+                                        Style="{DynamicResource TextBoxCleanStyleSmall}" />
                                     <TextBox
                                         x:Name="SE_PIN_starting_location_longitude"
                                         Grid.Row="1"
@@ -857,7 +857,7 @@
                                         Height="21"
                                         HorizontalAlignment="Stretch"
                                         Cursor="IBeam"
-                                        Style="{DynamicResource TextBoxCleanStyle_13}" />
+                                        Style="{DynamicResource TextBoxCleanStyleSmall}" />
                                 </Grid>
 
                                 <Grid Margin="0,15,0,0">
@@ -888,7 +888,7 @@
                                         Height="21"
                                         HorizontalAlignment="Stretch"
                                         Cursor="IBeam"
-                                        Style="{DynamicResource TextBoxCleanStyle_13}"
+                                        Style="{DynamicResource TextBoxCleanStyleSmall}"
                                         TextChanged="FilterDigitTextBox_TextChanged" />
                                 </Grid>
 
@@ -946,7 +946,7 @@
                                         Height="21"
                                         HorizontalAlignment="Stretch"
                                         Cursor="IBeam"
-                                        Style="{DynamicResource TextBoxCleanStyle_13}" />
+                                        Style="{DynamicResource TextBoxCleanStyleSmall}" />
                                 </Grid>
                                 <Grid Margin="0,10,0,0">
                                     <Grid.RowDefinitions>
@@ -964,7 +964,7 @@
                                         Height="21"
                                         HorizontalAlignment="Stretch"
                                         Cursor="IBeam"
-                                        Style="{DynamicResource TextBoxCleanStyle_13}"
+                                        Style="{DynamicResource TextBoxCleanStyleSmall}"
                                         TextChanged="FilterDigitTextBox_TextChanged" />
                                 </Grid>
 
@@ -984,7 +984,7 @@
                                         Height="21"
                                         HorizontalAlignment="Stretch"
                                         Cursor="IBeam"
-                                        Style="{DynamicResource TextBoxCleanStyle_13}"
+                                        Style="{DynamicResource TextBoxCleanStyleSmall}"
                                         TextChanged="FilterDigitTextBox_TextChanged" />
                                 </Grid>
 
@@ -1086,7 +1086,7 @@
                                         Height="21"
                                         HorizontalAlignment="Stretch"
                                         Cursor="IBeam"
-                                        Style="{DynamicResource TextBoxCleanStyle_13}" />
+                                        Style="{DynamicResource TextBoxCleanStyleSmall}" />
                                 </Grid>
                                 <Grid Margin="0,10,0,0">
                                     <Grid.RowDefinitions>
@@ -1104,7 +1104,7 @@
                                         Height="21"
                                         HorizontalAlignment="Stretch"
                                         Cursor="IBeam"
-                                        Style="{DynamicResource TextBoxCleanStyle_13}" />
+                                        Style="{DynamicResource TextBoxCleanStyleSmall}" />
                                 </Grid>
 
                                 <Grid Margin="0,10,0,0">

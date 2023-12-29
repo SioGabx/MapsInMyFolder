@@ -48,9 +48,7 @@
                 <StackPanel Margin="0,0,15,0">
                     <StackPanel.Resources>
                         <Style BasedOn="{StaticResource TextBoxFormeStyle}" TargetType="TextBox">
-                            <Setter Property="ContextMenu" Value="{StaticResource CopyPasteContextMenu}" />
                             <Setter Property="Height" Value="Auto" />
-                            <Setter Property="HorizontalAlignment" Value="Stretch" />
                         </Style>
                         <Style BasedOn="{StaticResource {x:Type Label}}" TargetType="Label">
                             <Setter Property="Foreground" Value="#888989" />

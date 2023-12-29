@@ -349,7 +349,7 @@
     </Style>
 
     <Style
-        x:Key="TextBoxCleanStyle_13"
+        x:Key="TextBoxCleanStyleSmall"
         BasedOn="{StaticResource TextBoxCleanStyleDefault}"
         TargetType="{x:Type TextBox}">
         <Setter Property="FontSize" Value="13" />
@@ -357,7 +357,7 @@
         <Setter Property="Height" Value="20" />
     </Style>
     <Style
-        x:Key="TextBoxCleanStyleNoBorder_13"
+        x:Key="TextBoxCleanStyleNoBorderSmall"
         BasedOn="{StaticResource TextBoxCleanStyleNoBorder}"
         TargetType="{x:Type TextBox}">
         <Setter Property="FontSize" Value="13" />
@@ -366,9 +366,10 @@
     </Style>
 
 
+    <!--  Add a light bottom border always visible  -->
     <Style
         x:Key="TextBoxFormeStyle"
-        BasedOn="{StaticResource TextBoxCleanStyle_13}"
+        BasedOn="{StaticResource TextBoxCleanStyleSmall}"
         TargetType="TextBox">
         <Setter Property="OverridesDefaultStyle" Value="False" />
         <Setter Property="Margin" Value="0" />
@@ -517,6 +518,7 @@
 
     <Style x:Key="RoundedButton" TargetType="Button">
         <Setter Property="Background" Value="#F18712" />
+        <Setter Property="Cursor" Value="Hand" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
@@ -544,7 +546,7 @@
                                 Storyboard.TargetProperty="(Button.Background).(SolidColorBrush.Color)"
                                 From="#F18712"
                                 To="#e17710"
-                                Duration="0:0:0.2" />
+                                Duration="0:0:0.1" />
                         </Storyboard>
                     </BeginStoryboard>
                 </EventTrigger.Actions>
@@ -559,7 +561,7 @@
                                 Storyboard.TargetProperty="(Button.Background).(SolidColorBrush.Color)"
                                 From="#e17710"
                                 To="#F18712"
-                                Duration="0:0:0.2" />
+                                Duration="0:0:0.1" />
                         </Storyboard>
                     </BeginStoryboard>
                 </EventTrigger.Actions>

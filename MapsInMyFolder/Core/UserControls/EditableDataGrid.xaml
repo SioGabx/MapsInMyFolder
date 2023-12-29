@@ -60,7 +60,7 @@
                 Cursor="IBeam"
                 AutoWordSelection="False"
                 PreviewKeyDown="TextBoxEditor_PreviewKeyDown"
-                Style="{DynamicResource TextBoxCleanStyleNoBorder_13}" />
+                Style="{DynamicResource TextBoxCleanStyleNoBorderSmall}" />
             <customCtrl:ScriptEditor
                 x:Name="CodeEditor"
                 Grid.Row="0"

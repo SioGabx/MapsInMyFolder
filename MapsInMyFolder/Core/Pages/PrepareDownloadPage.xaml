@@ -263,7 +263,7 @@
                                     FontFamily="Segoe UI"
                                     FontSize="11.8"
                                     LostFocus="TextBox_Scale_LostFocus"
-                                    Style="{DynamicResource TextBoxCleanStyle_13}"
+                                    Style="{DynamicResource TextBoxCleanStyleSmall}"
                                     Tag="automatic"
                                     Text="0"
                                     TextChanged="TextBox_Scale_TextChanged" />
@@ -277,7 +277,7 @@
                                     FontFamily="Segoe UI"
                                     FontSize="11.8"
                                     IsEnabled="False"
-                                    Style="{DynamicResource TextBoxCleanStyle_13}" />
+                                    Style="{DynamicResource TextBoxCleanStyleSmall}" />
                                 <Label
                                     x:Name="Label_ScalePrefix"
                                     Grid.Column="2"
@@ -383,7 +383,7 @@
                                         FontSize="11.8"
                                         IsEnabled="True"
                                         LostFocus="TextBox_Redim_Width_LostFocus"
-                                        Style="{DynamicResource TextBoxCleanStyle_13}"
+                                        Style="{DynamicResource TextBoxCleanStyleSmall}"
                                         Text="0"
                                         TextChanged="TextBox_Redim_Width_TextChanged" />
                                     <ComboBox
@@ -443,7 +443,7 @@
                                         FontSize="11.8"
                                         IsEnabled="True"
                                         LostFocus="TextBox_Redim_Height_LostFocus"
-                                        Style="{DynamicResource TextBoxCleanStyle_13}"
+                                        Style="{DynamicResource TextBoxCleanStyleSmall}"
                                         Text="0"
                                         TextChanged="TextBox_Redim_Height_TextChanged" />
                                     <ComboBox
@@ -527,7 +527,7 @@
                                         FontSize="11.8"
                                         Foreground="#BCBCBC"
                                         IsEnabled="True"
-                                        Style="{DynamicResource TextBoxCleanStyle_13}"
+                                        Style="{DynamicResource TextBoxCleanStyleSmall}"
                                         TextChanged="TextBox_quality_number_TextChanged" />
                                     <ComboBox
                                         x:Name="TextBox_quality_name"
