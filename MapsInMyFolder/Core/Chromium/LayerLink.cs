@@ -1,6 +1,7 @@
 ﻿using MapsInMyFolder.Commun;
 using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using System.Windows;
 using System.Windows.Threading;
@@ -138,7 +139,8 @@ namespace MapsInMyFolder
                     double TargetZoomLevel = MapViewer.TargetZoomLevel;
                     double Latitude = MapViewer.Center.Latitude;
                     double Longitude = MapViewer.Center.Longitude;
-                    return Layers.PreviewGetUrl(id_int, TargetZoomLevel, Latitude, Longitude);
+                    var Layer = LayersPanel.GetLayersMethod().Where(lay => lay.Id == id_int).FirstOrDefault();
+                    return Layers.PreviewGetUrl(Layer, TargetZoomLevel, Latitude, Longitude);
                 }, DispatcherPriority.Normal);
             }
             return LayerGetTilePreviewUrlFromId_Task(id);

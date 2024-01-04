@@ -8,7 +8,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -322,7 +321,7 @@ namespace MapsInMyFolder
             Map.CurentSelection.SE_Latitude = SE.Latitude;
             Map.CurentSelection.SE_Longitude = SE.Longitude;
 
-            if (Javascript.CheckIfFunctionExist(Layers.Current.Id, Javascript.InvokeFunction.selectionChanged.ToString(), null))
+            if (Javascript.CheckIfFunctionExist(Layers.Current, Javascript.InvokeFunction.selectionChanged.ToString(), null))
             {
                 string script = Layers.Current.Script;
 

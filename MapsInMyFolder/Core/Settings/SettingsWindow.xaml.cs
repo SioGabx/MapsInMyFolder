@@ -281,7 +281,7 @@ namespace MapsInMyFolder
         private async void ResetSettings_Click(object sender, RoutedEventArgs e)
         {
             ContentDialogResult dialogConfirmResetApplicationSettings = await Message.ShowContentDialog(Languages.Current["settingsMessageResetApplicationSettings"], Languages.Current["dialogTitleOperationConfirm"], MessageDialogButton.YesCancel);
-            
+
             if (dialogConfirmResetApplicationSettings == ContentDialogResult.Primary)
             {
                 try

@@ -1,12 +1,14 @@
 ﻿using CefSharp;
 using ICSharpCode.AvalonEdit.Highlighting;
 using MapsInMyFolder.Commun;
+using MapsInMyFolder.Commun.Capabilities;
 using MapsInMyFolder.MapControl;
 using ModernWpf;
 using ModernWpf.Media.Animation;
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media.Animation;

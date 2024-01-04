@@ -53,6 +53,8 @@
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Top"
                 VerticalContentAlignment="Top"
+                VerticalScrollBarVisibility="Auto"
+                HorizontalScrollBarVisibility="Auto"
                 AutoWordSelection="False"
                 Cursor="IBeam"
                 PreviewKeyDown="TextBoxEditor_PreviewKeyDown"

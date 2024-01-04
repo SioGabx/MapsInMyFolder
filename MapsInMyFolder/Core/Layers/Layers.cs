@@ -522,10 +522,9 @@ namespace MapsInMyFolder
             }
         }
 
-        public static string PreviewGetUrl(int id, double TargetZoomLevel, double Latitude, double Longitude)
+        public static string PreviewGetUrl(Layers layer, double TargetZoomLevel, double Latitude, double Longitude)
         {
-            Layers layer = Layers.GetLayerById(id);
-
+            int id = layer.Id;
             if (layer is null)
             {
                 return "";
@@ -555,9 +554,9 @@ namespace MapsInMyFolder
 
                 var TileNumber = Collectif.CoordonneesToTile(Latitude, Longitude, Zoom);
 
-                bool CheckIfFunctionExist(int layerId, Javascript.InvokeFunction invokeFunction)
+                bool CheckIfFunctionExist(Layers layerF, Javascript.InvokeFunction invokeFunction)
                 {
-                    return Javascript.CheckIfFunctionExist(layerId, invokeFunction.ToString(), null);
+                    return Javascript.CheckIfFunctionExist(layerF, invokeFunction.ToString(), null);
                 }
                 string GetReplacement(int layerId, string tileUrl, Javascript.InvokeFunction invokeFunction)
                 {
@@ -569,7 +568,7 @@ namespace MapsInMyFolder
                 string previewFallbackLayerFrontImageUrl = string.Empty;
                 string previewFallbackBackgroundImageUrl = string.Empty;
 
-                if (CheckIfFunctionExist(id, Javascript.InvokeFunction.getPreview))
+                if (CheckIfFunctionExist(layer, Javascript.InvokeFunction.getPreview))
                 {
                     previewLayerFrontImageUrl = GetReplacement(id, layer.TileUrl, Javascript.InvokeFunction.getPreview);
                 }
@@ -578,14 +577,14 @@ namespace MapsInMyFolder
                     previewLayerFrontImageUrl = GetReplacement(id, layer.TileUrl, Javascript.InvokeFunction.getTile);
                 }
 
-                if (CheckIfFunctionExist(id, Javascript.InvokeFunction.getPreviewFallback))
+                if (CheckIfFunctionExist(layer, Javascript.InvokeFunction.getPreviewFallback))
                 {
                     previewFallbackLayerFrontImageUrl = GetReplacement(id, layer.TileUrl, Javascript.InvokeFunction.getPreviewFallback);
                 }
 
                 if (layer.TilesFormatHasTransparency && backgroundLayer is not null)
                 {
-                    if (CheckIfFunctionExist(backgroundLayer.Id, Javascript.InvokeFunction.getPreview))
+                    if (CheckIfFunctionExist(backgroundLayer, Javascript.InvokeFunction.getPreview))
                     {
                         previewBackgroundImageUrl = GetReplacement(backgroundLayer.Id, backgroundLayer.TileUrl, Javascript.InvokeFunction.getPreview);
                     }
@@ -598,7 +597,7 @@ namespace MapsInMyFolder
                         previewBackgroundImageUrl = "";
                     }
 
-                    if (CheckIfFunctionExist(backgroundLayer.Id, Javascript.InvokeFunction.getPreviewFallback))
+                    if (CheckIfFunctionExist(backgroundLayer, Javascript.InvokeFunction.getPreviewFallback))
                     {
                         previewFallbackBackgroundImageUrl = GetReplacement(backgroundLayer.Id, backgroundLayer?.TileUrl, Javascript.InvokeFunction.getPreviewFallback);
                         if (backgroundLayer?.TileUrl == previewFallbackBackgroundImageUrl)

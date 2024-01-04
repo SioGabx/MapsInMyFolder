@@ -14,7 +14,6 @@ using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Threading;
-using System.ComponentModel;
 
 namespace MapsInMyFolder
 {
@@ -35,7 +34,7 @@ namespace MapsInMyFolder
             IsInDebugModeSwitch.IsChecked = IsInDebugModeArchive;
             LayerId = Layers.StartupLayerId;
         }
-  
+
 
         public event Layers.LayerEventHandler OnSaveLayerEvent;
         public event EventHandler OnLeaveEvent;
@@ -45,7 +44,7 @@ namespace MapsInMyFolder
         private static MapFigures MapFigures { get; set; }
         public int LayerId { get; set; }
         public EditingMode EditMode { get; set; } = EditingMode.New;
-        
+
         private int DefaultValuesHachCode = 0;
 
         public enum EditingMode
@@ -61,7 +60,8 @@ namespace MapsInMyFolder
             {
                 EditorLayerIdToLoad = -1;
                 LayerId = -1;
-            }else if(EditMode == EditingMode.NewFromTemplate)
+            }
+            else if (EditMode == EditingMode.NewFromTemplate)
             {
                 EditorLayerIdToLoad = LayerId;
                 LayerId = -1;
@@ -69,7 +69,8 @@ namespace MapsInMyFolder
             else if (EditMode == EditingMode.Edit)
             {
                 EditorLayerIdToLoad = LayerId;
-            }else if (EditMode == EditingMode.Memory)
+            }
+            else if (EditMode == EditingMode.Memory)
             {
                 EditorLayerIdToLoad = LayerId;
             }
@@ -78,7 +79,7 @@ namespace MapsInMyFolder
             TextboxLayerScriptConsole.Text = String.Empty;
             Javascript.Functions.ClearVar((int)Layers.ReservedId.TempLayerGeneric);
             Javascript.Functions.ClearVar((int)Layers.ReservedId.TempLayerDatabaseEditor);
-            
+
             mapviewerappercu.Background = Collectif.RgbValueToSolidColorBrush(Settings.background_layer_color_R, Settings.background_layer_color_G, Settings.background_layer_color_B);
             mapviewerappercu.Center = MainPage.Instance.mapviewer.Center;
             mapviewerappercu.ZoomLevel = MainPage.Instance.mapviewer.ZoomLevel;

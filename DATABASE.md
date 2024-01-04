@@ -508,4 +508,7 @@ var restartAt = 164;
  
  
  
- 
+  ### Planned to be added :
+  
+  - https://osm.datagrandest.fr/mapcache/wmts?service=WMTS&request=GetCapabilities
+  - https://www.datagrandest.fr/geoserver/gwc/service/wmts?request=getcapabilities

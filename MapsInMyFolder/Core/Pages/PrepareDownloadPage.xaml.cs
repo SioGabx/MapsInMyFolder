@@ -512,7 +512,7 @@ namespace MapsInMyFolder
                     SizeInPixelAfterRedim = Math.Max(10, Math.Round(rognage_info.width * ((double)ScaleConvertedAttachedTextBoxText / 100)));
                 }
 
-                
+
 
                 if (SizeInPixelAfterRedim < rognage_info.width)
                 {

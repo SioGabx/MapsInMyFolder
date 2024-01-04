@@ -126,7 +126,7 @@ namespace MapsInMyFolder.Commun
             UpdateNotification.Remove();
 
             ContentDialogResult dialogConfirmStartUpdateProcessResult = await Message.ShowContentDialog(Languages.Current["updateMessageStartUpdateProcess"], Languages.Current["dialogTitleOperationConfirm"], MessageDialogButton.YesCancel);
-            
+
             if (dialogConfirmStartUpdateProcessResult == ContentDialogResult.Primary)
             {
                 ApplyUpdate();

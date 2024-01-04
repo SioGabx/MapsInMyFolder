@@ -432,97 +432,6 @@ namespace MapsInMyFolder.Commun
 
 
 
-        //public static async Task<HttpResponse> ByteDownloadUri(Uri url, int LayerId, bool getRealRequestMessage = false)
-        //{
-
-        //    if (!Network.FastIsNetworkAvailable())
-        //    {
-        //        return new HttpResponse(null, new HttpResponseMessage(HttpStatusCode.ServiceUnavailable)
-        //        {
-        //            ReasonPhrase = "Aucune connexion : Vérifiez votre connexion Internet"
-        //        });
-        //    }
-
-        //    HttpResponse response = HttpResponse.HttpResponseError;
-        //    int maxRetry = Settings.max_redirection_download_tile;
-        //    int retry = 0;
-        //    bool doNeedToRetry;
-        //    Uri parsing_url = url;
-        //    do
-        //    {
-        //        doNeedToRetry = false;
-        //        retry++;
-
-        //        try
-        //        { 
-        //            using (var responseMessage = await Tiles.HttpClient.GetAsync(parsing_url, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false))
-        //            {
-        //                if (responseMessage is null)
-        //                {
-        //                    return response;
-        //                }
-
-        //                if (responseMessage.IsSuccessStatusCode)
-        //                {
-        //                    byte[] buffer = await responseMessage.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
-        //                    return new HttpResponse(buffer, responseMessage);
-        //                }
-        //                else if (!string.IsNullOrWhiteSpace(responseMessage?.Headers?.Location?.ToString()?.Trim()))
-        //                {
-        //                    // Redirect found (autodetect)  System.Net.HttpStatusCode.Found
-        //                    Uri new_location = responseMessage.Headers.Location;
-        //                    doNeedToRetry = true;
-        //                    parsing_url = new_location;
-        //                }
-        //                else
-        //                {
-        //                    if (LayerId == -2)
-        //                    {
-        //                        Javascript.Functions.PrintError($"DownloadUrl - Error {(int)responseMessage.StatusCode} : {responseMessage.ReasonPhrase}. Url : {parsing_url}");
-        //                    }
-
-        //                    if (Settings.generate_transparent_tiles_on_error)
-        //                    {
-        //                        if (getRealRequestMessage)
-        //                        {
-        //                            return new HttpResponse(null, responseMessage);
-        //                        }
-        //                        else
-        //                        {
-        //                            return new HttpResponse(null, new System.Net.Http.HttpResponseMessage(HttpStatusCode.NotFound));
-        //                        }
-        //                    }
-        //                }
-        //                if (getRealRequestMessage)
-        //                {
-        //                    response = new HttpResponse(response.Buffer, responseMessage);
-        //                }
-
-        //            }
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            if (ex.InnerException is System.Net.Sockets.SocketException socketException && socketException.SocketErrorCode == System.Net.Sockets.SocketError.HostNotFound)
-        //            {
-        //                // Check for internet connectivity when the host is unknown.
-        //                Network.IsNetworkAvailable();
-        //            }
-        //            Debug.WriteLine($"DownloadByteUrl catch: {url}: {ex}");
-
-        //            if (LayerId == -2)
-        //            {
-        //                Javascript.Functions.PrintError($"DownloadUrl - Error {ex.Message}. Url : {url}");
-        //            }
-        //            response = new HttpResponse(null, null, ex.Message);
-        //        }
-        //        finally
-        //        {
-
-        //        }
-        //    } while (doNeedToRetry && (retry < maxRetry));
-
-        //    return response;
-        //}
         public static string AddHttpToUrl(string url)
         {
             if (!string.IsNullOrWhiteSpace(url))
@@ -586,7 +495,7 @@ namespace MapsInMyFolder.Commun
                     }
                     else
                     {
-                        if (LayerId == -2)
+                        if (LayerId == (int)Layers.ReservedId.TempLayerDatabaseEditor)
                         {
                             var ErrorPageContent = "";
                             if (responseMessage?.Content != null)
@@ -761,9 +670,14 @@ namespace MapsInMyFolder.Commun
 
         public static void LockPreviousUndo(TextBox uIElement)
         {
+            try { 
             int undo_limit = uIElement.UndoLimit;
             uIElement.UndoLimit = 0;
             uIElement.UndoLimit = undo_limit;
+            }catch(Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+            }
         }
 
 

@@ -323,7 +323,7 @@ namespace MapsInMyFolder
             return returnString;
         }
 
-        public static bool CheckIfFunctionExist(int LayerId, string functionName, string script = null)
+        public static bool CheckIfFunctionExist(Layers layer, string functionName, string script = null)
         {
             if (string.IsNullOrEmpty(functionName))
             {
@@ -331,14 +331,14 @@ namespace MapsInMyFolder
             }
             if (string.IsNullOrEmpty(script))
             {
-                script = Layers.GetLayerById(LayerId)?.Script;
+                script = layer?.Script;
             }
             if (string.IsNullOrWhiteSpace(script) || !script.Contains(functionName))
             {
                 return false;
             }
 
-            Engine add = EngineGetById(LayerId, script);
+            Engine add = EngineGetById(layer.Id, script);
 
             if (add is null || string.IsNullOrEmpty(functionName))
             {

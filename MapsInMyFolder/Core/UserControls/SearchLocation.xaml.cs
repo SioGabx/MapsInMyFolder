@@ -51,7 +51,7 @@ namespace MapsInMyFolder.UserControls
             set { SetValue(SearchResultMapProperty, value); }
         }
 
-       
+
         public static readonly DependencyProperty IsFloatingSearchBarProperty =
             DependencyProperty.Register(
                 "IsFloatingSearchBar",
@@ -92,7 +92,7 @@ namespace MapsInMyFolder.UserControls
             }
         }
 
-        
+
 
 
         public class SearchResultEventArgs : EventArgs
@@ -182,7 +182,7 @@ namespace MapsInMyFolder.UserControls
 
         public Location GetMapLocation()
         {
-            return SearchResultMap?.Center ?? new Location(0,0);
+            return SearchResultMap?.Center ?? new Location(0, 0);
         }
 
         private async void SearchStart(bool selectFirst = false)
@@ -271,7 +271,7 @@ namespace MapsInMyFolder.UserControls
             {
                 MapPanel.SetLocation(SearchResultPushpin, searchResultLocation);
             }
-           
+
             if (SearchResultMap != null && mapViewerBoundingBox != null)
             {
                 SearchResultMap.ZoomToBounds(mapViewerBoundingBox);

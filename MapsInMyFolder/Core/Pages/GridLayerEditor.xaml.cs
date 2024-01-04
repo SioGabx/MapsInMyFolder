@@ -1,5 +1,6 @@
 ﻿using CefSharp;
 using MapsInMyFolder.Commun;
+using MapsInMyFolder.Commun.Capabilities;
 using MapsInMyFolder.MapControl;
 using System;
 using System.Collections.Generic;
@@ -25,7 +26,7 @@ namespace MapsInMyFolder
         }
 
         public new bool IsInitialized { get; private set; }
-      
+
         private static ObservableCollection<Layers> _items;
 
         public static Func<IEnumerable<Layers>> GetLayersListMethod
@@ -40,23 +41,24 @@ namespace MapsInMyFolder
             }
         }
 
-        private void GetData()
+        private async Task GetDataAsync()
         {
             _items = new ObservableCollection<Layers>();
-
-            foreach (Layers layers in Layers.GetLayersList())
+            var data = await WMTSParser.ParseAsync();
+            foreach (Layers layers in data)
             {
-                if (layers.SiteName.StartsWith("G"))
-                    _items.Add(layers);
+                _items.Add(layers);
             }
+
+
             LayerGrid.ItemsSource = _items;
         }
-        public void Init()
+        public async void Init()
         {
             if (!IsInitialized)
             {
                 IsInitialized = true;
-                GetData();
+                await GetDataAsync();
                 LayerPanel.Init();
                 MapFigures = new MapFigures();
             }
@@ -146,6 +148,6 @@ namespace MapsInMyFolder
             e.Cancel = true;
         }
 
-       
+
     }
 }

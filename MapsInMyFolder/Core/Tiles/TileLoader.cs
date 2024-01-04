@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace MapsInMyFolder
 {
-  
+
 
     public class TileProperty
     {
@@ -89,21 +89,21 @@ namespace MapsInMyFolder
     }
 
     public static partial class TileLoader
-    {  
-        public class HttpResponse
     {
-        public byte[] Buffer { get; }
-        public HttpResponseMessage ResponseMessage { get; }
-        public string CustomMessage { get; }
-        public static HttpResponse HttpResponseError { get; } = new HttpResponse(null, new System.Net.Http.HttpResponseMessage(System.Net.HttpStatusCode.BadRequest));
-
-        public HttpResponse(byte[] buffer, HttpResponseMessage responseMessage, string customMessage = "")
+        public class HttpResponse
         {
-            Buffer = buffer;
-            ResponseMessage = responseMessage;
-            CustomMessage = customMessage;
+            public byte[] Buffer { get; }
+            public HttpResponseMessage ResponseMessage { get; }
+            public string CustomMessage { get; }
+            public static HttpResponse HttpResponseError { get; } = new HttpResponse(null, new System.Net.Http.HttpResponseMessage(System.Net.HttpStatusCode.BadRequest));
+
+            public HttpResponse(byte[] buffer, HttpResponseMessage responseMessage, string customMessage = "")
+            {
+                Buffer = buffer;
+                ResponseMessage = responseMessage;
+                CustomMessage = customMessage;
+            }
         }
-    }
         public static async Task<HttpResponse> GetImageAsync(string urlBase, int TileX, int TileY, int TileZoom, int layerID, string fileformat = null, string save_temp_directory = "", bool pbfdisableadjacent = false)
         {
             string url = GetUrl.FromTileXYZ(urlBase, TileX, TileY, TileZoom, layerID, Javascript.InvokeFunction.getTile);

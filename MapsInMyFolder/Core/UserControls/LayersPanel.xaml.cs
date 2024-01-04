@@ -230,7 +230,7 @@ namespace MapsInMyFolder.UserControls
 
                     bool ShowCountry = true;
                     string CountryHTML = string.Empty;
-                    if (ShowCountry)
+                    if (ShowCountry && !string.IsNullOrWhiteSpace(layer.Country))
                     {
                         CountryHTML = " - " + layer.Country;
                     }

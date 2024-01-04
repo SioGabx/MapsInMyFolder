@@ -96,7 +96,10 @@ namespace MapsInMyFolder.MapControl
                     var tileSize = TileSize << (TileMatrix.ZoomLevel - tile.ZoomLevel);
                     var x = (tileSize * tile.X) - (TileSize * TileMatrix.XMin);
                     var y = (tileSize * tile.Y) - (TileSize * TileMatrix.YMin);
-
+                    if (tileSize < 0)
+                    {
+                        return finalSize;
+                    }
                     tile.Image.Width = tileSize;
                     tile.Image.Height = tileSize;
                     tile.Image.Arrange(new Rect(x, y, tileSize, tileSize));

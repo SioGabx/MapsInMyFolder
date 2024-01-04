@@ -48,10 +48,11 @@
                 DataContext="{Binding RelativeSource={RelativeSource AncestorType={x:Type mapsinmyfolder:GridLayerEditor}}}"
                 GetLayersMethod="{Binding GetLayersListMethod}"
                 LinkedMapViewer="{Binding ElementName=mapviewer}"
+                SetCurrentLayerEvent="LayerPanel_SetCurrentLayerEvent" 
                 OpenEditLayerPageEvent="LayerPanel_OpenEditLayerPageEvent" />
         </Grid>
 
-        <Grid Grid.Column="1" Visibility="Visible">
+        <Grid Grid.Column="1" Visibility="Collapsed ">
             <Grid.RowDefinitions>
                 <RowDefinition Height="65" />
                 <RowDefinition />
@@ -72,7 +73,7 @@
                 Margin="10,0,15,0" />
         </Grid>
 
-        <Grid Grid.Column="1" Visibility="Collapsed">
+        <Grid Grid.Column="1" Visibility="Visible">
 
             <Grid.RowDefinitions>
                 <RowDefinition Height="65" />
@@ -105,6 +106,7 @@
                 <customCtrl:SearchLocation
                     x:Name="mapLocationSearchBar"
                     Margin="10,0,0,0"
+                    FontSize="16"
                     SearchLostFocusRequest="MapLocationSearchBar_SearchLostFocusRequest"
                     SearchResultEvent="MapLocationSearchBar_SearchResultEvent"
                     SearchResultMap="{Binding ElementName=mapviewer}"
