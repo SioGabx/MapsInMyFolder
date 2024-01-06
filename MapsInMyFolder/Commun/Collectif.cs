@@ -358,7 +358,7 @@ namespace MapsInMyFolder.Commun
             const int tile_size = 300;
             const int border_size = 1;
             const int border_tile_size = tile_size - (border_size * 2);
-            if (FileFormat == "png" || LayerID == -2)
+            if (FileFormat == "png" || LayerID == (int)Layers.ReservedId.TempLayerDatabaseEditor)
             {
                 const string format = "png";
                 double[] color = new double[] { Settings.background_layer_color_R, Settings.background_layer_color_G, Settings.background_layer_color_B, 60 };
@@ -1077,10 +1077,10 @@ namespace MapsInMyFolder.Commun
             return str;
         }
 
-        public static string Replacements(string tileBaseUrl, string x, string y, string z, int LayerID, Javascript.InvokeFunction invokeFunction)
+        public static string Replacements(string tileBaseUrl, string x, string y, string z, Layers Layer, Javascript.InvokeFunction invokeFunction)
         {
             if (string.IsNullOrEmpty(tileBaseUrl)) { return string.Empty; }
-            return GetUrl.FromTileXYZ(tileBaseUrl, Convert.ToInt32(x), Convert.ToInt32(y), Convert.ToInt32(z), LayerID, invokeFunction).Replace(" ", "%20");
+            return GetUrl.FromTileXYZ(tileBaseUrl, Convert.ToInt32(x), Convert.ToInt32(y), Convert.ToInt32(z), Layer, invokeFunction).Replace(" ", "%20");
         }
 
         public static async Task<int> CheckIfDownloadSuccess(string url)

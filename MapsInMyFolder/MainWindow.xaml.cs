@@ -86,8 +86,7 @@ namespace MapsInMyFolder
             LightInit();
             ThemeManager.Current.ApplicationTheme = ApplicationTheme.Dark;
             Debug.WriteLine("Version dotnet :" + Environment.Version.ToString());
-            Javascript JavascriptLocationInstance = Javascript.instance;
-            JavascriptLocationInstance.LocationChanged += (o, e) => MainPage.MapViewerSetSelection(Javascript.instance.Location, Javascript.instance.ZoomToNewLocation);
+            Javascript.LocationChanged += (o, e) => MainPage.MapViewerSetSelection(Javascript.Location, Javascript.ZoomToNewLocation);
             Network.IsNetworkNowAvailable += (o, e) => NetworkIsBack();
             Database.RefreshPanels += (o, e) => RefreshAllPanels();
             Javascript.JavascriptActionEvent += JavascriptActionEvent;

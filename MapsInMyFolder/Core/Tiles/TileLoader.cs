@@ -45,7 +45,7 @@ namespace MapsInMyFolder
             }
         }
 
-        public void SetNeighbour(int LayerId, string urlBase)
+        public void SetNeighbour(Layers Layer, string urlBase)
         {
             neighbourTiles = new Dictionary<string, TileProperty>();
             for (int loopX = -1; loopX <= 1; loopX++)
@@ -55,7 +55,7 @@ namespace MapsInMyFolder
                     // Faites quelque chose avec les valeurs de x et y ici
                     int ComputedX = x + loopX;
                     int ComputedY = y + loopY;
-                    string ComputedURL = GetUrl.FromTileXYZ(urlBase, ComputedX, ComputedY, z, LayerId, Javascript.InvokeFunction.getTile);
+                    string ComputedURL = GetUrl.FromTileXYZ(urlBase, ComputedX, ComputedY, z, Layer, Javascript.InvokeFunction.getTile);
                     neighbourTiles.Add($"{(loopX + 1)}-{(loopY + 1)}", new TileProperty(ComputedURL, ComputedX, ComputedY, this.z, Status.waitfordownloading, this.downloadid, this.format));
                 }
             }
@@ -104,38 +104,37 @@ namespace MapsInMyFolder
                 CustomMessage = customMessage;
             }
         }
-        public static async Task<HttpResponse> GetImageAsync(string urlBase, int TileX, int TileY, int TileZoom, int layerID, string fileformat = null, string save_temp_directory = "", bool pbfdisableadjacent = false)
+        public static async Task<HttpResponse> GetImageAsync(string urlBase, int TileX, int TileY, int TileZoom, Layers layer, string fileformat = null, string save_temp_directory = "", bool pbfdisableadjacent = false)
         {
-            string url = GetUrl.FromTileXYZ(urlBase, TileX, TileY, TileZoom, layerID, Javascript.InvokeFunction.getTile);
+            string url = GetUrl.FromTileXYZ(urlBase, TileX, TileY, TileZoom, layer, Javascript.InvokeFunction.getTile);
 
             TileProperty tilesUrl = new TileProperty(url, TileX, TileY, TileZoom, Status.waitfordownloading, 0, fileformat);
             if (fileformat == "pbf")
             {
-                tilesUrl.SetNeighbour(layerID, urlBase);
+                tilesUrl.SetNeighbour(layer, urlBase);
             }
 
-            return await GetImageAsync(tilesUrl, layerID, fileformat, save_temp_directory, pbfdisableadjacent);
+            return await GetImageAsync(tilesUrl, layer.Id, layer.TilesSize, fileformat, save_temp_directory, pbfdisableadjacent);
         }
 
-        public static async Task<HttpResponse> GetImageAsync(TileProperty tilesUrl, int layerID, string fileformat = null, string save_temp_directory = "", bool pbfdisableadjacent = false)
+       
+        public static async Task<HttpResponse> GetImageAsync(TileProperty tilesUrl, int LayerId, int? LayerTileSize, string fileformat = null, string save_temp_directory = "", bool pbfdisableadjacent = false)
         {
             switch (fileformat)
             {
                 case "pbf":
                     const int TileSize = 1;
-                    Layers Layer = Layers.GetLayerById(layerID);
-                    return await GetTilePBF(layerID, tilesUrl, save_temp_directory, (int)Math.Floor((double)(Layer.TilesSize ?? 0) * TileSize), TileSize, 0.5, pbfdisableadjacent).ConfigureAwait(false);
+                    return await GetTilePBF(LayerId, tilesUrl, save_temp_directory, (int)Math.Floor((double)(LayerTileSize ?? 0) * TileSize), TileSize, 0.5, pbfdisableadjacent).ConfigureAwait(false);
 
                 default:
-                    return await GetTile(layerID, tilesUrl).ConfigureAwait(false);
+                    return await GetTile(LayerId, tilesUrl).ConfigureAwait(false);
             }
 
         }
 
 
 
-
-        public static string GetStyle(int layerID)
+            public static string GetStyle(int layerID)
         {
             string styleValueOrUrlOrPath;
             Layers layers = Layers.GetLayerById(layerID);

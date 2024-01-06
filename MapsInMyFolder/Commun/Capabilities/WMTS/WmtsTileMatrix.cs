@@ -32,6 +32,11 @@ namespace MapsInMyFolder.Commun.Capabilities
             public int TileHeight { get; }
             public int MatrixWidth { get; }
             public int MatrixHeight { get; }
+            public int MinTileRow { get; set; }
+            public int MaxTileRow { get; set; }
+            public int MinTileCol { get; set; }
+            public int MaxTileCol { get; set; }
+            public string Zoom { get; set; } = null;
 
             public static WmtsTileMatrix ReadTileMatrix(XElement tileMatrixElement)
             {

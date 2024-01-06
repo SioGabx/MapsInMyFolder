@@ -59,10 +59,35 @@ namespace MapsInMyFolder
             {
                 IsInitialized = true;
                 await GetDataAsync();
+                int StartId = _items.FirstOrDefault(null as Layers)?.Id ?? 1;
+                Layers.SetCurrentLayer(StartId);
+                //(int)Layers.ReservedId.TempLayerGeneric
                 LayerPanel.Init();
                 MapFigures = new MapFigures();
+                MapLoad(); 
+                SetMapLayer(StartId);
             }
         }
+
+        public void MapLoad()
+        {
+            mapviewer.MapLayer = new MapTileLayer();
+            NO_PIN.Visibility = Settings.visibility_pins;
+            SE_PIN.Visibility = Settings.visibility_pins;
+
+            if (mapviewer.Center.Latitude == 0 && mapviewer.Center.Longitude == 0)
+            {
+                mapviewer.Center = new Location((Settings.NO_PIN_starting_location_latitude + Settings.SE_PIN_starting_location_latitude) / 2, (Settings.NO_PIN_starting_location_longitude + Settings.SE_PIN_starting_location_longitude) / 2);
+                mapviewer.ZoomLevel = Settings.map_defaut_zoom_level;
+            }
+            mapviewer.Background = new System.Windows.Media.SolidColorBrush(
+                System.Windows.Media.Color.FromArgb(255,
+                (byte)Settings.background_layer_color_R,
+                (byte)Settings.background_layer_color_G,
+                (byte)Settings.background_layer_color_B)
+            );
+        }
+
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
@@ -77,10 +102,22 @@ namespace MapsInMyFolder
             }
         }
         private static MapFigures MapFigures;
+
+        private void LayerPanel_SetCurrentLayerEvent(object sender, UserControls.LayersPanel.LayerIdEventArgs e)
+        {
+            SetMapLayer(e.LayerId);
+        }
+
+        public void SetMapLayer(int id)
+        {
+            Layers.SetMapLayer(_items.GetLayerById(id), mapviewer, MapTileLayer_Transparent, MapFigures, mapviewerRectangles);
+        }
+
         private void Mapviewer_MouseWheel(object sender, MouseWheelEventArgs e)
         {
-            MapFigures.UpdateFiguresFromZoomLevel(mapviewer.TargetZoomLevel);
+            MapFigures?.UpdateFiguresFromZoomLevel(mapviewer?.TargetZoomLevel ?? 0);
             Collectif.AnimateLabel(ZoomLevelIndicator);
+            LayerTilePreview_RequestUpdate();
         }
 
         public void LayerTilePreview_RequestUpdate()
@@ -90,8 +127,7 @@ namespace MapsInMyFolder
             Map.CurentView.NO_Longitude = bbox.West;
             Map.CurentView.SE_Latitude = bbox.South;
             Map.CurentView.SE_Longitude = bbox.East;
-
-            LayerPanel.LayerBrowser.ExecuteScriptAsyncWhenPageLoaded("UpdatePreview();");
+            LayerPanel.PreviewRequestUpdate();
             return;
         }
 
@@ -136,18 +172,16 @@ namespace MapsInMyFolder
         private void EditPage_OnInitEvent(object sender, Layers.LayersEventArgs e)
         {
             CustomOrEditLayersPage EditPage = sender as CustomOrEditLayersPage;
-            e.Layer = _items.Where(l => l.Id == EditPage.LayerId).FirstOrDefault();
+            e.Layer = _items.GetLayerById(EditPage.LayerId);
         }
 
         private void EditPage_SaveLayerEvent(object sender, Layers.LayersEventArgs e)
         {
-            var OriginalLayer = _items.Where(l => l.Id == e.Layer.Id).FirstOrDefault();
+            var OriginalLayer = _items.GetLayerById(e.Layer.Id);
             var Index = _items.IndexOf(OriginalLayer);
             _items.Remove(OriginalLayer);
             _items.Insert(Index, e.Layer);
             e.Cancel = true;
         }
-
-
     }
 }

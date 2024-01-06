@@ -34,8 +34,11 @@ namespace MapsInMyFolder.Commun
                     return;
                 }
 
-                ContentDialogResult result = await Message.ShowContentDialog(Languages.GetWithArguments("databaseMessageNotFoundAskDownload", database_pathname), Languages.Current["dialogTitleOperationConfirm"], MessageDialogButton.YesNoRetry);
-
+                ContentDialogResult? result = await Message.ShowContentDialog(Languages.GetWithArguments("databaseMessageNotFoundAskDownload", database_pathname), Languages.Current["dialogTitleOperationConfirm"], MessageDialogButton.YesNoRetry);
+                if (result == null)
+                {
+                    return;
+                }
                 if (result == ContentDialogResult.Primary)
                 {
                     DB_Download();
@@ -125,7 +128,7 @@ namespace MapsInMyFolder.Commun
                         return;
                     }
 
-                    ContentDialogResult ErrorDetectedWantToAbord = await Message.ShowContentDialog(Languages.Current["databaseMessageDownloadingErrorUnknown"], Languages.Current["dialogTitleOperationConfirm"], MessageDialogButton.RetryCancel);
+                    ContentDialogResult? ErrorDetectedWantToAbord = await Message.ShowContentDialog(Languages.Current["databaseMessageDownloadingErrorUnknown"], Languages.Current["dialogTitleOperationConfirm"], MessageDialogButton.RetryCancel);
                     if (ErrorDetectedWantToAbord != ContentDialogResult.Primary)
                     {
                         break;
@@ -134,7 +137,7 @@ namespace MapsInMyFolder.Commun
                 else
                 {
                     //print network not available
-                    ContentDialogResult NoConnexionDetectedWantToAbord = await Message.ShowContentDialog(Languages.Current["databaseMessageDownloadingErrorNoConnexion"], Languages.Current["dialogTitleOperationConfirm"], MessageDialogButton.YesNo);
+                    ContentDialogResult? NoConnexionDetectedWantToAbord = await Message.ShowContentDialog(Languages.Current["databaseMessageDownloadingErrorNoConnexion"], Languages.Current["dialogTitleOperationConfirm"], MessageDialogButton.YesNo);
 
                     if (NoConnexionDetectedWantToAbord != ContentDialogResult.Primary)
                     {
@@ -312,14 +315,14 @@ namespace MapsInMyFolder.Commun
                 if (filinfo.Length == 0)
                 {
                     Debug.WriteLine("DB Taille corrompu");
-                    DB_AskDownload(true).ConfigureAwait(true);
+                   DB_AskDownload(true);
                     return null;
                 }
             }
             else
             {
                 Debug.WriteLine("DB Le fichier n'existe pas");
-                DB_AskDownload().ConfigureAwait(true);
+                DB_AskDownload();
                 return null;
             }
             SQLiteConnection connection = DB_OpenConnection(dbFile);
@@ -369,7 +372,7 @@ namespace MapsInMyFolder.Commun
             }
             using (SQLiteCommand sqlite_cmd = sqlite_conn.CreateCommand())
             {
-                const string commande_arg = "'ID' INTEGER UNIQUE, 'NAME' TEXT DEFAULT '', 'DESCRIPTION' TEXT DEFAULT '', 'CATEGORY' TEXT DEFAULT '','COUNTRY' TEXT DEFAULT '', 'IDENTIFIER' TEXT DEFAULT '', 'TILE_URL' TEXT DEFAULT '', 'MIN_ZOOM' INTEGER DEFAULT '', 'MAX_ZOOM' INTEGER DEFAULT '', 'FORMAT' TEXT DEFAULT '', 'SITE' TEXT DEFAULT '', 'SITE_URL' TEXT DEFAULT '', 'STYLE' TEXT DEFAULT '', 'TILE_SIZE' INTEGER DEFAULT '', 'FAVORITE' INTEGER DEFAULT 0, 'SCRIPT' TEXT DEFAULT '','VISIBILITY' TEXT DEFAULT '' ,'SPECIALSOPTIONS' TEXT DEFAULT '','RECTANGLES' TEXT DEFAULT '', 'VERSION' INTEGER DEFAULT 1, 'HAS_SCALE' INTEGER DEFAULT 1";
+                const string commande_arg = "'ID' INTEGER UNIQUE, 'NAME' TEXT DEFAULT '', 'DESCRIPTION' TEXT DEFAULT '', 'TAGS' TEXT DEFAULT '','COUNTRY' TEXT DEFAULT '', 'IDENTIFIER' TEXT DEFAULT '', 'TILE_URL' TEXT DEFAULT '', 'MIN_ZOOM' INTEGER DEFAULT '', 'MAX_ZOOM' INTEGER DEFAULT '', 'FORMAT' TEXT DEFAULT '', 'SITE' TEXT DEFAULT '', 'SITE_URL' TEXT DEFAULT '', 'STYLE' TEXT DEFAULT '', 'TILE_SIZE' INTEGER DEFAULT '', 'FAVORITE' INTEGER DEFAULT 0, 'SCRIPT' TEXT DEFAULT '','VISIBILITY' TEXT DEFAULT '' ,'SPECIALSOPTIONS' TEXT DEFAULT '','RECTANGLES' TEXT DEFAULT '', 'VERSION' INTEGER DEFAULT 1, 'HAS_SCALE' INTEGER DEFAULT 1";
                 sqlite_cmd.CommandText = $@"
                 CREATE TABLE IF NOT EXISTS 'CUSTOMSLAYERS' ({commande_arg});
                 CREATE TABLE IF NOT EXISTS 'LAYERS' ({commande_arg},PRIMARY KEY('ID' AUTOINCREMENT));
@@ -812,7 +815,12 @@ namespace MapsInMyFolder.Commun
             {
                 if (File.Exists(FilePath))
                 {
+                    try { 
                     File.Delete(FilePath);
+                    }catch (Exception ex)
+                    {
+                        Debug.WriteLine(ex.Message);
+                    }
                 }
                 using (SQLiteConnection sqlite_conn = new SQLiteConnection("Data Source=" + FilePath + "; Version = 3; New = True; Compress = True;"))
                 {

@@ -58,15 +58,14 @@ namespace MapsInMyFolder
             return (null, null);
         }
 
-        public static string FromTileXYZ(string urlbase, int Tilex, int Tiley, int z, int LayerID, Javascript.InvokeFunction InvokeFunction)
+        public static string FromTileXYZ(string urlbase, int Tilex, int Tiley, int z, Layers TileLayer, Javascript.InvokeFunction InvokeFunction)
         {
-            Layers calque = Layers.GetLayerById(LayerID);
-            if (calque is null)
+            if (TileLayer is null)
             {
                 return string.Empty;
             }
-            string Script = calque.Script;
-            var ValuesDictionnary = CallFunctionAndGetResult(urlbase, Script, Tilex, Tiley, z, LayerID, InvokeFunction);
+            string Script = TileLayer.Script;
+            var ValuesDictionnary = CallFunctionAndGetResult(urlbase, Script, Tilex, Tiley, z, TileLayer.Id, InvokeFunction);
             if (ValuesDictionnary.ResultCallValue is null)
             {
                 return string.Empty;
@@ -75,7 +74,7 @@ namespace MapsInMyFolder
             string finalurl;
             if (string.IsNullOrEmpty(urlbase))
             {
-                finalurl = calque.TileUrl;
+                finalurl = TileLayer.TileUrl;
             }
             else
             {
@@ -143,7 +142,7 @@ namespace MapsInMyFolder
             try
             {
                 Layers calque = Layers.Convert.Copy(Layers.GetLayerById(LayerID));
-                Layers.Add(-1, calque);
+                Layers.Add((int)Layers.ReservedId.TempLayerGeneric, calque);
 
                 var deserializedArray = JsonConvert.DeserializeObject<Dictionary<string, object>[]>(varContext);
 
@@ -156,14 +155,14 @@ namespace MapsInMyFolder
 
                         if (value != null && !string.IsNullOrEmpty(key))
                         {
-                            Javascript.Functions.SetVar(key, value, false, -1);
+                            Javascript.Functions.SetVar(key, value, false, (int)Layers.ReservedId.TempLayerGeneric);
                         }
                     }
                 }
 
-                Javascript.EngineDeleteById(-1);
+                Javascript.EngineDeleteById((int)Layers.ReservedId.TempLayerGeneric);
 
-                List<TileProperty> tilesUrls = GenrateListOfUrlFromLocation(location, z, urlbase, -1, downloadid, calque.TilesFormat);
+                List<TileProperty> tilesUrls = GenrateListOfUrlFromLocation(location, z, urlbase, (int)Layers.ReservedId.TempLayerGeneric, downloadid, calque.TilesFormat);
 
                 return tilesUrls;
 
@@ -202,11 +201,12 @@ namespace MapsInMyFolder
                 {
                     int tuileX = NO_x + Download_X_tile;
                     int tuileY = NO_y + Download_Y_tile;
-                    string url = FromTileXYZ(urlbase, tuileX, tuileY, z, LayerID, Javascript.InvokeFunction.getTile);
+                    Layers tempLayer = Layers.GetLayerById(LayerID);
+                    string url = FromTileXYZ(urlbase, tuileX, tuileY, z, tempLayer, Javascript.InvokeFunction.getTile);
                     TileProperty Tile = new TileProperty(url, tuileX, tuileY, z, Status.waitfordownloading, downloadid, format);
                     if (format == "pbf")
                     {
-                        Tile.SetNeighbour(LayerID, urlbase);
+                        Tile.SetNeighbour(tempLayer, urlbase);
                     }
                     list_of_url_to_download.Add(Tile);
                     List<int> next_num_list = NextNumberFromPara(Download_X_tile, Download_Y_tile, max_x, max_y);

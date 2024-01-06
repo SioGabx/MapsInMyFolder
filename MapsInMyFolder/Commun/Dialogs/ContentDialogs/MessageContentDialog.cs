@@ -45,7 +45,7 @@ namespace MapsInMyFolder.Commun
             return (textBox, dialog);
         }
 
-        public static async Task<ContentDialogResult> ShowContentDialog(ContentDialog dialog)
+        public static async Task<ContentDialogResult?> ShowContentDialog(ContentDialog dialog)
         {
             try
             {
@@ -54,11 +54,11 @@ namespace MapsInMyFolder.Commun
             catch (Exception ex)
             {
                 Debug.WriteLine("ShowContentDialog : " + ex.ToString());
-                return ContentDialogResult.None;
+                return null;
             }
         }
 
-        public static async Task<ContentDialogResult> ShowContentDialog(object text, object caption = null, MessageDialogButton messageBoxButton = MessageDialogButton.OK)
+        public static async Task<ContentDialogResult?> ShowContentDialog(object text, object caption = null, MessageDialogButton messageBoxButton = MessageDialogButton.OK)
         {
             var dialog = SetContentDialog(text, caption, messageBoxButton);
             return await ShowContentDialog(dialog);

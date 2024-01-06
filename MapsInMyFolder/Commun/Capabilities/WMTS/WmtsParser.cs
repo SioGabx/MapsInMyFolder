@@ -18,6 +18,7 @@ namespace MapsInMyFolder.Commun.Capabilities
         public string LayerAbstract { get; private set; } = string.Empty;
         public string LayerFormat { get; private set; } = string.Empty;
         public string LayerStyle { get; private set; } = string.Empty;
+        public string[] LayerKeyWords { get; private set; } = new string[0];
         public string UrlTemplate { get; private set; }
         public BoundingBox WGS84BoundingBox { get; private set; }
         public List<WmtsTileMatrixSet> TileMatrixSets { get; private set; }
@@ -63,6 +64,17 @@ namespace MapsInMyFolder.Commun.Capabilities
                 string LayerTitle = layerElement.Element(ows + "Title")?.Value ?? string.Empty;
                 string LayerAbstract = layerElement.Element(ows + "Abstract")?.Value ?? string.Empty;
 
+                List<string> ListOfKeywords = new List<string>();
+                XElement Keywords = layerElement.Element(ows + "Keywords");
+                foreach(XElement keyWord in Keywords?.Elements(ows + "Keyword"))
+                {
+                    string Word = keyWord?.Value;
+                    if (!string.IsNullOrWhiteSpace(Word))
+                    {
+                        ListOfKeywords.Add(Word);
+                    }
+                }
+
                 XElement boundingBoxElement = layerElement.Element(ows + "WGS84BoundingBox");
                 XElement LowerCorner = boundingBoxElement?.Element(ows + "LowerCorner");
                 XElement UpperCorner = boundingBoxElement?.Element(ows + "UpperCorner");
@@ -84,13 +96,44 @@ namespace MapsInMyFolder.Commun.Capabilities
                         .Elements(wmts + "TileMatrixSet")
                         .FirstOrDefault(s => s.Element(ows + "Identifier")?.Value == tileMatrixSetId);
 
+
                     if (tileMatrixSetElement == null)
                     {
                         continue;
                     }
                     WmtsTileMatrixSet MatrixSet = WmtsTileMatrixSet.ReadTileMatrixSet(tileMatrixSetElement);
+
+                    var TilesMatrixSetLink = layerElement?.Elements(wmts + "TileMatrixSetLink");
+                    foreach(var TileMatrixSetLink in TilesMatrixSetLink)
+                    {
+
+                        var CurrentTileMatrixSetId = TileMatrixSetLink?.Element(wmts + "TileMatrixSet")?.Value;
+                        if (CurrentTileMatrixSetId == tileMatrixSetId)
+                        {
+                            var TileMatrixSetLimits = TileMatrixSetLink?.Element(wmts + "TileMatrixSetLimits");
+                            foreach(var Matrix in MatrixSet.TileMatrixes) { 
+                                var TileMatrixLimits = TileMatrixSetLimits?.Elements(wmts + "TileMatrixLimits").Where(element=> element?.Element(wmts + "TileMatrix")?.Value == (Matrix.LevelPrefix + Matrix.Level))?.FirstOrDefault();
+                                if (TileMatrixLimits is null)
+                                {
+                                    continue;
+                                }
+                                
+                                _ = int.TryParse(TileMatrixLimits?.Element(wmts + "MinTileRow")?.Value, out int MinTileRow);
+                                _ = int.TryParse(TileMatrixLimits?.Element(wmts + "MaxTileRow")?.Value, out int MaxTileRow);
+                                _ = int.TryParse(TileMatrixLimits?.Element(wmts + "MinTileCol")?.Value, out int MinTileCol);
+                                _ = int.TryParse(TileMatrixLimits?.Element(wmts + "MaxTileCol")?.Value, out int MaxTileCol);
+                                Matrix.MinTileRow = MinTileRow;
+                                Matrix.MaxTileRow = MaxTileRow;
+                                Matrix.MinTileCol = MinTileCol;
+                                Matrix.MaxTileCol = MaxTileCol;
+                                Matrix.Zoom = Matrix.Level;
+                            }
+                        }
+                    }
+
                     tileMatrixSets.Add(MatrixSet);
                 }
+
 
 
                 ListOfWMTSParser.Add(new WMTSParser()
@@ -102,7 +145,8 @@ namespace MapsInMyFolder.Commun.Capabilities
                     LayerFormat = urlTemplate.layerFormat,
                     LayerStyle = StyleName,
                     TileMatrixSets = tileMatrixSets,
-                    WGS84BoundingBox = boundingBox
+                    WGS84BoundingBox = boundingBox,
+                    LayerKeyWords = ListOfKeywords.ToArray(),
                 });
             }
             return ListOfWMTSParser;

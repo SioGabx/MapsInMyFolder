@@ -109,8 +109,8 @@ namespace MapsInMyFolder
                 "NAME DESC",
                 "DESCRIPTION ASC",
                 "DESCRIPTION DESC",
-                "CATEGORY ASC",
-                "CATEGORY DESC",
+                "TAGS ASC",
+                "TAGS DESC",
                 "FORMAT ASC",
                 "FORMAT DESC",
                 "SITE ASC",
@@ -280,7 +280,7 @@ namespace MapsInMyFolder
 
         private async void ResetSettings_Click(object sender, RoutedEventArgs e)
         {
-            ContentDialogResult dialogConfirmResetApplicationSettings = await Message.ShowContentDialog(Languages.Current["settingsMessageResetApplicationSettings"], Languages.Current["dialogTitleOperationConfirm"], MessageDialogButton.YesCancel);
+            ContentDialogResult? dialogConfirmResetApplicationSettings = await Message.ShowContentDialog(Languages.Current["settingsMessageResetApplicationSettings"], Languages.Current["dialogTitleOperationConfirm"], MessageDialogButton.YesCancel);
 
             if (dialogConfirmResetApplicationSettings == ContentDialogResult.Primary)
             {
@@ -421,13 +421,13 @@ namespace MapsInMyFolder
             }
             e.Cancel = true;
 
-            ContentDialogResult dialogAskLeaveWithoutSavingResult = await Message.ShowContentDialog(Languages.Current["settingsMessageLeaveWithoutSaving"], Languages.Current["dialogTitleOperationConfirm"], MessageDialogButton.YesNo);
+            ContentDialogResult? dialogAskLeaveWithoutSavingResult = await Message.ShowContentDialog(Languages.Current["settingsMessageLeaveWithoutSaving"], Languages.Current["dialogTitleOperationConfirm"], MessageDialogButton.YesNo);
             if (dialogAskLeaveWithoutSavingResult == ContentDialogResult.Primary)
             {
                 SaveSettings();
 
                 // Redémarrer ?
-                ContentDialogResult dialogAskForRestartResult = await Message.ShowContentDialog(Languages.Current["settingsMessageAskForRestart"], Languages.Current["dialogTitleOperationConfirm"], MessageDialogButton.YesNo);
+                ContentDialogResult? dialogAskForRestartResult = await Message.ShowContentDialog(Languages.Current["settingsMessageAskForRestart"], Languages.Current["dialogTitleOperationConfirm"], MessageDialogButton.YesNo);
 
                 if (dialogAskForRestartResult == ContentDialogResult.Primary)
                 {

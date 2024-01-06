@@ -1,4 +1,6 @@
-﻿using MapsInMyFolder.Commun;
+﻿using BlackPearl.Controls.Contract;
+using BlackPearl.Controls.CoreLibrary;
+using MapsInMyFolder.Commun;
 using MapsInMyFolder.MapControl;
 using ModernWpf.Controls;
 using Newtonsoft.Json;
@@ -75,7 +77,7 @@ namespace MapsInMyFolder
                 EditorLayerIdToLoad = LayerId;
             }
 
-            Javascript.instance.Logs = String.Empty;
+            Javascript.Logs = String.Empty;
             TextboxLayerScriptConsole.Text = String.Empty;
             Javascript.Functions.ClearVar((int)Layers.ReservedId.TempLayerGeneric);
             Javascript.Functions.ClearVar((int)Layers.ReservedId.TempLayerDatabaseEditor);
@@ -84,7 +86,6 @@ namespace MapsInMyFolder
             mapviewerappercu.Center = MainPage.Instance.mapviewer.Center;
             mapviewerappercu.ZoomLevel = MainPage.Instance.mapviewer.ZoomLevel;
             TextBoxSetValueAndLock(TextboxLayerScript, Settings.tileloader_default_script);
-            CountryComboBox.ItemSource = Country.GetList();
 
             SetContextMenu();
 
@@ -102,8 +103,6 @@ namespace MapsInMyFolder
                 ResetInfoLayerClikableLabel.IsEnabled = false;
                 ResetInfoLayerClikableLabel.Opacity = 0.6;
             }
-            //var keyeventHandler = new KeyEventHandler(TextboxLayerScriptConsoleSender_KeyDown);
-            //TextboxLayerScriptConsoleSender.AddHandler(PreviewKeyDownEvent, keyeventHandler, handledEventsToo: true);
             TextboxLayerScriptConsoleSender.PreviewKeyDown += TextboxLayerScriptConsoleSender_KeyDown;
             TextboxRectangles.SetTextEditorPositionChangedHandler(EditeurGrid, EditeurScrollBar, 75);
             TextboxLayerScript.SetTextEditorPositionChangedHandler(EditeurGrid, EditeurScrollBar, 75);
@@ -219,12 +218,13 @@ namespace MapsInMyFolder
 
         private void Init_LayerEditableTextbox(Layers LayerInEditMode)
         {
-            InitComboboxAvailableValues();
-            if (LayerId > 0 && !string.IsNullOrEmpty(LayerInEditMode.Name.Trim()))
+            InitItemSourceValues();
+            if (EditMode == EditingMode.Edit)
             {
                 CalqueType.Content = string.Concat(Languages.Current["editorTitleLayer"], " - ", LayerInEditMode.Name);
+                CalqueType.ToolTip = $"Id : {LayerInEditMode.Id}";
             }
-            else if (LayerId != LayerInEditMode.Id)
+            else if (EditMode == EditingMode.NewFromTemplate)
             {
                 CalqueType.Content = Languages.GetWithArguments("editorTitleNewLayerBasedOn", LayerInEditMode.Id);
             }
@@ -233,12 +233,10 @@ namespace MapsInMyFolder
 
         public void SetValuesFromLayers(Layers LayerInEditMode)
         {
-            TextboxLayerCategory.IsEditable = true;
             TextboxLayerSite.IsEditable = true;
             TextboxLayerSiteUrl.IsEditable = true;
             if (LayerInEditMode is null)
             {
-                TextboxLayerCategory.Text = "";
                 TextboxLayerSite.Text = "";
                 TextboxLayerSiteUrl.Text = "";
                 TextBoxSetValueAndLock(TextboxLayerTileWidth, "256");
@@ -246,7 +244,6 @@ namespace MapsInMyFolder
             }
             TextboxLayerName.Text = LayerInEditMode.Name;
 
-            TextboxLayerCategory.Text = LayerInEditMode.Tag;
             TextboxLayerSiteUrl.Text = LayerInEditMode.SiteUrl;
             TextboxLayerSite.Text = LayerInEditMode.SiteName;
             TextboxLayerFormat.Text = LayerInEditMode.TilesFormat.ToUpperInvariant();
@@ -301,6 +298,19 @@ namespace MapsInMyFolder
             TextBoxSetValueAndLock(TextboxSpecialOptionBackgroundColor, LayerInEditMode.SpecialsOptions.BackgroundColor?.TrimEnd('#'));
             TextBoxSetValueAndLock(TextboxLayerStyle, LayerInEditMode.Style);
 
+            TagsComboBox.LookUpContract = new StringLookUpContract();
+            string[] class_tags = LayerInEditMode.Tags.Split(';', StringSplitOptions.RemoveEmptyEntries);
+            List<string> Tags = new List<string>();
+            foreach (string Tag in class_tags)
+            {
+                var Item = new string(Tag);
+                if (!Tags.Contains(Item) && !string.IsNullOrWhiteSpace(Tag))
+                {
+                    Tags.Add(Item);
+                }
+            }
+            TagsComboBox.SelectedItems = Tags;
+
             string[] class_country = LayerInEditMode.Country.Split(';', StringSplitOptions.RemoveEmptyEntries);
             List<Country> SelectedCountries = Country.GetListFromEnglishName(class_country);
             if (SelectedCountries.Count != class_country.Length && LayerInEditMode.Country != null)
@@ -346,9 +356,9 @@ namespace MapsInMyFolder
             Collectif.SetBackgroundOnUIElement(mapviewerappercu, LayerInEditMode?.SpecialsOptions?.BackgroundColor);
         }
 
-        void InitComboboxAvailableValues()
+        void InitItemSourceValues()
         {
-            List<string> Category = new List<string>();
+            List<string> Tags = new List<string>();
             List<string> Site = new List<string>();
             List<string> SiteUrl = new List<string>();
 
@@ -358,11 +368,14 @@ namespace MapsInMyFolder
                 {
                     continue;
                 }
-                string class_category = layer.Tag.Trim();
-                if (!Category.Contains(class_category) && !string.IsNullOrWhiteSpace(class_category))
+                var LayerTags = layer.Tags.Split(';', StringSplitOptions.RemoveEmptyEntries);
+                foreach (string Tag in LayerTags)
                 {
-                    Category.Add(class_category);
-                    TextboxLayerCategory.Items.Add(class_category);
+                    var Item = new string(Tag);
+                    if (!Tags.Contains(Item) && !string.IsNullOrWhiteSpace(Tag))
+                    {
+                        Tags.Add(Item);
+                    }
                 }
                 string class_site = layer.SiteName.Trim();
                 if (!Site.Contains(class_site) && !string.IsNullOrWhiteSpace(class_site))
@@ -377,11 +390,9 @@ namespace MapsInMyFolder
                     TextboxLayerSiteUrl.Items.Add(class_site_url);
                 }
             }
-            Category.Clear();
-            Site.Clear();
-            SiteUrl.Clear();
+            TagsComboBox.ItemSource = Tags;
+            CountryComboBox.ItemSource = Country.GetList();
             const System.ComponentModel.ListSortDirection listSortDirection = System.ComponentModel.ListSortDirection.Ascending;
-            TextboxLayerCategory.Items.SortDescriptions.Add(new System.ComponentModel.SortDescription("", listSortDirection));
             TextboxLayerSite.Items.SortDescriptions.Add(new System.ComponentModel.SortDescription("", listSortDirection));
             TextboxLayerSiteUrl.Items.SortDescriptions.Add(new System.ComponentModel.SortDescription("", listSortDirection));
         }
@@ -423,7 +434,7 @@ namespace MapsInMyFolder
             }
             try
             {
-                Javascript.instance.Logs = String.Empty;
+                Javascript.Logs = String.Empty;
                 if (string.IsNullOrEmpty(url) && !string.IsNullOrEmpty(TextboxLayerTileUrl.Text))
                 {
                     url = TextboxLayerTileUrl.Text;
@@ -469,7 +480,8 @@ namespace MapsInMyFolder
                 if (!string.IsNullOrEmpty(url))
                 {
                     UpdateEditorTempLayerToValues();
-                    MapTileLayer_Transparent.TileSource = new TileSource { UriFormat = url, LayerID = (int)Layers.ReservedId.TempLayerDatabaseEditor };
+                    Layers TempLayerDatabaseEditor = Layers.GetLayerById((int)Layers.ReservedId.TempLayerDatabaseEditor);
+                    MapTileLayer_Transparent.TileSource = new TileSource { UriFormat = url, TileLayer = TempLayerDatabaseEditor };
 
                 }
                 SetBackgroundMap(mapviewerappercu);
@@ -490,7 +502,7 @@ namespace MapsInMyFolder
                     Layers Layer = Layers.GetLayerById(Layers.StartupLayerId) ?? Layers.Empty();
                     basemap = new MapTileLayer
                     {
-                        TileSource = new TileSource { UriFormat = Layer.TileUrl, LayerID = Layer.Id },
+                        TileSource = new TileSource { UriFormat = Layer.TileUrl, TileLayer = Layer },
                         SourceName = Layer.Identifier,
                         MaxZoomLevel = Layer.MaxZoom ?? 0,
                         MinZoomLevel = Layer.MinZoom ?? 0,
@@ -724,7 +736,7 @@ namespace MapsInMyFolder
             var LayerSaveValues = Layers.GetValuesForSaving(layers);
             string NAME = LayerSaveValues["NAME"];
             string DESCRIPTION = LayerSaveValues["DESCRIPTION"];
-            string CATEGORY = LayerSaveValues["CATEGORY"];
+            string TAGS = LayerSaveValues["TAGS"];
             string COUNTRY = LayerSaveValues["COUNTRY"];
             string IDENTIFIER = LayerSaveValues["IDENTIFIER"];
             string TILE_URL = LayerSaveValues["TILE_URL"];
@@ -770,7 +782,7 @@ namespace MapsInMyFolder
 
                 NAME = getSavingOptimalValueWithNULL(NAME, DB_Layer.Name);
                 DESCRIPTION = getSavingOptimalValueWithNULL(DESCRIPTION, DB_Layer.Description);
-                CATEGORY = getSavingOptimalValueWithNULL(CATEGORY, DB_Layer.Tag);
+                TAGS = getSavingOptimalValueWithNULL(TAGS, DB_Layer.Tags);
                 COUNTRY = getSavingOptimalValueWithNULL(COUNTRY, DB_Layer.Country);
                 IDENTIFIER = getSavingOptimalValueWithNULL(IDENTIFIER, DB_Layer.Identifier);
                 MIN_ZOOM = getSavingOptimalValueWithNULL(MIN_ZOOM, DB_Layer.MinZoom);
@@ -796,16 +808,16 @@ namespace MapsInMyFolder
                 int CustomLayersMaxID = Database.ExecuteScalarSQLCommand("SELECT MAX(ID) FROM 'main'.'CUSTOMSLAYERS'");
                 int EditedLayersMaxID = Database.ExecuteScalarSQLCommand("SELECT MAX(ID) FROM 'main'.'EDITEDLAYERS'");
                 int ID = Math.Max(1000000, Math.Max(CustomLayersMaxID, EditedLayersMaxID)) + 1;
-                Database.ExecuteNonQuerySQLCommand("INSERT INTO 'main'.'CUSTOMSLAYERS'('ID','NAME', 'DESCRIPTION', 'CATEGORY', 'COUNTRY', 'IDENTIFIER', 'TILE_URL', 'MIN_ZOOM', 'MAX_ZOOM', 'FORMAT', 'SITE', 'SITE_URL', 'STYLE', 'TILE_SIZE', 'FAVORITE', 'SCRIPT', 'VISIBILITY', 'SPECIALSOPTIONS', 'RECTANGLES', 'VERSION', 'HAS_SCALE') " +
-                $"VALUES({ID}, {NAME}, {DESCRIPTION}, {CATEGORY},{COUNTRY}, {IDENTIFIER}, {TILE_URL}, {MIN_ZOOM}, {MAX_ZOOM}, {FORMAT}, {SITE}, {SITE_URL}, {STYLE},{TILE_SIZE}, {0} , {SCRIPT},  '{Visibility.Visible}',  {SPECIALSOPTIONS}, {RECTANGLES}, {1}, {HAS_SCALE})");
+                Database.ExecuteNonQuerySQLCommand("INSERT INTO 'main'.'CUSTOMSLAYERS'('ID','NAME', 'DESCRIPTION', 'TAGS', 'COUNTRY', 'IDENTIFIER', 'TILE_URL', 'MIN_ZOOM', 'MAX_ZOOM', 'FORMAT', 'SITE', 'SITE_URL', 'STYLE', 'TILE_SIZE', 'FAVORITE', 'SCRIPT', 'VISIBILITY', 'SPECIALSOPTIONS', 'RECTANGLES', 'VERSION', 'HAS_SCALE') " +
+                $"VALUES({ID}, {NAME}, {DESCRIPTION}, {TAGS},{COUNTRY}, {IDENTIFIER}, {TILE_URL}, {MIN_ZOOM}, {MAX_ZOOM}, {FORMAT}, {SITE}, {SITE_URL}, {STYLE},{TILE_SIZE}, {0} , {SCRIPT},  '{Visibility.Visible}',  {SPECIALSOPTIONS}, {RECTANGLES}, {1}, {HAS_SCALE})");
                 return;
             }
             else if (Database.ExecuteScalarSQLCommand("SELECT COUNT(*) FROM 'main'.'EDITEDLAYERS' WHERE ID = " + LayerId) == 0)
             {
                 int FAVORITE = (Layers.GetLayerById(LayerId)?.IsFavorite == true) ? 1 : 0;
                 int VERSION = Layers.GetLayerById(LayerId)?.Version ?? 1;
-                Database.ExecuteNonQuerySQLCommand("INSERT INTO 'main'.'EDITEDLAYERS'('ID', 'NAME', 'DESCRIPTION', 'CATEGORY', 'COUNTRY', 'IDENTIFIER', 'TILE_URL', 'MIN_ZOOM', 'MAX_ZOOM', 'FORMAT', 'SITE', 'SITE_URL', 'STYLE', 'TILE_SIZE', 'FAVORITE', 'SCRIPT', 'VISIBILITY', 'SPECIALSOPTIONS', 'RECTANGLES', 'VERSION', 'HAS_SCALE') " +
-                $"VALUES({LayerId}, {NAME}, {DESCRIPTION}, {CATEGORY},{COUNTRY}, {IDENTIFIER}, {TILE_URL}, {MIN_ZOOM}, {MAX_ZOOM}, {FORMAT}, {SITE}, {SITE_URL},{STYLE}, {TILE_SIZE}, {FAVORITE},  {SCRIPT},  '{Visibility.Visible}',  {SPECIALSOPTIONS}, {RECTANGLES}, {VERSION}, {HAS_SCALE})");
+                Database.ExecuteNonQuerySQLCommand("INSERT INTO 'main'.'EDITEDLAYERS'('ID', 'NAME', 'DESCRIPTION', 'TAGS', 'COUNTRY', 'IDENTIFIER', 'TILE_URL', 'MIN_ZOOM', 'MAX_ZOOM', 'FORMAT', 'SITE', 'SITE_URL', 'STYLE', 'TILE_SIZE', 'FAVORITE', 'SCRIPT', 'VISIBILITY', 'SPECIALSOPTIONS', 'RECTANGLES', 'VERSION', 'HAS_SCALE') " +
+                $"VALUES({LayerId}, {NAME}, {DESCRIPTION}, {TAGS},{COUNTRY}, {IDENTIFIER}, {TILE_URL}, {MIN_ZOOM}, {MAX_ZOOM}, {FORMAT}, {SITE}, {SITE_URL},{STYLE}, {TILE_SIZE}, {FAVORITE},  {SCRIPT},  '{Visibility.Visible}',  {SPECIALSOPTIONS}, {RECTANGLES}, {VERSION}, {HAS_SCALE})");
             }
             else
             {
@@ -814,13 +826,13 @@ namespace MapsInMyFolder
                 {
                     LastVersion = 1;
                 }
-                Database.ExecuteNonQuerySQLCommand($"UPDATE 'main'.'EDITEDLAYERS' SET 'NAME'={NAME},'DESCRIPTION'={DESCRIPTION},'CATEGORY'={CATEGORY},'COUNTRY'={COUNTRY},'IDENTIFIER'={IDENTIFIER},'TILE_URL'={TILE_URL},'MIN_ZOOM'={MIN_ZOOM},'MAX_ZOOM'={MAX_ZOOM},'FORMAT'={FORMAT},'SITE'={SITE},'SITE_URL'={SITE_URL},'STYLE'={STYLE},'TILE_SIZE'={TILE_SIZE},'SCRIPT'={SCRIPT},'VISIBILITY'='{Visibility.Visible}','SPECIALSOPTIONS'={SPECIALSOPTIONS}, 'RECTANGLES'={RECTANGLES}, 'VERSION'={LastVersion}, 'HAS_SCALE'={HAS_SCALE} WHERE ID = {LayerId}");
+                Database.ExecuteNonQuerySQLCommand($"UPDATE 'main'.'EDITEDLAYERS' SET 'NAME'={NAME},'DESCRIPTION'={DESCRIPTION},'TAGS'={TAGS},'COUNTRY'={COUNTRY},'IDENTIFIER'={IDENTIFIER},'TILE_URL'={TILE_URL},'MIN_ZOOM'={MIN_ZOOM},'MAX_ZOOM'={MAX_ZOOM},'FORMAT'={FORMAT},'SITE'={SITE},'SITE_URL'={SITE_URL},'STYLE'={STYLE},'TILE_SIZE'={TILE_SIZE},'SCRIPT'={SCRIPT},'VISIBILITY'='{Visibility.Visible}','SPECIALSOPTIONS'={SPECIALSOPTIONS}, 'RECTANGLES'={RECTANGLES}, 'VERSION'={LastVersion}, 'HAS_SCALE'={HAS_SCALE} WHERE ID = {LayerId}");
             }
         }
         private async void ClosePage_button_Click(object sender, RoutedEventArgs e)
         {
             int ValuesHachCode = Collectif.CheckIfInputValueHaveChange(EditeurStackPanel);
-            ContentDialogResult dialogLeaveWithoutSavingResult = ContentDialogResult.Primary;
+            ContentDialogResult? dialogLeaveWithoutSavingResult = ContentDialogResult.Primary;
             if (DefaultValuesHachCode != ValuesHachCode)
             {
                 dialogLeaveWithoutSavingResult = await Message.ShowContentDialog(Languages.Current["editorMessageLeaveWithoutSaving"], Languages.Current["dialogTitleOperationConfirm"], MessageDialogButton.YesCancel);
@@ -859,7 +871,7 @@ namespace MapsInMyFolder
             Javascript.EngineClearList();
             string NAME = TextboxLayerName.Text.Trim();
             string DESCRIPTION = TextboxLayerDescription.Text.Trim();
-            string CATEGORY = GetComboBoxValue(TextboxLayerCategory);
+            string TAGS = string.Join(';', TagsComboBox.SelectedValuesAsString("Content"));
             string COUNTRY = string.Join(';', CountryComboBox.SelectedValuesAsString("EnglishName"));
             string IDENTIFIER = TextboxLayerIdentifier.Text.Trim();
             string TILE_URL = TextboxLayerTileUrl.Text.Trim();
@@ -880,7 +892,7 @@ namespace MapsInMyFolder
             }
             layers.Name = NAME;
             layers.Description = DESCRIPTION;
-            layers.Tag = CATEGORY;
+            layers.Tags = TAGS;
             layers.Country = COUNTRY;
             layers.Identifier = IDENTIFIER;
             layers.TileUrl = TILE_URL;
@@ -938,7 +950,8 @@ namespace MapsInMyFolder
                 Javascript.Functions.Print(infotext, (int)Layers.ReservedId.TempLayerDatabaseEditor);
 
                 var (X, Y) = Collectif.CoordonneesToTile(location.Latitude, location.Longitude, Z);
-                string url = Collectif.Replacements(TextboxLayerTileUrl.Text, X.ToString(), Y.ToString(), Z.ToString(), (int)Layers.ReservedId.TempLayerDatabaseEditor, Javascript.InvokeFunction.getTile);
+                Layers TempLayerDatabaseEditor = Layers.GetLayerById((int)Layers.ReservedId.TempLayerDatabaseEditor);
+                string url = Collectif.Replacements(TextboxLayerTileUrl.Text, X.ToString(), Y.ToString(), Z.ToString(), TempLayerDatabaseEditor, Javascript.InvokeFunction.getTile);
 
                 int result = await Collectif.CheckIfDownloadSuccess(url);
                 Debug.WriteLine("-->" + result);
@@ -1390,7 +1403,8 @@ namespace MapsInMyFolder
             int ZoomLevel = Convert.ToInt32(Math.Floor(mapviewerappercu.ZoomLevel));
             (int X, int Y) = Collectif.CoordonneesToTile(mapviewerappercu.Center.Latitude, mapviewerappercu.Center.Longitude, ZoomLevel);
 
-            string Url = GetUrl.FromTileXYZ(TextboxLayerTileUrl.Text, X, Y, ZoomLevel, (int)Layers.ReservedId.TempLayerDatabaseEditor, invokeFunction);
+            Layers TempLayerDatabaseEditor = Layers.GetLayerById((int)Layers.ReservedId.TempLayerDatabaseEditor);
+            string Url = GetUrl.FromTileXYZ(TextboxLayerTileUrl.Text, X, Y, ZoomLevel, TempLayerDatabaseEditor, invokeFunction);
             Javascript.Functions.Print(invokeFunction.ToString() + " : " + Url, (int)Layers.ReservedId.TempLayerDatabaseEditor);
             Clipboard.SetText(Url);
         }
@@ -1662,4 +1676,45 @@ namespace MapsInMyFolder
         }
 
     }
-}
+
+    public class StringLookUpContract : ILookUpContract
+    {
+
+        public bool SupportsNewObjectCreation => true;
+
+        public object CreateObject(object sender, string searchString)
+        {
+            return new string(searchString);
+        }
+
+        public bool IsItemEqualToString(object sender, object item, string seachString)
+        {
+            string itemString = item?.ToString();
+            return StringEqualsPredicate(itemString, seachString);
+        }
+
+        public bool IsItemMatchingSearchString(object sender, object item, string searchString)
+        {
+            if (string.IsNullOrEmpty(searchString))
+            {
+                return true;
+            }
+
+            string itemString = item?.ToString();
+            return StringStartsWithPredicate(itemString, searchString);
+        }
+
+        private static bool StringStartsWithPredicate(string value, string searchString)
+        {
+            return value != null
+                && searchString != null
+                && value.StartsWith(searchString, StringComparison.InvariantCultureIgnoreCase);
+        }
+        private static bool StringEqualsPredicate(string value1, string value2)
+        {
+            return value1 != null
+               && value2 != null
+               && string.Compare(value1, value2, StringComparison.InvariantCultureIgnoreCase) == 0;
+        }
+    }
+    }

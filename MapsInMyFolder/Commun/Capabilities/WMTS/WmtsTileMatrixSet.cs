@@ -12,10 +12,8 @@ namespace MapsInMyFolder.Commun.Capabilities
             public string Identifier { get; }
             public string SupportedCrs { get; }
             public IList<WmtsTileMatrix> TileMatrixes { get; }
-            public int MinZoom { get; }
-            public int MaxZoom { get; }
 
-            public WmtsTileMatrixSet(string identifier, string supportedCrs, IEnumerable<WmtsTileMatrix> tileMatrixes, int minZoom, int maxZoom)
+            public WmtsTileMatrixSet(string identifier, string supportedCrs, IEnumerable<WmtsTileMatrix> tileMatrixes)
             {
                 if (string.IsNullOrEmpty(identifier))
                 {
@@ -35,9 +33,6 @@ namespace MapsInMyFolder.Commun.Capabilities
                 Identifier = identifier;
                 SupportedCrs = supportedCrs;
                 TileMatrixes = tileMatrixes.OrderBy(m => m.Scale).ToList();
-
-                MinZoom = minZoom;
-                MaxZoom = maxZoom;
             }
 
             internal static WmtsTileMatrixSet ReadTileMatrixSet(XElement tileMatrixSetElement)
@@ -76,23 +71,13 @@ namespace MapsInMyFolder.Commun.Capabilities
                     tileMatrixes.Add(Matrix);
                 }
 
-                int MinZoom = int.MaxValue;
-                int MaxZoom = int.MinValue;
-                tileMatrixes.ForEach(TileMatrix =>
-                {
-                    if (int.TryParse(TileMatrix.Level, out int tileMatrixLevel))
-                    {
-                        MinZoom = Math.Min(MinZoom, tileMatrixLevel);
-                        MaxZoom = Math.Max(MaxZoom, tileMatrixLevel);
-                    }
-                });
 
                 if (tileMatrixes.Count <= 0)
                 {
                     throw new ArgumentException($"No TileMatrix elements found in TileMatrixSet \"{identifier}\".");
                 }
 
-                return new WmtsTileMatrixSet(identifier, supportedCrs, tileMatrixes, MinZoom, MaxZoom);
+                return new WmtsTileMatrixSet(identifier, supportedCrs, tileMatrixes);
             }
         }
     }

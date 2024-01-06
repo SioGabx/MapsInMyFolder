@@ -70,7 +70,7 @@ namespace MapsInMyFolder.UserControls
             switch (BindingPath)
             {
                 case "Name":
-                case "Tag":
+                case "Tags":
                 case "Country":
                 case "Identifier":
                 case "TileUrl":

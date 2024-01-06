@@ -1,4 +1,5 @@
 ﻿using MapsInMyFolder.Commun;
+using MapsInMyFolder.MapControl;
 using System;
 using System.Collections.Generic;
 using System.Data.SQLite;
@@ -6,7 +7,9 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using System.Web;
+using System.Windows;
 
 namespace MapsInMyFolder
 {
@@ -16,7 +19,7 @@ namespace MapsInMyFolder
         public bool IsFavorite { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
-        public string Tag { get; set; }
+        public string Tags { get; set; }
         public string Country { get; set; }
         public string Identifier { get; set; }
         public string TileUrl { get; set; }
@@ -25,7 +28,6 @@ namespace MapsInMyFolder
         public int? MinZoom { get; set; }
         public int? MaxZoom { get; set; }
         public string TilesFormat { get; set; }
-        public bool TilesFormatHasTransparency = false;
         public string Style { get; set; }
         public int? TilesSize { get; set; }
         public string Script { get; set; }
@@ -37,13 +39,13 @@ namespace MapsInMyFolder
         public bool IsAtScale { get; set; }
 
 
-        public Layers(int Id, bool IsFavorite, string Name, string Description, string Tag, string Country, string Identifier, string TileUrl, string SiteName, string SiteUrl, int? MinZoom, int? MaxZoom, string TilesFormat, string Style, int? TilesSize, string Script, string Visibility, LayersSpecialsOptions SpecialsOptions, string BoundaryRectangles, int Version, bool IsAtScale)
+        public Layers(int Id, bool IsFavorite, string Name, string Description, string Tags, string Country, string Identifier, string TileUrl, string SiteName, string SiteUrl, int? MinZoom, int? MaxZoom, string TilesFormat, string Style, int? TilesSize, string Script, string Visibility, LayersSpecialsOptions SpecialsOptions, string BoundaryRectangles, int Version, bool IsAtScale)
         {
             this.Id = Id;
             this.IsFavorite = IsFavorite;
             this.Name = Name;
             this.Description = Description;
-            this.Tag = Tag;
+            this.Tags = Tags;
             this.Country = Country;
             this.Identifier = Identifier;
             this.TileUrl = TileUrl;
@@ -205,6 +207,104 @@ namespace MapsInMyFolder
             }
         }
 
+        public static void SetMapLayer(Layers layer, MapControl.Map mapviewer, MapTileLayer MapTileLayer_Transparent, MapFigures MapFigures, MapItemsControl mapviewerRectangles )
+        {
+            if (layer is not null)
+            {
+                MapFigures.DrawFigureOnMapItemsControlFromJsonString(mapviewerRectangles, layer.BoundaryRectangles, mapviewer.ZoomLevel);
+                //Clear all layer notifications
+                Notification.ListOfNotificationsOnShow.Where(notification => Regex.IsMatch(notification.NotificationId, @"^LayerId_\d+_")).ToList().ForEach(notification => notification.Remove());
+
+                try
+                {
+                    if (layer.HasTransparency())
+                    {
+                        MapTileLayer_Transparent.TileSource = new TileSource { UriFormat = layer.TileUrl, TileLayer = layer };
+                        MapTileLayer_Transparent.Opacity = 1;
+
+                        if (layer.Identifier is not null)
+                        {
+                            Layers StartupLayer = Layers.GetLayerById(Layers.StartupLayerId);
+                            if (StartupLayer != null)
+                            {
+                                UIElement basemap = new MapTileLayer
+                                {
+                                    TileSource = new TileSource { UriFormat = StartupLayer?.TileUrl, TileLayer = StartupLayer },
+                                    SourceName = StartupLayer.Identifier + new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds(),
+                                    MaxZoomLevel = StartupLayer.MaxZoom ?? 0,
+                                    MinZoomLevel = StartupLayer.MinZoom ?? 0,
+                                    Description = "",
+                                    Opacity = Settings.background_layer_opacity
+                                };
+                                mapviewer.MapLayer = basemap;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        UIElement layer_uielement = new MapTileLayer
+                        {
+                            TileSource = new TileSource { UriFormat = layer.TileUrl, TileLayer = layer },
+                            SourceName = layer.Identifier + new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds(),
+                            MaxZoomLevel = layer.MaxZoom ?? 0,
+                            MinZoomLevel = layer.MinZoom ?? 0,
+                            Description = layer.Description
+                        };
+
+                        MapTileLayer_Transparent.TileSource = new TileSource();
+                        MapTileLayer_Transparent.Opacity = 0;
+                        mapviewer.MapLayer.Opacity = 1;
+                        mapviewer.MapLayer = layer_uielement;
+                    }
+
+                    if (Settings.zoom_limite_taille_carte)
+                    {
+                        mapviewer.MinZoomLevel = layer.MinZoom < 3 ? 2 : layer.MinZoom ?? 0;
+                        mapviewer.MaxZoomLevel = layer.MaxZoom ?? 0;
+                    }
+                    else
+                    {
+                        mapviewer.MinZoomLevel = 2;
+                        mapviewer.MaxZoomLevel = 24;
+                    }
+
+                    if (string.IsNullOrEmpty(layer?.SpecialsOptions?.BackgroundColor?.Trim()))
+                    {
+                        mapviewer.Background = Collectif.RgbValueToSolidColorBrush(Settings.background_layer_color_R, Settings.background_layer_color_G, Settings.background_layer_color_B);
+                    }
+                    else
+                    {
+                        mapviewer.Background = Collectif.HexValueToSolidColorBrush(layer.SpecialsOptions.BackgroundColor);
+                    }
+                    Collectif.SetBackgroundOnUIElement(mapviewer, layer?.SpecialsOptions?.BackgroundColor);
+
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine("Erreur changement de calque" + ex.Message);
+                }
+            }
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         public static long ClearCache(int id, bool showErrors = true)
         {
             if (id == 0) { return 0; }
@@ -268,6 +368,7 @@ namespace MapsInMyFolder
             return null;
         }
 
+
         public static bool RemoveLayerById(int id)
         {
             if (LayersDictionary.ContainsKey(id))
@@ -305,7 +406,7 @@ namespace MapsInMyFolder
                 //Key need to be the same as the db
                 {"NAME", Collectif.HTMLEntities(layers.Name)},
                 {"DESCRIPTION", Collectif.HTMLEntities(layers.Description)},
-                {"CATEGORY", Collectif.HTMLEntities(layers.Tag)},
+                {"TAGS", Collectif.HTMLEntities(layers.Tags)},
                 {"COUNTRY", Collectif.HTMLEntities(layers.Country)},
                 {"IDENTIFIER", Collectif.HTMLEntities(layers.Identifier)},
                 {"TILE_URL", Collectif.HTMLEntities(layers.TileUrl)},
@@ -383,7 +484,7 @@ namespace MapsInMyFolder
             string DB_Layer_NAME = GetStringFromOrdinal("NAME").RemoveNewLineChar();
             bool DB_Layer_FAVORITE = System.Convert.ToBoolean(GetIntFromOrdinal("FAVORITE"));
             string DB_Layer_DESCRIPTION = GetStringFromOrdinal("DESCRIPTION");
-            string DB_Layer_CATEGORY = GetStringFromOrdinal("CATEGORY").RemoveNewLineChar();
+            string DB_Layer_TAGS = GetStringFromOrdinal("TAGS").RemoveNewLineChar();
             string DB_Layer_COUNTRY = GetStringFromOrdinal("COUNTRY").RemoveNewLineChar();
             string DB_Layer_IDENTIFIER = GetStringFromOrdinal("IDENTIFIER").RemoveNewLineChar();
             string DB_Layer_TILE_URL = GetStringFromOrdinal("TILE_URL").RemoveNewLineChar();
@@ -428,7 +529,7 @@ namespace MapsInMyFolder
                 DB_Layer_SCRIPT = Collectif.HTMLEntities(DB_Layer_SCRIPT, true);
             }
 
-            return new Layers((int)DB_Layer_ID, DB_Layer_FAVORITE, DB_Layer_NAME, DB_Layer_DESCRIPTION, DB_Layer_CATEGORY, DB_Layer_COUNTRY, DB_Layer_IDENTIFIER, DB_Layer_TILE_URL, DB_Layer_SITE, DB_Layer_SITE_URL, DB_Layer_MIN_ZOOM, DB_Layer_MAX_ZOOM, DB_Layer_FORMAT, DB_Layer_STYLE, DB_Layer_TILE_SIZE, DB_Layer_SCRIPT, DB_Layer_VISIBILITY, DeserializeSpecialsOptions, DB_Layer_RECTANGLES, DB_Layer_VERSION, DB_Layer_HAS_SCALE);
+            return new Layers((int)DB_Layer_ID, DB_Layer_FAVORITE, DB_Layer_NAME, DB_Layer_DESCRIPTION, DB_Layer_TAGS, DB_Layer_COUNTRY, DB_Layer_IDENTIFIER, DB_Layer_TILE_URL, DB_Layer_SITE, DB_Layer_SITE_URL, DB_Layer_MIN_ZOOM, DB_Layer_MAX_ZOOM, DB_Layer_FORMAT, DB_Layer_STYLE, DB_Layer_TILE_SIZE, DB_Layer_SCRIPT, DB_Layer_VISIBILITY, DeserializeSpecialsOptions, DB_Layer_RECTANGLES, DB_Layer_VERSION, DB_Layer_HAS_SCALE);
         }
 
         private static void LayersMergeLegacyWithEdited(List<Layers> legacyLayers, List<Layers> editedLayers)
@@ -486,16 +587,12 @@ namespace MapsInMyFolder
                 {
                     legacyLayerWithReplacements.Visibility = "Visible";
                 }
-                if (legacyLayerWithReplacements.Tag == "/")
+                if (legacyLayerWithReplacements.Tags == "/")
                 {
-                    legacyLayerWithReplacements.Tag = "";
+                    legacyLayerWithReplacements.Tags = "";
                 }
                 legacyLayerWithReplacements.Country = legacyLayerWithReplacements.Country?.Replace("*", "World");
-                List<string> listOfAllFormatsAcceptedWithTransparency = new List<string> { "png" };
-                if (!string.IsNullOrWhiteSpace(legacyLayerWithReplacements.TilesFormat) && listOfAllFormatsAcceptedWithTransparency.Contains(legacyLayerWithReplacements.TilesFormat))
-                {
-                    legacyLayerWithReplacements.TilesFormatHasTransparency = true;
-                }
+                
 
                 //make sure there is no null values inside the layer
                 foreach (FieldInfo field in typeof(Layers).GetFields(fieldsBindingFlags))
@@ -524,7 +621,6 @@ namespace MapsInMyFolder
 
         public static string PreviewGetUrl(Layers layer, double TargetZoomLevel, double Latitude, double Longitude)
         {
-            int id = layer.Id;
             if (layer is null)
             {
                 return "";
@@ -558,9 +654,9 @@ namespace MapsInMyFolder
                 {
                     return Javascript.CheckIfFunctionExist(layerF, invokeFunction.ToString(), null);
                 }
-                string GetReplacement(int layerId, string tileUrl, Javascript.InvokeFunction invokeFunction)
+                string GetReplacement(Layers Layer,Javascript.InvokeFunction invokeFunction)
                 {
-                    return Collectif.Replacements(tileUrl, TileNumber.X.ToString(), TileNumber.Y.ToString(), Zoom.ToString(), layerId, invokeFunction);
+                    return Collectif.Replacements(Layer?.TileUrl, TileNumber.X.ToString(), TileNumber.Y.ToString(), Zoom.ToString(), Layer, invokeFunction);
                 }
 
                 string previewLayerFrontImageUrl = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
@@ -570,27 +666,27 @@ namespace MapsInMyFolder
 
                 if (CheckIfFunctionExist(layer, Javascript.InvokeFunction.getPreview))
                 {
-                    previewLayerFrontImageUrl = GetReplacement(id, layer.TileUrl, Javascript.InvokeFunction.getPreview);
+                    previewLayerFrontImageUrl = GetReplacement(layer, Javascript.InvokeFunction.getPreview);
                 }
                 else
                 {
-                    previewLayerFrontImageUrl = GetReplacement(id, layer.TileUrl, Javascript.InvokeFunction.getTile);
+                    previewLayerFrontImageUrl = GetReplacement(layer,  Javascript.InvokeFunction.getTile);
                 }
 
                 if (CheckIfFunctionExist(layer, Javascript.InvokeFunction.getPreviewFallback))
                 {
-                    previewFallbackLayerFrontImageUrl = GetReplacement(id, layer.TileUrl, Javascript.InvokeFunction.getPreviewFallback);
+                    previewFallbackLayerFrontImageUrl = GetReplacement(layer, Javascript.InvokeFunction.getPreviewFallback);
                 }
 
-                if (layer.TilesFormatHasTransparency && backgroundLayer is not null)
+                if (layer.HasTransparency() && backgroundLayer is not null)
                 {
                     if (CheckIfFunctionExist(backgroundLayer, Javascript.InvokeFunction.getPreview))
                     {
-                        previewBackgroundImageUrl = GetReplacement(backgroundLayer.Id, backgroundLayer.TileUrl, Javascript.InvokeFunction.getPreview);
+                        previewBackgroundImageUrl = GetReplacement(backgroundLayer,  Javascript.InvokeFunction.getPreview);
                     }
                     else
                     {
-                        previewBackgroundImageUrl = GetReplacement(backgroundLayer.Id, backgroundLayer.TileUrl, Javascript.InvokeFunction.getTile);
+                        previewBackgroundImageUrl = GetReplacement(backgroundLayer,  Javascript.InvokeFunction.getTile);
                     }
                     if (backgroundLayer?.TileUrl == previewBackgroundImageUrl)
                     {
@@ -599,7 +695,7 @@ namespace MapsInMyFolder
 
                     if (CheckIfFunctionExist(backgroundLayer, Javascript.InvokeFunction.getPreviewFallback))
                     {
-                        previewFallbackBackgroundImageUrl = GetReplacement(backgroundLayer.Id, backgroundLayer?.TileUrl, Javascript.InvokeFunction.getPreviewFallback);
+                        previewFallbackBackgroundImageUrl = GetReplacement(backgroundLayer,  Javascript.InvokeFunction.getPreviewFallback);
                         if (backgroundLayer?.TileUrl == previewFallbackBackgroundImageUrl)
                         {
                             previewFallbackBackgroundImageUrl = "";

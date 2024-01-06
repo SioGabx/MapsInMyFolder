@@ -9,6 +9,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:map="clr-namespace:MapsInMyFolder.MapControl"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:sys="clr-namespace:System;assembly=netstandard"
     xmlns:ui="http://schemas.modernwpf.com/2019"
     x:Name="CustomOrEditLayers"
     Title="CustomOrEditLayersPage"
@@ -147,7 +148,7 @@
 
                     </Grid>
 
-                    <Grid Margin="0,10,0,0">
+                    <!--<Grid Margin="0,10,0,0">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="20" />
                             <RowDefinition Height="*" />
@@ -155,10 +156,10 @@
                         </Grid.RowDefinitions>
                         <Label
                             Grid.Row="0"
-                            Content="{Binding Source={x:Static commun:Languages.Current}, Path=[editorPropertyNameCategory]}"
+                            Content="{Binding Source={x:Static commun:Languages.Current}, Path=[editorPropertyNameTags]}"
                             Foreground="#888989" />
                         <ComboBox
-                            x:Name="TextboxLayerCategory"
+                            x:Name="TextboxLayerTags"
                             Grid.Row="1"
                             Width="Auto"
                             Height="21"
@@ -174,8 +175,36 @@
                                 </Style>
                             </ComboBox.Resources>
                         </ComboBox>
-                    </Grid>
+                    </Grid>-->
+                    <Grid Margin="0,10,0,0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="20" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+                        <Label
+                            Grid.Row="0"
+                            Content="{Binding Source={x:Static commun:Languages.Current}, Path=[editorPropertyNameTags]}"
+                            Foreground="#888989" />
 
+                        <cbcontrols:MultiSelectCombobox
+                            x:Name="TagsComboBox"
+                            Grid.Row="1"
+                            Height="Auto"
+                            MinHeight="16"
+                            HorizontalAlignment="Stretch"
+                            AdditionalItemSeparators="{DynamicResource ResourceKey=AdditionalCharArray}"
+                            ItemSeparator=";"
+                            RequestBringIntoView="DisableAllRequestBringIntoView">
+                            <cbcontrols:MultiSelectCombobox.Resources>
+                                <x:Array x:Key="AdditionalCharArray" Type="sys:Char">
+                                    <sys:Char>,</sys:Char>
+                                    <sys:Char>/</sys:Char>
+                                    <sys:Char>:</sys:Char>
+                                </x:Array>
+                            </cbcontrols:MultiSelectCombobox.Resources>
+                        </cbcontrols:MultiSelectCombobox>
+                    </Grid>
 
                     <Grid Margin="0,10,0,0">
                         <Grid.RowDefinitions>
@@ -698,8 +727,8 @@
                     MinWidth="30"
                     MinHeight="30"
                     Background="White"
-                    MouseWheel="Mapviewerappercu_MouseWheel"
                     Cursor="Hand"
+                    MouseWheel="Mapviewerappercu_MouseWheel"
                     ZoomLevel="18">
                     <map:Map.Center>
                         <map:Location Latitude="48.198846" Longitude="6.429381" />
@@ -808,8 +837,8 @@
                     Grid.Column="0"
                     Margin="5,5,110,0"
                     VerticalAlignment="Top"
-                    IsFloatingSearchBar="True"
                     FontSize="13"
+                    IsFloatingSearchBar="True"
                     SearchResultMap="{Binding ElementName=mapviewerappercu}"
                     SearchResultPushpin="{Binding ElementName=searchResult}" />
                 <StackPanel

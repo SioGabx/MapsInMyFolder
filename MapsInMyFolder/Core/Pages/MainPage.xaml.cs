@@ -54,18 +54,14 @@ namespace MapsInMyFolder
                     DisposeElementsOnUnload = false
                 };
                 MapFigures = new MapFigures();
-                Preload();
                 Init();
             }
         }
 
-        public void Preload()
-        {
-            MapLoad();
-        }
 
         void Init()
         {
+            MapLoad();
             InitDownloadPanel();
             LayerPanel.Init();
             isInitialised = true;
@@ -412,82 +408,7 @@ namespace MapsInMyFolder
         public void SetCurrentLayer(int id)
         {
             Layers.SetCurrentLayer(id);
-            Layers layer = Layers.Current;
-            if (layer is not null)
-            {
-                MapFigures.DrawFigureOnMapItemsControlFromJsonString(mapviewerRectangles, layer.BoundaryRectangles, mapviewer.ZoomLevel);
-                //Clear all layer notifications
-                Notification.ListOfNotificationsOnShow.Where(notification => Regex.IsMatch(notification.NotificationId, @"^LayerId_\d+_")).ToList().ForEach(notification => notification.Remove());
-
-                try
-                {
-                    if (layer.TilesFormatHasTransparency)
-                    {
-                        MapTileLayer_Transparent.TileSource = new TileSource { UriFormat = layer.TileUrl, LayerID = layer.Id };
-                        MapTileLayer_Transparent.Opacity = 1;
-
-                        if (layer.Identifier is not null)
-                        {
-                            Layers StartupLayer = Layers.GetLayerById(Layers.StartupLayerId);
-                            if (StartupLayer != null)
-                            {
-                                UIElement basemap = new MapTileLayer
-                                {
-                                    TileSource = new TileSource { UriFormat = StartupLayer?.TileUrl, LayerID = Layers.StartupLayerId },
-                                    SourceName = StartupLayer.Identifier + new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds(),
-                                    MaxZoomLevel = StartupLayer.MaxZoom ?? 0,
-                                    MinZoomLevel = StartupLayer.MinZoom ?? 0,
-                                    Description = "",
-                                    Opacity = Settings.background_layer_opacity
-                                };
-                                mapviewer.MapLayer = basemap;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        UIElement layer_uielement = new MapTileLayer
-                        {
-                            TileSource = new TileSource { UriFormat = layer.TileUrl, LayerID = layer.Id },
-                            SourceName = layer.Identifier + new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds(),
-                            MaxZoomLevel = layer.MaxZoom ?? 0,
-                            MinZoomLevel = layer.MinZoom ?? 0,
-                            Description = layer.Description
-                        };
-
-                        MapTileLayer_Transparent.TileSource = new TileSource();
-                        MapTileLayer_Transparent.Opacity = 0;
-                        mapviewer.MapLayer.Opacity = 1;
-                        mapviewer.MapLayer = layer_uielement;
-                    }
-
-                    if (Settings.zoom_limite_taille_carte)
-                    {
-                        mapviewer.MinZoomLevel = layer.MinZoom < 3 ? 2 : layer.MinZoom ?? 0;
-                        mapviewer.MaxZoomLevel = layer.MaxZoom ?? 0;
-                    }
-                    else
-                    {
-                        mapviewer.MinZoomLevel = 2;
-                        mapviewer.MaxZoomLevel = 24;
-                    }
-
-                    if (string.IsNullOrEmpty(layer?.SpecialsOptions?.BackgroundColor?.Trim()))
-                    {
-                        mapviewer.Background = Collectif.RgbValueToSolidColorBrush(Settings.background_layer_color_R, Settings.background_layer_color_G, Settings.background_layer_color_B);
-                    }
-                    else
-                    {
-                        mapviewer.Background = Collectif.HexValueToSolidColorBrush(layer.SpecialsOptions.BackgroundColor);
-                    }
-                    Collectif.SetBackgroundOnUIElement(mapviewer, layer?.SpecialsOptions?.BackgroundColor);
-
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine("Erreur changement de calque" + ex.Message);
-                }
-            }
+            Layers.SetMapLayer(Layers.Current, mapviewer, MapTileLayer_Transparent, MapFigures, mapviewerRectangles);
         }
 
         public void RefreshMap()
@@ -581,7 +502,7 @@ namespace MapsInMyFolder
                     FontWeight = FontWeight.FromOpenTypeWeight(600)
                 };
                 AskMsg.Children.Add(textBlockAsk);
-                ContentDialogResult dialogErrorUpdateAskFixResult = ContentDialogResult.Secondary;
+                ContentDialogResult? dialogErrorUpdateAskFixResult = ContentDialogResult.Secondary;
                 if (HasActionToBeTaken)
                 {
                     dialogErrorUpdateAskFixResult = await Message.ShowContentDialog(AskMsg, "MapsInMyFolder", MessageDialogButton.YesNoCancel);
@@ -626,7 +547,6 @@ namespace MapsInMyFolder
             {
                 CustomOrEditLayersPage EditPage = MainWindow.Instance.FrameLoad_CustomOrEditLayers(e.LayerId, EditMode);
                 EditPage.Init();
-
             }, null);
         }
 

@@ -517,7 +517,8 @@ namespace MapsInMyFolder
             }
             try
             {
-                TileLoader.HttpResponse httpResponse = await TileLoader.GetImageAsync(tileProperty, download_engine.layerid, download_engine.format, save_temp_directory).ConfigureAwait(false);
+                
+                TileLoader.HttpResponse httpResponse = await TileLoader.GetImageAsync(tileProperty, download_engine.layerid, download_engine.tileSize, download_engine.format, save_temp_directory).ConfigureAwait(false);
                 if (httpResponse?.ResponseMessage?.IsSuccessStatusCode == true)
                 {
                     using var contentStream = Collectif.ByteArrayToStream(httpResponse.Buffer);

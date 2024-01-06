@@ -140,7 +140,7 @@ namespace MapsInMyFolder
 
             ImageIsLoading.BeginAnimation(OpacityProperty, Collectif.GetOpacityAnimation(1, 0.2));
             lastRequestZoom = ZoomSlider.Value;
-            int layerID = Layers.Current.Id;
+            //int layerID = Layers.Current.Id;
 
             if (MainPage.MapSelectable is null)
             {
@@ -181,7 +181,7 @@ namespace MapsInMyFolder
                     {
                         for (int index_y = 0; index_y < 2; index_y++)
                         {
-                            string urlbase = GetUrl.FromTileXYZ(Layers.Current.TileUrl, tileX + index_x, tileY + index_y, zoom, layerID, Javascript.InvokeFunction.getTile);
+                            string urlbase = GetUrl.FromTileXYZ(Layers.Current.TileUrl, tileX + index_x, tileY + index_y, zoom, Layers.Current, Javascript.InvokeFunction.getTile);
                             listOfUrls.Add((urlbase, index_x, index_y));
                         }
                     }
@@ -193,7 +193,7 @@ namespace MapsInMyFolder
                             return;
                         }
 
-                        TileLoader.HttpResponse httpResponse = TileLoader.GetImageAsync(url.url, tileX + url.index_x, tileY + url.index_y, zoom, layerID, Layers.Current.TilesFormat, pbfdisableadjacent: true).Result;
+                        TileLoader.HttpResponse httpResponse = TileLoader.GetImageAsync(url.url, tileX + url.index_x, tileY + url.index_y, zoom, Layers.Current, Layers.Current.TilesFormat, pbfdisableadjacent: true).Result;
 
                         if (updateMigniatureParraleleToken.IsCancellationRequested && updateMigniatureParraleleToken.CanBeCanceled)
                         {
@@ -206,7 +206,7 @@ namespace MapsInMyFolder
                         }
                         else
                         {
-                            bitmapImageArray[url.index_x, url.index_y] = Collectif.GetEmptyImageBufferFromText(httpResponse, layerID, "jpeg");
+                            bitmapImageArray[url.index_x, url.index_y] = Collectif.GetEmptyImageBufferFromText(httpResponse, Layers.Current.Id, "jpeg");
                         }
                     });
                 }, updateMigniatureParraleleToken);
@@ -343,7 +343,7 @@ namespace MapsInMyFolder
             }
         }
 
-        MapControl.Location GetSelectionCenterLocation()
+        static MapControl.Location GetSelectionCenterLocation()
         {
             var SelectionLocation = MainPage.MapSelectable.GetRectangleLocation();
             var NO_PIN_Location = (SelectionLocation.NO.Latitude, SelectionLocation.NO.Longitude);
@@ -358,11 +358,6 @@ namespace MapsInMyFolder
 
             try
             {
-                bool ValidateResult(string center_view_city_arg)
-                {
-                    return center_view_city_arg != null && !string.IsNullOrEmpty(center_view_city_arg.Trim());
-                }
-
                 string url = "https://nominatim.openstreetmap.org/reverse?lat=" + LocaMillieux.Latitude + "&lon=" + LocaMillieux.Longitude + "&zoom=18&format=xml&email=siogabx@siogabx.fr";
                 using (HttpClient client = new HttpClient())
                 using (HttpResponseMessage response = await client.GetAsync(url))
@@ -394,7 +389,7 @@ namespace MapsInMyFolder
 
                                 foreach (var city in city_name)
                                 {
-                                    if (city.Key == name && ValidateResult(value))
+                                    if (city.Key == name && !string.IsNullOrWhiteSpace(value))
                                     {
                                         city_name[city.Key] = value.Trim();
                                     }
@@ -405,7 +400,7 @@ namespace MapsInMyFolder
 
                     foreach (var city in city_name)
                     {
-                        if (ValidateResult(city.Value))
+                        if (!string.IsNullOrWhiteSpace(city.Value))
                         {
                             centerViewCity = "_" + city.Value;
                             return;
@@ -626,7 +621,7 @@ namespace MapsInMyFolder
             }
         }
 
-        bool IsEnoughPlaceForScale(double width, double height, double scale)
+        static bool IsEnoughPlaceForScale(double width, double height, double scale)
         {
             return height >= 30 && scale > 0;
         }
@@ -1061,10 +1056,7 @@ namespace MapsInMyFolder
             const string jpgFilter = "JPEG|*.jpg";
             const string tiffFilter = "TIFF|*.tif";
 
-            string filterConcat(string filter1, string filter2)
-            {
-                return filter1 + "|" + filter2;
-            }
+            static string FilterConcat(string filter1, string filter2) => filter1 + "|" + filter2;
 
             if (string.Equals(Layers.Current.TilesFormat, "png", StringComparison.OrdinalIgnoreCase))
             {
@@ -1076,7 +1068,7 @@ namespace MapsInMyFolder
             }
             else if (string.Equals(Layers.Current.TilesFormat, "pbf", StringComparison.OrdinalIgnoreCase))
             {
-                filter = filterConcat(jpgFilter, pngFilter);
+                filter = FilterConcat(jpgFilter, pngFilter);
             }
 
             string strName = defaultFilename + centerViewCity + "_" + zoom;
@@ -1087,7 +1079,7 @@ namespace MapsInMyFolder
 
             SaveFileDialog saveFileDialog1 = new SaveFileDialog()
             {
-                Filter = filterConcat(filter, tiffFilter),
+                Filter = FilterConcat(filter, tiffFilter),
                 Title = Languages.Current["saveFileDialogSelectSaveLocation"],
                 RestoreDirectory = true,
                 OverwritePrompt = true,

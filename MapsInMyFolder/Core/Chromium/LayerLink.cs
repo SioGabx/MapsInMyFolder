@@ -88,6 +88,7 @@ namespace MapsInMyFolder
                 LayersPanel?.OnSetCurrentLayerEvent(id_int);
             }, null);
         }
+
         public void LayerShowWarningLegacyVersionNewerThanEdited(double id = 0)
         {
             int id_int = Convert.ToInt32(id);

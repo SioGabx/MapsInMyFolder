@@ -31,7 +31,8 @@
     <RepositoryUrl>https://github.com/SioGabx/MapsInMyFolder</RepositoryUrl>
     <Copyright>SioGabx</Copyright>
     <Version>1.1.0</Version>
-    
+
+    <SelfContained>true</SelfContained>
     <DisabledWarnings>CS8002</DisabledWarnings>
     <AnalysisLevel>6.0</AnalysisLevel>
     <PackageProjectUrl>https://github.com/SioGabx/MapsInMyFolder</PackageProjectUrl>

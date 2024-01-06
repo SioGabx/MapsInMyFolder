@@ -36,19 +36,14 @@ namespace MapsInMyFolder.MapControl
                     TileLoader.HttpResponse response;
                     string SaveTempDir = "";
                     string fileformat = string.Empty;
-                    if (!(tileSource is null) && tileSource.LayerID != 0)
+                    if ((tileSource is null || tileSource.TileLayer.Id == 0) == false)
                     {
-                        Layers layers = Layers.GetLayerById(tileSource.LayerID);
-                        if (layers is null)
-                        {
-                            return null;
-                        }
-                        SaveTempDir = Collectif.GetSaveTempDirectory(layers.Name, layers.Identifier, z);
-                        fileformat = layers.TilesFormat;
+                        SaveTempDir = Collectif.GetSaveTempDirectory(tileSource.TileLayer.Name, tileSource.TileLayer.Identifier, z);
+                        fileformat = tileSource.TileLayer.TilesFormat;
                     }
                     if (z != -1)
                     {
-                        response = await TileLoader.GetImageAsync(uri.ToString(), x, y, z, tileSource.LayerID, fileformat, SaveTempDir);
+                        response = await TileLoader.GetImageAsync(uri.ToString(), x, y, z, tileSource.TileLayer, fileformat, SaveTempDir);
                     }
                     else
                     {
@@ -63,7 +58,7 @@ namespace MapsInMyFolder.MapControl
                     }
                     else if (Settings.map_view_error_tile)
                     {
-                        image = await LoadImageAsync(Collectif.GetEmptyImageBufferFromText(response, tileSource.LayerID, fileformat)).ConfigureAwait(false);
+                        image = await LoadImageAsync(Collectif.GetEmptyImageBufferFromText(response, tileSource.TileLayer.Id, fileformat)).ConfigureAwait(false);
                     }
                 }
                 else

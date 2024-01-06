@@ -125,7 +125,7 @@ namespace MapsInMyFolder.UserControls
         {
             int LayerId = Layers.Current.Id;
             string scroll = ", true";
-            if (LayerId == -1)
+            if (LayerId == (int)Layers.ReservedId.TempLayerGeneric)
             {
                 LayerId = Layers.StartupLayerId;
                 scroll = "";
@@ -292,7 +292,8 @@ namespace MapsInMyFolder.UserControls
                                 <p class=""display_name"">{Collectif.HTMLEntities(layer.Name)}</p>
                                 <p class=""zoom"">[{layer.MinZoom}-{layer.MaxZoom}]{CountryHTML} - {layer.SiteName}</p>
                                 <p class=""layer_website{supplement_class}"">{layer.SiteName}</p>
-                                <p class=""layer_category{supplement_class}"">{layer.Tag}</p>
+                                <p class=""layer_tags{supplement_class}"">{layer.Tags}</p>
+                                <p class=""id displaynone"">[{layer.Id}]</p>
                             </div>
                             <div {layerFavoriteHTML} onclick=""ajouter_aux_favoris(event, this, {layer.Id})""></div>
                             <div {layerVisibilityHTML} onclick=""change_visibility(event, this, {layer.Id})""></div>

@@ -10,7 +10,7 @@ using System.Windows.Threading;
 
 namespace MapsInMyFolder
 {
-    public partial class Javascript
+    public static partial class Javascript
     {
         public static class Functions
         {
@@ -110,17 +110,17 @@ namespace MapsInMyFolder
             }
             #endregion
 
-            public static void SetSelection(double NO_Latitude, double NO_Longitude, double SE_Latitude, double SE_Longitude, bool ZoomToNewLocation, int LayerId)
+            public static void SetSelection(double NO_Latitude, double NO_Longitude, double SE_Latitude, double SE_Longitude, bool zoomToNewLocation, int LayerId)
             {
                 if (Layers.Current.Id == LayerId)
                 {
-                    instance.Location = new Dictionary<string, double>(){
+                    Location = new Dictionary<string, double>(){
                         {"SE_Latitude",SE_Latitude },
                         {"SE_Longitude",SE_Longitude },
                         {"NO_Latitude",NO_Latitude },
                         {"NO_Longitude",NO_Longitude }
                     };
-                    instance.ZoomToNewLocation = ZoomToNewLocation;
+                    ZoomToNewLocation = zoomToNewLocation;
                 }
                 else
                 {
@@ -271,7 +271,7 @@ namespace MapsInMyFolder
                 {
                     if (LayerId == (int)Layers.ReservedId.TempLayerDatabaseEditor && Tiles.AcceptJavascriptPrint)
                     {
-                        instance.Logs = string.Concat(instance.Logs, "\n", printString);
+                        Logs = string.Concat(Logs, "\n", printString);
                     }
                 }
             }
@@ -280,7 +280,7 @@ namespace MapsInMyFolder
             {
                 if (Tiles.AcceptJavascriptPrint)
                 {
-                    instance.Logs = String.Empty;
+                    Logs = String.Empty;
                 }
             }
 

@@ -99,7 +99,7 @@ namespace MapsInMyFolder.Commun
 
         public static async void StartUpdating()
         {
-            ContentDialogResult dialogAskUpdateNewVersionAvailable = await Message.ShowContentDialog(Languages.GetWithArguments("updateMessageNewVersionAvailable", UpdateRelease.Tag_name) + "\n\n" + Languages.GetWithArguments("updateMessageNewVersionReleaseNote", UpdateRelease.Body), Languages.Current["dialogTitleOperationConfirm"], MessageDialogButton.YesNo);
+            ContentDialogResult? dialogAskUpdateNewVersionAvailable = await Message.ShowContentDialog(Languages.GetWithArguments("updateMessageNewVersionAvailable", UpdateRelease.Tag_name) + "\n\n" + Languages.GetWithArguments("updateMessageNewVersionReleaseNote", UpdateRelease.Body), Languages.Current["dialogTitleOperationConfirm"], MessageDialogButton.YesNo);
 
             if (dialogAskUpdateNewVersionAvailable != ContentDialogResult.Primary)
             {
@@ -125,7 +125,7 @@ namespace MapsInMyFolder.Commun
             await client.StartDownload();
             UpdateNotification.Remove();
 
-            ContentDialogResult dialogConfirmStartUpdateProcessResult = await Message.ShowContentDialog(Languages.Current["updateMessageStartUpdateProcess"], Languages.Current["dialogTitleOperationConfirm"], MessageDialogButton.YesCancel);
+            ContentDialogResult? dialogConfirmStartUpdateProcessResult = await Message.ShowContentDialog(Languages.Current["updateMessageStartUpdateProcess"], Languages.Current["dialogTitleOperationConfirm"], MessageDialogButton.YesCancel);
 
             if (dialogConfirmStartUpdateProcessResult == ContentDialogResult.Primary)
             {

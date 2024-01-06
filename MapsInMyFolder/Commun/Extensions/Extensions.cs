@@ -48,7 +48,7 @@ namespace MapsInMyFolder.Commun
 
         public static string TrimStart(this string target, string trimString)
         {
-            if (string.IsNullOrEmpty(trimString)) return target;
+            if (string.IsNullOrEmpty(trimString) || string.IsNullOrEmpty(target)) return target;
 
             string result = target;
             while (result.StartsWith(trimString))

@@ -102,7 +102,7 @@
                     Margin="28,10,0,0"
                     HorizontalAlignment="Left"
                     VerticalAlignment="Top"
-                    Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsTitleCategory]}"
+                    Content="{Binding Source={x:Static commun:Languages.Current}, Path=[settingsTitleTags]}"
                     FontFamily="Segoe UI Light"
                     FontSize="30"
                     Foreground="#FFE2E2E1" />

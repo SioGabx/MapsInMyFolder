@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace MapsInMyFolder
 {
-    public partial class Javascript
+    public static partial class Javascript
     {
         public enum InvokeFunction { getTile, getPreview, getPreviewFallback, selectionChanged }
         public enum JavascriptAction { refreshMap, clearCache }
@@ -21,19 +21,18 @@ namespace MapsInMyFolder
 
         #region logs
         //Register logger to the CustomOrEditPage
-        public static Javascript instance = new Javascript();
-        private string _logs;
+        private static string _logs;
         public class LogsEventArgs : EventArgs
         {
             public string Logs { get; set; }
         }
         public delegate void LogsChangedHandler(object source, LogsEventArgs e);
         public static event EventHandler<LogsEventArgs> LogsChanged;
-        protected virtual void OnLogsChanged()
+        public static void OnLogsChanged()
         {
-            LogsChanged?.Invoke(this, new LogsEventArgs { Logs = _logs });
+            LogsChanged?.Invoke(null, new LogsEventArgs { Logs = _logs });
         }
-        public string Logs
+        public static string Logs
         {
             get { return _logs; }
             set
@@ -47,19 +46,19 @@ namespace MapsInMyFolder
         }
         #endregion
 
-        private Dictionary<string, double> _Location;
-        public bool ZoomToNewLocation;
+        private static Dictionary<string, double> _Location;
+        public static bool ZoomToNewLocation { get; set; }
         public class LocationEventArgs : EventArgs
         {
             public Dictionary<string, double> Location { get; set; }
         }
         public delegate void LocationChangedHandler(object source, LocationEventArgs e);
-        public event EventHandler<LocationEventArgs> LocationChanged;
-        protected virtual void OnLocationChanged()
+        public static event EventHandler<LocationEventArgs> LocationChanged;
+        public static void OnLocationChanged()
         {
-            LocationChanged?.Invoke(this, new LocationEventArgs());
+            LocationChanged?.Invoke(null, new LocationEventArgs());
         }
-        public Dictionary<string, double> Location
+        public static Dictionary<string, double> Location
         {
             get { return _Location; }
             set
@@ -72,8 +71,8 @@ namespace MapsInMyFolder
             }
         }
 
-        public static long OldScriptTimestamp;
-        public static bool IsWaitingUserAction;
+        public static long OldScriptTimestamp { get; set; }
+        public static bool IsWaitingUserAction { get; set; }
         public static readonly TimeSpan ScriptTimeOut = new TimeSpan(0, 0, 4);
 
         private static Engine SetupEngine(int LayerId)

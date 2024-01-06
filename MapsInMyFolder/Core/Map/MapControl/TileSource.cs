@@ -37,7 +37,7 @@ namespace MapsInMyFolder.MapControl
         /// Gets or sets an array of request subdomain names that are replaced for the {s} format specifier.
         /// </summary>
         public string[] Subdomains { get; set; }
-        public int LayerID { get; set; }
+        public Layers TileLayer { get; set; }
 
         /// <summary>
         /// Gets the image Uri for the specified tile indices and zoom level.
@@ -48,7 +48,7 @@ namespace MapsInMyFolder.MapControl
 
             if (UriFormat != null)
             {
-                var uriString = GetUrl.FromTileXYZ(UriFormat, x, y, zoomLevel, LayerID, Javascript.InvokeFunction.getTile);
+                var uriString = GetUrl.FromTileXYZ(UriFormat, x, y, zoomLevel, TileLayer, Javascript.InvokeFunction.getTile);
 
                 if (Subdomains != null && Subdomains.Length > 0)
                 {

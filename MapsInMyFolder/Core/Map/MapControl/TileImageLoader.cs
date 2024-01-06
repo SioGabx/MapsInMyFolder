@@ -139,7 +139,7 @@ namespace MapsInMyFolder.MapControl
                     "{0}/{1}/{2}/{3}{4}", cacheName, tile.ZoomLevel, tile.XIndex, tile.Y, extension);
 
 
-                return LoadCachedTile(tile, tileSource.UriFormat, cacheKey, tileSource.LayerID);
+                return LoadCachedTile(tile, tileSource.UriFormat, cacheKey, tileSource.TileLayer.Id);
             }
 
             return Task.CompletedTask;
