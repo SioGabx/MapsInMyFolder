@@ -12,7 +12,8 @@
     Title="GridLayerEditor"
     d:DesignHeight="450"
     d:DesignWidth="800"
-    mc:Ignorable="d" Loaded="Page_Loaded">
+    Loaded="Page_Loaded"
+    mc:Ignorable="d">
     <Page.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -20,6 +21,15 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Page.Resources>
+    <!--
+        Ask for a link or a xml file
+        Show progress bar
+        Ask user to select layers to keep importing
+        If duplicate layer ask user what action choose, replace or choose or ignore new
+        Create a splitted view with the table with actual values and new values
+        Save, selected rows (if a row in table 1 is selected, deselect in table 2) is no one is selected, then ignore and keep old
+    -->
+
     <Grid x:Name="DataGridEditorGrid" Visibility="Visible">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="360" />
@@ -48,11 +58,14 @@
                 DataContext="{Binding RelativeSource={RelativeSource AncestorType={x:Type mapsinmyfolder:GridLayerEditor}}}"
                 GetLayersMethod="{Binding GetLayersListMethod}"
                 LinkedMapViewer="{Binding ElementName=mapviewer}"
-                SetCurrentLayerEvent="LayerPanel_SetCurrentLayerEvent" 
-                OpenEditLayerPageEvent="LayerPanel_OpenEditLayerPageEvent" />
+                OpenEditLayerPageEvent="LayerPanel_OpenEditLayerPageEvent"
+                SetCurrentLayerEvent="LayerPanel_SetCurrentLayerEvent" />
         </Grid>
 
-        <Grid Grid.Column="1" Visibility="Collapsed ">
+        <Grid
+            x:Name="GridLayerEditorTable"
+            Grid.Column="1"
+            Visibility="Visible">
             <Grid.RowDefinitions>
                 <RowDefinition Height="65" />
                 <RowDefinition />
@@ -73,7 +86,10 @@
                 Margin="10,0,15,0" />
         </Grid>
 
-        <Grid Grid.Column="1" Visibility="Visible">
+        <Grid
+            x:Name="GridLayerEditorMap"
+            Grid.Column="1"
+            Visibility="Collapsed">
 
             <Grid.RowDefinitions>
                 <RowDefinition Height="65" />

@@ -21,14 +21,14 @@ namespace MapsInMyFolder.Commun.Capabilities
             "EPSG:3785",    //Popular Visualisation CRS / Mercator -- Spherical Mercator (deprecated EPSG code wrongly defined)
         };
 
-        public static async Task<IEnumerable<Layers>> ParseAsync()
+        public static async Task<IEnumerable<Layers>> ParseAsync(string path)
         {
-             var distUrl = "http://wxs.ign.fr/an7nvfzojv5wa96dsga5nk8w/geoportail/wmts?SERVICE=WMTS&REQUEST=GetCapabilities";
+            // var distUrl = "http://wxs.ign.fr/an7nvfzojv5wa96dsga5nk8w/geoportail/wmts?SERVICE=WMTS&REQUEST=GetCapabilities";
            // var distUrl = @"C:\Users\franc\Documents\SharpDevelop Projects\WMTSCapabilitiesParser\WMTSCapabilitiesParser.Test\datagrandest.xml";
             //var distUrl = @"C:\Users\franc\Documents\SharpDevelop Projects\WMTSCapabilitiesParser\WMTSCapabilitiesParser.Test\datagrandest_v2.xml";
 
 
-            var Capabilities = await WMTSParser.ReadCapabilitiesAsync(new Uri(distUrl.Trim('"')));
+            var Capabilities = await WMTSParser.ReadCapabilitiesAsync(new Uri(path.Trim('"')));
             var LayersList = new List<Layers>();
             foreach (var LayerCapabilities in Capabilities)
             {

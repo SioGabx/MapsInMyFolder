@@ -3,6 +3,7 @@ using MapsInMyFolder.Commun;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Windows;
@@ -24,9 +25,9 @@ namespace MapsInMyFolder.UserControls
         }
 
 
-        public IEnumerable ItemsSource
+        public ObservableCollection<Layers> ItemsSource
         {
-            get { return dataGrid.ItemsSource; }
+            get { return (ObservableCollection<Layers>)dataGrid.ItemsSource; }
             set { dataGrid.ItemsSource = value; }
         }
 
@@ -257,7 +258,7 @@ namespace MapsInMyFolder.UserControls
         {
             if (!IsContiguousSelection(dataGrid))
             {
-                await Message.ShowContentDialog(Languages.Current["EditableDataGridImpossibleActionOnMultiplePlage"], Languages.Current["dialogTitleOperationFailed"], MessageDialogButton.OK);
+                await Message.ShowContentDialog(Languages.Current["editableDataGridImpossibleActionOnMultiplePlage"], Languages.Current["dialogTitleOperationFailed"], MessageDialogButton.OK);
                 return;
             }
             string data = Clipboard.GetText();
@@ -367,5 +368,23 @@ namespace MapsInMyFolder.UserControls
             }
         }
 
+        private void ContextMenuDeleteLine_Click(object sender, RoutedEventArgs e)
+        {
+            var selectedItems = dataGrid.SelectedItems.Cast<Layers>().ToList();
+            foreach (var selectedItem in selectedItems)
+            {
+                ItemsSource.Remove(selectedItem);
+            }
+        }
+
+        private void ContextMenuCopy_Click(object sender, RoutedEventArgs e)
+        {
+            CopySelectedCells();
+        }
+
+        private void ContextMenuPaste_Click(object sender, RoutedEventArgs e)
+        {
+            PasteIntoCells();
+        }
     }
 }

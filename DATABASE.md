@@ -512,3 +512,8 @@ var restartAt = 164;
   
   - https://osm.datagrandest.fr/mapcache/wmts?service=WMTS&request=GetCapabilities
   - https://www.datagrandest.fr/geoserver/gwc/service/wmts?request=getcapabilities
+  - https://www.datagrandest.fr/geoserver/wms?SERVICE=WMS&REQUEST=GetCapabilities
+  - https://www.datagrandest.fr/geoserver/gwc/service/wmts?SERVICE=WMTS&REQUEST=GetCapabilities
+  - https://www.datagrandest.fr/geoserver/gwc/service/wmts?SERVICE=WMTS&REQUEST=GetCapabilities
+  
+  https://wiki.openstreetmap.org/wiki/FR:Serveurs/wms.openstreetmap.fr

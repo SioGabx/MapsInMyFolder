@@ -882,8 +882,8 @@ namespace MapsInMyFolder
             string SITE_URL = TextboxLayerSiteUrl.Text.Trim();
             string STYLE = TextboxLayerStyle.Text.Trim();
             int TILE_SIZE = GetIntValueFromTextBox(TextboxLayerTileWidth);
-            string SCRIPT = TextboxLayerScript.Script.Trim();
-            string RECTANGLES = TextboxRectangles.Script.Trim();
+            string SCRIPT = TextboxLayerScript.Script?.Trim();
+            string RECTANGLES = TextboxRectangles.Script?.Trim();
             Layers layers = Layers.GetLayerById((int)Layers.ReservedId.TempLayerDatabaseEditor);
             if (layers is null)
             {

@@ -44,15 +44,16 @@ namespace MapsInMyFolder
         private async Task GetDataAsync()
         {
             _items = new ObservableCollection<Layers>();
-            var data = await WMTSParser.ParseAsync();
+            string dataURL = @"http://wxs.ign.fr/an7nvfzojv5wa96dsga5nk8w/geoportail/wmts?SERVICE=WMTS&REQUEST=GetCapabilities";
+            var data = await WMTSParser.ParseAsync(dataURL);
             foreach (Layers layers in data)
             {
                 _items.Add(layers);
             }
 
-
             LayerGrid.ItemsSource = _items;
         }
+
         public async void Init()
         {
             if (!IsInitialized)
@@ -179,8 +180,17 @@ namespace MapsInMyFolder
         {
             var OriginalLayer = _items.GetLayerById(e.Layer.Id);
             var Index = _items.IndexOf(OriginalLayer);
-            _items.Remove(OriginalLayer);
-            _items.Insert(Index, e.Layer);
+            if (Index == -1)
+            {
+                //Item is found inside the list (editing)
+                _items.Remove(OriginalLayer);
+                _items.Insert(Index, e.Layer);
+            }
+            else
+            {
+                //Item is NOT found inside the list (adding)
+                _items.Add(e.Layer);
+            }
             e.Cancel = true;
         }
     }
