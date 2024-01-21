@@ -297,7 +297,7 @@ namespace MapsInMyFolder.UserControls
             DataGridColumn[] SelectedColumns =
                 dataGrid.Columns.OrderBy(column => column.DisplayIndex)
                 .SkipWhile(column => column != currentCell.Column)
-                .Take(clipboardData.Max(row => NumberOfColumnsSelected)).ToArray();
+                .Take(NumberOfColumnsSelected).ToArray();
 
             //if (rows.Count() > NumberOfRowSelected && columns.Count() > NumberOfColumnsSelected)
             //{

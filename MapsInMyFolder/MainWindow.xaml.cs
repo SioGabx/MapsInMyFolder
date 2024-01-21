@@ -193,9 +193,12 @@ namespace MapsInMyFolder
 
         public void NetworkIsBack()
         {
-            MainPage.RefreshMap();
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                MainPage.RefreshMap();
             MainPage.SetBBOXPreviewRequestUpdate();
             Downloader.CheckIfReadyToStartDownload();
+            });
         }
 
         public static void LoadAvalonEditThemes()
