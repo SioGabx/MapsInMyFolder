@@ -2287,7 +2287,7 @@ function getPreview(args) {
     &quot;SE_Long&quot;: -40.930573
   }
 ]','2','1');
-INSERT INTO 'LAYERS' (ID,NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('642','North America Elevation_meters','The North America elevation data were derived from the GTOPO30 elevation dataset ( http://eros.usgs.gov/products/elevation/gtopo30.html ) produced by the U.S. Geological Survey and from the Canada3D elevation dataset produced by the Centre for Topographic Information (Sherbrooke), Natural Resources Canada . GTOPO30 is a global digital elevation model (DEM) with a horizontal grid spacing of 30 arc seconds (approximately 1 kilometer). GTOPO30 was derived from several raster and vector sources of topographic information. It was developed between 1993 and 1996 through a collaborative effort led by staff at the U.S. Geological Survey&apos;s Earth Resources Observation and Science Center (EROS). In the United States, GTOPO30 data were derived from the National Elevation Dataset (NED). In Mexico, GTOPO30 data were derived from 3-arc-second elevation data from INEGI. These data were prepared by the U.S. Defense Mapping Agency (now National Geospatial-Intelligence Agency, NGA) using contour lines from the INEGI topographic national map series at 1:250,000 scale. Elsewhere, GTOPO30 data were derived from several sources. Canada3D was developed by Natural Resources Canada as a national-level elevation dataset at 30-arc-second resolution. In contrast to GTOPO30 data in Canada, Canada3D elevation data displayed relatively few artifacts and were of higher quality than GTOPO30, and were accordingly used for all land masses in Canada. Files Download',NULL,'United States','North America Elevation_meters','https://tiles.arcgis.com/tiles/oF9CDB4lUYF7Um9q/arcgis/rest/services/Elevation_meters/MapServer/tile/{z}/{y}/{x}','0','9','png','CECAtlas','https://www.arcgis.com',NULL,'256','0','function getTile(args) {
+INSERT INTO 'LAYERS' (ID,NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('642','North America Elevation_meters','The North America elevation data were derived from the GTOPO30 elevation dataset ( http://eros.usgs.gov/products/elevation/gtopo30.html ) produced by the U.S. Geological Survey and from the Canada3D elevation dataset produced by the Centre for Topographic Information (Sherbrooke), Natural Resources Canada . GTOPO30 is a global digital elevation model (DEM) with a horizontal grid spacing of 30 arc seconds (approximately 1 kilometer). GTOPO30 was derived from several raster and vector sources of topographic information. It was developed between 1993 and 1996 through a collaborative effort led by staff at the U.S. Geological Survey&apos;s Earth Resources Observation and Science Center (EROS). In the United States, GTOPO30 data were derived from the National Elevation Dataset (NED). In Mexico, GTOPO30 data were derived from 3-arc-second elevation data from INEGI. These data were prepared by the U.S. Defense Mapping Agency (now National Geospatial-Intelligence Agency, NGA) using contour lines from the INEGI topographic national map series at 1:250,000 scale. Elsewhere, GTOPO30 data were derived from several sources. Canada3D was developed by Natural Resources Canada as a national-level elevation dataset at 30-arc-second resolution. In contrast to GTOPO30 data in Canada, Canada3D elevation data displayed relatively few artifacts and were of higher quality than GTOPO30, and were accordingly used for all land masses in Canada. Files Download',NULL,'United States','North America Elevation_meters','https://tiles.arcgis.com/tiles/oF9CDB4lUYF7Um9q/arcgis/rest/services/North_America_Elevation_meters_/MapServer/tile/{z}/{y}/{x}','0','9','png','CECAtlas','https://www.arcgis.com',NULL,'256','0','function getTile(args) {
     return args;
 }
 function getPreview(args) {
@@ -2295,7 +2295,7 @@ function getPreview(args) {
     args.y = &quot;6&quot;;
     args.z = &quot;4&quot;;
     return args;
-}','Visible',NULL,NULL,'2','1');
+}','Visible','{&quot;BackgroundColor&quot;:&quot;&quot;,&quot;ErrorsToIgnore&quot;:&quot;&quot;,&quot;MaxDownloadTilesInParralele&quot;:0,&quot;WaitingBeforeStartAnotherTile&quot;:0}',NULL,'3','1');
 INSERT INTO 'LAYERS' (ID,NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('643','North America Land Cover 2010 250m','The 2010 North American Land Cover 250-meter dataset was produced as part of the North American Land Change Monitoring System (NALCMS) , a trilateral effort between Natural Resources Canada , the United States Geological Survey , and three Mexican organizations including the National Institute of Statistics and Geography (Instituto Nacional de Estadística y Geografía) , National Commission for the Knowledge and Use of the Biodiversity (Comisión Nacional Para el Conocimiento y Uso de la Biodiversidad) , and the National Forestry Commission of Mexico (Comisión Nacional Forestal) . The collaboration is facilitated by the Commission for Environmental Cooperation , an international organization created by the Canada, Mexico, and United States governments under the North American Agreement on Environmental Cooperation to promote environmental collaboration between the three countries. The general objective of NALCMS is to devise, through collective effort, a harmonized multi-scale land cover monitoring approach which ensures high accuracy and consistency in monitoring land cover changes at the North American scale, and which meets each country’s specific requirements. The initial data set of North American Land Cover at 250 meters reflected land cover information for 2005. This 2010 data set was produced by updating the 2005 data to show land cover changes as determined from more recent data. No changes were mapped in Hawaii because newer data were not available. Land cover classification changed between 2005 and 2010 for approximately 1 percent of the continental area. For the continental data sets (including surrounding water fringe) 4150241 pixels (1.03&percnt; of the area) changed in the update. The following national counts exclude the water fringe: Canada, 3264779 pixels changed (2.05&percnt;); Mexico, 47070 pixels changed (0.15&percnt;), and U.S., 836706 pixels changed (0.55&percnt;). The initial data set used to generate land cover information over North America was produced by the Canada Centre for Remote Sensing from observations acquired by the Moderate Resolution Imaging Spectroradiometer (MODIS/Terra). All seven land spectral bands were processed from Level 1 granules into top-of-atmosphere reflectance covering North America at a 250-meter spatial and 10-day temporal resolution. In order to generate a seamless and consistent land cover map of North America, national maps were generated for Canada by the CCRS; for Mexico by INEGI, CONABIO, and CONAFOR; and for the United States by the USGS. Each country used specific training data and land cover mapping methodologies to create national data sets. This North America data set was produced by combining the national land cover data sets. This version 2.0 of the North America Land Cover map at 250 meters spatial resolution has removed the water buffer along the coastline of North America, this will ensure consistency in the statistics calculations of class 18 (water) without incorporating ocean water. The countries worked together to produce a definitive list of land cover classifications for the 2005 data; the same classifications were used for the 2010 data. This document is available for download from the same site as the data and is entitled: North American Land Cover Classifications (2005). Files Download',NULL,'United States','North America Land Cover 2010 250m','https://tiles.arcgis.com/tiles/oF9CDB4lUYF7Um9q/arcgis/rest/services/NA_Land_Cover_2010_250m/MapServer/tile/{z}/{y}/{x}','0','24','jpeg','CECAtlas','https://www.arcgis.com',NULL,'256','0','//default script
 function getTile(args) {
    return args;
@@ -4733,49 +4733,6 @@ function getPreviewFallback(args) {
   }
 ]','2','1');
 INSERT INTO 'LAYERS' (ID,NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('757','衛星画像（World Imagery）','この衛星画像では、世界の多くの地域において、1 m もしくはより良い解像度の衛星画像と航空画像を提供しています。 小中縮尺では世界全体をカバーする衛星画像を提供しており、15 m TerraColor 画像（縮尺レベル 1:591,000,000 から 1:72,000 の範囲）と 2.5 m SPOT 画像 (縮尺レベル 1:288,000 から 1:72,000 の範囲) を使用しています。 アメリカ合衆国本土と西ヨーロッパにおいては、0.3 m 解像度の DigitalGlobe 衛星画像を使用しています。 DigitalGlobe から提供されている 1 m 以下の画像は、世界のその他の地域でも多く使用されています。 アメリカ合衆国 内では、1 m もしくはより良い NAIP 画像が利用可能な地域もあります。 その他の地域では、GIS コミュニティにより提供されたさまざまな解像度の画像を使用しています。一部のコミュニティにおいては、非常に高解像度（最高 0.03 m）の画像が約 1:280 の縮尺レベルで利用できます。 Esri のサービスにあなたのお持ちのデータを組み込むには 、 Community Maps Program を通じてデータをご提供いただけます。 GIS コミュニティによって提供されているデータ ソースの詳細については、こちらのリスト Contributors for the World Imagery Map をご覧ください。 提供範囲 最新の更新情報および提供範囲については、下記のリンクをご参照ください。 What&apos;s new in World Imagery World coverage map Citations レイヤー このレイヤーには、画像提供者、取得日、解像度、画像ソースなどの情報が含まれています。ArcGIS Desktop の個別属性ツールを使用すると、これらの引用情報について確認することができます。 引用情報は、情報が含まれている場所と縮尺でのみ取得できます。各縮尺レベルによって使用しているソースが異なるため、利用可能な最高解像度の画像について引用情報を確認するには、最大縮尺までズームしてください。引用情報はこちらの World Imagery with Metadata web map からもアクセスいただけます。 使用 このレイヤーは、ArcGIS Online マップ ビューア、ArcGIS Desktop、ArcGIS Pro に追加してご利用いただけます。ラベルや道路、鉄道などのリファレンスを重ねて見るには、こちらのマップ Imagery Hybrid をご参照ください。ラベルのみを重ねて見たい場合には、こちらのマップ Imagery with Labels もあります。 フィードバック 報告するべき問題を見つけましたか？こちらの Imagery Map Feedback マップから、見つけた問題についてコメントすることができます。 ArcGIS Online チームがあなたのフィードバックをレビューし、今後のアップデートの参考にさせていただきます。 ※このアイテムは、米国 Esri 社が提供する下記のサービスを日本語に翻訳したものです（2018 年 3 月時点）。最新情報は下記からご参照ください。 World Imagery','Satellite','Japan','衛星画像（World Imagery）','https://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}','0','24','jpeg','Esri_JP_Content','https://www.arcgis.com',NULL,'256','0',NULL,'Visible',NULL,NULL,'2','1');
-INSERT INTO 'LAYERS' (ID,NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('758','Ortofotomapa ČR','Ortofotomapa Česk&eacute; republiky Tato webov&aacute; mapa pokrýv&aacute; daty ortofota celý použitelný měřítkový rozsah, tj. včetně malých měřítek. Služba je vhodn&aacute; pro všechny typy klientů (desktop, web i mobilní). Více informací o mapových služb&aacute;ch poskytovaných Českým úřadem zeměměřickým a katastr&aacute;lním naleznete na Geoport&aacute;lu ČÚZK .','Satellite','Czechia','Ortofotomapa ČR (Web Mercator)','https://ags.cuzk.cz/arcgis/rest/services/ortofoto_wm/MapServer/tile/{z}/{y}/{x}','6','20','png','zem_urad','https://www.arcgis.com',NULL,'256','0','//default script
-function getTile(args) {
-   return args;
-}
-function getPreview(args) {
-    args.x = &quot;276&quot;;
-    args.y = &quot;173&quot;;
-    args.z = &quot;9&quot;;
-    return args;
-}','Visible',NULL,'[
-  {
-    &quot;Name&quot;: &quot;Selection sans nom&quot;,
-    &quot;Color&quot;: &quot;#000000&quot;,
-    &quot;StrokeThickness&quot;: &quot;1&quot;,
-    &quot;MinZoom&quot;: &quot;∞&quot;,
-    &quot;MaxZoom&quot;: &quot;∞&quot;,
-    &quot;NO_Lat&quot;: &quot;51.315626&quot;,
-    &quot;NO_Long&quot;: &quot;11.633928&quot;,
-    &quot;SE_Lat&quot;: &quot;48.170609&quot;,
-    &quot;SE_Long&quot;: &quot;19.456194&quot;
-  }
-]','2','1');
-INSERT INTO 'LAYERS' (ID,NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('759','Z&aacute;kladní mapy ČR','Z&aacute;kladní mapy Česk&eacute; republiky - služba Tato mapov&aacute; služba zahrnuje Z&aacute;kladní mapy ČR v měřítk&aacute;ch 1:10 000, 1:25 000, 1:50 000, 1:200 000, 1:500 000 a 1:1 000 000. Služba je vhodn&aacute; pro všechny typy klientů (desktop, web i mobilní). Více informací o mapových služb&aacute;ch poskytovaných Českým úřadem zeměměřickým a katastr&aacute;lním naleznete na Geoport&aacute;lu ČÚZK .',NULL,'Czechia','Z&aacute;kladní mapy ČR (Web Mercator)','https://ags.cuzk.cz/arcgis/rest/services/zmwm/MapServer/tile/{z}/{y}/{x}','6','19','png','zem_urad','https://www.arcgis.com',NULL,'256','0','function getTile(args) {
-    return args;
-}
-function getPreview(args) {
-    args.x = &quot;276&quot;;
-    args.y = &quot;173&quot;;
-    args.z = &quot;9&quot;;
-    return args;
-}','Visible',NULL,'[
-  {
-    &quot;Name&quot;: &quot;Selection sans nom&quot;,
-    &quot;Color&quot;: &quot;#000000&quot;,
-    &quot;StrokeThickness&quot;: &quot;1&quot;,
-    &quot;MinZoom&quot;: &quot;∞&quot;,
-    &quot;MaxZoom&quot;: &quot;∞&quot;,
-    &quot;NO_Lat&quot;: &quot;51.315626&quot;,
-    &quot;NO_Long&quot;: &quot;11.633928&quot;,
-    &quot;SE_Lat&quot;: &quot;48.170609&quot;,
-    &quot;SE_Long&quot;: &quot;19.456194&quot;
-  }
-]','2','1');
 INSERT INTO 'LAYERS' (ID,NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('760','USGS National Map','USGS Topo is a topographic tile cache base map service visible from world scale to 1:18,000 that combines the most current data (Boundaries, Elevation, Geographic Names, Hydrography, Land Cover, Structures, Transportation, and other themes) that make up The National Map. Contours generated for the US Topo product are included and are visible at 1:36:000 and 1:18,000 scales. This service is designed to provide a seamless view of the data in a geographic information system (GIS) accessible format, closely resembling the US Topo product at large scales.','Topographie','United States','USGS National Map','https://basemap.nationalmap.gov/arcgis/rest/services/USGSTopo/MapServer/tile/{z}/{y}/{x}','0','16','jpeg','esri','https://www.arcgis.com',NULL,'256','0','function getTile(args) {
     return args;
 }
@@ -7090,13 +7047,9 @@ function getPreview(args) {
     &quot;SE_Long&quot;: 169.459474
   }
 ]','2','1');
-INSERT INTO 'LAYERS' (ID,NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('822','Cartographie - Planisphere','Planisphere 0101 du 04/10/2018','Cartes marines','*','RASTER_MARINE_0101_3857_WMTS','https://services.data.shom.fr/clevisu/wmts?layer=RASTER_MARINE_0101_3857_WMTS&amp;style=normal&amp;tilematrixset=3857&amp;Service=WMTS&amp;Request=GetTile&amp;Version=1.0.0&amp;Format=image&percnt;2Fpng&amp;TileMatrix={z}&amp;TileCol={x}&amp;TileRow={y}','1','6','png','Shom','data.shom.fr',NULL,'256','0','function getTile(args) {
+INSERT INTO 'LAYERS' (ID,NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('822','Cartographie - Planisphere','Planisphere 0101 du 04/10/2018','Cartes marines','World','RASTER_MARINE_0101_3857_WMTS','https://services.data.shom.fr/clevisu/wmts?layer=RASTER_MARINE_0101_3857_WMTS&amp;style=normal&amp;tilematrixset=3857&amp;Service=WMTS&amp;Request=GetTile&amp;Version=1.0.0&amp;Format=image&percnt;2Fpng&amp;TileMatrix={z}&amp;TileCol={x}&amp;TileRow={y}','1','6','png','Shom','data.shom.fr',NULL,'256','0','function getTile(args) {
     return args;
-}
-function getPreview(args) {
-    args.url = &quot;[internal]&quot; + args.url;
-    return args;
-}','Visible','{&quot;BackgroundColor&quot;:&quot;&quot;}',NULL,'2','1');
+}','Visible','{&quot;BackgroundColor&quot;:&quot;&quot;,&quot;ErrorsToIgnore&quot;:&quot;&quot;,&quot;MaxDownloadTilesInParralele&quot;:0,&quot;WaitingBeforeStartAnotherTile&quot;:0}',NULL,'3','1');
 INSERT INTO 'LAYERS' (ID,NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('823','Autre produit Lidar - Polyn&eacute;sie Fran&ccedil;aise - Bora Bora','Lidar Polyn&eacute;sie Fran&ccedil;aise 2015 - Bora Bora
 Legende : https://services.data.shom.fr/static/legends/FR/MNT_LITTORAL_LITTO3D/legende_litto3d_finistr.png','Cartes marines','France','L3D_LIDAR_POLYNESIE_BOR_2015_WMTS_3857','https://services.data.shom.fr/clevisu/wmts?layer=L3D_LIDAR_POLYNESIE_BOR_2015_WMTS_3857&amp;style=normal&amp;tilematrixset=3857&amp;Service=WMTS&amp;Request=GetTile&amp;Version=1.0.0&amp;Format=image&percnt;2Fpng&amp;TileMatrix={z}&amp;TileCol={x}&amp;TileRow={y}','6','17','png','Shom','data.shom.fr',NULL,'256','0','function getTile(args) {
     return args;
@@ -8422,15 +8375,15 @@ function getPreview(args) {
   }
 ]','2','1');
 INSERT INTO 'LAYERS' (ID,NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('861','Limites maritimes - Trait de c&ocirc;te mondial','Ce trait de c&ocirc;te correspond &agrave; la fusion du trait de c&ocirc;te de la NOAA, du trait Histolitt V2 pour la m&eacute;tropole et la Corse, du trait de c&ocirc;te Histolitt V1 pour les DOM-TOM et du trait de c&ocirc;te de la DITTT de Nouvelle Cal&eacute;donie. Ce produit n&apos;est pas diffusable en dehors du site http://data.shom.fr.
-Legende : https://services.data.shom.fr/static/legends/FR/TRAIT_DE_COTE/legende_trait_cote.png','Cartes marines','*','TCM-LINE_PYR-PNG_WLD_3857_WMTS','https://services.data.shom.fr/clevisu/wmts?layer=TCM-LINE_PYR-PNG_WLD_3857_WMTS&amp;style=normal&amp;tilematrixset=3857&amp;Service=WMTS&amp;Request=GetTile&amp;Version=1.0.0&amp;Format=image&percnt;2Fpng&amp;TileMatrix={z}&amp;TileCol={x}&amp;TileRow={y}','4','17','png','Shom','data.shom.fr',NULL,'256','0','function getTile(args) {
+Legende : https://services.data.shom.fr/static/legends/FR/TRAIT_DE_COTE/legende_trait_cote.png','Cartes marines','World','TCM-LINE_PYR-PNG_WLD_3857_WMTS','https://services.data.shom.fr/clevisu/wmts?layer=TCM-LINE_PYR-PNG_WLD_3857_WMTS&amp;style=normal&amp;tilematrixset=3857&amp;Service=WMTS&amp;Request=GetTile&amp;Version=1.0.0&amp;Format=image&percnt;2Fpng&amp;TileMatrix={z}&amp;TileCol={x}&amp;TileRow={y}','4','17','png','Shom','data.shom.fr',NULL,'256','0','function getTile(args) {
     return args;
 }
 function getPreview(args) {
     args.x = &quot;62&quot;;
     args.y = &quot;44&quot;;
-    args.z = &quot;7&quot;;args.url = &quot;[internal]&quot; + args.url;
+    args.z = &quot;7&quot;;
     return args;
-}','Visible','{&quot;BackgroundColor&quot;:&quot;&quot;}',NULL,'2','1');
+}','Visible','{&quot;BackgroundColor&quot;:&quot;&quot;,&quot;ErrorsToIgnore&quot;:&quot;&quot;,&quot;MaxDownloadTilesInParralele&quot;:0,&quot;WaitingBeforeStartAnotherTile&quot;:0}',NULL,'3','1');
 INSERT INTO 'LAYERS' (ID,NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('862','Litto3D&reg; - Saint-Barth&eacute;lemy 2019 v2','Le produit Litto3D est une base de donn&eacute;es altim&eacute;trique unique et continue terre-mer donnant une repr&eacute;sentation tridimensionnelle de la forme et de la position du sol sur la frange littorale du territoire fran&ccedil;ais. Litto3D est disponible sous deux formes : un semis de points tridimensionnels et un mod&egrave;le num&eacute;rique de terrain maill&eacute; et qualifi&eacute;.
 Legende : https://services.data.shom.fr/static/legends/FR/MNT_LITTORAL_LITTO3D/legende_litto3d_StBarthMartinV2.png','Cartes marines','France','LITTO3D_STBARTHELEMY_2019_PYR_3857_WMTS','https://services.data.shom.fr/clevisu/wmts?layer=LITTO3D_STBARTHELEMY_2019_PYR_3857_WMTS&amp;style=normal&amp;tilematrixset=3857&amp;Service=WMTS&amp;Request=GetTile&amp;Version=1.0.0&amp;Format=image&percnt;2Fpng&amp;TileMatrix={z}&amp;TileCol={x}&amp;TileRow={y}','4','17','png','Shom','data.shom.fr',NULL,'256','0','function getTile(args) {
     return args;
@@ -8686,16 +8639,15 @@ function getPreview(args) {
     return args;
 }','Visible','{&quot;BackgroundColor&quot;:&quot;&quot;}',NULL,'2','1');
 INSERT INTO 'LAYERS' (ID,NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('874','Mesures bathym&eacute;triques - Entre 1990 et 2005','Les lev&eacute;s bathym&eacute;triques sont des semis de sondes issus de lev&eacute;s provenant de la base des donn&eacute;es diffusables par le Shom. Pour les fonds jusqu&apos;&agrave; 50m, la pr&eacute;cision verticale des sondes varie de 30cm &agrave; 1m et la pr&eacute;cision planim&eacute;trique de 1 &agrave; 20m. Au-del&agrave;, dans les grands fonds, la pr&eacute;cision verticale est majoritairement de l&apos;ordre de 1 &agrave; 2&percnt; de la profondeur du fond. Parfois, elle est plus &eacute;lev&eacute;e selon la technologie utilis&eacute;e. Les donn&eacute;es sont r&eacute;f&eacute;renc&eacute;es au ZH qui est assimil&eacute; &agrave; la Plus Basse Mer Astronomique (PBMA). Les donn&eacute;es sont corrig&eacute;es des variations de la c&eacute;l&eacute;rit&eacute; du son dans l eau.
-Legende : https://services.data.shom.fr/static/legends/FR/LEVES_BATHY/Legende_levesBathy.png','Cartes marines','*','LEVES_BATHY_1990-2005_WMTS','https://services.data.shom.fr/clevisu/wmts?layer=LEVES_BATHY_1990-2005_WMTS&amp;style=normal&amp;tilematrixset=3857&amp;Service=WMTS&amp;Request=GetTile&amp;Version=1.0.0&amp;Format=image&percnt;2Fpng&amp;TileMatrix={z}&amp;TileCol={x}&amp;TileRow={y}','4','17','png','Shom','data.shom.fr',NULL,'256','0','function getTile(args) {
+Legende : https://services.data.shom.fr/static/legends/FR/LEVES_BATHY/Legende_levesBathy.png','Cartes marines','World','LEVES_BATHY_1990-2005_WMTS','https://services.data.shom.fr/clevisu/wmts?layer=LEVES_BATHY_1990-2005_WMTS&amp;style=normal&amp;tilematrixset=3857&amp;Service=WMTS&amp;Request=GetTile&amp;Version=1.0.0&amp;Format=image&percnt;2Fpng&amp;TileMatrix={z}&amp;TileCol={x}&amp;TileRow={y}','4','17','png','Shom','data.shom.fr',NULL,'256','0','function getTile(args) {
     return args;
 }
 function getPreview(args) {
     args.x = &quot;62&quot;;
     args.y = &quot;44&quot;;
     args.z = &quot;7&quot;;
-    args.url = &quot;[internal]&quot; + args.url;
     return args;
-}','Visible','{&quot;BackgroundColor&quot;:&quot;&quot;}',NULL,'2','1');
+}','Visible','{&quot;BackgroundColor&quot;:&quot;&quot;,&quot;ErrorsToIgnore&quot;:&quot;&quot;,&quot;MaxDownloadTilesInParralele&quot;:0,&quot;WaitingBeforeStartAnotherTile&quot;:0}',NULL,'3','1');
 INSERT INTO 'LAYERS' (ID,NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('875','Mesures bathym&eacute;triques - Entre 1970 et 1990','Les lev&eacute;s bathym&eacute;triques sont des semis de sondes issus de lev&eacute;s provenant de la base des donn&eacute;es diffusables par le Shom. Pour les fonds jusqu&apos;&agrave; 50m, la pr&eacute;cision verticale des sondes varie de 30cm &agrave; 1m et la pr&eacute;cision planim&eacute;trique de 1 &agrave; 20m. Au-del&agrave;, dans les grands fonds, la pr&eacute;cision verticale est majoritairement de l&apos;ordre de 1 &agrave; 2&percnt; de la profondeur du fond. Parfois, elle est plus &eacute;lev&eacute;e selon la technologie utilis&eacute;e. Les donn&eacute;es sont r&eacute;f&eacute;renc&eacute;es au ZH qui est assimil&eacute; &agrave; la Plus Basse Mer Astronomique (PBMA). Les donn&eacute;es sont corrig&eacute;es des variations de la c&eacute;l&eacute;rit&eacute; du son dans l eau.
 Legende : https://services.data.shom.fr/static/legends/FR/LEVES_BATHY/Legende_levesBathy.png','Cartes marines','France','LEVES_BATHY_1970-1990_WMTS','https://services.data.shom.fr/clevisu/wmts?layer=LEVES_BATHY_1970-1990_WMTS&amp;style=normal&amp;tilematrixset=3857&amp;Service=WMTS&amp;Request=GetTile&amp;Version=1.0.0&amp;Format=image&percnt;2Fpng&amp;TileMatrix={z}&amp;TileCol={x}&amp;TileRow={y}','4','17','png','Shom','data.shom.fr',NULL,'256','0','function getTile(args) {
     return args;
@@ -9233,16 +9185,15 @@ function getPreview(args) {
   }
 ]','2','1');
 INSERT INTO 'LAYERS' (ID,NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('894','S&eacute;dimentologie - Carte s&eacute;dimentaire mondiale','Le produit « Carte s&eacute;dimentaire mondiale &raquo; contient des donn&eacute;es num&eacute;riques g&eacute;o r&eacute;f&eacute;renc&eacute;es, d&eacute;crivant la nature des fonds g&eacute;ologiques rencontr&eacute;s sur les diff&eacute;rentes zones du globe. Les objets sont tous surfaciques et la description d&apos;un objet comprend en particulier la nature du s&eacute;diment incluant les fonds de type roche.
-Legende : https://services.data.shom.fr/static/legends/FR/SEDIM_MONDIALE/LegendeSedim.png','Cartes marines','*','SEDIM_MONDIALE_PYR_PNG_3857_WMTS','https://services.data.shom.fr/clevisu/wmts?layer=SEDIM_MONDIALE_PYR_PNG_3857_WMTS&amp;style=normal&amp;tilematrixset=3857&amp;Service=WMTS&amp;Request=GetTile&amp;Version=1.0.0&amp;Format=image&percnt;2Fpng&amp;TileMatrix={z}&amp;TileCol={x}&amp;TileRow={y}','4','17','png','Shom','data.shom.fr',NULL,'256','0','function getTile(args) {
+Legende : https://services.data.shom.fr/static/legends/FR/SEDIM_MONDIALE/LegendeSedim.png','Cartes marines','World','SEDIM_MONDIALE_PYR_PNG_3857_WMTS','https://services.data.shom.fr/clevisu/wmts?layer=SEDIM_MONDIALE_PYR_PNG_3857_WMTS&amp;style=normal&amp;tilematrixset=3857&amp;Service=WMTS&amp;Request=GetTile&amp;Version=1.0.0&amp;Format=image&percnt;2Fpng&amp;TileMatrix={z}&amp;TileCol={x}&amp;TileRow={y}','4','17','png','Shom','data.shom.fr',NULL,'256','0','function getTile(args) {
     return args;
 }
 function getPreview(args) {
     args.x = &quot;62&quot;;
     args.y = &quot;44&quot;;
     args.z = &quot;7&quot;;
-    args.url = &quot;[internal]&quot; + args.url;
     return args;
-}','Visible','{&quot;BackgroundColor&quot;:&quot;&quot;}',NULL,'2','1');
+}','Visible','{&quot;BackgroundColor&quot;:&quot;&quot;,&quot;ErrorsToIgnore&quot;:&quot;&quot;,&quot;MaxDownloadTilesInParralele&quot;:0,&quot;WaitingBeforeStartAnotherTile&quot;:0}',NULL,'3','1');
 INSERT INTO 'LAYERS' (ID,NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('895','S&eacute;dimentologie - Nature des fonds m&eacute;tropole','Le Shom collecte les donn&eacute;es s&eacute;dimentaires du fond marin provenant de ses propres observations et pr&eacute;l&egrave;vements mais &eacute;galement d’organismes ext&eacute;rieurs (tels le BRGM, l’Ifremer, des universit&eacute;s, des ports autonomes, soci&eacute;t&eacute;s de services, etc.) et les int&egrave;gre au sein de la base de donn&eacute;es s&eacute;dimentologiques du Shom (BDSS). L’exploitation conjointe de la BDSS et des donn&eacute;es de morphologie permet de d&eacute;terminer les diff&eacute;rents domaines s&eacute;dimentaires et de produire les cartes G ainsi que le produit num&eacute;rique « Natures de fond &raquo; qui en est d&eacute;riv&eacute;.
 Legende : https://services.data.shom.fr/static/legends/FR/NATURES_DE_FOND/legende_ndf50.png','Cartes marines','France','NDF_PYR-PNG_WLD_3857_WMTS','https://services.data.shom.fr/clevisu/wmts?layer=NDF_PYR-PNG_WLD_3857_WMTS&amp;style=normal&amp;tilematrixset=3857&amp;Service=WMTS&amp;Request=GetTile&amp;Version=1.0.0&amp;Format=image&percnt;2Fpng&amp;TileMatrix={z}&amp;TileCol={x}&amp;TileRow={y}','4','17','png','Shom','data.shom.fr',NULL,'256','0','function getTile(args) {
     return args;
@@ -9393,26 +9344,25 @@ function getPreview(args) {
   }
 ]','2','1');
 INSERT INTO 'LAYERS' (ID,NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('902','Mar&eacute;e - Types de mar&eacute;e','Ce produit pr&eacute;sente la r&eacute;partition mondiale des types de mar&eacute;e. Il existe quatre types de mar&eacute;e, class&eacute;s selon le nombre et la hauteur des pleines et basses mers de chaque jour : la mar&eacute;e semi-diurne : on observe chaque jour deux pleines et deux basses mers ayant sensiblement la m&ecirc;me hauteur. la mar&eacute;e semi-diurne &agrave; in&eacute;galit&eacute;s diurnes : on observe chaque jour deux pleines et deux basses mers (comme dans le cas semi-diurne) mais avec des diff&eacute;rences importantes entre les hauteurs des pleines et des basses mers d’une m&ecirc;me journ&eacute;e, la mar&eacute;e diurne : on observe chaque jour une seule pleine mer et une seule basse mer par jour la mar&eacute;e mixte : on observe tant&ocirc;t une mar&eacute;e de type diurne et tant&ocirc;t une mar&eacute;e de type semi-diurne ou &agrave; in&eacute;galit&eacute;s diurnes.
-Legende : https://services.data.shom.fr/static/legends/FR/TYPE_MAREE/legende_type_maree.png','Cartes marines','*','TYPE_MAREE_PYR_PNG_3857_WMTS','https://services.data.shom.fr/clevisu/wmts?layer=TYPE_MAREE_PYR_PNG_3857_WMTS&amp;style=normal&amp;tilematrixset=3857&amp;Service=WMTS&amp;Request=GetTile&amp;Version=1.0.0&amp;Format=image&percnt;2Fpng&amp;TileMatrix={z}&amp;TileCol={x}&amp;TileRow={y}','4','17','png','Shom','data.shom.fr',NULL,'256','0','function getTile(args) {
+Legende : https://services.data.shom.fr/static/legends/FR/TYPE_MAREE/legende_type_maree.png','Cartes marines','World','TYPE_MAREE_PYR_PNG_3857_WMTS','https://services.data.shom.fr/clevisu/wmts?layer=TYPE_MAREE_PYR_PNG_3857_WMTS&amp;style=normal&amp;tilematrixset=3857&amp;Service=WMTS&amp;Request=GetTile&amp;Version=1.0.0&amp;Format=image&percnt;2Fpng&amp;TileMatrix={z}&amp;TileCol={x}&amp;TileRow={y}','4','17','png','Shom','data.shom.fr',NULL,'256','0','function getTile(args) {
     return args;
 }
 function getPreview(args) {
     args.x = &quot;31&quot;;
     args.y = &quot;22&quot;;
-    args.z = &quot;6&quot;;args.url = &quot;[internal]&quot; + args.url;
+    args.z = &quot;6&quot;;
     return args;
-}','Visible','{&quot;BackgroundColor&quot;:&quot;&quot;}',NULL,'2','1');
+}','Visible','{&quot;BackgroundColor&quot;:&quot;&quot;,&quot;ErrorsToIgnore&quot;:&quot;&quot;,&quot;MaxDownloadTilesInParralele&quot;:0,&quot;WaitingBeforeStartAnotherTile&quot;:0}',NULL,'3','1');
 INSERT INTO 'LAYERS' (ID,NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('903','Mar&eacute;e - Zones de mar&eacute;e','Ce produit contient, sous forme de fichier shapefile, les limites des zones de mar&eacute;e pour les c&ocirc;tes de France de la Manche, de l&apos;Atlantique et de la M&eacute;diterran&eacute;e. Les caract&eacute;ristiques des zones de mar&eacute;e sont disponibles dans le produit RAM (R&eacute;f&eacute;rence Altim&eacute;triques maritimes).
-Legende : https://services.data.shom.fr/static/legends/FR/ZONES_MAREE/zones_maree2014.png','Cartes marines','*','ZONES_MAREE_PYR_PNG_3857_WMTS','https://services.data.shom.fr/clevisu/wmts?layer=ZONES_MAREE_PYR_PNG_3857_WMTS&amp;style=normal&amp;tilematrixset=3857&amp;Service=WMTS&amp;Request=GetTile&amp;Version=1.0.0&amp;Format=image&percnt;2Fpng&amp;TileMatrix={z}&amp;TileCol={x}&amp;TileRow={y}','4','17','png','Shom','data.shom.fr',NULL,'256','0','function getTile(args) {
+Legende : https://services.data.shom.fr/static/legends/FR/ZONES_MAREE/zones_maree2014.png','Cartes marines','World','ZONES_MAREE_PYR_PNG_3857_WMTS','https://services.data.shom.fr/clevisu/wmts?layer=ZONES_MAREE_PYR_PNG_3857_WMTS&amp;style=normal&amp;tilematrixset=3857&amp;Service=WMTS&amp;Request=GetTile&amp;Version=1.0.0&amp;Format=image&percnt;2Fpng&amp;TileMatrix={z}&amp;TileCol={x}&amp;TileRow={y}','4','17','png','Shom','data.shom.fr',NULL,'256','0','function getTile(args) {
     return args;
 }
 function getPreview(args) {
     args.x = &quot;15&quot;;
     args.y = &quot;11&quot;;
     args.z = &quot;5&quot;;
-    args.url = &quot;[internal]&quot; + args.url;
     return args;
-}','Visible','{&quot;BackgroundColor&quot;:&quot;&quot;}','[
+}','Visible','{&quot;BackgroundColor&quot;:&quot;&quot;,&quot;ErrorsToIgnore&quot;:&quot;&quot;,&quot;MaxDownloadTilesInParralele&quot;:0,&quot;WaitingBeforeStartAnotherTile&quot;:0}','[
   {
     &quot;Color&quot;: &quot;#000000&quot;,
     &quot;StrokeThickness&quot;: 5.0,
@@ -9423,7 +9373,7 @@ function getPreview(args) {
     &quot;SE_Lat&quot;: 38.594407,
     &quot;SE_Long&quot;: 12.306751
   }
-]','2','1');
+]','3','1');
 INSERT INTO 'LAYERS' (ID,NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('904','Courants de mar&eacute;e 2D - Morte Eau - Pleine Mer Brest -6h','Ce produit contient, sous forme maill&eacute;e, l’ensemble des fichiers num&eacute;riques du Shom relatif aux courants de mar&eacute;e des c&ocirc;tes fran&ccedil;aises m&eacute;tropolitaines de la Manche et de la fa&ccedil;ade Atlantique. Ces fichiers num&eacute;riques indiquent les composantes du courant de mar&eacute;e de surface, heure par heure et pour deux coefficients de mar&eacute;e caract&eacute;ristiques (45 et 95) ainsi que les vitesses de courant maximales en vive-eau moyenne. Pour la visualisation, le port de r&eacute;f&eacute;rence est le port de Brest. Les points de courant contenus dans les fichiers correspondent aux fl&egrave;ches repr&eacute;sent&eacute;es sur les atlas de courant.
 Legende : https://services.data.shom.fr/static/legends/FR/COURANTS_2D/legende_C2D.png','Cartes marines','France','COURANTS2D_WMTS_MEAV6_3857','https://services.data.shom.fr/clevisu/wmts?layer=COURANTS2D_WMTS_MEAV6_3857&amp;style=normal&amp;tilematrixset=3857&amp;Service=WMTS&amp;Request=GetTile&amp;Version=1.0.0&amp;Format=image&percnt;2Fpng&amp;TileMatrix={z}&amp;TileCol={x}&amp;TileRow={y}','4','17','png','Shom','data.shom.fr',NULL,'256','0','function getTile(args) {
     return args;
@@ -14708,20 +14658,6 @@ function getPreview(args) {
     args.url = &quot;https://i.ibb.co/fkkHqjc/cartes-ign-courbes-de-niveau-Toul-15.jpg&quot;
     return args;
 }','Visible','{&quot;BackgroundColor&quot;:&quot;&quot;}',NULL,'2','1');
-INSERT INTO 'LAYERS' (ID,NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('991','OSM Liberty (customisable)','- Editor : https://maputnik.github.io/editor/','Cartes','*','OSM Liberty (customisable)','https://api.maptiler.com/tiles/v3/{z}/{x}/{y}.pbf?key=KDhMfHvorAFkFe64wlZb','0','15','pbf','maptiler','maptiler.com','https://maputnik.github.io/osm-liberty/style.json','512','0','function getTile(args) {
-    return args;
-}
-function getPreview(args) {
-    args.url = &quot;https://i.ibb.co/cc43wMv/osm-liberty-customisable-Paris-14.jpg&quot;
-    return args;
-}','Visible','{&quot;BackgroundColor&quot;:&quot;&quot;}',NULL,'2','1');
-INSERT INTO 'LAYERS' (ID,NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('992','Klokantech Basic (customisable)','- Editor : https://maputnik.github.io/editor/','Cartes','*','Klokantech Basic (customisable)','https://api.maptiler.com/tiles/v3/{z}/{x}/{y}.pbf?key=KDhMfHvorAFkFe64wlZb','0','15','pbf','maptiler','maptiler.com','https://cdn.jsdelivr.net/gh/openmaptiles/klokantech-basic-gl-style@v1.9/style.json','256','0','function getTile(args) {
-    return args;
-}
-function getPreview(args) {
-    args.url = &quot;https://i.ibb.co/C7qjSsR/klokantech-basic-customisable-Paris-14.jpg&quot;
-    return args;
-}','Visible','{&quot;BackgroundColor&quot;:&quot;&quot;}',NULL,'2','1');
 INSERT INTO 'LAYERS' (ID,NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('993','Bing Microsoft-Hybrid',NULL,'/','*','Bing Microsoft-Hybrid','http://ecn.dynamic.t2.tiles.virtualearth.net/comp/ch/{quadkey}?it=A,G,L','1','19','jpeg','Bing','https://www.bing.com/maps/',NULL,'256','0','//default script
 function getTile(args) {
     args.quadkey = getQuadKey(args.x, args.y,args.z);
@@ -15134,7 +15070,7 @@ get on https://nakarte.me/','Cartes','*','Google Maps - Street View Map','https:
 function getTile(args) {
    return args;
 }','Visible','{&quot;BackgroundColor&quot;:&quot;&quot;}',NULL,'2','1');
-INSERT INTO 'LAYERS' (ID,NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('1005','Bing Microsoft-Batiments',NULL,'/','*','Bing Microsoft-Batiments','https://t.ssl.ak.dynamic.tiles.virtualearth.net/comp/ch/{quadkey}?mkt=fr-FR&amp;it=z,bf','16','19','jpeg','Bing','https://www.bing.com/maps/',NULL,'256','0','//default script
+INSERT INTO 'LAYERS' (ID,NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('1005','Bing Microsoft-Batiments',NULL,'/','World','Bing Microsoft-Batiments','https://t.ssl.ak.dynamic.tiles.virtualearth.net/comp/ch/{quadkey}?mkt=fr-FR&amp;it=z,bf','16','19','png','Bing','https://www.bing.com/maps/',NULL,'256','0','//default script
 function getTile(args) {
     args.quadkey = getQuadKey(args.x, args.y,args.z);
    return args;
@@ -15155,7 +15091,7 @@ function getQuadKey(x, y, z) {
             quadKey.push(digit);
         }
         return quadKey.join(&apos;&apos;);
-    }','Visible','{&quot;BackgroundColor&quot;:&quot;&quot;,&quot;ErrorsToIgnore&quot;:&quot;&quot;}',NULL,'1','1');
+    }','Visible','{&quot;BackgroundColor&quot;:&quot;#111&quot;,&quot;ErrorsToIgnore&quot;:&quot;&quot;,&quot;MaxDownloadTilesInParralele&quot;:0,&quot;WaitingBeforeStartAnotherTile&quot;:0}',NULL,'2','1');
 INSERT INTO 'LAYERS' (ID,NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('1006','Bing Microsoft-Hybrid (No label)',NULL,'/','*','Bing Microsoft-Hybrid (No label)','http://ecn.dynamic.t2.tiles.virtualearth.net/comp/ch/{quadkey}?it=A,G','1','19','jpeg','Bing','https://www.bing.com/maps/',NULL,'256','0','//default script
 function getTile(args) {
     args.quadkey = getQuadKey(args.x, args.y,args.z);
@@ -15945,10 +15881,6 @@ INSERT INTO 'LAYERS' (ID,NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,M
 function getTile(args) {
    return args;
 }','Visible','{&quot;BackgroundColor&quot;:&quot;&quot;,&quot;ErrorsToIgnore&quot;:&quot;&quot;,&quot;MaxDownloadTilesInParralele&quot;:0,&quot;WaitingBeforeStartAnotherTile&quot;:0}',NULL,'2','1');
-INSERT INTO 'LAYERS' (ID,NAME,DESCRIPTION,CATEGORY,COUNTRY,IDENTIFIER,TILE_URL,MIN_ZOOM,MAX_ZOOM,FORMAT,SITE,SITE_URL,STYLE,TILE_SIZE,FAVORITE,SCRIPT,VISIBILITY,SPECIALSOPTIONS,RECTANGLES,VERSION,HAS_SCALE) VALUES ('1036','World Topo Map caca','This map is designed to be used as a basemap by GIS professionals and as a reference map by anyone. The map includes administrative boundaries, cities, water features, physiographic features, parks, landmarks, highways, roads, railways, and airports overlaid on land cover and shaded relief imagery for added context. The map provides coverage for the world down to a scale of ~1:72k. Coverage is provided down to ~1:4k for the following areas: Australia and New Zealand; India; Europe; Canada; Mexico; the continental United States and Hawaii; South America and Central America; Africa; and most of the Middle East. Coverage down to ~1:1k and ~1:2k is available in select urban areas. This basemap was compiled from a variety of best available sources from several data providers, including the U.S. Geological Survey (USGS), U.S. Environmental Protection Agency (EPA), U.S. National Park Service (NPS), Food and Agriculture Organization of the United Nations (FAO), Department of Natural Resources Canada (NRCAN), GeoBase, Agriculture and Agri-Food Canada, Garmin, HERE, Esri, OpenStreetMap contributors, and the GIS User Community. For more information on this map, including our terms of use, visit us online at http://goto.arcgisonline.com/maps/World_Topo_Map','Cartes','*','ARCGIS_World_Topo_Map','https://services.arcgisonline.com/arcgis/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}','0','19','jpeg','ArcGIS','www.arcgis.com',NULL,'256','0','//default script
-function getTile(args) {
-   return args;
-}','Visible','{&quot;BackgroundColor&quot;:&quot;&quot;,&quot;ErrorsToIgnore&quot;:&quot;&quot;}',NULL,'2','1');
-PRAGMA user_version=8;
+PRAGMA user_version=9;
 COMMIT;
  
