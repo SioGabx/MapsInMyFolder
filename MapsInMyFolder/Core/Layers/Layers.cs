@@ -1,4 +1,5 @@
-﻿using MapsInMyFolder.Commun;
+﻿using Esprima.Ast;
+using MapsInMyFolder.Commun;
 using MapsInMyFolder.MapControl;
 using System;
 using System.Collections.Generic;
@@ -65,6 +66,8 @@ namespace MapsInMyFolder
         }
 
         public static Layers Current { get; set; } = Empty();
+
+        public static event LayerEventHandler CurrentLayerChanged;
 
         public static int StartupLayerId { get; set; } = Settings.layer_startup_id;
 
@@ -204,6 +207,7 @@ namespace MapsInMyFolder
             if (layer is not null)
             {
                 Convert.ToCurentLayer(layer);
+                CurrentLayerChanged?.Invoke(id, new LayersEventArgs(layer));
             }
         }
 

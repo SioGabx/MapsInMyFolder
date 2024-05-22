@@ -11,7 +11,7 @@ namespace MapsInMyFolder.VectorTileRenderer
         public VectorTile ApplyExtent(Rect extent)
         {
             VectorTile newTile = new VectorTile();
-            newTile.IsOverZoomed = this.IsOverZoomed;
+            newTile.IsOverZoomed = IsOverZoomed;
 
             foreach (var layer in Layers)
             {

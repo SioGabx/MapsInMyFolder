@@ -232,12 +232,12 @@ namespace MapsInMyFolder
             Instance.MainPage.MapLoad();
             Instance.MainPage.LayerPanel.Init();
             Instance.MainPage.InitDownloadPanel();
-            Instance.MainPage.SetCurrentLayer(Layers.Current.Id);
+            Layers.SetCurrentLayer(Layers.Current.Id);
         }
 
         private void Window_ContentRendered(object sender, EventArgs e)
         {
-            MainPage.SetCurrentLayer(Layers.StartupLayerId);
+            Layers.SetCurrentLayer(Layers.StartupLayerId);
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)

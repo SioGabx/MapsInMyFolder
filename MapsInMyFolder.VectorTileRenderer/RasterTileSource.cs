@@ -5,11 +5,11 @@ namespace MapsInMyFolder.VectorTileRenderer.Sources
 {
     public class RasterTileSource : ITileSource
     {
-        public string Path { get; private set; }
+        public string Path { get; }
 
         public RasterTileSource(string path)
         {
-            this.Path = path;
+            Path = path;
         }
 
 #pragma warning disable CS1998 // Cette méthode async n'a pas d'opérateur 'await' et elle s'exécutera de façon synchrone

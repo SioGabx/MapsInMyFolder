@@ -125,7 +125,7 @@ namespace MapsInMyFolder.VectorTileRenderer
             return null;
         }
 
-        static Rect getLineRect(List<Point> polyLine)
+        static Rect GetLineRect(List<Point> polyLine)
         {
             double minX = double.MaxValue;
             double minY = double.MaxValue;
@@ -158,7 +158,7 @@ namespace MapsInMyFolder.VectorTileRenderer
 
         public static List<Point> ClipPolyline(List<Point> polyLine, Rect bounds)
         {
-            var lineRect = getLineRect(polyLine);
+            var lineRect = GetLineRect(polyLine);
 
             if (!bounds.IntersectsWith(lineRect))
             {
@@ -178,9 +178,11 @@ namespace MapsInMyFolder.VectorTileRenderer
                 {
                     if (newLine == null)
                     {
-                        newLine = new List<Point>();
-                        newLine.Add(newSegment.Item1);
-                        newLine.Add(newSegment.Item2);
+                        newLine = new List<Point>
+                        {
+                            newSegment.Item1,
+                            newSegment.Item2
+                        };
                     }
                     else
                     {
@@ -194,9 +196,6 @@ namespace MapsInMyFolder.VectorTileRenderer
                             newLine.Add(newSegment.Item2);
                         }
                     }
-                }
-                else
-                {
                 }
             }
 

@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace MapsInMyFolder.VectorTileRenderer
 {
-    class SkiaGL
+    static class SkiaGL
     {
         internal static class Gles
         {

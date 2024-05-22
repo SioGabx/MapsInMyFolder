@@ -66,6 +66,12 @@ namespace MapsInMyFolder
             LayerPanel.Init();
             isInitialised = true;
             Notification.UpdateNotification += UpdateNotification;
+            Layers.CurrentLayerChanged += OnCurrentLayerChange;
+        }
+
+        private void OnCurrentLayerChange(object sender, Layers.LayersEventArgs e)
+        {
+            RefreshMap();
         }
 
         private async void Map_panel_open_location_panel_Click(object sender, RoutedEventArgs e)
@@ -402,18 +408,12 @@ namespace MapsInMyFolder
 
         private void LayerPanel_SetCurrentLayerEvent(object sender, UserControls.LayersPanel.LayerIdEventArgs e)
         {
-            SetCurrentLayer(e.LayerId);
-        }
-
-        public void SetCurrentLayer(int id)
-        {
-            Layers.SetCurrentLayer(id);
-            Layers.SetMapLayer(Layers.Current, mapviewer, MapTileLayer_Transparent, MapFigures, mapviewerRectangles);
+            Layers.SetCurrentLayer(e.LayerId);
         }
 
         public void RefreshMap()
         {
-            SetCurrentLayer(Layers.Current.Id);
+            Layers.SetMapLayer(Layers.Current, mapviewer, MapTileLayer_Transparent, MapFigures, mapviewerRectangles);
         }
         public void RequestReloadPage()
         {
@@ -521,7 +521,7 @@ namespace MapsInMyFolder
                 }
 
                 RequestReloadPage();
-                SetCurrentLayer(Layers.Current.Id);
+                Layers.SetCurrentLayer(Layers.Current.Id);
             }
         }
 

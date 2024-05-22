@@ -41,9 +41,9 @@ namespace MapsInMyFolder.VectorTileRenderer
 
     public class GlobalMercator
     {
-        private int tileSize;
-        private double initialResolution;
-        private double originShift;
+        private readonly int tileSize;
+        private readonly double initialResolution;
+        private readonly double originShift;
         public class CoordinatePair
         {
             public double X { get; set; }
@@ -66,9 +66,9 @@ namespace MapsInMyFolder.VectorTileRenderer
 
         public GlobalMercator()
         {
-            this.tileSize = 256;
-            this.initialResolution = 2 * Math.PI * 6378137 / tileSize;
-            this.originShift = 2 * Math.PI * 6378137 / 2.0;
+            tileSize = 256;
+            initialResolution = 2 * Math.PI * 6378137 / tileSize;
+            originShift = 2 * Math.PI * 6378137 / 2.0;
         }
 
         public CoordinatePair LatLonToMeters(double lat, double lon)
@@ -76,15 +76,15 @@ namespace MapsInMyFolder.VectorTileRenderer
             CoordinatePair retval = new CoordinatePair();
             try
             {
-                retval.X = lon * this.originShift / 180.0;
+                retval.X = lon * originShift / 180.0;
                 retval.Y = Math.Log(Math.Tan((90 + lat) * Math.PI / 360.0)) / (Math.PI / 180.0);
 
-                retval.Y *= this.originShift / 180.0;
+                retval.Y *= originShift / 180.0;
                 return retval;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                throw ex;
+                throw;
             }
         }
 
@@ -93,15 +93,15 @@ namespace MapsInMyFolder.VectorTileRenderer
             CoordinatePair retval = new CoordinatePair();
             try
             {
-                retval.X = mx / this.originShift * 180.0;
-                retval.Y = my / this.originShift * 180.0;
+                retval.X = mx / originShift * 180.0;
+                retval.Y = my / originShift * 180.0;
 
                 retval.Y = 180 / Math.PI * ((2 * Math.Atan(Math.Exp(retval.Y * Math.PI / 180.0))) - (Math.PI / 2.0));
                 return retval;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                throw ex;
+                throw;
             }
         }
 
@@ -111,13 +111,13 @@ namespace MapsInMyFolder.VectorTileRenderer
             try
             {
                 var res = Resolution(zoom);
-                retval.X = (px * res) - this.originShift;
-                retval.Y = (py * res) - this.originShift;
+                retval.X = (px * res) - originShift;
+                retval.Y = (py * res) - originShift;
                 return retval;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                throw ex;
+                throw;
             }
         }
 
@@ -127,13 +127,13 @@ namespace MapsInMyFolder.VectorTileRenderer
             try
             {
                 var res = Resolution(zoom);
-                retval.X = (mx + this.originShift) / res;
-                retval.Y = (my + this.originShift) / res;
+                retval.X = (mx + originShift) / res;
+                retval.Y = (my + originShift) / res;
                 return retval;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                throw ex;
+                throw;
             }
         }
 
@@ -142,92 +142,84 @@ namespace MapsInMyFolder.VectorTileRenderer
             TileAddress retval = new TileAddress();
             try
             {
-                retval.X = (int)(Math.Ceiling(Convert.ToDouble(px / this.tileSize)) - 1);
-                retval.Y = (int)(Math.Ceiling(Convert.ToDouble(py / this.tileSize)) - 1);
+                retval.X = (int)(Math.Ceiling(Convert.ToDouble(px / tileSize)) - 1);
+                retval.Y = (int)(Math.Ceiling(Convert.ToDouble(py / tileSize)) - 1);
                 return retval;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                throw ex;
+                throw;
             }
         }
 
         public TileAddress MetersToTile(double mx, double my, int zoom)
         {
-            TileAddress retval = new TileAddress();
             try
             {
-                var p = this.MetersToPixels(mx, my, zoom);
-                retval = this.PixelsToTile(p.X, p.Y);
-                return retval;
+                var p = MetersToPixels(mx, my, zoom);
+                return PixelsToTile(p.X, p.Y);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                throw ex;
+                throw;
             }
         }
 
         public TileAddress LatLonToTile(double lat, double lon, int zoom)
         {
-            TileAddress retval = new TileAddress();
             try
             {
-                var m = this.LatLonToMeters(lat, lon);
-                retval = this.MetersToTile(m.X, m.Y, zoom);
-                return retval;
+                var m = LatLonToMeters(lat, lon);
+                return MetersToTile(m.X, m.Y, zoom);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                throw ex;
+                throw;
             }
         }
 
         public TileAddress LatLonToTileXYZ(double lat, double lon, int zoom)
         {
-            TileAddress retval = new TileAddress();
+            TileAddress retval;
             try
             {
-                var m = this.LatLonToMeters(lat, lon);
-                retval = this.MetersToTile(m.X, m.Y, zoom);
+                var m = LatLonToMeters(lat, lon);
+                retval = MetersToTile(m.X, m.Y, zoom);
                 retval.Y = (int)Math.Pow(2, zoom) - retval.Y - 1;
                 return retval;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                throw ex;
+                throw;
             }
         }
 
         public GeoExtent TileBounds(int tx, int ty, int zoom)
         {
-            GeoExtent retval = new GeoExtent();
             try
             {
-                var min = this.PixelsToMeters(tx * this.tileSize, ty * this.tileSize, zoom);
-                var max = this.PixelsToMeters((tx + 1) * this.tileSize, (ty + 1) * this.tileSize, zoom);
-                retval = new GeoExtent() { North = max.Y, South = min.Y, East = max.X, West = min.X };
-                return retval;
+                var min = PixelsToMeters(tx * tileSize, ty * tileSize, zoom);
+                var max = PixelsToMeters((tx + 1) * tileSize, (ty + 1) * tileSize, zoom);
+                return new GeoExtent() { North = max.Y, South = min.Y, East = max.X, West = min.X };
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                throw ex;
+                throw;
             }
         }
 
         public GeoExtent TileLatLonBounds(int tx, int ty, int zoom)
         {
-            GeoExtent retval = new GeoExtent();
             try
             {
-                var bounds = this.TileBounds(tx, ty, zoom);
-                var min = this.MetersToLatLon(bounds.West, bounds.South);
-                var max = this.MetersToLatLon(bounds.East, bounds.North);
-                retval = new GeoExtent() { North = max.Y, South = min.Y, East = max.X, West = min.X };
-                return retval;
+                var bounds = TileBounds(tx, ty, zoom);
+                var min = MetersToLatLon(bounds.West, bounds.South);
+                var max = MetersToLatLon(bounds.East, bounds.North);
+                return new GeoExtent() { North = max.Y, South = min.Y, East = max.X, West = min.X };
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                throw ex;
+                throw;
             }
         }
 
@@ -240,9 +232,9 @@ namespace MapsInMyFolder.VectorTileRenderer
                 retval.Y = Convert.ToInt32(Math.Pow(2, zoom) - 1 - ty);
                 return retval;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                throw ex;
+                throw;
             }
         }
 
@@ -259,7 +251,7 @@ namespace MapsInMyFolder.VectorTileRenderer
                     var mask = 1 << (i - 1);
 
                     if ((tx & mask) != 0)
-                        digit += 1;
+                        digit++;
 
                     if ((ty & mask) != 0)
                         digit += 2;
@@ -269,9 +261,9 @@ namespace MapsInMyFolder.VectorTileRenderer
 
                 return retval;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                throw ex;
+                throw;
             }
         }
 
@@ -302,33 +294,30 @@ namespace MapsInMyFolder.VectorTileRenderer
                 retval.Y = ty;
                 return retval;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                throw ex;
+                throw;
             }
         }
 
         public string LatLonToQuadTree(double lat, double lon, int zoom)
         {
-            string retval = "";
             try
             {
-                var m = this.LatLonToMeters(lat, lon);
-                var t = this.MetersToTile(m.X, m.Y, zoom);
+                var m = LatLonToMeters(lat, lon);
+                var t = MetersToTile(m.X, m.Y, zoom);
 
-                retval = this.QuadTree(Convert.ToInt32(t.X), Convert.ToInt32(t.Y), zoom);
-
-                return retval;
+                return QuadTree(Convert.ToInt32(t.X), Convert.ToInt32(t.Y), zoom);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                throw ex;
+                throw;
             }
         }
 
         private double Resolution(int zoom)
         {
-            return this.initialResolution / (1 << zoom);
+            return initialResolution / (1 << zoom);
         }
     }
 }

@@ -889,7 +889,7 @@ namespace MapsInMyFolder.VectorTileRenderer
             //surface.Canvas.Flush();
             //grContext.
 
-            bitmap.AddDirtyRect(new Int32Rect(0, 0, this.width, this.height));
+            bitmap.AddDirtyRect(new Int32Rect(0, 0, width, height));
             bitmap.Unlock();
             bitmap.Freeze();
 

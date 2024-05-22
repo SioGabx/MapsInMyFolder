@@ -181,7 +181,7 @@ namespace MapsInMyFolder.Commun
                     }
                     else
                     {
-                        throw ex;
+                        throw;
                     }
                 }
             } while (HasError);
@@ -315,14 +315,14 @@ namespace MapsInMyFolder.Commun
                 if (filinfo.Length == 0)
                 {
                     Debug.WriteLine("DB Taille corrompu");
-                   DB_AskDownload(true);
+                   _ =DB_AskDownload(true);
                     return null;
                 }
             }
             else
             {
                 Debug.WriteLine("DB Le fichier n'existe pas");
-                DB_AskDownload();
+                _ = DB_AskDownload();
                 return null;
             }
             SQLiteConnection connection = DB_OpenConnection(dbFile);

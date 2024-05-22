@@ -850,7 +850,7 @@ namespace MapsInMyFolder
             Leave();
             if (Layers.Current.Id == LayerId)
             {
-                MainPage.Instance.SetCurrentLayer(Layers.Current.Id);
+                Layers.SetCurrentLayer(Layers.Current.Id);
             }
         }
 
@@ -1002,6 +1002,7 @@ namespace MapsInMyFolder
             TextboxLayerScriptConsoleSender.PreviewKeyDown -= TextboxLayerScriptConsoleSender_KeyDown;
             //make sure to reload base layer if curent layer is png
             Layers.Current.TilesFormat = "jpeg";
+            Layers.SetCurrentLayer(Layers.Current.Id);
         }
 
         System.Timers.Timer UpdateTimer;

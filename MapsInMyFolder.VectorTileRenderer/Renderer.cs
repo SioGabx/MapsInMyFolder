@@ -181,7 +181,7 @@ namespace MapsInMyFolder.VectorTileRenderer
         //    }
         //}
 
-        public async static Task<MapsInMyFolder.VectorTileRenderer.Renderer.ICanvasCollisions> Render(Style style, ICanvas canvas, int x, int y, double zoom, double scale = 1, List<string> whiteListLayers = null, ROptions options = null, Collisions collisions = null)
+        public static async Task<MapsInMyFolder.VectorTileRenderer.Renderer.ICanvasCollisions> Render(Style style, ICanvas canvas, int x, int y, double zoom, double scale = 1, List<string> whiteListLayers = null, ROptions options = null, Collisions collisions = null)
         {
             Dictionary<Source, Stream> rasterTileCache = new Dictionary<Source, Stream>();
             Dictionary<Source, VectorTile> vectorTileCache = new Dictionary<Source, VectorTile>();
@@ -455,12 +455,13 @@ namespace MapsInMyFolder.VectorTileRenderer
                         }
                         else if (feature.GeometryType == "Unknown")
                         {
-                            Debug.WriteLine("Draw unknown 2 " + feature.Attributes.ToString());
+                            Debug.WriteLine("Draw unknown 2 " + feature.Attributes);
                             canvas.DrawUnknown(geometry, brush);
                         }
                     }
-                    catch (Exception)
+                    catch (Exception ex)
                     {
+                        Debug.WriteLine(ex.ToString());
                     }
                 }
                 else if (layer.Type == VisualLayerType.Raster)
@@ -483,7 +484,7 @@ namespace MapsInMyFolder.VectorTileRenderer
                     var originalgeometry = layer.OriginalGeometry;
                     var brush = layer.Brush;
 
-                    string hatch = brush.Layer.SourceLayer + brush.Text + brush.ZIndex.ToString() + brush.Paint + originalgeometry.ToString();
+                    string hatch = brush.Layer.SourceLayer + brush.Text + brush.ZIndex.ToString() + brush.Paint + originalgeometry;
                     int hatchCode = hatch.GetHashCode();
 
                     var attributesDict = feature.Attributes.ToDictionary(key => key.Key, value => value.Value);

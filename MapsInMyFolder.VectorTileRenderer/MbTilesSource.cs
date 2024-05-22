@@ -19,19 +19,19 @@ namespace MapsInMyFolder.VectorTileRenderer.Sources
         public string Name { get; private set; }
         public string Description { get; private set; }
         public string MBTilesVersion { get; private set; }
-        public string Path { get; private set; }
+        public string Path { get; }
 
-        ConcurrentDictionary<string, VectorTile> tileCache = new ConcurrentDictionary<string, VectorTile>();
+        readonly ConcurrentDictionary<string, VectorTile> tileCache = new ConcurrentDictionary<string, VectorTile>();
 
-        private GlobalMercator gmt = new GlobalMercator();
+        private readonly GlobalMercator gmt = new GlobalMercator();
 
         SQLiteConnection sharedConnection;
 
         public MbTilesSource(string path)
         {
-            this.Path = path;
+            Path = path;
 
-            sharedConnection = new SQLiteConnection(String.Format("Data Source={0};Version=3;Mode=ReadOnly", this.Path));
+            sharedConnection = new SQLiteConnection(String.Format("Data Source={0};Version=3;Mode=ReadOnly", Path));
             sharedConnection.Open();
 
             LoadMetadata();
@@ -52,27 +52,27 @@ namespace MapsInMyFolder.VectorTileRenderer.Sources
                             case "bounds":
                                 string val = reader["value"].ToString();
                                 string[] vals = val.Split(new char[] { ',' });
-                                this.Bounds = new GlobalMercator.GeoExtent() { West = Convert.ToDouble(vals[0]), South = Convert.ToDouble(vals[1]), East = Convert.ToDouble(vals[2]), North = Convert.ToDouble(vals[3]) };
+                                Bounds = new GlobalMercator.GeoExtent() { West = Convert.ToDouble(vals[0]), South = Convert.ToDouble(vals[1]), East = Convert.ToDouble(vals[2]), North = Convert.ToDouble(vals[3]) };
                                 break;
                             case "center":
                                 val = reader["value"].ToString();
                                 vals = val.Split(new char[] { ',' });
-                                this.Center = new GlobalMercator.CoordinatePair() { X = Convert.ToDouble(vals[0]), Y = Convert.ToDouble(vals[1]) };
+                                Center = new GlobalMercator.CoordinatePair() { X = Convert.ToDouble(vals[0]), Y = Convert.ToDouble(vals[1]) };
                                 break;
                             case "minzoom":
-                                this.MinZoom = Convert.ToInt32(reader["value"]);
+                                MinZoom = Convert.ToInt32(reader["value"]);
                                 break;
                             case "maxzoom":
-                                this.MaxZoom = Convert.ToInt32(reader["value"]);
+                                MaxZoom = Convert.ToInt32(reader["value"]);
                                 break;
                             case "name":
-                                this.Name = reader["value"].ToString();
+                                Name = reader["value"].ToString();
                                 break;
                             case "description":
-                                this.Description = reader["value"].ToString();
+                                Description = reader["value"].ToString();
                                 break;
                             case "version":
-                                this.MBTilesVersion = reader["value"].ToString();
+                                MBTilesVersion = reader["value"].ToString();
                                 break;
                         }
                     }

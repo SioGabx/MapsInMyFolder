@@ -14,12 +14,12 @@ namespace MapsInMyFolder.VectorTileRenderer.Sources
 
         public PbfTileSource(string path)
         {
-            this.Path = path;
+            Path = path;
         }
 
         public PbfTileSource(Stream stream)
         {
-            this.Stream = stream;
+            Stream = stream;
         }
 
 #pragma warning disable CS1998 // Cette méthode async n'a pas d'opérateur 'await' et elle s'exécutera de façon synchrone

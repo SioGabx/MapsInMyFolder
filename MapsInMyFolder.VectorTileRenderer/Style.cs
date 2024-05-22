@@ -402,7 +402,7 @@ namespace MapsInMyFolder.VectorTileRenderer
             {
                 ZIndex = index,
                 Layer = layer,
-                GlyphsDirectory = this.FontDirectory
+                GlyphsDirectory = FontDirectory
             };
 
             var paint = new Paint();
@@ -555,7 +555,7 @@ namespace MapsInMyFolder.VectorTileRenderer
                     try
                     {
                         string valuefield = Convert.ToString(GetValue(layoutData["text-field"], attributes));
-                        if (valuefield.ToString() != "System.Object[]")
+                        if (valuefield != "System.Object[]")
                         {
                             brush.TextField = valuefield;
                             brush.Text = Regex.Replace(brush.TextField, @"\{([A-Za-z0-9\-\:_]+)\}", (Match m) =>
