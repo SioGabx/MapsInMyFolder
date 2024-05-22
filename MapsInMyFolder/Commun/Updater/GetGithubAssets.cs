@@ -3,6 +3,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 
 namespace MapsInMyFolder.Commun
@@ -188,12 +189,16 @@ namespace MapsInMyFolder.Commun
 
                 foreach (var file in files)
                 {
-                    if (file.Name == filename)
+                    if (string.Equals(file.Name.Trim(), filename.Trim()))
                     {
                         return file;
                     }
                 }
-                Debug.WriteLine("Fichier non trouvé : " + filename);
+                Debug.WriteLine($"Fichier non trouvé sur Github : {filename}\n");
+                using (StreamWriter writer = new StreamWriter(System.IO.Path.Combine(Settings.temp_folder, $"github_files_{DateTime.Now.Ticks}.json")))
+                {
+                    writer.Write(responseBody);
+                }
             }
             return null;
         }

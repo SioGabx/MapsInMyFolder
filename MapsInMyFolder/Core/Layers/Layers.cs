@@ -711,7 +711,7 @@ namespace MapsInMyFolder
                     return HttpUtility.UrlEncode(url);
                 }
 
-                bool UseReferrerForPreviews = true;
+                const bool UseReferrerForPreviews = true;
 
                 string previewReferrer = Collectif.AddHttpToUrl(layer?.SiteUrl);
                 string previewBackgroundReferrer = Collectif.AddHttpToUrl(backgroundLayer?.SiteUrl);

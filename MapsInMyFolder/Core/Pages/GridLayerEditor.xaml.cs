@@ -180,7 +180,7 @@ namespace MapsInMyFolder
         {
             var OriginalLayer = _items.GetLayerById(e.Layer.Id);
             var Index = _items.IndexOf(OriginalLayer);
-            if (Index == -1)
+            if (Index != -1)
             {
                 //Item is found inside the list (editing)
                 _items.Remove(OriginalLayer);

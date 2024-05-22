@@ -66,6 +66,7 @@ namespace MapsInMyFolder.Commun.Capabilities
 
                 List<string> ListOfKeywords = new List<string>();
                 XElement Keywords = layerElement.Element(ows + "Keywords");
+                if (Keywords != null) { 
                 foreach(XElement keyWord in Keywords?.Elements(ows + "Keyword"))
                 {
                     string Word = keyWord?.Value;
@@ -73,6 +74,7 @@ namespace MapsInMyFolder.Commun.Capabilities
                     {
                         ListOfKeywords.Add(Word);
                     }
+                }
                 }
 
                 XElement boundingBoxElement = layerElement.Element(ows + "WGS84BoundingBox");
