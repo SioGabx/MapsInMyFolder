@@ -154,8 +154,8 @@ namespace MapsInMyFolder
             {
                 Debug.WriteLine(ex.ToString());
             }
-            working_folder.Text = Settings.working_folder;
-            temp_folder.Text = Settings.temp_folder;
+            working_folder.Text = Settings.working_folder.Trim();
+            temp_folder.Text = Settings.temp_folder.Trim();
             max_retry_download.Text = Settings.max_retry_download.ToString();
             max_redirection_download_tile.Text = Settings.max_redirection_download_tile.ToString();
             tiles_cache_expire_after_x_days.Text = Settings.tiles_cache_expire_after_x_days.ToString();
@@ -193,11 +193,11 @@ namespace MapsInMyFolder
                 }
             }
 
-            database_pathname.Text = Settings.database_pathname;
+            database_pathname.Text = Settings.database_pathname.Trim();
             selection_rectangle_resize_tblr_gap.Text = Settings.selection_rectangle_resize_tblr_gap.ToString();
             selection_rectangle_resize_angle_gap.Text = Settings.selection_rectangle_resize_angle_gap.ToString();
-            github_repository_url.Text = Settings.github_repository_url;
-            github_database_name.Text = Settings.github_database_name;
+            github_repository_url.Text = Settings.github_repository_url.Trim();
+            github_database_name.Text = Settings.github_database_name.Trim();
             is_in_debug_mode.IsChecked = Settings.is_in_debug_mode;
             show_layer_devtool.IsChecked = Settings.show_layer_devtool;
             show_download_devtool.IsChecked = Settings.show_download_devtool;
