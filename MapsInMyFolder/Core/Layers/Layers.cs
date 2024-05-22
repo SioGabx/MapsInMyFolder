@@ -182,7 +182,10 @@ namespace MapsInMyFolder
             }
         }
 
-
+        public static void RefreshCurrent()
+        {
+            Layers.SetCurrentLayer(Layers.Current.Id);
+        }
 
         public static void SetCurrentLayer(int id)
         {

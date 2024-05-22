@@ -705,7 +705,7 @@ namespace MapsInMyFolder
                 ShareStringKeyValues += $"'{KeyPair.Key}'='{KeyPair.Value}',";
             }
 
-            return ($"SET {ShareStringKeyValues.Trim(',')}");
+            return $"SET {ShareStringKeyValues.Trim(',')}";
         }
 
         private void SaveLayer()

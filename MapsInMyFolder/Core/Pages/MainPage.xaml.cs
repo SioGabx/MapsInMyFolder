@@ -521,7 +521,7 @@ namespace MapsInMyFolder
                 }
 
                 RequestReloadPage();
-                Layers.SetCurrentLayer(Layers.Current.Id);
+                Layers.RefreshCurrent();
             }
         }
 
