@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<PendingCommit>
-  <CommitComment>hhgh</CommitComment>
-  <PinnedBranches>
-    <PinnedBranch Name="refs/heads/redev" />
-  </PinnedBranches>
-  <PublishPrompt Enabled="True" />
-  <RepositorySorts />
-</PendingCommit>
