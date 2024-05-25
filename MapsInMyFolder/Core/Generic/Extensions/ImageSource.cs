@@ -27,7 +27,7 @@ namespace MapsInMyFolder.Core.Generic.Extensions
                                 150),
                             new System.Windows.Point(5, 5));
                     }
-                    Pen pen = new Pen(couleur, 1);
+                    Pen pen = new Pen(couleur, Thickness);
                     dc.DrawRectangle(Brushes.Transparent, pen, new System.Windows.Rect(0, 0, bitmapSource.PixelWidth, bitmapSource.PixelHeight));
                 }
                 RenderTargetBitmap targetBitmap = new RenderTargetBitmap(bitmapSource.PixelWidth, bitmapSource.PixelHeight, 96, 96, PixelFormats.Default);

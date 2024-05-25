@@ -2,7 +2,7 @@
 using System.Windows.Controls;
 using System.Windows.Input;
 
-namespace MapsInMyFolder.Core.View.Controls
+namespace MapsInMyFolder.View.Controls
 {
     /// <summary>
     /// Logique d'interaction pour ClickableLabel.xaml

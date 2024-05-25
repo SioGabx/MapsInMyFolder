@@ -1,0 +1,46 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:ui="http://schemas.modernwpf.com/2019">
+
+    <MenuItem
+        x:Key="ContextMenu_Copier"
+        x:Shared="false"
+        Command="{x:Static ApplicationCommands.Copy}"
+        Header="editorContextMenuCopy"
+        InputGestureText="Ctrl+C">
+        <MenuItem.Icon>
+            <ui:FontIcon Foreground="#888989" Glyph="&#xE16F;" />
+        </MenuItem.Icon>
+    </MenuItem>
+    <MenuItem
+        x:Key="ContextMenu_Couper"
+        x:Shared="false"
+        Command="{x:Static ApplicationCommands.Cut}"
+        Header="editorContextMenuCut"
+        InputGestureText="Ctrl+X">
+        <MenuItem.Icon>
+            <ui:FontIcon Foreground="#888989" Glyph="&#xE16B;" />
+        </MenuItem.Icon>
+    </MenuItem>
+    <MenuItem
+        x:Key="ContextMenu_Coller"
+        x:Shared="false"
+        Command="{x:Static ApplicationCommands.Paste}"
+        Header="editorContextMenuPaste"
+        InputGestureText="Ctrl+V">
+        <MenuItem.Icon>
+            <ui:FontIcon Foreground="#888989" Glyph="&#xE16D;" />
+        </MenuItem.Icon>
+    </MenuItem>
+
+    <ContextMenu
+        x:Key="CopyPasteContextMenu"
+        x:Name="CopyPasteContextMenu"
+        Background="#171719"
+        Foreground="#E2E2E1">
+        <StaticResourceExtension ResourceKey="ContextMenu_Copier" />
+        <StaticResourceExtension ResourceKey="ContextMenu_Couper" />
+        <StaticResourceExtension ResourceKey="ContextMenu_Coller" />
+    </ContextMenu>
+</ResourceDictionary>

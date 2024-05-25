@@ -36,15 +36,7 @@ namespace MapsInMyFolder.View.Controls.Map
                     Image.Opacity = 1d;
                 }
 
-                if (true)
-                {
-                    Image.Source = image.AddBorder(1, "Hello");
-                }
-                else
-                {
-                    Image.Source = image;
-                }
-
+                Image.Source = image;
             }
             catch (Exception ex)
             {

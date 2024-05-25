@@ -28,6 +28,9 @@ namespace MapsInMyFolder.View.Controls.Map
         public static readonly DependencyProperty MaxZoomLevelProperty = DependencyProperty.Register(
             nameof(MaxZoomLevel), typeof(int), typeof(MapTileLayer), new PropertyMetadata(19));
 
+        public static readonly DependencyProperty LayerIndexProperty = DependencyProperty.Register(
+            nameof(LayerIndex), typeof(int), typeof(MapTileLayer), new PropertyMetadata(0));
+
         public MapTileLayer()
             : this(new TileImageLoader())
         {
@@ -58,6 +61,12 @@ namespace MapsInMyFolder.View.Controls.Map
         {
             get { return (int)GetValue(MaxZoomLevelProperty); }
             set { SetValue(MaxZoomLevelProperty, value); }
+        }
+
+        public int LayerIndex
+        {
+            get { return (int)GetValue(LayerIndexProperty); }
+            set { SetValue(LayerIndexProperty, value); }
         }
 
         protected override Size MeasureOverride(Size availableSize)

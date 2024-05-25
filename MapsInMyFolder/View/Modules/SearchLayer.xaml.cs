@@ -5,7 +5,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 
-namespace MapsInMyFolder.Core.View.Modules
+namespace MapsInMyFolder.View.Modules
 {
     /// <summary>
     /// Logique d'interaction pour SearchLayer.xaml

@@ -1,29 +1,24 @@
 ﻿<Page
-    x:Class="MapsInMyFolder.MainPage"
+    x:Class="MapsInMyFolder.View.Layout.MainPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mapsinmyfolder="clr-namespace:MapsInMyFolder"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:viewControls="clr-namespace:MapsInMyFolder.Core.View.Controls"
-    xmlns:viewControls1="clr-namespace:MapsInMyFolder.View.Controls.Map"
-    xmlns:viewModules="clr-namespace:MapsInMyFolder.Core.View.Modules"
+    xmlns:viewControls="clr-namespace:MapsInMyFolder.View.Controls"
+    xmlns:map="clr-namespace:MapsInMyFolder.View.Controls.Map"
+    xmlns:viewModules="clr-namespace:MapsInMyFolder.View.Modules"
     Title="MainPage"
     d:DesignHeight="450"
     d:DesignWidth="800"
     mc:Ignorable="d">
-    <Page.Resources>
-        <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries />
-        </ResourceDictionary>
-    </Page.Resources>
     <Grid x:Name="MainPageGrid" Visibility="Visible">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="360" />
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
 
-        <Grid Grid.Column="0" Background="#FF171719">
+        <Grid Grid.Column="0" Background="{StaticResource MapsInMyFolder.BackgroundSecondary}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="65" />
                 <RowDefinition />
@@ -38,7 +33,7 @@
                 Content="Calques"
                 FontFamily="Segoe UI Light"
                 FontSize="30"
-                Foreground="#FFE2E2E1" />
+                Foreground="{StaticResource MapsInMyFolder.WhiteForeground}" />
             <Rectangle x:Name="LayerPanel" Grid.Row="1" />
 
         </Grid>
@@ -73,22 +68,22 @@
                     <ColumnDefinition Width="5" />
                 </Grid.ColumnDefinitions>
 
-                <!--<viewModules:SearchLocation
+                <viewModules:SearchLocation
                     x:Name="mapLocationSearchBar"
                     Margin="10,0,0,0"
                     FontSize="16"
                     SearchLostFocusRequest="MapLocationSearchBar_SearchLostFocusRequest"
                     SearchResultEvent="MapLocationSearchBar_SearchResultEvent"
                     SearchResultMap="{Binding ElementName=mapviewer}"
-                    SearchResultPushpin="{Binding ElementName=searchResult}" />-->
+                    SearchResultPushpin="{Binding ElementName=searchResult}" />
+                
                 <Button
-                    x:Name="map_panel_open_location_panel"
+                    x:Name="MapManualLocationMenu"
                     Grid.Column="1"
                     Height="26"
                     Margin="0,5,0,0"
                     HorizontalAlignment="Center"
                     VerticalAlignment="Top"
-                    Click="Map_panel_open_location_panel_Click"
                     Cursor="Hand"
                     Foreground="#FFE2E2E1"
                     Style="{DynamicResource IconButton}">
@@ -119,8 +114,8 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="15" />
                 </Grid.RowDefinitions>
-                <!--<viewControls1:Map
-                    x:Name="mapviewer"
+                <map:Map
+                    x:Name="MapViewer"
                     Grid.Row="0"
                     Grid.RowSpan="2"
                     Grid.Column="0"
@@ -129,41 +124,41 @@
                     MinHeight="30"
                     Margin="10,0,0,0"
                     Background="White"
-                    MouseWheel="Mapviewer_MouseWheel"
+                    MouseWheel="MapViewer_MouseWheel"
                     ZoomLevel="18">
 
-                    <viewControls1:Map.Center>
-                        <viewControls1:Location Latitude="0" Longitude="0" />
-                    </viewControls1:Map.Center>
-                    <viewControls1:Pushpin
-                        x:Name="SE_PIN"
+                    <map:Map.Center>
+                        <map:Location Latitude="0" Longitude="0" />
+                    </map:Map.Center>
+                    <map:Pushpin
+                        x:Name="SEPushpin"
                         Panel.ZIndex="999"
                         Background="#303031"
                         Foreground="#FFE2E2E1" />
-                    <viewControls1:Pushpin
-                        x:Name="NO_PIN"
+                    <map:Pushpin
+                        x:Name="NOPushpin"
                         Panel.ZIndex="999"
                         Background="#303031"
                         Foreground="#FFE2E2E1" />
-                    <viewControls1:Pushpin
-                        x:Name="searchResult"
+                    <map:Pushpin
+                        x:Name="SearchResultPushpin"
                         Panel.ZIndex="999"
                         Style="{DynamicResource PushpinStyleOrange}"
                         Visibility="Collapsed" />
 
-                    <viewControls1:MapTileLayer x:Name="MapTileLayer_Transparent" />
-                    <viewControls1:MapItemsControl x:Name="mapviewerRectangles" />
-                </viewControls1:Map>-->
-                <StackPanel
+                    <map:MapTileLayer x:Name="TransparentMapTileLayer" LayerIndex="1"/>
+                    <map:MapItemsControl x:Name="MapViewerRectangles" />
+                </map:Map>
+                <!--<StackPanel
                     x:Name="NotificationZone"
                     Grid.Row="0"
                     Grid.RowSpan="2"
                     Grid.Column="0"
                     Grid.ColumnSpan="2"
                     Margin="10,0,0,0"
-                    VerticalAlignment="Top" />
+                    VerticalAlignment="Top" />-->
                 <Button
-                    x:Name="StartDownloadButton"
+                    x:Name="ValidateAreaDownload"
                     Grid.Row="1"
                     Grid.Column="1"
                     Height="45"
@@ -189,13 +184,13 @@
                     Foreground="#e2e2e1"
                     Visibility="Hidden">
                     <Label.Content>
-                        <TextBlock Text="mapZoomLevelIndicator">
-                            <!--<TextBlock.Text>
+                        <TextBlock>
+                            <TextBlock.Text>
                                 <MultiBinding StringFormat="{}{0}: {1:0.#}">
-                                    <Binding Path="[mapZoomLevelIndicator]" Source="{x:Static commun:Languages.Current}"  />
-                                    <Binding ElementName="mapviewer" Path="ZoomLevel" />
+                                    <!--<Binding Path="[mapZoomLevelIndicator]" Source="{x:Static commun:Languages.Current}"  />-->
+                                    <Binding ElementName="MapViewer" Path="ZoomLevel" />
                                 </MultiBinding>
-                            </TextBlock.Text>-->
+                            </TextBlock.Text>
                         </TextBlock>
                     </Label.Content>
                 </Label>
@@ -311,5 +306,6 @@
                     Margin="0,0,0,0" />
             </Grid>
         </Grid>
+
     </Grid>
 </Page>

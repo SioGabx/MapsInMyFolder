@@ -1,4 +1,6 @@
-﻿using ModernWpf;
+﻿using MapsInMyFolder.Core.Layers;
+using MapsInMyFolder.View.Layout;
+using ModernWpf;
 using ModernWpf.Media.Animation;
 using System;
 using System.Diagnostics;
@@ -19,7 +21,16 @@ namespace MapsInMyFolder
         public MainWindow()
         {
             InitializeComponent();
-            ThemeManager.Current.ApplicationTheme = ApplicationTheme.Dark;
+
+            Init();
+        }
+
+        public void Init()
+        {
+            Debug.WriteLine("Version dotnet :" + Environment.Version.ToString());
+
+            MainContentFrame.Navigate(new MainPage());
+            Layer.Current = Layer.Default;
         }
 
 
@@ -40,16 +51,9 @@ namespace MapsInMyFolder
         }
 
 
-        public void Init()
-        {
-            Debug.WriteLine("Version dotnet :" + Environment.Version.ToString());
-
-        }
-
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-
         }
 
 
@@ -67,21 +71,13 @@ namespace MapsInMyFolder
         {
         }
 
-        private void Map_panel_open_download_panel_Click(object sender, RoutedEventArgs e)
-        {
-        }
-
-        private void Map_panel_open_settings_panel_Click(object sender, RoutedEventArgs e)
-        {
-        }
-
-        private void MainContentFrame_Navigating(object sender, NavigatingCancelEventArgs e)
-        {
-            if (e.NavigationMode == NavigationMode.New && e?.Uri != null)
-            {
-                Process.Start(new ProcessStartInfo(e.Uri.ToString()) { UseShellExecute = true });
-                e.Cancel = true;
-            }
-        }
+        //private void MainContentFrame_Navigating(object sender, NavigatingCancelEventArgs e)
+        //{
+        //    if (e.NavigationMode == NavigationMode.New && e?.Uri != null)
+        //    {
+        //        Process.Start(new ProcessStartInfo(e.Uri.ToString()) { UseShellExecute = true });
+        //        e.Cancel = true;
+        //    }
+        //}
     }
 }

@@ -5,7 +5,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:ui="http://schemas.modernwpf.com/2019"
-    Title="MainWindow"
+    Title="Re:MapsInMyFolder"
     Width="1160"
     Height="695"
     MinWidth="750"
@@ -43,11 +43,10 @@
         <Grid
             x:Name="AppTitleBar"
             Grid.Row="0"
-            ui:ThemeManager.RequestedTheme="Dark"
             Background="Black">
             <Grid.Style>
                 <Style TargetType="Grid">
-                    <Setter Property="TextElement.Foreground" Value="WhiteSmoke" />
+                    <Setter Property="TextElement.Foreground" Value="{StaticResource MapsInMyFolder.WhiteForeground}" />
                 </Style>
             </Grid.Style>
 
@@ -64,24 +63,22 @@
                 HorizontalAlignment="Left"
                 VerticalAlignment="Center"
                 FontFamily="Segoe UI Light"
-                FontSize="13" />
+                FontSize="13"
+                Text="MapsInMyFolder" />
 
             <StackPanel
-                x:Name="titlebar_buttons"
                 Grid.Column="2"
                 HorizontalAlignment="Right"
                 Orientation="Horizontal">
                 <ui:TitleBarButton
-                    x:Name="open_download_panel_titlebar_button"
+                    x:Name="AppTitleBarDownloadPanel"
                     Width="Auto"
                     Padding="16,0"
-                    Click="Map_panel_open_download_panel_Click"
                     FontFamily="Segoe UI Light"
                     FontSize="13"
                     Style="{StaticResource AppTitleBarButtonStyle}">
                     <StackPanel VerticalAlignment="Center" Orientation="Horizontal">
                         <Path
-                            x:Name="open_download_panel_titlebar_button_path"
                             MaxWidth="15"
                             MaxHeight="15"
                             HorizontalAlignment="Center"
@@ -97,7 +94,6 @@
                             StrokeStartLineCap="round"
                             StrokeThickness="0.8" />
                         <Label
-                            x:Name="open_download_panel_titlebar_button_label"
                             Margin="10,0,0,0"
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center"
@@ -111,9 +107,9 @@
                     Margin="0,8"
                     Fill="#333" />
                 <ui:TitleBarButton
-                    Padding="16,0"
-                    Click="Map_panel_open_settings_panel_Click"
+                    x:Name="AppTitleBarSetting"
                     Width="Auto"
+                    Padding="16,0"
                     FontFamily="Segoe UI Light"
                     FontSize="13"
                     Style="{StaticResource AppTitleBarButtonStyle}">
@@ -152,6 +148,6 @@
         <ui:Frame
             x:Name="MainContentFrame"
             Grid.Row="1"
-            Navigating="MainContentFrame_Navigating" />
+            Background="{StaticResource MapsInMyFolder.BackgroundPrimary}" />
     </Grid>
 </Window>

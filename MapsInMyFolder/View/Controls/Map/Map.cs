@@ -2,9 +2,13 @@
 // © 2022 Clemens Fischer
 // Licensed under the Microsoft Public License (Ms-PL)
 
+using MapsInMyFolder.Core.Layers;
 using System;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Input;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace MapsInMyFolder.View.Controls.Map
 {
@@ -37,6 +41,56 @@ namespace MapsInMyFolder.View.Controls.Map
             MouseDown += OnMouseDown;
             MouseUp += OnMouseUp;
         }
+
+        public void SetMapLayer(Layer FrontLayer, Layer BackLayer)
+        {
+
+            foreach (var item in Children)
+            {
+                Debug.WriteLine(item.GetType());
+                if (item is MapTileLayer Mtl && Mtl.LayerIndex > 0)
+                {
+                    if (FrontLayer.HasTransparency)
+                    {
+                        Mtl.TileSource = new TileSource() { Layer = FrontLayer };
+                    }
+                    else
+                    {
+                        Mtl.TileSource = new TileSource();
+                    }
+
+                    Debug.WriteLine("--");
+                    break;
+                }
+            }
+            if (FrontLayer.HasTransparency && !(MapLayer is MapTileLayer MlIsMtl && MlIsMtl.TileSource.Layer == BackLayer))
+            {
+                MapLayer = new MapTileLayer()
+                {
+                    LayerIndex = 0,
+                    TileSource = new TileSource() { Layer = BackLayer },
+                    SourceName = BackLayer.Identifier + new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds(),
+                    MaxZoomLevel = BackLayer.MaxZoom,
+                    MinZoomLevel = BackLayer.MinZoom,
+                    Description = BackLayer.Description
+                };
+            }
+            else if (!FrontLayer.HasTransparency && !(MapLayer is MapTileLayer MlIsMtl2 && MlIsMtl2.TileSource.Layer == FrontLayer))
+            {
+                MapLayer = new MapTileLayer()
+                {
+                    LayerIndex = 0,
+                    TileSource = new TileSource() { Layer = FrontLayer },
+                    SourceName = FrontLayer.Identifier + new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds(),
+                    MaxZoomLevel = FrontLayer.MaxZoom,
+                    MinZoomLevel = FrontLayer.MinZoom,
+                    Description = FrontLayer.Description
+                };
+            }
+
+        }
+
+
 
         /// <summary>
         /// Gets or sets the amount by which the ZoomLevel property changes during a MouseWheel event.
