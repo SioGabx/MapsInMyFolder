@@ -1,0 +1,141 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <!-- dotnet publish - -runtime win-x64 -c Release - -self-contained -->
+
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFrameworks>net6.0-windows</TargetFrameworks>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <Platforms>x64</Platforms>
+    <PlatformTarget>x64</PlatformTarget>
+    <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <SatelliteResourceLanguages>fr</SatelliteResourceLanguages>
+    <CefSharpAnyCpuSupport>true</CefSharpAnyCpuSupport>
+    <CefSharpBuildAction>Content</CefSharpBuildAction>
+    <ProduceReferenceAssembly>True</ProduceReferenceAssembly>
+
+    <Prefer32Bit>false</Prefer32Bit>
+    <ErrorReport>prompt</ErrorReport>
+    <SignAssembly>False</SignAssembly>
+    <AssemblyOriginatorKeyFile>MapsInMyFolder.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <NoWarn>NU1701</NoWarn>
+    <ApplicationIcon>Media\Icon\Main\icone.ico</ApplicationIcon>
+    <RepositoryUrl>https://github.com/SioGabx/MapsInMyFolder</RepositoryUrl>
+    <Copyright>SioGabx</Copyright>
+    <Version>1.1.0</Version>
+
+    <SelfContained>true</SelfContained>
+    <DisabledWarnings>CS8002</DisabledWarnings>
+    <AnalysisLevel>6.0</AnalysisLevel>
+    <PackageProjectUrl>https://github.com/SioGabx/MapsInMyFolder</PackageProjectUrl>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>False</Optimize>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Optimize>False</Optimize>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Core\Settings\**" />
+    <Compile Remove="Icone\**" />
+    <Compile Remove="Media\InterfaceIcon\**" />
+    <EmbeddedResource Remove="Core\Settings\**" />
+    <EmbeddedResource Remove="Icone\**" />
+    <EmbeddedResource Remove="Media\InterfaceIcon\**" />
+    <None Remove="Core\Settings\**" />
+    <None Remove="Icone\**" />
+    <None Remove="Media\InterfaceIcon\**" />
+    <Page Remove="Core\Settings\**" />
+    <Page Remove="Icone\**" />
+    <Page Remove="Media\InterfaceIcon\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="closedhand.cur" />
+    <None Remove="download_panel.html" />
+    <None Remove="layer_panel.html" />
+    <None Remove="ScriptEditorTheme.xshd" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Media\Icon\Main\icone.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Media\Cursors\closedhand.cur" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AvalonEdit" Version="6.3.0.90" />
+    <PackageReference Include="BlackPearl.Controls.Library" Version="2.0.4" />
+    <PackageReference Include="Clipper" Version="6.4.0" />
+    <PackageReference Include="ColorMine" Version="1.1.3" />
+    <PackageReference Include="Esprima" Version="3.0.5" />
+    <PackageReference Include="Jint" Version="3.1.1" />
+    <PackageReference Include="Mapbox.VectorTile" Version="1.0.4-alpha2" />
+    <PackageReference Include="ModernWpfUis" Version="1.4.0" />
+    <PackageReference Include="NetVips" Version="2.4.1" />
+    <PackageReference Include="NetVips.Native" Version="8.15.2" />
+    <PackageReference Include="NetVips.Native.win-x64" Version="8.15.2" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="NReco.Csv" Version="1.0.2" />
+    <PackageReference Include="ProjNet" Version="2.0.0" />
+    <PackageReference Include="SkiaSharp" Version="2.88.8" />
+    <PackageReference Include="System.Data.SQLite" Version="1.0.118" />
+    <PackageReference Include="System.Runtime.Caching" Version="8.0.0" />
+    <PackageReference Include="wix" Version="3.14.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\.editorconfig" Link=".editorconfig" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <None Update="VC_redist.x64.exe">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Update="chromiumembeddedframework.runtime.win-arm64" Version="104.4.24" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Update="chromiumembeddedframework.runtime.win-x64" Version="124.3.8" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Update="chromiumembeddedframework.runtime.win-x86" Version="104.4.24" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Properties\Settings.Designer.cs">
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="View\Styles\" />
+  </ItemGroup>
+
+</Project>

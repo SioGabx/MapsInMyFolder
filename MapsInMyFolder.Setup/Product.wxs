@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <?define MapsInMyFolder_TargetDir=$(var.MapsInMyFolder.ProjectDir)bin/Publication/?>
+
+ <?include $(sys.CURRENTDIR)Files.wxi ?>
+
+<!--DONT FORGET TO CHANGE THE VERSION NUMER HERE AND IN MAPSINMYFOLDER.CSPROJ-->
+  <Product Id="*" Name="MapsInMyFolder" Language="1033" Version="1.1.0" Manufacturer="SioGabx" UpgradeCode="091b4d98-0e03-441f-8e40-acb9706db235">
+    <Package InstallerVersion="200" Compressed="yes" InstallPrivileges="elevated" AdminImage="yes" Manufacturer="SioGabx" Description="This program provides the functionality to install MapsInMyFolder." Comments="This program provides the functionality to install MapsInMyFolder. See https://github.com/SioGabx/MapsInMyFolder" /><!--InstallScope="perUser"-->
+    <Media Id="1" Cabinet="MyCabFile.cab" EmbedCab="yes"/>
+    
+    <MajorUpgrade AllowDowngrades="yes" IgnoreRemoveFailure="no" Schedule="afterInstallInitialize" />
+
+    <!-- Wix requires that shortcut icons' Id have the same extension as the target file, hence the .exe in the icon Id -->
+    <Icon Id="application_icon.exe" SourceFile="$(var.MapsInMyFolder_TargetDir)MapsInMyFolder.exe"/>
+
+    <!-- ARPPRODUCTICON is a special Id which sets the icon in Add/Remove Programs (see https://wixtoolset.org/documentation/manual/v3/howtos/ui_and_localization/configure_arp_appearance.html) -->
+    <Property Id="ARPPRODUCTICON" Value="application_icon.exe" />
+    <Property Id="REINSTALLMODE" Value="dmus"/>
+    <!-- 
+    a = replace all 
+    d = Missing or another version
+    o = Missing or previous
+    -->
+    <Property Id="VC_REDIST_X64_EXISTS" Secure="yes">
+      <RegistrySearch Id="VC_REDIST_X64_REGSEARCH" Root="HKLM" Key="SOFTWARE\Microsoft\VisualStudio\14.0\VC\Runtimes\x64" Name="Version" Type="raw" />
+    </Property>
+
+    <InstallExecuteSequence>
+      <!--<Custom Action="LaunchExe2" Before="InstallFinalize"></Custom>-->
+      <!--<Custom Action="LaunchExe" Before="InstallFinalize">NOT Installed AND NOT REMOVE</Custom>-->
+      <Custom Action='DownloadAndInvokeBootstrapper' Before='InstallFinalize'>
+        <![CDATA[NOT(REMOVE OR VC_REDIST_X64_EXISTS)]]>
+      </Custom>
+      <Custom Action="LaunchApp" After="InstallFinalize">NOT REMOVE</Custom>
+    </InstallExecuteSequence>
+    <CustomAction Id='DownloadAndInvokeBootstrapper' Directory="INSTALLFOLDER" Execute="deferred" ExeCommand='powershell.exe -windowstyle hidden Invoke-WebRequest -Uri "https://aka.ms/vs/17/release/vc_redist.x64.exe" -OutFile "$env:TEMP\vc_redist.x64.exe" ; &amp; $env:TEMP\vc_redist.x64.exe /install /quiet /norestart' Return='check' Impersonate="no"/>
+    <!--<CustomAction Id="LaunchApp" Directory="INSTALLFOLDER" ExeCommand="[INSTALLFOLDER]MapsInMyFolder.exe" Execute="deferred" Impersonate="no" Return="asyncNoWait" />-->
+    <CustomAction Id="LaunchApp" Directory="INSTALLFOLDER" ExeCommand="[INSTALLFOLDER]MapsInMyFolder.exe" Return="asyncNoWait"/>
+    <!--<CustomAction Id="LaunchExe2" FileKey="VCredist.x64.exe" ExeCommand="/install /norestart" Execute="deferred" Return="ignore" />-->
+    
+    
+    
+    <!--<CustomAction Id="LaunchExe" FileKey="MapsInMyFolder.exe" ExeCommand="" Execute="deferred" Return="check" Impersonate="no" />-->
+
+    <!--<Binary Id="VCRedist" SourceFile="$(var.MapsInMyFolder_TargetDir)VC_redist.x64.exe" />-->
+    <!--<CustomAction Id="InstallVCRedist" BinaryKey="VCRedist" ExeCommand="/install /quiet /norestart" Execute="deferred" Return="ignore"/>-->
+
+    <!--<Condition Message="This application requires the VC++ 2015 Redistributable x64 to be installed. vc_redist.x64 can be downloaded here : https://aka.ms/vs/17/release/vc_redist.x64.exe">
+      <![CDATA[Installed OR VC_REDIST_X64_EXISTS]]>
+    </Condition>-->
+
+    <Feature Id="ProductFeature" Title="MapsInMyFolder" Level="1">
+      <ComponentGroupRef Id="ProductComponents" />
+      <!--<ComponentGroupRef Id="locales_files" />-->
+      <ComponentGroupRef Id="_x64_files" />
+      <ComponentGroupRef Id="fr_files" />
+      <ComponentRef Id="DesktopShortcut"/>
+      <ComponentRef Id="StartupShortcut"/>
+    </Feature>
+
+  </Product>
+
+
+  <Fragment>
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      
+      <Directory Id="DesktopFolder" Name="Desktop">
+        <Component Id="DesktopShortcut" Guid="0a8acb6c-78e4-46c1-8c2a-4eb87d63fd98">
+          <Shortcut Id="DesktopShortcutElement" Name="MapsInMyFolder" Target="[INSTALLFOLDER]MapsInMyFolder.exe" WorkingDirectory="INSTALLFOLDER" />
+          <RegistryValue Root="HKCU" Key="Software\SioGabx\MapsInMyFolder" Name="installed" Type="integer" Value="1" KeyPath="yes" />
+        </Component>
+      </Directory>
+      
+      <Directory Id="ProgramMenuFolder" Name="Startup">
+        <Component Id="StartupShortcut" Guid="c20320eb-53ec-4633-8291-8d1aee45c4e1">
+          <Shortcut Id="StartupShortcutElement" Name="MapsInMyFolder" Target="[INSTALLFOLDER]MapsInMyFolder.exe" WorkingDirectory="INSTALLFOLDER"/>
+          <RemoveFolder Id="ProgramMenuFolder" On="uninstall"/>
+          <RegistryValue Root="HKCU" Key="Software\MapsInMyFolder" Name="installed" Type="integer" Value="1" KeyPath="yes"/>
+        </Component>
+
+
+      </Directory>
+      
+      <Directory Id="ProgramFilesFolder">
+        <Directory Id="INSTALLFOLDER" Name="MapsInMyFolder">
+          <!--<Directory Id="locales" Name="locales" />-->
+          <Directory Id="_x64" Name="x64" />
+          <Directory Id="fr" Name="fr" />
+        </Directory>
+      </Directory>
+    </Directory>
+  </Fragment>
+  <Fragment>
+    <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+      <?foreach FileName in $(var.MapsInMyFolderFiles)?>
+      <Component>
+        <File Source="$(var.MapsInMyFolder_TargetDir)$(var.FileName)" Name="$(var.FileName)" />
+      </Component>  
+    
+      <?endforeach?>
+      <!--<Component>
+        <File Source="$(var.MapsInMyFolder_TargetDir)VC_redist.x64.exe" Name="VC_redist.x64.exe"  Id="VCredist.x64.exe" />
+      </Component>-->
+      <!--<Component>
+        <File Source="$(var.MapsInMyFolder_TargetDir)MapsInMyFolder.exe" Name="MapsInMyFolder.exe" Id="MapsInMyFolder.exe" />
+      </Component>-->
+    </ComponentGroup>
+  </Fragment>
+  <!--<Fragment>
+    <ComponentGroup Id="locales_files" Directory="locales">
+      <?foreach File in $(var.MapsInMyFolderFileslocales)?>
+      <Component>
+        <File Source="$(var.MapsInMyFolder_TargetDir)locales\$(var.File)" Name="$(var.File)" />
+      </Component>
+      <?endforeach?>
+    </ComponentGroup>
+  </Fragment>-->
+  <Fragment>
+    <ComponentGroup Id="_x64_files" Directory="_x64">
+      <?foreach File in $(var.MapsInMyFolderFilesx64)?>
+      <Component>
+        <File Source="$(var.MapsInMyFolder_TargetDir)x64\$(var.File)" Name="$(var.File)" />
+      </Component>
+      <?endforeach?>
+    </ComponentGroup>
+  </Fragment>
+  <Fragment>
+    <ComponentGroup Id="fr_files" Directory="fr">
+      <?foreach File in $(var.MapsInMyFolderFilesfr)?>
+      <Component>
+        <File Source="$(var.MapsInMyFolder_TargetDir)fr\$(var.File)" Name="$(var.File)" />
+      </Component>
+      <?endforeach?>
+    </ComponentGroup>
+  </Fragment>
+</Wix>

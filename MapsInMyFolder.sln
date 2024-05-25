@@ -1,0 +1,56 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32228.430
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MapsInMyFolder", "MapsInMyFolder\MapsInMyFolder.csproj", "{2E0B14EC-2DF3-4238-8887-549DA9FBA906}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{BB867E64-4723-4D15-A952-6F84AAE071F4}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
+EndProject
+Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "MapsInMyFolder.Setup", "MapsInMyFolder.Setup\MapsInMyFolder.Setup.wixproj", "{39C2D97B-AB07-4ED9-A4AB-821FE140B6B8}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2E0B14EC-2DF3-4238-8887-549DA9FBA906}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{2E0B14EC-2DF3-4238-8887-549DA9FBA906}.Debug|Any CPU.Build.0 = Debug|x64
+		{2E0B14EC-2DF3-4238-8887-549DA9FBA906}.Debug|x64.ActiveCfg = Debug|x64
+		{2E0B14EC-2DF3-4238-8887-549DA9FBA906}.Debug|x64.Build.0 = Debug|x64
+		{2E0B14EC-2DF3-4238-8887-549DA9FBA906}.Debug|x86.ActiveCfg = Debug|x64
+		{2E0B14EC-2DF3-4238-8887-549DA9FBA906}.Debug|x86.Build.0 = Debug|x64
+		{2E0B14EC-2DF3-4238-8887-549DA9FBA906}.Release|Any CPU.ActiveCfg = Release|x64
+		{2E0B14EC-2DF3-4238-8887-549DA9FBA906}.Release|Any CPU.Build.0 = Release|x64
+		{2E0B14EC-2DF3-4238-8887-549DA9FBA906}.Release|x64.ActiveCfg = Release|x64
+		{2E0B14EC-2DF3-4238-8887-549DA9FBA906}.Release|x64.Build.0 = Release|x64
+		{2E0B14EC-2DF3-4238-8887-549DA9FBA906}.Release|x86.ActiveCfg = Release|x64
+		{2E0B14EC-2DF3-4238-8887-549DA9FBA906}.Release|x86.Build.0 = Release|x64
+		{39C2D97B-AB07-4ED9-A4AB-821FE140B6B8}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{39C2D97B-AB07-4ED9-A4AB-821FE140B6B8}.Debug|Any CPU.Build.0 = Debug|x86
+		{39C2D97B-AB07-4ED9-A4AB-821FE140B6B8}.Debug|x64.ActiveCfg = Debug|x86
+		{39C2D97B-AB07-4ED9-A4AB-821FE140B6B8}.Debug|x64.Build.0 = Debug|x86
+		{39C2D97B-AB07-4ED9-A4AB-821FE140B6B8}.Debug|x86.ActiveCfg = Debug|x86
+		{39C2D97B-AB07-4ED9-A4AB-821FE140B6B8}.Debug|x86.Build.0 = Debug|x86
+		{39C2D97B-AB07-4ED9-A4AB-821FE140B6B8}.Release|Any CPU.ActiveCfg = Release|x86
+		{39C2D97B-AB07-4ED9-A4AB-821FE140B6B8}.Release|Any CPU.Build.0 = Release|x86
+		{39C2D97B-AB07-4ED9-A4AB-821FE140B6B8}.Release|x64.ActiveCfg = Release|x86
+		{39C2D97B-AB07-4ED9-A4AB-821FE140B6B8}.Release|x64.Build.0 = Release|x86
+		{39C2D97B-AB07-4ED9-A4AB-821FE140B6B8}.Release|x86.ActiveCfg = Release|x86
+		{39C2D97B-AB07-4ED9-A4AB-821FE140B6B8}.Release|x86.Build.0 = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {138AA06C-37A9-4516-B156-9138BB046D95}
+	EndGlobalSection
+EndGlobal
