@@ -25,7 +25,8 @@ namespace MapsInMyFolder.Core.Downloader
                 {
                     _httpClient = CreateHttpClient();
                     _httpClient.Timeout = TimeSpan.FromSeconds(30);
-                    _httpClient.DefaultRequestHeaders.Define("User-Agent", _layer.UserAgent);
+                    _httpClient.DefaultRequestHeaders.Define("User-Agent", _layer.UserAgent ?? Settings.Default.DefaultUserAgent);
+                    //_httpClient.DefaultRequestHeaders.Define("Referrer", _layer.SiteUrl);
                 }
                 return _httpClient;
             }

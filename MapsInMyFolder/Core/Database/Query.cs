@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Data.SQLite;
 
 namespace MapsInMyFolder.Core.Database
 {
@@ -17,5 +14,28 @@ namespace MapsInMyFolder.Core.Database
                 return DbCommand.ExecuteNonQuery();
             }
         }
+
+        public static SQLiteDataReader ExecuteReader(this Database database, string Command)
+        {
+            var DbConnection = database.OpenConnection();
+            {
+                var DbCommand = DbConnection.CreateCommand();
+                DbCommand.CommandText = Command;
+                return DbCommand.ExecuteReader();
+            }
+        }
+
+        public static IEnumerable<SQLiteDataReader> ExecuteReaderIEnumerable(this Database database, string Command)
+        {
+            var Reader = database.ExecuteReader(Command);
+            {
+                while (Reader.Read())
+                {
+                    yield return Reader;
+                }
+            }
+        }
+
+
     }
 }

@@ -21,16 +21,17 @@ namespace MapsInMyFolder
         public MainWindow()
         {
             InitializeComponent();
-
-            Init();
         }
 
         public void Init()
         {
             Debug.WriteLine("Version dotnet :" + Environment.Version.ToString());
+        }
 
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            Init();
             MainContentFrame.Navigate(MainPage);
-            Layer.Current = Layer.Default;
         }
 
 
@@ -52,9 +53,7 @@ namespace MapsInMyFolder
 
 
 
-        private void Window_Loaded(object sender, RoutedEventArgs e)
-        {
-        }
+     
 
 
 

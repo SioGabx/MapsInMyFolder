@@ -1,6 +1,10 @@
-﻿using MapsInMyFolder.Core.Layers;
+﻿using MapsInMyFolder.Core.Database;
+using MapsInMyFolder.Core.Generic.Extensions;
+using MapsInMyFolder.Core.Layers;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -20,13 +24,55 @@ namespace MapsInMyFolder.View.Layout
     /// <summary>
     /// Logique d'interaction pour MainPage.xaml
     /// </summary>
-    public partial class MainPage : System.Windows.Controls.Page
+    public partial class MainPage : System.Windows.Controls.Page, INotifyPropertyChanged
     {
+        private ObservableCollection<Layer> _layerCollection;
+
+        public ObservableCollection<Layer> LayerCollection
+        {
+            get { return _layerCollection; }
+            set
+            {
+                _layerCollection = value;
+                OnPropertyChanged(nameof(LayerCollection));
+            }
+        }
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+
         public MainPage()
         {
             InitializeComponent();
             Layer.CurrentLayerChanged += Layer_CurrentLayerChanged;
         }
+
+
+        private void Page_Loaded(object sender, RoutedEventArgs e)
+        {
+            LoadLayers();
+        }
+
+
+        public void LoadLayers()
+        {
+            Database database = new Database()
+            {
+                Path = @"C:\Users\franc\Documents\SharpDevelop Projects\ReMapsInMyFolder\Debug\SampleDb.db",
+                AvailableTables = Tables.LAYERS,
+            };
+
+            LayerCollection = Core.Layers.Loader.LoadFromDatabase(database, Tables.LAYERS).ToObservableCollection();
+            Layer.Current = Layer.Default;
+        }
+
+
+
+
 
         private void Layer_CurrentLayerChanged(object sender, Layer.LayerChangedEventArgs e)
         {
@@ -76,5 +122,6 @@ namespace MapsInMyFolder.View.Layout
         {
 
         }
+
     }
 }

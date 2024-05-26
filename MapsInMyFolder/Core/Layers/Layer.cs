@@ -8,12 +8,13 @@ namespace MapsInMyFolder.Core.Layers
 {
 
 
-    public enum Format { png, jpeg }
+    public enum Format { png, jpeg, pbf }
     public enum Display { visible, hidden }
     public partial class Layer : IDisposable
     {
         public int LayerId { get; set; }
         public string Identifier { get; set; }
+        public bool IsFavorite { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
         public string Tags { get; set; }
@@ -28,6 +29,8 @@ namespace MapsInMyFolder.Core.Layers
         public string Script { get; set; }
         public Display Visibility { get; set; }
         public int TileSize { get; set; }
+        public int Version { get; set; }
+        public string Area { get; set; }
         public string UserAgent { get; set; }
 
         public bool ShowTileBorder { get; set; }
@@ -53,17 +56,16 @@ namespace MapsInMyFolder.Core.Layers
             MaxZoom = 19;
             TilesFormat = Format.jpeg;
             Visibility = Display.visible;
-
-            UserAgent = "Mozilla/4.0 (Compatible; Windows NT 5.1; MSIE 6.0) (compatible; MSIE 6.0; Windows NT 5.1; .NET CLR 1.1.4322; .NET CLR 2.0.50727)";
+            IsFavorite = false;
+            
+            UserAgent = null;
 
             Client = new Client(this);
         }
-        public static Layer Default = new Layer()
-        {
-
-
-        };
+        public static Layer Default = new Layer();
 
         public bool HasTransparency => TilesFormat == Format.png;
+
+
     }
 }

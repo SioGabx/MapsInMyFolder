@@ -64,5 +64,30 @@ namespace MapsInMyFolder.Properties {
                 return ((short)(this["MaxRequestErrorRetry"]));
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("ID ASC")]
+        public string LayerOrder {
+            get {
+                return ((string)(this["LayerOrder"]));
+            }
+            set {
+                this["LayerOrder"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Mozilla/4.0 (Compatible; Windows NT 5.1; MSIE 6.0) (compatible; MSIE 6.0; Windows" +
+            " NT 5.1; .NET CLR 1.1.4322; .NET CLR 2.0.50727)")]
+        public string DefaultUserAgent {
+            get {
+                return ((string)(this["DefaultUserAgent"]));
+            }
+            set {
+                this["DefaultUserAgent"] = value;
+            }
+        }
     }
 }

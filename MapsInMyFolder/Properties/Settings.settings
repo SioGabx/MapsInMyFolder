@@ -14,5 +14,11 @@
     <Setting Name="MaxRequestErrorRetry" Type="System.Int16" Scope="Application">
       <Value Profile="(Default)">3</Value>
     </Setting>
+    <Setting Name="LayerOrder" Type="System.String" Scope="User">
+      <Value Profile="(Default)">ID ASC</Value>
+    </Setting>
+    <Setting Name="DefaultUserAgent" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Mozilla/4.0 (Compatible; Windows NT 5.1; MSIE 6.0) (compatible; MSIE 6.0; Windows NT 5.1; .NET CLR 1.1.4322; .NET CLR 2.0.50727)</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
