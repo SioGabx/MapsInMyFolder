@@ -3,10 +3,10 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:map="clr-namespace:MapsInMyFolder.View.Controls.Map"
     xmlns:mapsinmyfolder="clr-namespace:MapsInMyFolder"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:viewControls="clr-namespace:MapsInMyFolder.View.Controls"
-    xmlns:map="clr-namespace:MapsInMyFolder.View.Controls.Map"
     xmlns:viewModules="clr-namespace:MapsInMyFolder.View.Modules"
     Title="MainPage"
     d:DesignHeight="450"
@@ -76,7 +76,7 @@
                     SearchResultEvent="MapLocationSearchBar_SearchResultEvent"
                     SearchResultMap="{Binding ElementName=mapviewer}"
                     SearchResultPushpin="{Binding ElementName=searchResult}" />
-                
+
                 <Button
                     x:Name="MapManualLocationMenu"
                     Grid.Column="1"
@@ -146,7 +146,7 @@
                         Style="{DynamicResource PushpinStyleOrange}"
                         Visibility="Collapsed" />
 
-                    <map:MapTileLayer x:Name="TransparentMapTileLayer" LayerIndex="1"/>
+                    <map:MapTileLayer x:Name="TransparentMapTileLayer" LayerIndex="1" />
                     <map:MapItemsControl x:Name="MapViewerRectangles" />
                 </map:Map>
                 <!--<StackPanel

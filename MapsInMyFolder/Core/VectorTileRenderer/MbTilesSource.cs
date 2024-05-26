@@ -120,9 +120,7 @@ namespace MapsInMyFolder.Core.VectorTileRenderer.Sources
             }
         }
 
-#pragma warning disable CS1998 // Cette méthode async n'a pas d'opérateur 'await' et elle s'exécutera de façon synchrone
-        public async Task<VectorTile> GetVectorTile(int x, int y, int zoom)
-#pragma warning restore CS1998 // Cette méthode async n'a pas d'opérateur 'await' et elle s'exécutera de façon synchrone
+        public VectorTile GetVectorTile(int x, int y, int zoom)
         {
             var extent = new Rect(0, 0, 1, 1);
             bool overZoomed = false;
@@ -213,7 +211,7 @@ namespace MapsInMyFolder.Core.VectorTileRenderer.Sources
                 using (var rawTileStream = GetRawTile(x, y, zoom))
                 {
                     var pbfTileProvider = new PbfTileSource(rawTileStream);
-                    var tile = pbfTileProvider.GetVectorTile(x, y, zoom).Result;
+                    var tile = pbfTileProvider.GetVectorTile(x, y, zoom);
                     tileCache[key] = tile;
 
                     return tile;
@@ -221,9 +219,7 @@ namespace MapsInMyFolder.Core.VectorTileRenderer.Sources
             }
         }
 
-#pragma warning disable CS1998 // Cette méthode async n'a pas d'opérateur 'await' et elle s'exécutera de façon synchrone
-        async Task<Stream> ITileSource.GetTile(int x, int y, int zoom)
-#pragma warning restore CS1998 // Cette méthode async n'a pas d'opérateur 'await' et elle s'exécutera de façon synchrone
+        Stream ITileSource.GetTile(int x, int y, int zoom)
         {
             return GetRawTile(x, y, zoom);
         }

@@ -181,7 +181,7 @@ namespace MapsInMyFolder.Core.VectorTileRenderer
         //    }
         //}
 
-        public static async Task<ICanvasCollisions> Render(Style style, ICanvas canvas, int x, int y, double zoom, double scale = 1, List<string> whiteListLayers = null, ROptions options = null, Collisions collisions = null)
+        public static ICanvasCollisions Render(Style style, ICanvas canvas, int x, int y, double zoom, double scale = 1, List<string> whiteListLayers = null, ROptions options = null, Collisions collisions = null)
         {
             Dictionary<Source, Stream> rasterTileCache = new Dictionary<Source, Stream>();
             Dictionary<Source, VectorTile> vectorTileCache = new Dictionary<Source, VectorTile>();
@@ -239,7 +239,7 @@ namespace MapsInMyFolder.Core.VectorTileRenderer
                     {
                         if (!vectorTileCache.ContainsKey(layer.Source) && layer.Source.Provider is Sources.IVectorTileSource source)
                         {
-                            var vectorTile = await source.GetVectorTile(x, y, (int)zoom);
+                            var vectorTile = source.GetVectorTile(x, y, (int)zoom);
 
                             if (vectorTile == null)
                             {
@@ -307,7 +307,7 @@ namespace MapsInMyFolder.Core.VectorTileRenderer
                             {
                                 if (layer.Source.Provider is Sources.ITileSource)
                                 {
-                                    var tile = await layer.Source.Provider.GetTile(x, y, (int)zoom);
+                                    var tile = layer.Source.Provider.GetTile(x, y, (int)zoom);
 
                                     if (tile == null)
                                     {

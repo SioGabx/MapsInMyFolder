@@ -5,6 +5,6 @@ namespace MapsInMyFolder.Core.VectorTileRenderer.Sources
 {
     public interface ITileSource
     {
-        Task<Stream> GetTile(int x, int y, int zoom);
+        Stream GetTile(int x, int y, int zoom);
     }
 }

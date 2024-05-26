@@ -41,10 +41,10 @@ namespace MapsInMyFolder.View.Controls.Map
             MouseDown += OnMouseDown;
             MouseUp += OnMouseUp;
         }
-
+        
         public void SetMapLayer(Layer FrontLayer, Layer BackLayer)
         {
-
+            Debug.WriteLine("SetMapLayer");
             foreach (var item in Children)
             {
                 Debug.WriteLine(item.GetType());

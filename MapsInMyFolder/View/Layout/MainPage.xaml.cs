@@ -1,6 +1,7 @@
 ﻿using MapsInMyFolder.Core.Layers;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,14 +22,15 @@ namespace MapsInMyFolder.View.Layout
     /// </summary>
     public partial class MainPage : System.Windows.Controls.Page
     {
-        public MainPage() { 
+        public MainPage()
+        {
             InitializeComponent();
-
             Layer.CurrentLayerChanged += Layer_CurrentLayerChanged;
         }
 
         private void Layer_CurrentLayerChanged(object sender, Layer.LayerChangedEventArgs e)
         {
+            Debug.WriteLine("Layer_CurrentLayerChanged");
             MapViewer.SetMapLayer(e.NewLayer, Layer.Default);
         }
 
@@ -41,7 +43,8 @@ namespace MapsInMyFolder.View.Layout
                 Tags = "Urbanisme; Parcelles",
                 Identifier = "CADASTRALPARCELS.PARCELS",
                 TileUrl = "http://wxs.ign.fr/an7nvfzojv5wa96dsga5nk8w/geoportail/wmts?layer=CADASTRALPARCELS.PARCELS&style=bdparcellaire&tilematrixset=PM&Service=WMTS&Request=GetTile&Version=1.0.0&Format=image/png&TileMatrix={z}&TileCol={x}&TileRow={y}",
-                MinZoom = 0, MaxZoom = 20,
+                MinZoom = 0,
+                MaxZoom = 20,
                 TilesFormat = Format.png,
                 SiteName = "Geoportail",
                 SiteUrl = "geoportail.gouv.fr",

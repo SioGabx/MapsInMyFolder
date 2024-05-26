@@ -12,9 +12,7 @@ namespace MapsInMyFolder.Core.VectorTileRenderer.Sources
             Path = path;
         }
 
-#pragma warning disable CS1998 // Cette méthode async n'a pas d'opérateur 'await' et elle s'exécutera de façon synchrone
-        public async Task<Stream> GetTile(int x, int y, int zoom)
-#pragma warning restore CS1998 // Cette méthode async n'a pas d'opérateur 'await' et elle s'exécutera de façon synchrone
+        public Stream GetTile(int x, int y, int zoom)
         {
             var qualifiedPath = Path
                 .Replace("{x}", x.ToString())

@@ -29,7 +29,7 @@ namespace MapsInMyFolder
         {
             Debug.WriteLine("Version dotnet :" + Environment.Version.ToString());
 
-            MainContentFrame.Navigate(new MainPage());
+            MainContentFrame.Navigate(MainPage);
             Layer.Current = Layer.Default;
         }
 
