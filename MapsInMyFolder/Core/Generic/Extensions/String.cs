@@ -117,6 +117,10 @@ namespace MapsInMyFolder.Core.Generic.Extensions
             Regex reg = new Regex(pattern, RegexOptions.Compiled | RegexOptions.IgnoreCase);
             return reg.IsMatch(Value);
         }
+        public static bool IsNull(this string Value)
+        {
+            return string.IsNullOrEmpty(Value);
+        }
 
         public static string ToSingleLine(this string Value)
         {

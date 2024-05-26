@@ -7,25 +7,15 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     d:DesignHeight="450"
     d:DesignWidth="800"
-    DataContext="{Binding RelativeSource={RelativeSource Self}}"
     mc:Ignorable="d">
     <Grid>
-        <ListView
-            x:Name="LayersS"
-            Background="Red"
-            ItemsSource="{Binding LayersSource}"
-            MouseDoubleClick="ListView_MouseDoubleClick">
+        <ListView 
+            ItemsSource="{Binding LayersSource, RelativeSource={RelativeSource AncestorType=UserControl}, UpdateSourceTrigger=PropertyChanged}" MouseDoubleClick="ListView_MouseDoubleClick">
             <ListView.ItemTemplate>
                 <DataTemplate>
-                    <WrapPanel>
-                        <TextBlock Text="Name: " />
-                        <TextBlock FontWeight="Bold" Text="{Binding Name}" />
-                    </WrapPanel>
+                    <TextBlock Text="{Binding Name}" Unloaded="TextBlock_Unloaded" Loaded="TextBlock_Loaded"  />
                 </DataTemplate>
             </ListView.ItemTemplate>
-
         </ListView>
-
-
     </Grid>
 </UserControl>

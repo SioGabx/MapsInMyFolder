@@ -2,6 +2,7 @@
 using MapsInMyFolder.Core.Layers;
 using MapsInMyFolder.Properties;
 using System;
+using System.Diagnostics;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -24,21 +25,28 @@ namespace MapsInMyFolder.Core.Downloader
                 if (_httpClient == null)
                 {
                     _httpClient = CreateHttpClient();
-                    _httpClient.Timeout = TimeSpan.FromSeconds(30);
-                    _httpClient.DefaultRequestHeaders.Define("User-Agent", _layer.UserAgent ?? Settings.Default.DefaultUserAgent);
-                    //_httpClient.DefaultRequestHeaders.Define("Referrer", _layer.SiteUrl);
+
                 }
                 return _httpClient;
             }
         }
-        private static HttpClient CreateHttpClient()
+        private HttpClient CreateHttpClient()
         {
-            return new HttpClient(new HttpClientHandler
+            var HttpClient = new HttpClient(new HttpClientHandler
             {
                 AllowAutoRedirect = true,
                 MaxAutomaticRedirections = 5,
                 AutomaticDecompression = System.Net.DecompressionMethods.GZip | System.Net.DecompressionMethods.Deflate
-            });
+            })
+            {
+                Timeout = TimeSpan.FromSeconds(30)
+            };
+
+            var UserAgent = _layer.UserAgent ?? Settings.Default.DefaultUserAgent;
+            HttpClient.DefaultRequestHeaders.Define("User-Agent", UserAgent);
+            HttpClient.DefaultRequestHeaders.Define("Referrer", _layer.SiteUrl);
+
+            return HttpClient;
         }
 
         public async Task<HttpResponseMessage> SendRequest(string url)
@@ -61,9 +69,15 @@ namespace MapsInMyFolder.Core.Downloader
                 var NewRedirectLocation = httpResponseMessage?.Headers?.Location?.ToString()?.Trim();
                 if (!string.IsNullOrWhiteSpace(NewRedirectLocation))
                 {
+                    Debug.WriteLine("Redirect request to" + NewRedirectLocation);
                     url = NewRedirectLocation;
                 }
+                else
+                {
+                    return httpResponseMessage;
+                }
             }
+            Debug.WriteLine("SendRequestAutoRedirect : Too many redirect");
             return httpResponseMessage;
         }
 
@@ -79,6 +93,7 @@ namespace MapsInMyFolder.Core.Downloader
                 }
                 await Task.Delay(DelayBetweenRetry);
             }
+            Debug.WriteLine("SendRequestAutoRetry : Too many retry");
             return httpResponseMessage;
         }
 

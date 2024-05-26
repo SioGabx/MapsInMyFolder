@@ -48,13 +48,14 @@ namespace MapsInMyFolder.View.Layout
         public MainPage()
         {
             InitializeComponent();
-            Layer.CurrentLayerChanged += Layer_CurrentLayerChanged;
         }
 
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
+            Layer.CurrentLayerChanged += Layer_CurrentLayerChanged;
             LoadLayers();
+            Layer.Current = Layer.Default;
         }
 
 
@@ -67,7 +68,7 @@ namespace MapsInMyFolder.View.Layout
             };
 
             LayerCollection = Core.Layers.Loader.LoadFromDatabase(database, Tables.LAYERS).ToObservableCollection();
-            Layer.Current = Layer.Default;
+           
         }
 
 

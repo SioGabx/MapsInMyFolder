@@ -13,7 +13,7 @@ namespace MapsInMyFolder.Core.Generic.Extensions
         {
             var Ordinal = DataReader.GetOrdinal(Name);
             if (DataReader.IsDBNull(Ordinal)) {  return string.Empty; }
-            return DataReader.GetString(Ordinal);
+            return DataReader.GetString(Ordinal).DecodeEntities();
         }
         public static int GetInt(this SQLiteDataReader DataReader, string Name)
         {

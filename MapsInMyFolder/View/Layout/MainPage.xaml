@@ -35,10 +35,10 @@
                 FontFamily="Segoe UI Light"
                 FontSize="30"
                 Foreground="{StaticResource MapsInMyFolder.WhiteForeground}" />
-            <!--<viewModules:LayerPanel 
+            <viewModules:LayerPanel 
                 LayersSource="{Binding LayerCollection, UpdateSourceTrigger=PropertyChanged}" 
-                x:Name="LayerPanel" Grid.Row="1" />-->
-            <ListView ItemsSource="{Binding LayerCollection, UpdateSourceTrigger=PropertyChanged}"></ListView>
+                x:Name="LayerPanel" Grid.Row="1" />
+            <!--<ListView ItemsSource="{Binding LayerCollection, UpdateSourceTrigger=PropertyChanged}"  Grid.Row="1" ></ListView>-->
 
         </Grid>
 
