@@ -63,7 +63,7 @@ namespace MapsInMyFolder.View.Layout
         {
             Database database = new Database()
             {
-                Path = @"C:\Users\franc\Documents\SharpDevelop Projects\ReMapsInMyFolder\Debug\SampleDb.db",
+                Path = @".\SampleDb.db",
                 AvailableTables = Tables.LAYERS,
             };
 

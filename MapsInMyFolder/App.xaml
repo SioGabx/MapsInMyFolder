@@ -15,9 +15,11 @@
                             Accent="#84470B"
                             AltHigh="#84470B"
                             AltLow="#333333" />
+                        <ResourceDictionary Source="\View\Styles\ScrollBars.xaml" />
                         <ResourceDictionary Source="\View\Styles\RessourcesDictionnary.xaml" />
                         <ResourceDictionary Source="\View\Styles\Colors.xaml" />
                         <ResourceDictionary Source="\View\Styles\ContextMenu.xaml" />
+                        <ResourceDictionary Source="\View\Styles\Icons.xaml" />
                     </ui:ThemeResources.MergedDictionaries>
                 </ui:ThemeResources>
                 <ui:XamlControlsResources />
