@@ -1,4 +1,5 @@
-﻿using MapsInMyFolder.Core.Layers;
+﻿using MapsInMyFolder.Core.Downloader;
+using MapsInMyFolder.Core.Layers;
 using MapsInMyFolder.View.Layout;
 using ModernWpf;
 using ModernWpf.Media.Animation;
@@ -21,6 +22,7 @@ namespace MapsInMyFolder
         public MainWindow()
         {
             InitializeComponent();
+            TestPolymorphisme.GetFromFormat(Format.png).GetFormat();
         }
 
         public void Init()
