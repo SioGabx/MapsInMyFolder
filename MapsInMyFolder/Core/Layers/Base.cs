@@ -11,7 +11,7 @@ namespace MapsInMyFolder.Core.Layers
 
     public enum Format { png, jpeg, pbf }
     public enum Display { visible, hidden }
-    public partial class Layer : IDisposable
+    public partial class Layer
     {
         public int LayerId { get; set; }
         public string Identifier { get; set; }
@@ -37,7 +37,7 @@ namespace MapsInMyFolder.Core.Layers
         public bool ShowTileBorder { get; set; }
         public bool ShowTileLocation { get; set; }
 
-        public Client Client { get; private set; }
+        public TilesImages Tiles { get; private set; }
 
         public Layer()
         {
@@ -58,10 +58,10 @@ namespace MapsInMyFolder.Core.Layers
             TilesFormat = Format.jpeg;
             Visibility = Display.visible;
             IsFavorite = false;
-            
-            UserAgent = null;
 
-            Client = new Client(this);
+            Tiles = TilesImages.Create(this);
+
+            UserAgent = null;
         }
         public static Layer Default = new Layer();
 

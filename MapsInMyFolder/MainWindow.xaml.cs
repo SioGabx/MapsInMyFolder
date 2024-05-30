@@ -22,7 +22,6 @@ namespace MapsInMyFolder
         public MainWindow()
         {
             InitializeComponent();
-            TestPolymorphisme.GetFromFormat(Format.png).GetFormat();
         }
 
         public void Init()

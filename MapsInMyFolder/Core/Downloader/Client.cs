@@ -101,6 +101,7 @@ namespace MapsInMyFolder.Core.Downloader
         public void Dispose()
         {
             ((IDisposable)_httpClient).Dispose();
+            GC.SuppressFinalize(this);
         }
     }
 }

@@ -9,7 +9,7 @@ namespace MapsInMyFolder.Core.Layers
 {
   
 
-    public partial class Layer : IDisposable
+    public partial class Layer
     {
         private static Layer _current;
 

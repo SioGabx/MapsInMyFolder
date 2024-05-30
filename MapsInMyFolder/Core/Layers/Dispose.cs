@@ -29,7 +29,7 @@ namespace MapsInMyFolder.Core.Layers
 
         private void Cleanup()
         {
-            Client?.Dispose();
+            Tiles?.Dispose();
         }
 
     }

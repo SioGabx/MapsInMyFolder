@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MapsInMyFolder.Core.Downloader
+namespace MapsInMyFolder.Core.Images
 {
-    public static class ImageSaving
+    public static class Saving
     {
         public static VOption GetSaveVOption(string SaveFileFormat, int Quality, int TileSize)
         {

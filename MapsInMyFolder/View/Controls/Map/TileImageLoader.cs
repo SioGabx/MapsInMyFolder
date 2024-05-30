@@ -115,7 +115,7 @@ namespace MapsInMyFolder.View.Controls.Map
         private static async Task LoadTile(Tile tile, TileSource tileSource)
         {
             if (tileSource.Layer is null) { return; }
-            var Image = await tileSource.Layer.GetTile(tile.X, tile.Y, tile.ZoomLevel);
+            var Image = await tileSource.Layer.Tiles.GetDisplayTileFromUrl(tile.X, tile.Y, tile.ZoomLevel);
             await tile.Image.Dispatcher.InvokeAsync(() => tile.SetImage(Image));
         }
     }
