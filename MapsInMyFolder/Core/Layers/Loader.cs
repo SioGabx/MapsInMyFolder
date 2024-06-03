@@ -7,6 +7,7 @@ using System.Data.SQLite;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media;
 
 namespace MapsInMyFolder.Core.Layers
 {
@@ -37,6 +38,7 @@ namespace MapsInMyFolder.Core.Layers
                     TileSize = DataReader.GetInt("TILE_SIZE"),
                     Script = DataReader.GetString("SCRIPT"),
                     Visibility = DataReader.GetString("VISIBILITY").ConvertToEnum<Display>(),
+                    BackColor = Color.FromRgb(230, 230, 230),
                     UserAgent = null,
                 };
 

@@ -15,6 +15,7 @@
                             Accent="#84470B"
                             AltHigh="#84470B"
                             AltLow="#333333" />
+                        <ResourceDictionary Source="\View\Styles\Converters.xaml" />
                         <ResourceDictionary Source="\View\Styles\ScrollBars.xaml" />
                         <ResourceDictionary Source="\View\Styles\RessourcesDictionnary.xaml" />
                         <ResourceDictionary Source="\View\Styles\Colors.xaml" />

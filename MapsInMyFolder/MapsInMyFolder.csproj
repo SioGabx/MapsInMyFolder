@@ -54,6 +54,10 @@
     <Page Remove="Media\InterfaceIcon\**" />
   </ItemGroup>
   <ItemGroup>
+    <None Remove="View\Modules\bat_135768_90934.png" />
+    <None Remove="View\Modules\sat_135768_90934.jpeg" />
+  </ItemGroup>
+  <ItemGroup>
     <Content Include="Media\Icon\Main\icone.ico" />
   </ItemGroup>
   <ItemGroup>
@@ -81,6 +85,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\.editorconfig" Link=".editorconfig" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\Modules\bat_135768_90934.png" />
+    <Resource Include="View\Modules\sat_135768_90934.jpeg" />
   </ItemGroup>
   <ItemGroup>
     <None Update="Properties\Settings.settings">

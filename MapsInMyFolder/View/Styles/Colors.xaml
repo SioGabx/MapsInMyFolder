@@ -1,9 +1,12 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <SolidColorBrush x:Key="MapsInMyFolder.BackgroundPrimary" Color="#0a0c0c" />
-    <SolidColorBrush x:Key="MapsInMyFolder.BackgroundSecondary" Color="#171719" /> <!--FF171719-->
+    <SolidColorBrush x:Key="MapsInMyFolder.BackgroundSecondary" Color="#171719" /> 
+    <!--  FF171719  -->
 
+    <SolidColorBrush x:Key="MapsInMyFolder.ThemeColor" Color="#F18712" />
     <SolidColorBrush x:Key="MapsInMyFolder.AccentColor" Color="#84470B" />
     <SolidColorBrush x:Key="MapsInMyFolder.DarkAccentColor" Color="#84470B" />
 
-    <SolidColorBrush x:Key="MapsInMyFolder.WhiteForeground" Color="#FFE2E2E1" /> <!--WhiteSmoke-->
+    <SolidColorBrush x:Key="MapsInMyFolder.WhiteForeground" Color="#E2E2E1" />    
+    <!--  WhiteSmoke / #E2E2E1  -->
 </ResourceDictionary>

@@ -22,7 +22,16 @@ namespace MapsInMyFolder.View.Modules
             set { SetValue(LayersSourceProperty, value); }
         }
 
-        
+        public static readonly DependencyProperty CurrentLayerProperty =
+           DependencyProperty.Register("CurrentLayer", typeof(Layer), typeof(LayerPanel), new PropertyMetadata(null));
+
+        public Layer CurrentLayer
+        {
+            get { return (Layer)GetValue(CurrentLayerProperty); }
+            set { SetValue(CurrentLayerProperty, value); }
+        }
+
+
         public LayerPanel()
         {
             InitializeComponent();
@@ -31,21 +40,24 @@ namespace MapsInMyFolder.View.Modules
 
         private void ListView_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            MessageBox.Show(LayersSource.Count().ToString());
+
         }
 
 
-        private void TextBlock_Unloaded(object sender, RoutedEventArgs e)
+        private void Item_Unloaded(object sender, RoutedEventArgs e)
         {
-
-            Debug.WriteLine("Unloaded of " + (sender as TextBlock)?.Text);
+            ListViewItem ViewItem = sender as ListViewItem;
+            var layer = ViewItem.Content as Layer;
+            Debug.WriteLine("Unloaded of " + layer?.Name);
         }
 
-        private void TextBlock_Loaded(object sender, RoutedEventArgs e)
+        private void Item_Loaded(object sender, RoutedEventArgs e)
         {
-
-            Debug.WriteLine("Load of " + (sender as TextBlock)?.Text);
+            ListViewItem ViewItem = sender as ListViewItem;
+            var layer = ViewItem.Content as Layer;
+            Debug.WriteLine("Load of " + layer?.Name);
         }
+
     }
 }
 

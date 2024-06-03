@@ -5,17 +5,218 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:MapsInMyFolder.View.Modules"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:sys="clr-namespace:System;assembly=netstandard"
     d:DesignHeight="450"
     d:DesignWidth="800"
     mc:Ignorable="d">
+    <UserControl.Resources>
+
+        <Style
+            x:Key="ListViewContainerStyle"
+            BasedOn="{StaticResource {x:Type ListViewItem}}"
+            TargetType="{x:Type ListViewItem}">
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="Margin" Value="12,0,20,10" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Cursor" Value="Hand" />
+            <!--<Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="Gold" />
+                </Trigger>
+            </Style.Triggers>-->
+        </Style>
+
+
+        <DataTemplate x:Key="ItemTemplate">
+            <Border
+                x:Name="LeftBorder"
+                BorderBrush="#6F6F7B"
+                BorderThickness="4,0,0,0">
+                <Grid
+                    Width="Auto"
+                    Height="110"
+                    Background="{Binding Path=BackColor, Converter={StaticResource ColorToSolidColorBrush}}">
+
+                    <!--  2 Images superposées  -->
+                    <Image
+                        Opacity="0.5"
+                        Source="/View/Modules/sat_135768_90934.jpeg"
+                        Stretch="UniformToFill" />
+
+                    <Image Source="/View/Modules/bat_135768_90934.png" Stretch="UniformToFill" />
+                    <!--  Dégradé  -->
+                    <Rectangle>
+                        <Rectangle.Fill>
+                            <LinearGradientBrush StartPoint="0,1" EndPoint="0,0">
+                                <GradientStop Offset="0.0" Color="#D8282828" />
+                                <GradientStop Offset="1.2" Color="#00323232" />
+                            </LinearGradientBrush>
+                        </Rectangle.Fill>
+                    </Rectangle>
+
+                    <StackPanel
+                        Margin="10"
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Bottom"
+                        Orientation="Vertical">
+                        <TextBlock
+                            HorizontalAlignment="Left"
+                            FontSize="16"
+                            Foreground="{StaticResource MapsInMyFolder.WhiteForeground}"
+                            IsHyphenationEnabled="True"
+                            Text="{Binding Name}"
+                            TextTrimming="CharacterEllipsis"
+                            TextWrapping="WrapWithOverflow" />
+                        <TextBlock
+                            FontSize="12"
+                            Foreground="{StaticResource MapsInMyFolder.WhiteForeground}"
+                            IsHyphenationEnabled="True"
+                            TextTrimming="CharacterEllipsis"
+                            TextWrapping="WrapWithOverflow">
+
+                            <Run>
+                                <MultiBinding StringFormat="{}[{0}-{1}]">
+                                    <Binding Path="MinZoom" />
+                                    <Binding Path="MaxZoom" />
+                                </MultiBinding>
+                            </Run>
+                            <Run>-</Run>
+                            <Run Text="{Binding Country}" />
+                            <Run>-</Run>
+                            <Run Text="{Binding SiteName}" />
+                        </TextBlock>
+                    </StackPanel>
+
+                    <!--  2 icônes dans le coin haut droit  -->
+                    <StackPanel
+                        Margin="2"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Top"
+                        Orientation="Vertical">
+                        <StackPanel.Resources>
+                            <sys:Double x:Key="DefaultButtonOpacity">0.6</sys:Double>
+                            <sys:Double x:Key="HoverButtonOpacity">0.8</sys:Double>
+                            <Style TargetType="{x:Type Button}">
+                                <Setter Property="Opacity" Value="1" />
+                                <Setter Property="OverridesDefaultStyle" Value="True" />
+                                <Setter Property="MaxWidth" Value="22" />
+                                <Setter Property="Margin" Value="0,0,0,10" />
+                                <Setter Property="Panel.ZIndex" Value="2" />
+                                <Setter Property="Background" Value="Transparent" />
+                                <Setter Property="BorderBrush" Value="Transparent" />
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="Button">
+                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+
+                            <Style x:Key="HoverGrid" TargetType="{x:Type Grid}">
+                                <Style.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Opacity" Value="{StaticResource HoverButtonOpacity}" />
+                                    </Trigger>
+                                    <Trigger Property="IsMouseOver" Value="False">
+                                        <Setter Property="Opacity" Value="{StaticResource DefaultButtonOpacity}" />
+                                    </Trigger>
+                                </Style.Triggers>
+
+                            </Style>
+                            <Style TargetType="{x:Type Path}">
+                                <Setter Property="Stretch" Value="Uniform" />
+                                <Setter Property="RenderTransformOrigin" Value="0,0" />
+                                <Setter Property="StrokeEndLineCap" Value="round" />
+                                <Setter Property="StrokeLineJoin" Value="round" />
+                                <Setter Property="StrokeStartLineCap" Value="round" />
+                                <Setter Property="Fill" Value="#010101" />
+                                <Setter Property="Stroke" Value="#000000" />
+                                <Setter Property="StrokeThickness" Value=".8" />
+                            </Style>
+                        </StackPanel.Resources>
+                        <Button>
+                            <Grid
+                                Background="Transparent"
+                                Focusable="False"
+                                Style="{StaticResource ResourceKey=HoverGrid}">
+                                <Path Data="{StaticResource FavoriteButton}" />
+                            </Grid>
+                        </Button>
+                        <Button
+                            x:Name="VisibilityButton"
+                            IsEnabled="False"
+                            Opacity="0">
+                            <Grid
+                                Background="Transparent"
+                                Focusable="False"
+                                Style="{StaticResource ResourceKey=HoverGrid}">
+                                <Path Data="{StaticResource EyeShowButton}" />
+                                <Path Data="{StaticResource EyeHideButton}" StrokeThickness="1.5" />
+                            </Grid>
+                            <Button.Style>
+                                <Style BasedOn="{StaticResource {x:Type Button}}" TargetType="{x:Type Button}">
+                                    <Style.Triggers>
+                                        <Trigger Property="IsEnabled" Value="True">
+                                            <Trigger.EnterActions>
+                                                <BeginStoryboard>
+                                                    <Storyboard>
+                                                        <DoubleAnimation
+                                                            Storyboard.TargetProperty="Opacity"
+                                                            From="0"
+                                                            To="1"
+                                                            Duration="0:0:0.1" />
+                                                    </Storyboard>
+                                                </BeginStoryboard>
+                                            </Trigger.EnterActions>
+                                            <Trigger.ExitActions>
+                                                <BeginStoryboard>
+                                                    <Storyboard>
+                                                        <DoubleAnimation
+                                                            Storyboard.TargetProperty="Opacity"
+                                                            From="1"
+                                                            To="0"
+                                                            Duration="0:0:0.1" />
+                                                    </Storyboard>
+                                                </BeginStoryboard>
+                                            </Trigger.ExitActions>
+                                        </Trigger>
+
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                    </StackPanel>
+                </Grid>
+            </Border>
+            <DataTemplate.Triggers>
+                <Trigger Property="UIElement.IsMouseOver" Value="True">
+                    <Setter TargetName="LeftBorder" Property="BorderBrush" Value="#62626B" />
+                    <Setter TargetName="VisibilityButton" Property="IsEnabled" Value="True" />
+                </Trigger>
+                <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListBoxItem}}, Path=IsSelected}" Value="True">
+                    <Setter TargetName="LeftBorder" Property="BorderBrush" Value="{StaticResource MapsInMyFolder.ThemeColor}" />
+                </DataTrigger>
+            </DataTemplate.Triggers>
+        </DataTemplate>
+
+
+    </UserControl.Resources>
     <Grid>
-        <ListView 
-            ItemsSource="{Binding LayersSource, RelativeSource={RelativeSource AncestorType=UserControl}, UpdateSourceTrigger=PropertyChanged}" MouseDoubleClick="ListView_MouseDoubleClick">
-            <ListView.ItemTemplate>
-                <DataTemplate>
-                    <TextBlock Text="{Binding Name}" Unloaded="TextBlock_Unloaded" Loaded="TextBlock_Loaded"  />
-                </DataTemplate>
-            </ListView.ItemTemplate>
+        <ListView
+            ItemTemplate="{StaticResource ItemTemplate}"
+            ItemsSource="{Binding LayersSource, RelativeSource={RelativeSource AncestorType=UserControl}, UpdateSourceTrigger=PropertyChanged}"
+            MouseDoubleClick="ListView_MouseDoubleClick"
+            ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+            SelectionMode="Extended"
+            VirtualizingPanel.CacheLengthUnit="Item"
+            VirtualizingPanel.ScrollUnit="Pixel">
+            <ListView.ItemContainerStyle>
+                <Style BasedOn="{StaticResource ListViewContainerStyle}" TargetType="ListViewItem">
+                    <EventSetter Event="Loaded" Handler="Item_Loaded" />
+                    <EventSetter Event="Unloaded" Handler="Item_Unloaded" />
+                </Style>
+            </ListView.ItemContainerStyle>
         </ListView>
     </Grid>
 </UserControl>

@@ -68,7 +68,7 @@ namespace MapsInMyFolder.View.Layout
             };
 
             LayerCollection = Core.Layers.Loader.LoadFromDatabase(database, Tables.LAYERS).ToObservableCollection();
-           
+
         }
 
 

@@ -3,6 +3,7 @@ using MapsInMyFolder.Properties;
 using System;
 using System.Net.Http;
 using System.Windows;
+using System.Windows.Media;
 using System.Windows.Navigation;
 
 namespace MapsInMyFolder.Core.Layers
@@ -32,6 +33,7 @@ namespace MapsInMyFolder.Core.Layers
         public int TileSize { get; set; }
         public int Version { get; set; }
         public string Area { get; set; }
+        public Color BackColor { get; set; }
         public string UserAgent { get; set; }
 
         public bool ShowTileBorder { get; set; }
@@ -58,7 +60,7 @@ namespace MapsInMyFolder.Core.Layers
             TilesFormat = Format.jpeg;
             Visibility = Display.visible;
             IsFavorite = false;
-
+            BackColor = Color.FromRgb(230, 230, 230); //#E6E6E6
             Tiles = TilesImages.Create(this);
 
             UserAgent = null;
