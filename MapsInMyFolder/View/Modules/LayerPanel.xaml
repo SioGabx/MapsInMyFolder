@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:MapsInMyFolder.View.Modules"
+    xmlns:layers="clr-namespace:MapsInMyFolder.Core.Layers"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:sys="clr-namespace:System;assembly=netstandard"
     d:DesignHeight="450"
@@ -140,8 +141,23 @@
                                 Background="Transparent"
                                 Focusable="False"
                                 Style="{StaticResource ResourceKey=HoverGrid}">
-                                <Path Data="{StaticResource FavoriteButton}" />
+                                <Path Data="{StaticResource FavoriteButton}">
+                                    <Path.Style>
+                                        <Style TargetType="{x:Type Path}" BasedOn="{StaticResource {x:Type Path}}">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsFavorite}" Value="True">
+                                                    <Setter Property="Fill" Value="{StaticResource MapsInMyFolder.ThemeColor}"></Setter>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Path.Style>
+                                </Path>
                             </Grid>
+                            <Button.Style>
+                                <Style BasedOn="{StaticResource {x:Type Button}}" TargetType="{x:Type Button}">
+                                    <EventSetter Event="Click" Handler="FavoriteButton_Click" />
+                                </Style>
+                            </Button.Style>
                         </Button>
                         <Button
                             x:Name="VisibilityButton"
@@ -152,10 +168,21 @@
                                 Focusable="False"
                                 Style="{StaticResource ResourceKey=HoverGrid}">
                                 <Path Data="{StaticResource EyeShowButton}" />
-                                <Path Data="{StaticResource EyeHideButton}" StrokeThickness="1.5" />
+                                <Path Data="{StaticResource EyeHideButton}" StrokeThickness="1.5">
+                                    <Path.Style>
+                                        <Style TargetType="{x:Type Path}" BasedOn="{StaticResource {x:Type Path}}">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Visibility}" Value="{x:Static layers:Display.hidden}">
+                                                    <Setter Property="Visibility" Value="Hidden"></Setter>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Path.Style>
+                                </Path>
                             </Grid>
                             <Button.Style>
                                 <Style BasedOn="{StaticResource {x:Type Button}}" TargetType="{x:Type Button}">
+                                    <EventSetter Event="Click" Handler="VisibilityButton_Click" />
                                     <Style.Triggers>
                                         <Trigger Property="IsEnabled" Value="True">
                                             <Trigger.EnterActions>
@@ -215,6 +242,22 @@
                 <Style BasedOn="{StaticResource ListViewContainerStyle}" TargetType="ListViewItem">
                     <EventSetter Event="Loaded" Handler="Item_Loaded" />
                     <EventSetter Event="Unloaded" Handler="Item_Unloaded" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Visibility}" Value="{x:Static layers:Display.hidden}">
+                            <Setter Property="Opacity" Value="0.5"></Setter>
+                        </DataTrigger>
+                        
+                    </Style.Triggers>
+                    <!--<Style.Triggers>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Property="IsEnabled" Value="False"></Condition>
+                            </MultiDataTrigger.Conditions>
+                            <MultiDataTrigger.Setters>
+                                <Setter Property="Opacity" Value="0.5"></Setter>
+                            </MultiDataTrigger.Setters>
+                        </MultiDataTrigger>
+                    </Style.Triggers>-->
                 </Style>
             </ListView.ItemContainerStyle>
         </ListView>

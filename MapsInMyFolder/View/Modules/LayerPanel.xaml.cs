@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Input;
 
 namespace MapsInMyFolder.View.Modules
@@ -58,6 +59,22 @@ namespace MapsInMyFolder.View.Modules
             Debug.WriteLine("Load of " + layer?.Name);
         }
 
+        private void VisibilityButton_Click(object sender, RoutedEventArgs e)
+        {
+            Button Button = sender as Button;
+            var layer = (Button.TemplatedParent as ContentPresenter).Content as Layer;
+            layer.Visibility = layer.Visibility == Display.visible ? Display.hidden : Display.visible;
+            Debug.WriteLine(layer.Name);
+            CollectionViewSource.GetDefaultView(this.LayersSource).Refresh();
+        }
+        private void FavoriteButton_Click(object sender, RoutedEventArgs e)
+        {
+            Button Button = sender as Button;
+            var layer = (Button.TemplatedParent as ContentPresenter).Content as Layer;
+            layer.IsFavorite = !layer.IsFavorite;
+            Debug.WriteLine(layer.Name);
+            CollectionViewSource.GetDefaultView(this.LayersSource).Refresh();
+        }
     }
 }
 
