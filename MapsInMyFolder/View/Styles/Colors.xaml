@@ -4,6 +4,7 @@
     <!--  FF171719  -->
 
     <SolidColorBrush x:Key="MapsInMyFolder.ThemeColor" Color="#F18712" />
+    <SolidColorBrush x:Key="MapsInMyFolder.ThemeColorFlashy" Color="#FFFF9621" />
     <SolidColorBrush x:Key="MapsInMyFolder.AccentColor" Color="#84470B" />
     <SolidColorBrush x:Key="MapsInMyFolder.DarkAccentColor" Color="#84470B" />
 

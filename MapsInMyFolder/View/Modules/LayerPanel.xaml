@@ -145,8 +145,8 @@
                                     <Path.Style>
                                         <Style TargetType="{x:Type Path}" BasedOn="{StaticResource {x:Type Path}}">
                                             <Style.Triggers>
-                                                <DataTrigger Binding="{Binding IsFavorite}" Value="True">
-                                                    <Setter Property="Fill" Value="{StaticResource MapsInMyFolder.ThemeColor}"></Setter>
+                                                <DataTrigger Binding="{Binding Path=IsFavorite,Mode=TwoWay}" Value="True">
+                                                    <Setter Property="Fill" Value="{StaticResource MapsInMyFolder.ThemeColorFlashy}"></Setter>
                                                 </DataTrigger>
                                             </Style.Triggers>
                                         </Style>

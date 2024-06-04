@@ -1,7 +1,9 @@
 ﻿using MapsInMyFolder.Core.Downloader;
 using MapsInMyFolder.Properties;
 using System;
+using System.ComponentModel;
 using System.Net.Http;
+using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Navigation;
@@ -12,11 +14,23 @@ namespace MapsInMyFolder.Core.Layers
 
     public enum Format { png, jpeg, pbf }
     public enum Display { visible, hidden }
-    public partial class Layer
+    public partial class Layer : INotifyPropertyChanged
     {
+        public event PropertyChangedEventHandler PropertyChanged;
+        // Create the OnPropertyChanged method to raise the event
+        // The calling member's name will be used as the parameter.
+        protected void OnPropertyChanged([CallerMemberName] string name = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
+
         public int LayerId { get; set; }
         public string Identifier { get; set; }
-        public bool IsFavorite { get; set; }
+        public bool IsFavorite
+        {
+            get { return isFavorite; }
+            set { isFavorite = value; OnPropertyChanged(); }
+        }
         public string Name { get; set; }
         public string Description { get; set; }
         public string Tags { get; set; }
@@ -66,6 +80,7 @@ namespace MapsInMyFolder.Core.Layers
             UserAgent = null;
         }
         public static Layer Default = new Layer();
+        private bool isFavorite;
 
         public bool HasTransparency => TilesFormat == Format.png;
 
