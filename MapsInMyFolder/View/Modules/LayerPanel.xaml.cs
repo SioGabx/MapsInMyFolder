@@ -1,6 +1,7 @@
 ﻿using MapsInMyFolder.Core.Layers;
 using System;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows;
@@ -41,7 +42,12 @@ namespace MapsInMyFolder.View.Modules
 
         private void ListView_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-
+            //CollectionViewSource.GetDefaultView(this.LayersSource).Filter = UserFilter;
+            var Colec = (CollectionView)CollectionViewSource.GetDefaultView(this.LayersSource);
+            PropertyGroupDescription groupDescription2 = new PropertyGroupDescription("SiteName");
+            Colec.GroupDescriptions.Add(groupDescription2);
+            SortDescription listSortDescription = new SortDescription("IsFavorite", ListSortDirection.Descending);
+            Colec.SortDescriptions.Add(listSortDescription);
         }
 
 
@@ -70,10 +76,17 @@ namespace MapsInMyFolder.View.Modules
         private void FavoriteButton_Click(object sender, RoutedEventArgs e)
         {
             Button Button = sender as Button;
-            var layer = (Button.TemplatedParent as ContentPresenter).Content as Layer;
+            var ContentP = (Button.TemplatedParent as ContentPresenter);
+            var layer = ContentP.Content as Layer;
             layer.IsFavorite = !layer.IsFavorite;
             Debug.WriteLine(layer.Name);
             CollectionViewSource.GetDefaultView(this.LayersSource).Refresh();
+        }
+
+        private bool UserFilter(object item)
+        {
+            var Layer = item as Layer;
+            return Layer.MinZoom == 0;
         }
     }
 }

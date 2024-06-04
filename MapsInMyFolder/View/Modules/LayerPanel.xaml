@@ -237,6 +237,7 @@
             ScrollViewer.HorizontalScrollBarVisibility="Disabled"
             SelectionMode="Extended"
             VirtualizingPanel.CacheLengthUnit="Item"
+            VirtualizingPanel.IsVirtualizingWhenGrouping="True"
             VirtualizingPanel.ScrollUnit="Pixel">
             <ListView.ItemContainerStyle>
                 <Style BasedOn="{StaticResource ListViewContainerStyle}" TargetType="ListViewItem">
@@ -260,6 +261,15 @@
                     </Style.Triggers>-->
                 </Style>
             </ListView.ItemContainerStyle>
+            <ListView.GroupStyle>
+                <GroupStyle>
+                    <GroupStyle.HeaderTemplate>
+                        <DataTemplate>
+                            <TextBlock FontWeight="Bold" FontSize="14" Text="{Binding Name}"/>
+                        </DataTemplate>
+                    </GroupStyle.HeaderTemplate>
+                </GroupStyle>
+            </ListView.GroupStyle>
         </ListView>
     </Grid>
 </UserControl>
