@@ -231,6 +231,7 @@
     </UserControl.Resources>
     <Grid>
         <ListView
+            x:Name="LayersList"
             ItemTemplate="{StaticResource ItemTemplate}"
             ItemsSource="{Binding LayersSource, RelativeSource={RelativeSource AncestorType=UserControl}, UpdateSourceTrigger=PropertyChanged}"
             MouseDoubleClick="ListView_MouseDoubleClick"

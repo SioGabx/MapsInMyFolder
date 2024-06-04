@@ -44,10 +44,13 @@ namespace MapsInMyFolder.View.Modules
         {
             //CollectionViewSource.GetDefaultView(this.LayersSource).Filter = UserFilter;
             var Colec = (CollectionView)CollectionViewSource.GetDefaultView(this.LayersSource);
-            PropertyGroupDescription groupDescription2 = new PropertyGroupDescription("SiteName");
-            Colec.GroupDescriptions.Add(groupDescription2);
-            SortDescription listSortDescription = new SortDescription("IsFavorite", ListSortDirection.Descending);
-            Colec.SortDescriptions.Add(listSortDescription);
+            using (Colec.DeferRefresh())
+            {
+                PropertyGroupDescription groupDescription2 = new PropertyGroupDescription("SiteName");
+                Colec.GroupDescriptions.Add(groupDescription2);
+                SortDescription listSortDescription = new SortDescription("IsFavorite", ListSortDirection.Descending);
+                Colec.SortDescriptions.Add(listSortDescription);
+            }
         }
 
 
@@ -80,7 +83,8 @@ namespace MapsInMyFolder.View.Modules
             var layer = ContentP.Content as Layer;
             layer.IsFavorite = !layer.IsFavorite;
             Debug.WriteLine(layer.Name);
-            CollectionViewSource.GetDefaultView(this.LayersSource).Refresh();
+            //CollectionViewSource.GetDefaultView(this.LayersSource).Refresh();
+            LayersList.
         }
 
         private bool UserFilter(object item)
