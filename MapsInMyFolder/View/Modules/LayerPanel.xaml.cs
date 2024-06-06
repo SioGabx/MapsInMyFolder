@@ -46,12 +46,20 @@ namespace MapsInMyFolder.View.Modules
             var Colec = (CollectionView)CollectionViewSource.GetDefaultView(this.LayersSource);
             using (Colec.DeferRefresh())
             {
-                PropertyGroupDescription groupDescription2 = new PropertyGroupDescription("SiteName");
-                if (Colec.GroupDescriptions.Count == 0) { 
-                Colec.GroupDescriptions.Add(groupDescription2);
+                if (Colec.GroupDescriptions.Count == 0)
+                {
+
+                    SortDescription listSortDescription = new SortDescription("SiteName", ListSortDirection.Ascending);
+                    Colec.SortDescriptions.Add(listSortDescription);
+                    PropertyGroupDescription groupDescription2 = new PropertyGroupDescription("SiteName");
+                    Colec.GroupDescriptions.Add(groupDescription2);
                 }
-                //SortDescription listSortDescription = new SortDescription("IsFavorite", ListSortDirection.Descending);
-                //Colec.SortDescriptions.Add(listSortDescription);
+                if (Colec.SortDescriptions.Count == 1)
+                {
+                    SortDescription listSortDescription = new SortDescription("IsFavorite", ListSortDirection.Descending);
+                    Colec.SortDescriptions.Add(listSortDescription);
+                }
+
             }
         }
 
