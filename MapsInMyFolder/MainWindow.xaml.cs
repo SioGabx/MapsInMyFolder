@@ -1,13 +1,9 @@
-﻿using MapsInMyFolder.Core.Downloader;
-using MapsInMyFolder.Core.Layers;
-using MapsInMyFolder.View.Layout;
-using ModernWpf;
+﻿using MapsInMyFolder.View.Layout;
 using ModernWpf.Media.Animation;
 using System;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Input;
-using System.Windows.Navigation;
 
 namespace MapsInMyFolder
 {
@@ -54,7 +50,7 @@ namespace MapsInMyFolder
 
 
 
-     
+
 
 
 

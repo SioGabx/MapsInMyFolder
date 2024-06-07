@@ -1,13 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MapsInMyFolder.Core.Layers
 {
-  
+
 
     public partial class Layer
     {
@@ -39,7 +34,7 @@ namespace MapsInMyFolder.Core.Layers
             public Layer NewLayer { get; set; }
             public bool Cancel { get; set; }
 
-            public LayerChangedEventArgs() {}
+            public LayerChangedEventArgs() { }
         }
         public delegate void LayerChangedEventHandler(object sender, LayerChangedEventArgs e);
 

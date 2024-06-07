@@ -5,7 +5,6 @@ using MapsInMyFolder.Properties;
 using NetVips;
 using System;
 using System.Diagnostics;
-using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Windows.Media;

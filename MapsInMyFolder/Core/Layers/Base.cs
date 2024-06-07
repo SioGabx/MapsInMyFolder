@@ -1,12 +1,7 @@
 ﻿using MapsInMyFolder.Core.Downloader;
-using MapsInMyFolder.Properties;
-using System;
 using System.ComponentModel;
-using System.Net.Http;
 using System.Runtime.CompilerServices;
-using System.Windows;
 using System.Windows.Media;
-using System.Windows.Navigation;
 
 namespace MapsInMyFolder.Core.Layers
 {

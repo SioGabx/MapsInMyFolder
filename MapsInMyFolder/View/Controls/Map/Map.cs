@@ -7,8 +7,6 @@ using System;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Input;
-using System.Linq;
-using System.Collections.Generic;
 
 namespace MapsInMyFolder.View.Controls.Map
 {
@@ -41,7 +39,7 @@ namespace MapsInMyFolder.View.Controls.Map
             MouseDown += OnMouseDown;
             MouseUp += OnMouseUp;
         }
-        
+
         public void SetMapLayer(Layer FrontLayer, Layer BackLayer)
         {
             Debug.WriteLine("SetMapLayer");

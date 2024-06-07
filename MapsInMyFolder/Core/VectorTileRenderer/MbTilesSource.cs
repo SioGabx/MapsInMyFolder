@@ -2,7 +2,6 @@
 using System.Collections.Concurrent;
 using System.Data.SQLite;
 using System.IO;
-using System.Threading.Tasks;
 using System.Windows;
 
 namespace MapsInMyFolder.Core.VectorTileRenderer.Sources

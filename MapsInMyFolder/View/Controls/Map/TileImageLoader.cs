@@ -2,7 +2,6 @@
 // © 2022 Clemens Fischer
 // Licensed under the Microsoft Public License (Ms-PL)
 
-using MapsInMyFolder.Core.Layers;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
