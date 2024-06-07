@@ -62,7 +62,7 @@
 
   <!-- Activer les thèmes pour les contrôles et boîtes de dialogue communes de Windows (Windows XP et version ultérieure) -->
   
-  <dependency>
+  <!--<dependency>
     <dependentAssembly>
       <assemblyIdentity
           type="win32"
@@ -73,7 +73,7 @@
           language="*"
         />
     </dependentAssembly>
-  </dependency>
+  </dependency>-->
  
 
 </assembly>
