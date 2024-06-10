@@ -33,6 +33,7 @@
                 x:Name="LeftBorder"
                 BorderBrush="#6F6F7B"
                 BorderThickness="4,0,0,0">
+                
                 <Grid
                     Width="Auto"
                     Height="110"
@@ -45,8 +46,10 @@
                         Stretch="UniformToFill" />
 
                     <Image Source="/View/Modules/bat_135768_90934.png" Stretch="UniformToFill" />
+
+                    <Rectangle x:Name="MultiSelectColor" Fill="Transparent" Visibility="Collapsed" Opacity=".5"></Rectangle>
                     <!--  Dégradé  -->
-                    <Rectangle>
+                    <Rectangle x:Name="BackTextGradient">
                         <Rectangle.Fill>
                             <LinearGradientBrush StartPoint="0,1" EndPoint="0,0">
                                 <GradientStop Offset="0.0" Color="#D8282828" />
@@ -221,9 +224,28 @@
                     <Setter TargetName="LeftBorder" Property="BorderBrush" Value="#62626B" />
                     <Setter TargetName="VisibilityButton" Property="IsEnabled" Value="True" />
                 </Trigger>
-                <DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListBoxItem}}, Path=IsSelected}" Value="True">
+                <DataTrigger Binding="{Binding IsCurrent}" Value="True">
                     <Setter TargetName="LeftBorder" Property="BorderBrush" Value="{StaticResource MapsInMyFolder.ThemeColor}" />
                 </DataTrigger>
+                
+                
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListView}}, Path=SelectedItems.Count, Mode=OneWay, Converter={StaticResource IsGreaterThan}, ConverterParameter=1}" Value="True">
+
+                        </Condition>
+                        <Condition  Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListBoxItem}}, Path=IsSelected}" Value="True">
+
+                        </Condition>
+                    </MultiDataTrigger.Conditions>
+                    <MultiDataTrigger.Setters>
+                        <Setter TargetName="MultiSelectColor" Property="Fill" Value="{StaticResource MapsInMyFolder.ThemeColorFlashy}"></Setter>
+                        <Setter TargetName="MultiSelectColor" Property="Visibility" Value="Visible"></Setter>
+                    </MultiDataTrigger.Setters>
+                </MultiDataTrigger>
+                <!--<DataTrigger Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListView}}, Path=SelectedItems.Count, Mode=OneWay, Converter={StaticResource IsGreaterThan}, ConverterParameter=1}" Value="True">
+                    <Setter Property="Opacity" Value="0.5"></Setter>
+                </DataTrigger>-->
             </DataTemplate.Triggers>
         </DataTemplate>
 
@@ -244,11 +266,11 @@
                 <Style BasedOn="{StaticResource ListViewContainerStyle}" TargetType="ListViewItem">
                     <EventSetter Event="Loaded" Handler="Item_Loaded" />
                     <EventSetter Event="Unloaded" Handler="Item_Unloaded" />
+                    <EventSetter Event="Selected" Handler="ListViewItem_Selected"></EventSetter>
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding Visibility}" Value="{x:Static layers:Display.hidden}">
                             <Setter Property="Opacity" Value="0.5"></Setter>
                         </DataTrigger>
-                        
                     </Style.Triggers>
                     <!--<Style.Triggers>
                         <MultiDataTrigger>

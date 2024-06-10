@@ -38,7 +38,12 @@ namespace MapsInMyFolder.Core.Layers
         public Format TilesFormat { get; set; }
         public string Style { get; set; }
         public string Script { get; set; }
-        public Display Visibility { get; set; }
+        public Display Visibility
+        {
+            get { return visibility; }
+            set { visibility = value; OnPropertyChanged(); }
+        }
+        public Display visibility;
         public int TileSize { get; set; }
         public int Version { get; set; }
         public string Area { get; set; }
@@ -78,6 +83,13 @@ namespace MapsInMyFolder.Core.Layers
         private bool isFavorite;
 
         public bool HasTransparency => TilesFormat == Format.png;
+
+        private bool isCurrent;
+        public bool IsCurrent
+        {
+            get { return isCurrent; }
+            private set { isCurrent = value; OnPropertyChanged(); }
+        }
 
 
     }

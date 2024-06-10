@@ -22,14 +22,6 @@ namespace MapsInMyFolder.View.Modules
             set { SetValue(LayersSourceProperty, value); }
         }
 
-        public static readonly DependencyProperty CurrentLayerProperty =
-           DependencyProperty.Register("CurrentLayer", typeof(Layer), typeof(LayerPanel), new PropertyMetadata(null));
-
-        public Layer CurrentLayer
-        {
-            get { return (Layer)GetValue(CurrentLayerProperty); }
-            set { SetValue(CurrentLayerProperty, value); }
-        }
 
 
         public LayerPanel()
@@ -82,7 +74,7 @@ namespace MapsInMyFolder.View.Modules
             var layer = (Button.TemplatedParent as ContentPresenter).Content as Layer;
             layer.Visibility = layer.Visibility == Display.visible ? Display.hidden : Display.visible;
             Debug.WriteLine(layer.Name);
-            CollectionViewSource.GetDefaultView(this.LayersSource).Refresh();
+           // CollectionViewSource.GetDefaultView(this.LayersSource).Refresh();
         }
         private void FavoriteButton_Click(object sender, RoutedEventArgs e)
         {
@@ -98,6 +90,18 @@ namespace MapsInMyFolder.View.Modules
         {
             var Layer = item as Layer;
             return Layer.MinZoom == 0;
+        }
+
+        private void ListViewItem_Selected(object sender, RoutedEventArgs e)
+        {
+            if (Keyboard.Modifiers.HasFlag(ModifierKeys.Control) || Keyboard.Modifiers.HasFlag(ModifierKeys.Shift))
+            {
+                return;
+            }
+            ListViewItem ViewItem = sender as ListViewItem;
+            var layer = ViewItem.Content as Layer;
+            Layer.Current = layer;
+            Debug.WriteLine("hello");
         }
     }
 }

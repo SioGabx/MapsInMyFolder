@@ -2,4 +2,11 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:converters="clr-namespace:MapsInMyFolder.View.Converters">
     <converters:ColorToSolidColorBrushValueConverter  x:Key="ColorToSolidColorBrush"/>
+    <converters:IsGreaterThanConverter  x:Key="IsGreaterThan"/>
+    <converters:IsLessThanConverter  x:Key="IsLessThan"/>
+    <converters:IsDifferentConverter  x:Key="IsDifferent"/>
+    <converters:VisibilityConverter  x:Key="Visibility"/>
+    <converters:InvertBoolConverter  x:Key="InvertBool"/>
+    <converters:IsEqualConverter  x:Key="IsEqual"/>
+    <converters:ContainsConverter  x:Key="Contains"/>
 </ResourceDictionary>
