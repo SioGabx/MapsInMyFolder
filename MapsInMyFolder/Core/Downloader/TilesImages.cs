@@ -26,7 +26,6 @@ namespace MapsInMyFolder.Core.Downloader
                     break;
                 case Format.pbf:
                     throw new NotImplementedException();
-                    break;
             }
             return (TilesImages)Activator.CreateInstance(ClassType, layer);
         }

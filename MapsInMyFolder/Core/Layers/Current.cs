@@ -20,24 +20,30 @@ namespace MapsInMyFolder.Core.Layers
                 {
                     return;
                 }
-                var LayerChangedEventArgs = new LayerChangedEventArgs() { OldLayer = _current, NewLayer = value };
-                CurrentLayerChanged?.Invoke(null, LayerChangedEventArgs);
+                var LayerChangedEventArgs = new LayerChangedEventArgs(_current, value);
+                CurrentLayerChanging?.Invoke(null, LayerChangedEventArgs);
                 if (!LayerChangedEventArgs.Cancel)
                 {
                     _current = LayerChangedEventArgs.NewLayer;
                 }
+                CurrentLayerChanged?.Invoke(null, LayerChangedEventArgs);
             }
         }
 
-        public static event LayerChangedEventHandler CurrentLayerChanged;
+        public static event EventHandler<LayerChangedEventArgs> CurrentLayerChanging;
+        public static event EventHandler<LayerChangedEventArgs> CurrentLayerChanged;
 
         public class LayerChangedEventArgs : EventArgs
         {
-            public Layer OldLayer { get; set; }
+            public Layer OldLayer { get; }
             public Layer NewLayer { get; set; }
             public bool Cancel { get; set; }
 
-            public LayerChangedEventArgs() { }
+            public LayerChangedEventArgs(Layer OldLayer, Layer NewLayer)
+            {
+                this.OldLayer = OldLayer;
+                this.NewLayer = NewLayer;
+            }
         }
         public delegate void LayerChangedEventHandler(object sender, LayerChangedEventArgs e);
 

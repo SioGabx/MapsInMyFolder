@@ -15,6 +15,7 @@ namespace MapsInMyFolder.View.Modules
     public partial class LayerPanel : UserControl
     {
         public event System.EventHandler<Layer.LayerChangedEventArgs> SelectedLayerChanged;
+        public event System.EventHandler<Layer.LayerChangedEventArgs> SelectedLayerChanging;
 
 
         public static readonly DependencyProperty LayersSourceProperty =
@@ -31,12 +32,20 @@ namespace MapsInMyFolder.View.Modules
             get { return _currentSelectedLayer; }
             set
             {
-                Debug.WriteLine("CurrentSelectedLayer trigered");
                 if (_currentSelectedLayer == value) { return; }
-                Debug.WriteLine("CurrentSelectedLayer change");
+                Layer.LayerChangedEventArgs layerChangedEventArgs = new Layer.LayerChangedEventArgs(_currentSelectedLayer, value);
+
+                SelectedLayerChanging?.Invoke(this, layerChangedEventArgs);
+
+                if (layerChangedEventArgs.Cancel)
+                {
+                    return;
+                }
                 if (_currentSelectedLayer != null) _currentSelectedLayer.IsCurrent = false;
-                _currentSelectedLayer = value;
+                _currentSelectedLayer = layerChangedEventArgs.NewLayer;
                 if (_currentSelectedLayer != null) _currentSelectedLayer.IsCurrent = true;
+
+                SelectedLayerChanged?.Invoke(this, layerChangedEventArgs);
             }
         }
 
@@ -111,20 +120,23 @@ namespace MapsInMyFolder.View.Modules
             ListViewItem ViewItem = sender as ListViewItem;
             var layer = ViewItem.Content as Layer;
 
-            Layer.LayerChangedEventArgs layerChangedEventArgs = new Layer.LayerChangedEventArgs
-            {
-                OldLayer = CurrentSelectedLayer,
-                NewLayer = layer
-            };
+            //Layer.LayerChangedEventArgs layerChangedEventArgs = new Layer.LayerChangedEventArgs
+            //{
+            //    OldLayer = CurrentSelectedLayer,
+            //    NewLayer = layer
+            //};
 
-            SelectedLayerChanged.Invoke(this, layerChangedEventArgs);
+            //SelectedLayerChanged.Invoke(this, layerChangedEventArgs);
 
-            if (layerChangedEventArgs.Cancel)
-            {
-                return;
-            }
+            //if (layerChangedEventArgs.Cancel)
+            //{
+            //    return;
+            //}
 
-            CurrentSelectedLayer = layerChangedEventArgs.NewLayer;
+            //CurrentSelectedLayer = layerChangedEventArgs.NewLayer;
+
+
+            CurrentSelectedLayer = layer;
         }
     }
 }
