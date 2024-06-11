@@ -32,7 +32,7 @@ namespace MapsInMyFolder.Core.VectorTileRenderer
         {
 
             System.Security.Cryptography.SHA256 crypt = System.Security.Cryptography.SHA256.Create();
-            StringBuilder hash = new System.Text.StringBuilder();
+            StringBuilder hash = new StringBuilder();
             byte[] crypto = crypt.ComputeHash(Encoding.UTF8.GetBytes(randomString));
             foreach (byte theByte in crypto)
             {

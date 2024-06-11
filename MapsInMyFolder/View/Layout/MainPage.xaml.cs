@@ -73,17 +73,17 @@ namespace MapsInMyFolder.View.Layout
             LayerPanel.CurrentSelectedLayer = e.NewLayer;
         }
 
-        private void Start_Download_Click(object sender, System.Windows.RoutedEventArgs e)
+        private void Start_Download_Click(object sender, RoutedEventArgs e)
         {
             Layer.Current = LayerCollection.First();
         }
 
-        private void Map_panel_open_location_panel_Click(object sender, System.Windows.RoutedEventArgs e)
+        private void Map_panel_open_location_panel_Click(object sender, RoutedEventArgs e)
         {
 
         }
 
-        private void Download_panel_close_button_Click(object sender, System.Windows.RoutedEventArgs e)
+        private void Download_panel_close_button_Click(object sender, RoutedEventArgs e)
         {
 
         }
@@ -103,6 +103,6 @@ namespace MapsInMyFolder.View.Layout
 
         }
 
-      
+
     }
 }

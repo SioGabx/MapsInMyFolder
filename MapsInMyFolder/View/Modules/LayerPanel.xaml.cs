@@ -1,4 +1,5 @@
 ﻿using MapsInMyFolder.Core.Layers;
+using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -15,8 +16,8 @@ namespace MapsInMyFolder.View.Modules
     /// </summary>
     public partial class LayerPanel : UserControl, INotifyPropertyChanged
     {
-        public event System.EventHandler<Layer.LayerChangedEventArgs> SelectedLayerChanged;
-        public event System.EventHandler<Layer.LayerChangedEventArgs> SelectedLayerChanging;
+        public event EventHandler<Layer.LayerChangedEventArgs> SelectedLayerChanged;
+        public event EventHandler<Layer.LayerChangedEventArgs> SelectedLayerChanging;
 
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -88,30 +89,25 @@ namespace MapsInMyFolder.View.Modules
 
         private void Item_Unloaded(object sender, RoutedEventArgs e)
         {
-            ListViewItem ViewItem = sender as ListViewItem;
-            var layer = ViewItem.Content as Layer;
+            var layer = GetFromSender(sender);
             Debug.WriteLine("Unloaded of " + layer?.Name);
         }
 
         private void Item_Loaded(object sender, RoutedEventArgs e)
         {
-            ListViewItem ViewItem = sender as ListViewItem;
-            var layer = ViewItem.Content as Layer;
+            var layer = GetFromSender(sender);
             Debug.WriteLine("Load of " + layer?.Name);
         }
 
         private void VisibilityButton_Click(object sender, RoutedEventArgs e)
         {
-            Button Button = sender as Button;
-            var layer = (Button.TemplatedParent as ContentPresenter).Content as Layer;
+            var layer = GetFromSender(sender);
             layer.Visibility = layer.Visibility == Display.visible ? Display.hidden : Display.visible;
             Debug.WriteLine(layer.Name);
         }
         private void FavoriteButton_Click(object sender, RoutedEventArgs e)
         {
-            Button Button = sender as Button;
-            var ContentP = (Button.TemplatedParent as ContentPresenter);
-            var layer = ContentP.Content as Layer;
+            var layer = GetFromSender(sender);
             layer.IsFavorite = !layer.IsFavorite;
             Debug.WriteLine(layer.Name);
         }
@@ -128,27 +124,24 @@ namespace MapsInMyFolder.View.Modules
             {
                 return;
             }
-            ListViewItem ViewItem = sender as ListViewItem;
-            var layer = ViewItem.Content as Layer;
-
-            //Layer.LayerChangedEventArgs layerChangedEventArgs = new Layer.LayerChangedEventArgs
-            //{
-            //    OldLayer = CurrentSelectedLayer,
-            //    NewLayer = layer
-            //};
-
-            //SelectedLayerChanged.Invoke(this, layerChangedEventArgs);
-
-            //if (layerChangedEventArgs.Cancel)
-            //{
-            //    return;
-            //}
-
-            //CurrentSelectedLayer = layerChangedEventArgs.NewLayer;
-
-
-            CurrentSelectedLayer = layer;
+            CurrentSelectedLayer = GetFromSender(sender);
         }
+
+        public static Layer GetFromSender(object sender)
+        {
+            if (sender is ListViewItem ViewItem)
+            {
+                return ViewItem.Content as Layer;
+            }
+            else if (sender is Button Button)
+            {
+                var ContentP = (Button.TemplatedParent as ContentPresenter);
+                return ContentP.Content as Layer;
+            }
+            throw new NotSupportedException();
+        }
+
+
     }
 }
 

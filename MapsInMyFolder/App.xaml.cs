@@ -21,7 +21,7 @@ namespace MapsInMyFolder
                 using (FileStream fs = File.Create(
              Path.Combine(tempfolderpath, Path.GetRandomFileName()), 1, FileOptions.DeleteOnClose)) { }
             }
-            catch (System.UnauthorizedAccessException)
+            catch (UnauthorizedAccessException)
             {
                 return false;
             }

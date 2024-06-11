@@ -55,7 +55,7 @@ namespace MapsInMyFolder.View.Modules
         }
 
         private string lastSearch = "searchLayerPlaceholder";
-        private void Layer_searchbar_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        private void Layer_searchbar_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Enter)
             {
