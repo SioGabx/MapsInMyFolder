@@ -138,10 +138,6 @@ namespace MapsInMyFolder.View.Modules
             throw new NotSupportedException();
         }
 
-        private void ListViewItem_Unselected(object sender, RoutedEventArgs e)
-        {
-        }
-
         private void LayersListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (LayersListView.SelectedItems.Count == 1)
