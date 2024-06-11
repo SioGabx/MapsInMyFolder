@@ -51,10 +51,7 @@ namespace MapsInMyFolder.View.Modules
                     return;
                 }
                 _currentSelectedLayer = layerChangedEventArgs.NewLayer;
-                if (LayersListView.SelectedItem != _currentSelectedLayer)
-                {
-                    LayersListView.SelectedItem = _currentSelectedLayer;
-                }
+                LayersListView.SelectedItem = _currentSelectedLayer;
                 OnPropertyChanged();
 
                 SelectedLayerChanged?.Invoke(this, layerChangedEventArgs);
@@ -141,7 +138,17 @@ namespace MapsInMyFolder.View.Modules
             throw new NotSupportedException();
         }
 
+        private void ListViewItem_Unselected(object sender, RoutedEventArgs e)
+        {
+        }
 
+        private void LayersListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (LayersListView.SelectedItems.Count == 1)
+            {
+                CurrentSelectedLayer = LayersListView.SelectedItems[0] as Layer;
+            }
+        }
     }
 }
 

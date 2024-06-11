@@ -267,6 +267,7 @@
             VirtualizingPanel.CacheLengthUnit="Item"
             VirtualizingPanel.IsVirtualizingWhenGrouping="True"
             VirtualizingPanel.ScrollUnit="Pixel"
+            SelectionChanged="LayersListView_SelectionChanged"
             >
             <ListView.ItemContainerStyle>
                 <Style BasedOn="{StaticResource ListViewContainerStyle}" TargetType="ListViewItem">
