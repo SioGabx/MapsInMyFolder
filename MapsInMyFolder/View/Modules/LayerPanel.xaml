@@ -224,21 +224,15 @@
                     <Setter TargetName="LeftBorder" Property="BorderBrush" Value="#62626B" />
                     <Setter TargetName="VisibilityButton" Property="IsEnabled" Value="True" />
                 </Trigger>
-                <DataTrigger Binding="{Binding IsCurrent}" Value="True">
-                    <Setter TargetName="LeftBorder" Property="BorderBrush" Value="{StaticResource MapsInMyFolder.ThemeColor}" />
-                </DataTrigger>
-                <!--<DataTrigger Value="True">
+                <DataTrigger Value="True">
                     <DataTrigger.Binding>
-                        <MultiBinding Converter="{StaticResource IsEqualMulti}">
-                            --><!--<Binding Path="CurrentSelectedLayer.Name" />-->
-                            <!--<Binding />
-                            <Binding />--><!--
-                            <Binding Path="DataContext.CurrentSelectedLayer" />
-                            <Binding Path="CurrentSelectedLayer" />
+                        <MultiBinding Converter="{StaticResource IsEqualMulti}" >
+                            <Binding Path="CurrentSelectedLayer" RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType={x:Type UserControl}}"  UpdateSourceTrigger="PropertyChanged"  Mode="TwoWay" NotifyOnSourceUpdated="True" BindsDirectlyToSource="True"/>
+                            <Binding  UpdateSourceTrigger="PropertyChanged" Mode="TwoWay"/>
                         </MultiBinding>
                     </DataTrigger.Binding>
                     <Setter TargetName="LeftBorder" Property="BorderBrush" Value="{StaticResource MapsInMyFolder.ThemeColor}" />
-                </DataTrigger>-->
+                </DataTrigger>
 
                 <MultiDataTrigger>
                     <MultiDataTrigger.Conditions>
@@ -264,7 +258,7 @@
     </UserControl.Resources>
     <Grid>
         <ListView
-            x:Name="LayersList"
+            x:Name="LayersListView"
             ItemTemplate="{StaticResource ItemTemplate}"
             ItemsSource="{Binding LayersSource, RelativeSource={RelativeSource AncestorType=UserControl}, UpdateSourceTrigger=PropertyChanged}"
             MouseDoubleClick="ListView_MouseDoubleClick"

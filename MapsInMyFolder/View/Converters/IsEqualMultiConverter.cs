@@ -1,5 +1,7 @@
-﻿using System;
+﻿using MapsInMyFolder.Core.Layers;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -12,11 +14,12 @@ namespace MapsInMyFolder.View.Converters
     {
         public object Convert(object[] values, Type targetType, object parameters, CultureInfo culture)
         {
+            Debug.WriteLine("Check IsEqualMultiConverter");
             for (int i = 0; i + 1 < values.Length; i++)
             {
                 object Current = values[i];
                 object Next = values[i + 1];
-                if (Current != Next) { return false; }
+                if (!Current.Equals(Next)) { return false; }
             }
             return true;
         }

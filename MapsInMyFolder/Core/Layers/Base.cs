@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Media;
+using System.Xml.Linq;
 
 namespace MapsInMyFolder.Core.Layers
 {
@@ -18,6 +19,7 @@ namespace MapsInMyFolder.Core.Layers
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
+
 
         public int LayerId { get; set; }
         public string Identifier { get; set; }
@@ -83,14 +85,5 @@ namespace MapsInMyFolder.Core.Layers
         private bool isFavorite;
 
         public bool HasTransparency => TilesFormat == Format.png;
-
-        private bool isCurrent;
-        public bool IsCurrent
-        {
-            get { return isCurrent; }
-            set { isCurrent = value; OnPropertyChanged(); }
-        }
-
-
     }
 }

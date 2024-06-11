@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -12,10 +13,17 @@ namespace MapsInMyFolder.View.Modules
     /// <summary>
     /// Logique d'interaction pour LayerPanel.xaml
     /// </summary>
-    public partial class LayerPanel : UserControl
+    public partial class LayerPanel : UserControl, INotifyPropertyChanged
     {
         public event System.EventHandler<Layer.LayerChangedEventArgs> SelectedLayerChanged;
         public event System.EventHandler<Layer.LayerChangedEventArgs> SelectedLayerChanging;
+
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
 
 
         public static readonly DependencyProperty LayersSourceProperty =
@@ -41,9 +49,12 @@ namespace MapsInMyFolder.View.Modules
                 {
                     return;
                 }
-                if (_currentSelectedLayer != null) _currentSelectedLayer.IsCurrent = false;
                 _currentSelectedLayer = layerChangedEventArgs.NewLayer;
-                if (_currentSelectedLayer != null) _currentSelectedLayer.IsCurrent = true;
+                if (LayersListView.SelectedItem != _currentSelectedLayer)
+                {
+                    LayersListView.SelectedItem = _currentSelectedLayer;
+                }
+                OnPropertyChanged();
 
                 SelectedLayerChanged?.Invoke(this, layerChangedEventArgs);
             }
