@@ -37,6 +37,7 @@
                 Foreground="{StaticResource MapsInMyFolder.WhiteForeground}" />
             <viewModules:LayerPanel 
                 LayersSource="{Binding LayerCollection, UpdateSourceTrigger=PropertyChanged}" 
+                SelectedLayerChanged="LayerPanel_SelectedLayerChanged"
                 x:Name="LayerPanel" Grid.Row="1" />
             <!--<ListView ItemsSource="{Binding LayerCollection, UpdateSourceTrigger=PropertyChanged}"  Grid.Row="1" ></ListView>-->
 

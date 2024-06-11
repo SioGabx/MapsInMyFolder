@@ -8,5 +8,6 @@
     <converters:VisibilityConverter  x:Key="Visibility"/>
     <converters:InvertBoolConverter  x:Key="InvertBool"/>
     <converters:IsEqualConverter  x:Key="IsEqual"/>
+    <converters:IsEqualMultiConverter  x:Key="IsEqualMulti"/>
     <converters:ContainsConverter  x:Key="Contains"/>
 </ResourceDictionary>

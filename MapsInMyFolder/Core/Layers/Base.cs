@@ -88,7 +88,7 @@ namespace MapsInMyFolder.Core.Layers
         public bool IsCurrent
         {
             get { return isCurrent; }
-            private set { isCurrent = value; OnPropertyChanged(); }
+            set { isCurrent = value; OnPropertyChanged(); }
         }
 
 

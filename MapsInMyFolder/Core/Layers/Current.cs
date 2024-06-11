@@ -14,17 +14,17 @@ namespace MapsInMyFolder.Core.Layers
             {
                 return _current;
             }
-
             set
             {
-                
+                if (_current == value)
+                {
+                    return;
+                }
                 var LayerChangedEventArgs = new LayerChangedEventArgs() { OldLayer = _current, NewLayer = value };
                 CurrentLayerChanged?.Invoke(null, LayerChangedEventArgs);
                 if (!LayerChangedEventArgs.Cancel)
                 {
-                    if (_current != null) { _current.IsCurrent = false; }
                     _current = LayerChangedEventArgs.NewLayer;
-                    if (_current != null) { _current.IsCurrent = true; }
                 }
             }
         }

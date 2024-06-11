@@ -14,6 +14,9 @@ namespace MapsInMyFolder.View.Modules
     /// </summary>
     public partial class LayerPanel : UserControl
     {
+        public event System.EventHandler<Layer.LayerChangedEventArgs> SelectedLayerChanged;
+
+
         public static readonly DependencyProperty LayersSourceProperty =
             DependencyProperty.Register("LayersSource", typeof(ObservableCollection<Layer>), typeof(LayerPanel), new PropertyMetadata(null));
         public ObservableCollection<Layer> LayersSource
@@ -22,13 +25,25 @@ namespace MapsInMyFolder.View.Modules
             set { SetValue(LayersSourceProperty, value); }
         }
 
-
+        private Layer _currentSelectedLayer;
+        public Layer CurrentSelectedLayer
+        {
+            get { return _currentSelectedLayer; }
+            set
+            {
+                Debug.WriteLine("CurrentSelectedLayer trigered");
+                if (_currentSelectedLayer == value) { return; }
+                Debug.WriteLine("CurrentSelectedLayer change");
+                if (_currentSelectedLayer != null) _currentSelectedLayer.IsCurrent = false;
+                _currentSelectedLayer = value;
+                if (_currentSelectedLayer != null) _currentSelectedLayer.IsCurrent = true;
+            }
+        }
 
         public LayerPanel()
         {
             InitializeComponent();
         }
-
 
         private void ListView_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
@@ -38,7 +53,6 @@ namespace MapsInMyFolder.View.Modules
             {
                 if (Colec.GroupDescriptions.Count == 0)
                 {
-
                     SortDescription listSortDescription = new SortDescription("SiteName", ListSortDirection.Ascending);
                     Colec.SortDescriptions.Add(listSortDescription);
                     PropertyGroupDescription groupDescription2 = new PropertyGroupDescription("SiteName");
@@ -49,10 +63,8 @@ namespace MapsInMyFolder.View.Modules
                     SortDescription listSortDescription = new SortDescription("IsFavorite", ListSortDirection.Descending);
                     Colec.SortDescriptions.Add(listSortDescription);
                 }
-
             }
         }
-
 
         private void Item_Unloaded(object sender, RoutedEventArgs e)
         {
@@ -74,7 +86,6 @@ namespace MapsInMyFolder.View.Modules
             var layer = (Button.TemplatedParent as ContentPresenter).Content as Layer;
             layer.Visibility = layer.Visibility == Display.visible ? Display.hidden : Display.visible;
             Debug.WriteLine(layer.Name);
-           // CollectionViewSource.GetDefaultView(this.LayersSource).Refresh();
         }
         private void FavoriteButton_Click(object sender, RoutedEventArgs e)
         {
@@ -83,7 +94,6 @@ namespace MapsInMyFolder.View.Modules
             var layer = ContentP.Content as Layer;
             layer.IsFavorite = !layer.IsFavorite;
             Debug.WriteLine(layer.Name);
-            //CollectionViewSource.GetDefaultView(this.LayersSource).Refresh();
         }
 
         private bool UserFilter(object item)
@@ -100,8 +110,21 @@ namespace MapsInMyFolder.View.Modules
             }
             ListViewItem ViewItem = sender as ListViewItem;
             var layer = ViewItem.Content as Layer;
-            Layer.Current = layer;
-            Debug.WriteLine("hello");
+
+            Layer.LayerChangedEventArgs layerChangedEventArgs = new Layer.LayerChangedEventArgs
+            {
+                OldLayer = CurrentSelectedLayer,
+                NewLayer = layer
+            };
+
+            SelectedLayerChanged.Invoke(this, layerChangedEventArgs);
+
+            if (layerChangedEventArgs.Cancel)
+            {
+                return;
+            }
+
+            CurrentSelectedLayer = layerChangedEventArgs.NewLayer;
         }
     }
 }

@@ -33,7 +33,7 @@
                 x:Name="LeftBorder"
                 BorderBrush="#6F6F7B"
                 BorderThickness="4,0,0,0">
-                
+
                 <Grid
                     Width="Auto"
                     Height="110"
@@ -227,8 +227,19 @@
                 <DataTrigger Binding="{Binding IsCurrent}" Value="True">
                     <Setter TargetName="LeftBorder" Property="BorderBrush" Value="{StaticResource MapsInMyFolder.ThemeColor}" />
                 </DataTrigger>
-                
-                
+                <!--<DataTrigger Value="True">
+                    <DataTrigger.Binding>
+                        <MultiBinding Converter="{StaticResource IsEqualMulti}">
+                            --><!--<Binding Path="CurrentSelectedLayer.Name" />-->
+                            <!--<Binding />
+                            <Binding />--><!--
+                            <Binding Path="DataContext.CurrentSelectedLayer" />
+                            <Binding Path="CurrentSelectedLayer" />
+                        </MultiBinding>
+                    </DataTrigger.Binding>
+                    <Setter TargetName="LeftBorder" Property="BorderBrush" Value="{StaticResource MapsInMyFolder.ThemeColor}" />
+                </DataTrigger>-->
+
                 <MultiDataTrigger>
                     <MultiDataTrigger.Conditions>
                         <Condition Binding="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type ListView}}, Path=SelectedItems.Count, Mode=OneWay, Converter={StaticResource IsGreaterThan}, ConverterParameter=1}" Value="True">
@@ -261,7 +272,8 @@
             SelectionMode="Extended"
             VirtualizingPanel.CacheLengthUnit="Item"
             VirtualizingPanel.IsVirtualizingWhenGrouping="True"
-            VirtualizingPanel.ScrollUnit="Pixel">
+            VirtualizingPanel.ScrollUnit="Pixel"
+            >
             <ListView.ItemContainerStyle>
                 <Style BasedOn="{StaticResource ListViewContainerStyle}" TargetType="ListViewItem">
                     <EventSetter Event="Loaded" Handler="Item_Loaded" />
