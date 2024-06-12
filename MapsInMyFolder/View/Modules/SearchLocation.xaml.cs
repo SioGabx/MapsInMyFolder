@@ -1,4 +1,5 @@
-﻿using MapsInMyFolder.View.Controls.Map;
+﻿using MapsInMyFolder.Core.Layers;
+using MapsInMyFolder.View.Controls.Map;
 using System;
 using System.Collections.Generic;
 using System.Windows;
@@ -151,6 +152,7 @@ namespace MapsInMyFolder.View.Modules
 
         private void MapSearchbar_TextChanged(object sender, TextChangedEventArgs e)
         {
+            SearchAlgorithm.Search(mapSearchbar.Text, null);
             if (mapSearchbar.Text != "searchMapPlaceholder")
             {
                 SetPushpinVisibility(Visibility.Hidden);
