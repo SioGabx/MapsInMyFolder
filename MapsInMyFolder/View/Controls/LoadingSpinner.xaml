@@ -1,0 +1,69 @@
+﻿<UserControl x:Class="MapsInMyFolder.View.Controls.LoadingSpinner"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:MapsInMyFolder.View.Controls"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Grid Width="100">
+        <Canvas>
+            <Canvas.Resources>
+                <DoubleKeyFrameCollection x:Key="ScaleAnimation">
+                    <SplineDoubleKeyFrame KeyTime="0:0:0" Value="0" KeySpline="0.3,0,0.7,1" />
+                    <SplineDoubleKeyFrame KeyTime="0:0:0.5" Value="1" KeySpline="0.3,0,0.7,1" />
+                    <SplineDoubleKeyFrame KeyTime="0:0:1" Value="0" KeySpline="0.3,0,0.7,1" />
+                </DoubleKeyFrameCollection>
+
+
+                <Style TargetType="Ellipse">
+                    <Setter Property="Width" Value="12"></Setter>
+                    <Setter Property="Height" Value="12"></Setter>
+                    <Setter Property="RenderTransformOrigin" Value="0.5,0.5"></Setter>
+                    <Setter Property="Canvas.Top" Value="0"></Setter>
+                    <Setter Property="Fill" Value="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type UserControl}}, Path=Foreground}"></Setter>
+                </Style>
+                
+            </Canvas.Resources>
+            <Canvas.Triggers>
+                <EventTrigger RoutedEvent="Grid.Loaded">
+                    <BeginStoryboard>
+                        <Storyboard BeginTime="0:0:.5" >
+                            <DoubleAnimationUsingKeyFrames Storyboard.TargetName="circle4" Storyboard.TargetProperty="(RenderTransform).(ScaleTransform.ScaleX)" RepeatBehavior="Forever" BeginTime="0:0:0.375" Duration="0:0:0:1"  KeyFrames="{StaticResource ScaleAnimation}"/>
+                            <DoubleAnimationUsingKeyFrames Storyboard.TargetName="circle4" Storyboard.TargetProperty="(RenderTransform).(ScaleTransform.ScaleY)" RepeatBehavior="Forever" BeginTime="0:0:0.375" Duration="0:0:0:1"    KeyFrames="{StaticResource ScaleAnimation}"/>
+
+                            <DoubleAnimationUsingKeyFrames Storyboard.TargetName="circle3" Storyboard.TargetProperty="(RenderTransform).(ScaleTransform.ScaleX)" RepeatBehavior="Forever" BeginTime="0:0:0.25"  Duration="0:0:0:1"  KeyFrames="{StaticResource ScaleAnimation}"/>
+                            <DoubleAnimationUsingKeyFrames Storyboard.TargetName="circle3" Storyboard.TargetProperty="(RenderTransform).(ScaleTransform.ScaleY)" RepeatBehavior="Forever" BeginTime="0:0:0.25"  Duration="0:0:0:1"  KeyFrames="{StaticResource ScaleAnimation}"/>
+
+                            <DoubleAnimationUsingKeyFrames Storyboard.TargetName="circle2" Storyboard.TargetProperty="(RenderTransform).(ScaleTransform.ScaleX)" RepeatBehavior="Forever" BeginTime="0:0:0.125"  Duration="0:0:0:1"  KeyFrames="{StaticResource ScaleAnimation}"/>
+                            <DoubleAnimationUsingKeyFrames Storyboard.TargetName="circle2" Storyboard.TargetProperty="(RenderTransform).(ScaleTransform.ScaleY)" RepeatBehavior="Forever" BeginTime="0:0:0.125"  Duration="0:0:0:1"  KeyFrames="{StaticResource ScaleAnimation}"/>
+
+                            <DoubleAnimationUsingKeyFrames Storyboard.TargetName="circle1" Storyboard.TargetProperty="(RenderTransform).(ScaleTransform.ScaleX)"  RepeatBehavior="Forever" BeginTime="0:0:0"  Duration="0:0:0:1"  KeyFrames="{StaticResource ScaleAnimation}"/>
+                            <DoubleAnimationUsingKeyFrames Storyboard.TargetName="circle1" Storyboard.TargetProperty="(RenderTransform).(ScaleTransform.ScaleY)" RepeatBehavior="Forever"  BeginTime="0:0:0" Duration="0:0:0:1"   KeyFrames="{StaticResource ScaleAnimation}"/>
+                        </Storyboard>
+                    </BeginStoryboard>
+                </EventTrigger>
+            </Canvas.Triggers>
+            <Ellipse x:Name="circle1"  Canvas.Left="0">
+                <Ellipse.RenderTransform>
+                    <ScaleTransform  ScaleX="0" ScaleY="0"></ScaleTransform>
+                </Ellipse.RenderTransform>
+            </Ellipse>
+            <Ellipse x:Name="circle2" Canvas.Left="20">
+                <Ellipse.RenderTransform>
+                    <ScaleTransform  ScaleX="0" ScaleY="0"></ScaleTransform>
+                </Ellipse.RenderTransform>
+            </Ellipse>
+            <Ellipse x:Name="circle3" Canvas.Left="40">
+                <Ellipse.RenderTransform>
+                    <ScaleTransform  ScaleX="0" ScaleY="0"></ScaleTransform>
+                </Ellipse.RenderTransform>
+            </Ellipse>
+            <Ellipse x:Name="circle4" Canvas.Left="60" >
+                <Ellipse.RenderTransform>
+                    <ScaleTransform  ScaleX="0" ScaleY="0"></ScaleTransform>
+                </Ellipse.RenderTransform>
+            </Ellipse>
+        </Canvas>
+    </Grid>
+</UserControl>

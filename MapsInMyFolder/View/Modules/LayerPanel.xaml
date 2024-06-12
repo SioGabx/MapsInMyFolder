@@ -3,6 +3,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:localcrl="clr-namespace:MapsInMyFolder.View.Controls"
     xmlns:local="clr-namespace:MapsInMyFolder.View.Modules"
     xmlns:layers="clr-namespace:MapsInMyFolder.Core.Layers"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -41,12 +42,16 @@
 
                     <!--  2 Images superposées  -->
                     <Image
+                        x:Name="BackLayerPreview"
                         Opacity="0.5"
                         Source="/View/Modules/sat_135768_90934.jpeg"
                         Stretch="UniformToFill" />
-
-                    <Image Source="/View/Modules/bat_135768_90934.png" Stretch="UniformToFill" />
-
+                    <!--https://weblog.west-wind.com/posts/2024/Jan/03/Working-around-the-WPF-ImageSource-Blues-->
+                    <Image x:Name="LayerPreview"  Source="/View/Modules/bat_135768_90934.png" Stretch="UniformToFill">
+                    </Image>
+                    
+                    <localcrl:LoadingSpinner VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="#0a0c0c"></localcrl:LoadingSpinner>
+                    
                     <Rectangle x:Name="MultiSelectColor" Fill="Transparent" Visibility="Collapsed" Opacity=".5"></Rectangle>
                     <!--  Dégradé  -->
                     <Rectangle x:Name="BackTextGradient">

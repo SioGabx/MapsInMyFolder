@@ -9,7 +9,6 @@ namespace MapsInMyFolder.View.Converters
     {
         public object Convert(object[] values, Type targetType, object parameters, CultureInfo culture)
         {
-            Debug.WriteLine("Check IsEqualMultiConverter");
             for (int i = 0; i + 1 < values.Length; i++)
             {
                 object Current = values[i];
