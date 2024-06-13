@@ -1,66 +1,29 @@
 ﻿using MapsInMyFolder.Core.Generic.Extensions;
-using MapsInMyFolder.Core.Layers;
 using MapsInMyFolder.Properties;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 
-namespace MapsInMyFolder.Core.Downloader
+namespace MapsInMyFolder.Core.Generic.Network
 {
-    public class Client : IDisposable
+    public static class Request
     {
-        private HttpClient _httpClient;
-        private Layer _layer;
-
-        public Client(Layer layer)
-        {
-            _layer = layer;
-        }
-
-        private HttpClient HttpClient
-        {
-            get
-            {
-                if (_httpClient == null)
-                {
-                    _httpClient = CreateHttpClient();
-
-                }
-                return _httpClient;
-            }
-        }
-        private HttpClient CreateHttpClient()
-        {
-            var HttpClient = new HttpClient(new HttpClientHandler
-            {
-                AllowAutoRedirect = true,
-                MaxAutomaticRedirections = 5,
-                AutomaticDecompression = System.Net.DecompressionMethods.GZip | System.Net.DecompressionMethods.Deflate
-            })
-            {
-                Timeout = TimeSpan.FromSeconds(30)
-            };
-
-            var UserAgent = _layer.UserAgent ?? Settings.Default.DefaultUserAgent;
-            HttpClient.DefaultRequestHeaders.Define("User-Agent", UserAgent);
-            HttpClient.DefaultRequestHeaders.Define("Referrer", _layer.SiteUrl);
-
-            return HttpClient;
-        }
-
-        public async Task<HttpResponseMessage> SendRequest(string url)
+        public static async Task<HttpResponseMessage> SendRequest(this HttpClient HttpClient, string url)
         {
             using var requestMessage = new HttpRequestMessage(HttpMethod.Get, url);
             return await HttpClient.SendAsync(requestMessage, HttpCompletionOption.ResponseHeadersRead);
         }
 
-        public async Task<HttpResponseMessage> SendRequestAutoRedirect(string url)
+        public static async Task<HttpResponseMessage> SendRequestAutoRedirect(this HttpClient HttpClient, string url)
         {
             HttpResponseMessage httpResponseMessage = null;
             for (int RetryNumber = 0; RetryNumber < Math.Max(Settings.Default.MaxRequestRedirection, (short)1); RetryNumber++)
             {
-                httpResponseMessage = await SendRequest(url);
+                httpResponseMessage = await HttpClient.SendRequest(url);
                 if (httpResponseMessage.IsSuccessStatusCode)
                 {
                     return httpResponseMessage;
@@ -81,12 +44,12 @@ namespace MapsInMyFolder.Core.Downloader
             return httpResponseMessage;
         }
 
-        public async Task<HttpResponseMessage> SendRequestAutoRetry(string url, short MaxNumberOfRetry, TimeSpan DelayBetweenRetry)
+        public static async Task<HttpResponseMessage> SendRequestAutoRetry(this HttpClient HttpClient, string url, short MaxNumberOfRetry, TimeSpan DelayBetweenRetry)
         {
             HttpResponseMessage httpResponseMessage = null;
             for (int RetryNumber = 0; RetryNumber < Math.Max(MaxNumberOfRetry, (short)1); RetryNumber++)
             {
-                httpResponseMessage = await SendRequestAutoRedirect(url);
+                httpResponseMessage = await HttpClient.SendRequestAutoRedirect(url);
                 if (httpResponseMessage.IsSuccessStatusCode)
                 {
                     return httpResponseMessage;
@@ -98,10 +61,6 @@ namespace MapsInMyFolder.Core.Downloader
         }
 
 
-        public void Dispose()
-        {
-            ((IDisposable)_httpClient).Dispose();
-            GC.SuppressFinalize(this);
-        }
+
     }
 }

@@ -31,11 +31,11 @@ namespace MapsInMyFolder.Core.Downloader
         }
 
         private readonly Layer _layer;
-        private readonly Client _client;
+        private readonly TilesClient _client;
         public TilesImages(Layer layer)
         {
             _layer = layer;
-            _client = new Client(layer);
+            _client = new TilesClient(layer);
         }
 
         public virtual byte[] GetEmpty(HttpResponseMessage Message)
