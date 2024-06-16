@@ -1,6 +1,16 @@
-﻿using MapsInMyFolder.Core.Geodetic.Search;
+﻿using MapsInMyFolder.Core.Generic.Extensions;
+using MapsInMyFolder.Core.Generic.Network;
+using MapsInMyFolder.Core.Geodetic.Search;
+using MapsInMyFolder.Core.Geodetic.Search.Vendor;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
+using System.Net.Http;
+using System.Text;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 
 namespace MapsInMyFolder.Core.Layers
@@ -16,13 +26,13 @@ namespace MapsInMyFolder.Core.Layers
             const double Latitude = 48.2271673;
             const double Longitude = 6.050189;
             ISearch SearchVendor = new MapsInMyFolder.Core.Geodetic.Search.Vendor.Google();
-            var SearchResult = await SearchVendor.GetSuggestion(Input, Latitude, Longitude);
+           var SearchResult = await SearchVendor.GetSuggestion(Input, Latitude, Longitude);
             SearchResult.ForEach(result => Debug.WriteLine(result.ToString()));
         }
 
         public static List<string> ExtractQuotedText(string value)
         {
-
+           
             List<string> result = new List<string>();
 
             int StartQuoteIndex = -1;

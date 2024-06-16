@@ -1,5 +1,6 @@
 ﻿using MapsInMyFolder.Core.Generic.Extensions;
 using MapsInMyFolder.Core.Generic.Network;
+using Microsoft.VisualBasic.Devices;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -33,7 +34,7 @@ namespace MapsInMyFolder.Core.Geodetic.Search.Vendor
         public async Task<List<SearchResult>> GetSuggestion(string SearchValue, double UserLocationLatitude, double UserLocationLongitude)
         {
             var BackEndApiUrl = $"https://www.google.com/s?tbm=map&gs_ri=maps&suggest=p&authuser=0&pf=t&tch=1&ech={12}&q={System.Web.HttpUtility.UrlEncode(SearchValue)}&pb=!2d{UserLocationLatitude}!3d{UserLocationLongitude}";
-            Debug.WriteLine(BackEndApiUrl);
+             Debug.WriteLine(BackEndApiUrl);
             var BackEndResponse = await RequestClient.SendRequestAutoRedirect(BackEndApiUrl);
 
             List<SearchResult> Results = new List<SearchResult>();
@@ -52,12 +53,13 @@ namespace MapsInMyFolder.Core.Geodetic.Search.Vendor
                         {
                             JArray MainValues = (JArray)Result.TryGet(22);
                             if (MainValues is null) { continue; }
-                            //var PlaceFullName = MainValues.TryGet(0).TryGet(0).ToString();
+                            var PlaceFullName = MainValues.TryGet(0).TryGet(0).ToString();
                             var PlaceName = MainValues.TryGet(1).TryGet(0).ToString();
                             var PlaceLocation = MainValues.TryGet(2)?.TryGet(0)?.ToString();
                             var PlaceLatitude = MainValues.TryGet(11)?.TryGet(2)?.ToString();
                             var PlaceLongitude = MainValues.TryGet(11)?.TryGet(3)?.ToString();
-
+                            //If not Latitude, longitude => suggestion of typing
+                            
                             SearchResult SearchResult = new SearchResult(
                                 string.IsNullOrEmpty(PlaceLatitude) ? SearchResultType.Suggestion : SearchResultType.Place,
                                 PlaceName,
@@ -78,7 +80,7 @@ namespace MapsInMyFolder.Core.Geodetic.Search.Vendor
             return Results;
         }
 
-
+      
 
 
         private static string CleanJson(string Json)
