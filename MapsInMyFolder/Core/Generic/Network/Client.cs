@@ -1,11 +1,7 @@
 ﻿using MapsInMyFolder.Core.Generic.Extensions;
 using MapsInMyFolder.Properties;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MapsInMyFolder.Core.Generic.Network
 {
