@@ -152,7 +152,7 @@ namespace MapsInMyFolder.View.Modules
 
         private void MapSearchbar_TextChanged(object sender, TextChangedEventArgs e)
         {
-            SearchAlgorithm.Search(mapSearchbar.Text, null);
+            Search.Query(mapSearchbar.Text, null);
             if (mapSearchbar.Text != "searchMapPlaceholder")
             {
                 SetPushpinVisibility(Visibility.Hidden);

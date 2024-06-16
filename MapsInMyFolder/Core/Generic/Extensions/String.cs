@@ -62,6 +62,14 @@ namespace MapsInMyFolder.Core.Generic.Extensions
             stream.Position = 0;
             return stream;
         }
+        public static double ToDouble(this string s, double FallbackValue)
+        {
+            if (double.TryParse(s, out var ConvertResult))
+            {
+                return ConvertResult;
+            }
+            return FallbackValue;
+        }
         public static Dictionary<string, string> GetHTMLEntities() => new Dictionary<string, string>
         {
             { "<", "&lt;" },

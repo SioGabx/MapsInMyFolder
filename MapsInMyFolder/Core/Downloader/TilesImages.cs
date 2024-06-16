@@ -31,7 +31,7 @@ namespace MapsInMyFolder.Core.Downloader
         }
 
         private readonly Layer _layer;
-        private readonly TilesClient _client;
+        private readonly TilesClient _client; 
         public TilesImages(Layer layer)
         {
             _layer = layer;
