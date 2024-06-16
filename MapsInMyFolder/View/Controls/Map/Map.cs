@@ -45,7 +45,7 @@ namespace MapsInMyFolder.View.Controls.Map
             Debug.WriteLine("SetMapLayer");
             foreach (var item in Children)
             {
-                //Debug.WriteLine(item.GetType());
+                Debug.WriteLine(item.GetType());
                 if (item is MapTileLayer Mtl && Mtl.LayerIndex > 0)
                 {
                     if (FrontLayer.HasTransparency)
@@ -56,6 +56,8 @@ namespace MapsInMyFolder.View.Controls.Map
                     {
                         Mtl.TileSource = new TileSource();
                     }
+
+                    Debug.WriteLine("--");
                     break;
                 }
             }

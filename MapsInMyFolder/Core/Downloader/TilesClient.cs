@@ -28,7 +28,7 @@ namespace MapsInMyFolder.Core.Downloader
                 return _httpClient;
             }
         }
- 
+
 
         public async Task<HttpResponseMessage> SendRequest(string url)
         {

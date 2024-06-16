@@ -529,7 +529,7 @@ namespace MapsInMyFolder.Core.VectorTileRenderer
                 }
             }
 
-            return new ICanvasCollisions(collisions, canvas, options);
+            return new Renderer.ICanvasCollisions(collisions, canvas, options);
         }
 
         //private static List<List<Point>> LocalizeGeometry(List<List<Point>> coordinates, double sizeX, double sizeY, double extent)

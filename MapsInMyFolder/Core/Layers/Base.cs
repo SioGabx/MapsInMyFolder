@@ -19,7 +19,6 @@ namespace MapsInMyFolder.Core.Layers
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
 
-
         public int LayerId { get; set; }
         public string Identifier { get; set; }
         public bool IsFavorite
@@ -39,12 +38,7 @@ namespace MapsInMyFolder.Core.Layers
         public Format TilesFormat { get; set; }
         public string Style { get; set; }
         public string Script { get; set; }
-        public Display Visibility
-        {
-            get { return visibility; }
-            set { visibility = value; OnPropertyChanged(); }
-        }
-        public Display visibility;
+        public Display Visibility { get; set; }
         public int TileSize { get; set; }
         public int Version { get; set; }
         public string Area { get; set; }
@@ -84,5 +78,7 @@ namespace MapsInMyFolder.Core.Layers
         private bool isFavorite;
 
         public bool HasTransparency => TilesFormat == Format.png;
+
+
     }
 }
