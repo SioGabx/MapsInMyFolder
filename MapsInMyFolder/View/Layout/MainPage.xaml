@@ -79,8 +79,8 @@
                     FontSize="16"
                     SearchLostFocusRequest="MapLocationSearchBar_SearchLostFocusRequest"
                     SearchResultEvent="MapLocationSearchBar_SearchResultEvent"
-                    SearchResultMap="{Binding ElementName=mapviewer}"
-                    SearchResultPushpin="{Binding ElementName=searchResult}" />
+                    SearchResultMap="{Binding ElementName=MapViewer}"
+                    SearchResultPushpin="{Binding ElementName=SearchResultPushpin}" Cursor="" />
 
                 <Button
                     x:Name="MapManualLocationMenu"
@@ -130,7 +130,8 @@
                     Margin="10,0,0,0"
                     Background="White"
                     MouseWheel="MapViewer_MouseWheel"
-                    ZoomLevel="18">
+                    ZoomLevel="18"
+                    Focusable="True">
 
                     <map:Map.Center>
                         <map:Location Latitude="0" Longitude="0" />

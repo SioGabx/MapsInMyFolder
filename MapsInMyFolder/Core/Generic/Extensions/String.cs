@@ -3,11 +3,37 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Xml.Linq;
 
 namespace MapsInMyFolder.Core.Generic.Extensions
 {
     public static class String
     {
+        public static char GetLastChar(this string text)
+        {
+            return text[^1];
+        }
+
+        public static bool IsValidXML(this string text)
+        {
+            if (!string.IsNullOrEmpty(text) && text.TrimStart().StartsWith("<"))
+            {
+                try
+                {
+                    var doc = XDocument.Parse(text);
+                    return true;
+                }
+                catch (Exception)
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
+
         public static string Wrap(this string text, int width)
         {
             if (string.IsNullOrEmpty(text) || width == 0 || width >= text.Length)

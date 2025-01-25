@@ -5,24 +5,17 @@ using System.Text.RegularExpressions;
 
 namespace MapsInMyFolder.Core.Layers
 {
-    public class Search
+    public static class Search
     {
-        public static async void Query(string Input, List<Layer> layers)
+        public static void Query(string Input, List<Layer> layers)
         {
             Debug.WriteLine("--");
             ExtractQuotedText(Input).ForEach(el => Debug.WriteLine(Regex.Unescape(el)));
 
-
-            const double Latitude = 48.2271673;
-            const double Longitude = 6.050189;
-            ISearch SearchVendor = new MapsInMyFolder.Core.Geodetic.Search.Vendor.Google();
-            var SearchResult = await SearchVendor.GetSuggestion(Input, Latitude, Longitude);
-            SearchResult.ForEach(result => Debug.WriteLine(result.ToString()));
         }
 
         public static List<string> ExtractQuotedText(string value)
         {
-
             List<string> result = new List<string>();
 
             int StartQuoteIndex = -1;

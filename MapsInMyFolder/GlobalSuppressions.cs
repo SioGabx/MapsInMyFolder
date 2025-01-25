@@ -11,3 +11,4 @@ using System.Diagnostics.CodeAnalysis;
 [assembly: SuppressMessage("Style", "IDE0057:Utiliser l'opérateur de plage", Justification = "More readable", Scope = "module")]
 [assembly: SuppressMessage("Performance", "SYSLIB1045:Convertissez en 'GeneratedRegexAttribute'.", Justification = "Visibility, performance is not crucial", Scope = "module")]
 [assembly: SuppressMessage("Roslynator", "RCS1036:Remove unnecessary blank line", Justification = "Temporaly removed to be able to see other info ", Scope = "module")]
+[assembly: SuppressMessage("AsyncUsage", "AsyncFixer03:Fire-and-forget async-void methods or delegates", Scope = "module")]

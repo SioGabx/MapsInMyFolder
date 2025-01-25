@@ -1,4 +1,4 @@
-﻿using MapsInMyFolder.Core.Database;
+﻿using MapsInMyFolder.Core.XMLDatabase;
 using MapsInMyFolder.Core.Generic.Extensions;
 using MapsInMyFolder.Core.Layers;
 using System;
@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Input;
+using System.Collections.Generic;
 
 namespace MapsInMyFolder.View.Layout
 {
@@ -51,13 +52,13 @@ namespace MapsInMyFolder.View.Layout
 
         public void LoadLayers()
         {
-            Database database = new Database()
-            {
-                Path = @".\SampleDb.db",
-                AvailableTables = Tables.LAYERS,
-            };
+            //Database database = new Database()
+            //{
+            //    Path = @".\SampleDb.db",
+            //    AvailableTables = Tables.LAYERS,
+            //};
 
-            LayerCollection = Core.Layers.Loader.LoadFromDatabase(database, Tables.LAYERS).ToObservableCollection();
+            LayerCollection = Core.Layers.Loader.LoadFromDatabase(new List<Database>()).ToObservableCollection();
 
         }
 

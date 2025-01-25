@@ -1,10 +1,15 @@
-﻿using MapsInMyFolder.Core.Layers;
+﻿using MapsInMyFolder.Core.Geodetic.Search;
+using MapsInMyFolder.Core.Layers;
 using MapsInMyFolder.View.Controls.Map;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Threading;
 
 namespace MapsInMyFolder.View.Modules
 {
@@ -112,14 +117,14 @@ namespace MapsInMyFolder.View.Modules
             SearchResultEvent?.Invoke(this, new SearchResultEventArgs(searchResultLocation, mapViewerBoundingBox));
         }
 
-        private void MapSearchbar_GotFocus(object sender, RoutedEventArgs e)
+        private async void MapSearchbar_GotFocus(object sender, RoutedEventArgs e)
         {
-            if (mapSearchbar.Text == "searchMapPlaceholder")
+            if (mapSearchbar.Text == GetPlaceHolderString())
             {
                 mapSearchbar.Text = "";
             }
 
-            SearchStart();
+            await SearchStart();
             mapSearchbarSuggestion.Visibility = Visibility.Visible;
             mapSearchbarOverflow.Visibility = Visibility.Hidden;
         }
@@ -132,7 +137,7 @@ namespace MapsInMyFolder.View.Modules
             if (string.IsNullOrWhiteSpace(mapSearchbar.Text))
             {
                 SetPushpinVisibility(Visibility.Hidden);
-                mapSearchbar.Text = "searchMapPlaceholder";
+                mapSearchbar.Text = GetPlaceHolderString();
                 mapSearchbar.Foreground = (System.Windows.Media.SolidColorBrush)new System.Windows.Media.BrushConverter().ConvertFromString("#5A5A5A");
                 IsFloatingSearchBarVisible = false;
             }
@@ -152,8 +157,7 @@ namespace MapsInMyFolder.View.Modules
 
         private void MapSearchbar_TextChanged(object sender, TextChangedEventArgs e)
         {
-            Search.Query(mapSearchbar.Text, null);
-            if (mapSearchbar.Text != "searchMapPlaceholder")
+            if (mapSearchbar.Text != GetPlaceHolderString())
             {
                 SetPushpinVisibility(Visibility.Hidden);
                 mapSearchbar.Foreground = (System.Windows.Media.SolidColorBrush)new System.Windows.Media.BrushConverter().ConvertFromString("#BCBCBC");
@@ -171,20 +175,53 @@ namespace MapsInMyFolder.View.Modules
             mapSearchbarTimer.Enabled = true;
         }
 
-        private void MapSearchbarTimer_Elapsed_StartSearch(object source, EventArgs e)
+        private async void MapSearchbarTimer_Elapsed_StartSearch(object source, EventArgs e)
         {
-            SearchStart();
+            await SearchStart();
         }
 
-        private string lastSearch = "searchMapPlaceholder";
+        private string lastSearch = "";
+
+        private string GetPlaceHolderString()
+        {
+            return "searchMapPlaceholder";
+        }
 
         public Location GetMapLocation()
         {
             return SearchResultMap?.Center ?? new Location(0, 0);
         }
 
-        private void SearchStart(bool selectFirst = false)
+        private async System.Threading.Tasks.Task SearchStart(bool selectFirstResult = false)
         {
+            await Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)async delegate
+            {
+                var Query = mapSearchbar.Text;
+                if (string.IsNullOrWhiteSpace(Query) || Query == lastSearch || Query == GetPlaceHolderString())
+                {
+                    return;
+                }
+
+                lastSearch = Query;
+                Debug.WriteLine("Search start");
+                Location centerLocation = GetMapLocation();
+
+                var SearchResults = await MapsInMyFolder.Core.Geodetic.Search.Search.Query(Query, centerLocation.Latitude, centerLocation.Longitude);
+                if (SearchResults != null && SearchResults.Count > 0)
+                {
+                    mapSearchbarSuggestion.ItemsSource = SearchResults;
+                    mapSearchbarSuggestion.Height = SearchResults.Count * 35;
+                    if (selectFirstResult)
+                    {
+                        SelectSearchResult(0);
+                    }
+                }
+                else
+                {
+                    mapSearchbarSuggestion.ItemsSource = new List<SearchResult> { new SearchResult(SearchResultType.Suggestion, "Aucun résultats", "", "", 0, 0) };
+                    mapSearchbarSuggestion.Height = 35;
+                }
+            }, null);
             //string text = "";
             //await Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, (SendOrPostCallback)async delegate
             //{
@@ -231,11 +268,22 @@ namespace MapsInMyFolder.View.Modules
         private void MapSearchbarSuggestion_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             int index = mapSearchbarSuggestion.SelectedIndex;
-            SetSelection(index);
+            SelectSearchResult(index);
         }
 
-        private void SetSelection(int index)
+        private void SelectSearchResult(int index)
         {
+            if (index < 0) { return; }
+            if (mapSearchbarSuggestion.Items[index] is SearchResult searchResult)
+            {
+                Debug.WriteLine(searchResult.Name);
+                if (searchResult.Type == SearchResultType.Place)
+                {
+                    mapSearchbar.Text = searchResult.ToString();
+                    SetPushpinVisibility(Visibility.Visible);
+                    SetMapView(new Location(searchResult.Latitude, searchResult.Longitude));
+                }
+            }
             //if (index >= 0)
             //{
             //    MapLocationSearchEngineResult selectedSearchResult = MapLocationSearchEngineResult.GetResultById(index);
@@ -263,30 +311,31 @@ namespace MapsInMyFolder.View.Modules
             //}
         }
 
-        public async void SetMapView(Location searchResultLocation, BoundingBox mapViewerBoundingBox)
+        public Task SetMapView(Location searchResultLocation)
         {
-            //if (SearchResultPushpin != null)
-            //{
-            //    MapPanel.SetLocation(SearchResultPushpin, searchResultLocation);
-            //}
+            if (SearchResultPushpin != null)
+            {
+                MapPanel.SetLocation(SearchResultPushpin, searchResultLocation);
+            }
 
-            //if (SearchResultMap != null && mapViewerBoundingBox != null)
-            //{
-            //    SearchResultMap.ZoomToBounds(mapViewerBoundingBox);
-            //}
-            //await Task.Delay((int)Settings.animations_duration_millisecond);
+            if (SearchResultMap != null)
+            {
+                SearchResultMap.ZoomToBounds(new BoundingBox(searchResultLocation.Latitude, searchResultLocation.Longitude, searchResultLocation.Latitude, searchResultLocation.Longitude));
+            }
+            return Task.Delay((int)500);
         }
 
 
-        private void MapSearchbar_KeyDown(object sender, KeyEventArgs e)
+        private async void MapSearchbar_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Enter)
             {
                 try
                 {
                     lastSearch = "";
-                    SearchStart(true);
+                    await SearchStart(true);
                     SearchLostFocusRequest?.Invoke(this, EventArgs.Empty);
+                   SearchResultMap.Focus();
                 }
                 catch { }
             }
