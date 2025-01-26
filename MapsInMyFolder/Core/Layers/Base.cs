@@ -1,4 +1,5 @@
 ﻿using MapsInMyFolder.Core.Downloader;
+using MapsInMyFolder.Core.Generic.Extensions;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Media;
@@ -7,7 +8,7 @@ namespace MapsInMyFolder.Core.Layers
 {
 
 
-    public enum Format { png, jpeg, pbf }
+    public enum SavingFormat { png, jpeg, pbf }
     public enum Display { visible, hidden }
     public partial class Layer : INotifyPropertyChanged
     {
@@ -20,7 +21,7 @@ namespace MapsInMyFolder.Core.Layers
         }
 
 
-        public int LayerId { get; set; }
+        public string Path { get; set; }
         public string Identifier { get; set; }
         public bool IsFavorite
         {
@@ -30,13 +31,13 @@ namespace MapsInMyFolder.Core.Layers
         public string Name { get; set; }
         public string Description { get; set; }
         public string Tags { get; set; }
-        public string Country { get; set; }
-        public string TileUrl { get; set; }
-        public string SiteName { get; set; }
-        public string SiteUrl { get; set; }
+        public string Countries { get; set; }
+        public string TileUrlSchema { get; set; }
+        public string ProviderName { get; set; }
+        public string ProviderUrl { get; set; }
         public int MinZoom { get; set; }
         public int MaxZoom { get; set; }
-        public Format TilesFormat { get; set; }
+        public SavingFormat TileSavingFormat { get; set; }
         public string Style { get; set; }
         public string Script { get; set; }
         public Display Visibility
@@ -44,12 +45,15 @@ namespace MapsInMyFolder.Core.Layers
             get { return visibility; }
             set { visibility = value; OnPropertyChanged(); }
         }
-        public Display visibility;
+        private Display visibility;
+
         public int TileSize { get; set; }
-        public int Version { get; set; }
+        public string Version { get; set; }
         public string Area { get; set; }
-        public Color BackColor { get; set; }
+        public SolidColorBrush BackColor { get; set; }
         public string UserAgent { get; set; }
+
+        public bool IsAtScale { get; set; }
 
         public bool ShowTileBorder { get; set; }
         public bool ShowTileLocation { get; set; }
@@ -58,24 +62,24 @@ namespace MapsInMyFolder.Core.Layers
 
         public Layer()
         {
-            LayerId = 0;
+            Path = "/";
             Identifier = "OpenStreetMap";
             Name = "OpenStreetMap";
             Description = string.Empty;
             Tags = string.Empty;
             TileSize = 256;
-            Country = "All";
-            TileUrl = "http://tile.openstreetmap.org/{z}/{x}/{y}.png";
+            Countries = "All";
+            TileUrlSchema = "http://tile.openstreetmap.org/{z}/{x}/{y}.png";
             Script = string.Empty;
             Style = string.Empty;
-            SiteName = "OpenStreetMap";
-            SiteUrl = "openstreetmap.org";
+            ProviderName = "OpenStreetMap";
+            ProviderUrl = "openstreetmap.org";
             MinZoom = 0;
             MaxZoom = 19;
-            TilesFormat = Format.jpeg;
+            TileSavingFormat = SavingFormat.jpeg;
             Visibility = Display.visible;
             IsFavorite = false;
-            BackColor = Color.FromRgb(230, 230, 230); //#E6E6E6
+            BackColor = "#E6E6E6".ConvertHexValueToSolidColorBrush();
             Tiles = TilesImages.Create(this);
 
             UserAgent = null;
@@ -83,6 +87,6 @@ namespace MapsInMyFolder.Core.Layers
         public static Layer Default = new Layer();
         private bool isFavorite;
 
-        public bool HasTransparency => TilesFormat == Format.png;
+        public bool HasTransparency => TileSavingFormat == SavingFormat.png;
     }
 }

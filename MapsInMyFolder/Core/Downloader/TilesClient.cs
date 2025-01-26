@@ -22,7 +22,7 @@ namespace MapsInMyFolder.Core.Downloader
             {
                 if (_httpClient == null)
                 {
-                    _httpClient = Generic.Network.Client.CreateHttpClient(_layer.SiteUrl, _layer.UserAgent);
+                    _httpClient = Generic.Network.Client.CreateHttpClient(_layer.ProviderUrl, _layer.UserAgent);
 
                 }
                 return _httpClient;

@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Windows.Media;
 using System.Xml.Linq;
 
 namespace MapsInMyFolder.Core.Generic.Extensions
 {
-    public static class String
+    public static class StringExtensions
     {
         public static char GetLastChar(this string text)
         {
@@ -178,7 +179,6 @@ namespace MapsInMyFolder.Core.Generic.Extensions
             }
             return sb.ToString();
         }
-
 
     }
 }

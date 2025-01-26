@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Content>
+  <Layer>
+    <Version>26/01/2024</Version>
+    <Name>Photographies aériennes</Name>
+    <Description>Images satelite de Geoportail</Description>
+    <Tags>Satellite</Tags>
+	<Countries>France</Countries>
+    <Identifier>ORTHOIMAGERY.ORTHOPHOTOS</Identifier>
+    <TileUrlSchema>http://wxs.ign.fr/an7nvfzojv5wa96dsga5nk8w/geoportail/wmts?layer=ORTHOIMAGERY.ORTHOPHOTOS&amp;style=normal&amp;tilematrixset=PM&amp;Service=WMTS&amp;Request=GetTile&amp;Version=1.0.0&amp;Format=image/jpeg&amp;TileMatrix={z}&amp;TileCol={x}&amp;TileRow={y}</TileUrlSchema>
+    <MinZoom>0</MinZoom>
+    <MaxZoom>21</MaxZoom>
+    <TileSavingFormat>jpeg</TileSavingFormat>
+    <TileSize>256</TileSize>
+	<Area></Area>
+    <Style></Style>
+    <Script>
+	function getTile(args) {
+    return args;
+}
+function getPreviewFallback(args) {
+    args.x = &quot;8296&quot;;
+    args.y = &quot;5636&quot;;
+    args.z = &quot;14&quot;;
+    return args;
+}
+	</Script>
+    <BackColor></BackColor>
+    <UserAgent></UserAgent>
+	
+    <ProviderName>Geoportail</ProviderName>
+    <ProviderUrl>geoportail.gouv.fr</ProviderUrl>
+  </Layer>
+  <Settings>
+    <IsFavorite>true</IsFavorite>
+    <Visibility>Visible</Visibility>
+    <IsAtScale>true</IsAtScale>
+    <ShowTileBorder>false</ShowTileBorder>
+    <ShowTileLocation>false</ShowTileLocation>
+  </Settings>
+</Content>

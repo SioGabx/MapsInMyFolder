@@ -18,6 +18,10 @@ namespace MapsInMyFolder.View.Converters
             {
                 return new SolidColorBrush(color);
             }
+            if (value is SolidColorBrush solidcolorbrush)
+            {
+                return solidcolorbrush;
+            }
             // You can support here more source types if you wish
             // For the example I throw an exception
 

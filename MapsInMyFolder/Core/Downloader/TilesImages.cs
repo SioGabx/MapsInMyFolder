@@ -16,15 +16,15 @@ namespace MapsInMyFolder.Core.Downloader
         public static TilesImages Create(Layer layer)
         {
             Type ClassType = typeof(TilesImages);
-            switch (layer.TilesFormat)
+            switch (layer.TileSavingFormat)
             {
-                case Format.png:
+                case SavingFormat.png:
                     ClassType = typeof(PNGTilesImages);
                     break;
-                case Format.jpeg:
+                case SavingFormat.jpeg:
                     ClassType = typeof(JPEGTilesImages);
                     break;
-                case Format.pbf:
+                case SavingFormat.pbf:
                     throw new NotImplementedException();
             }
             return (TilesImages)Activator.CreateInstance(ClassType, layer);
@@ -121,7 +121,7 @@ namespace MapsInMyFolder.Core.Downloader
 
         public virtual string GetUrl(int X, int Y, int ZoomLevel)
         {
-            var url = _layer.TileUrl;
+            var url = _layer.TileUrlSchema;
             url = url.Replace("{x}", X.ToString());
             url = url.Replace("{y}", Y.ToString());
             url = url.Replace("{z}", ZoomLevel.ToString());
